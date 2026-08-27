@@ -2,6 +2,7 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -35,7 +36,11 @@ import {
   type WorkStep,
 } from "./turns";
 import { UserMessage } from "./user-message";
-import { AssistantMessage } from "./assistant-message";
+import {
+  AssistantMessage,
+  MessageToolbar,
+  hasMessageActions,
+} from "./assistant-message";
 import { AssistantMarkdown } from "./assistant-markdown";
 import { SystemMessage } from "./system-message";
 import { ToolCallGroup } from "./tool-call";
@@ -48,6 +53,12 @@ interface MessageListProps {
 }
 
 const SCROLL_THRESHOLD = 200;
+/**
+ * How close to the oldest loaded message the viewport has to get before the
+ * next page is fetched. Generous on purpose: the page should already be in
+ * place by the time the reader arrives, so history feels continuous.
+ */
+const HISTORY_PREFETCH_DISTANCE = 400;
 const INITIAL_RENDER_COUNT = 12;
 const RENDER_BATCH_COUNT = 6;
 const WINDOW_SIZE = 7;
@@ -102,29 +113,51 @@ export const MessageList = memo(function MessageList({
     return () => clearInterval(id);
   }, [isStreaming, autoFollow]);
 
-  const handleScroll = useCallback(
-    (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-      const isAwayFromBottom = e.nativeEvent.contentOffset.y > SCROLL_THRESHOLD;
-      setShowScrollButton(isAwayFromBottom);
-      setAutoFollow(!isAwayFromBottom);
-    },
-    [],
-  );
-
-  const scrollToBottom = useCallback(() => {
-    setAutoFollow(true);
-    setShowScrollButton(false);
-    listRef.current?.scrollToOffset({ offset: 0, animated: true });
-  }, []);
-
   const sessionRef = useRef(session);
   sessionRef.current = session;
+
+  // Each auto-load has to be re-armed by the content actually growing, so a
+  // page shorter than the prefetch distance cannot spin the handler into
+  // firing on every scroll frame.
+  const lastPrefetchHeightRef = useRef(0);
 
   const handleLoadMore = useCallback(() => {
     const s = sessionRef.current;
     if (s.hasMoreMessages && !s.isLoadingOlderMessages) {
       s.loadOlderMessages();
     }
+  }, []);
+
+  const handleScroll = useCallback(
+    (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent;
+      const isAwayFromBottom = contentOffset.y > SCROLL_THRESHOLD;
+      setShowScrollButton(isAwayFromBottom);
+      setAutoFollow(!isAwayFromBottom);
+
+      // The list is inverted, so the oldest message is at the *end* of the
+      // scrollable content. FlatList's own onEndReached cannot be trusted here:
+      // it latches per content length, so the fire it spends on mount (when
+      // hasMoreMessages is still false because history is in flight) is never
+      // replayed, leaving the footer button as the only way to page back.
+      // Deriving the distance from each scroll event has no such latch.
+      const distanceFromOldest =
+        contentSize.height - layoutMeasurement.height - contentOffset.y;
+      if (
+        distanceFromOldest <= HISTORY_PREFETCH_DISTANCE &&
+        contentSize.height !== lastPrefetchHeightRef.current
+      ) {
+        lastPrefetchHeightRef.current = contentSize.height;
+        handleLoadMore();
+      }
+    },
+    [handleLoadMore],
+  );
+
+  const scrollToBottom = useCallback(() => {
+    setAutoFollow(true);
+    setShowScrollButton(false);
+    listRef.current?.scrollToOffset({ offset: 0, animated: true });
   }, []);
 
   const renderItem = useCallback(
@@ -151,7 +184,15 @@ export const MessageList = memo(function MessageList({
           <ActivityIndicator size="small" color={colors.textTertiary} />
         </Animated.View>
       ) : session.hasMoreMessages ? (
-        <Pressable onPress={handleLoadMore} style={styles.loadMoreBtn}>
+        // Scrolling here loads the page automatically; this stays as the
+        // affordance for the case where the history is shorter than the
+        // viewport and there is nothing to scroll.
+        <Pressable
+          onPress={handleLoadMore}
+          accessibilityRole="button"
+          accessibilityLabel="Load earlier messages"
+          style={styles.loadMoreBtn}
+        >
           <Text style={[styles.loadMoreText, { color: colors.textTertiary }]}>
             Load earlier messages
           </Text>
@@ -173,7 +214,9 @@ export const MessageList = memo(function MessageList({
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.3}
         onScroll={handleScroll}
-        scrollEventThrottle={100}
+        // Native only throttles this; a coarser value would let a fast flick
+        // reach the oldest message without ever reporting the distance.
+        scrollEventThrottle={16}
         initialNumToRender={INITIAL_RENDER_COUNT}
         maxToRenderPerBatch={RENDER_BATCH_COUNT}
         updateCellsBatchingPeriod={50}
@@ -459,6 +502,10 @@ const TurnBlock = memo(function TurnBlock({
 
   const toggle = useCallback(() => setOverride(!expanded), [expanded]);
 
+  // The action row belongs to the whole turn, so hover is tracked here rather
+  // than on the answer alone: the file-change card counts as part of it.
+  const [hovered, setHovered] = useState(false);
+
   // Only worth deriving once the turn reports it touched something.
   const fileChanges = useMemo(() => {
     if (!turn.fileStats) return [];
@@ -495,7 +542,14 @@ const TurnBlock = memo(function TurnBlock({
   );
 
   return (
-    <View>
+    <View
+      {...(Platform.OS === "web"
+        ? {
+            onPointerEnter: () => setHovered(true),
+            onPointerLeave: () => setHovered(false),
+          }
+        : {})}
+    >
       {showDivider &&
         (hasWork ? (
           <Pressable
@@ -534,6 +588,12 @@ const TurnBlock = memo(function TurnBlock({
       )}
       {turn.fileStats && (
         <TurnSummary stats={turn.fileStats} changes={fileChanges} isDark={isDark} />
+      )}
+      {/* Last in the turn: the answer, then what it changed, then the actions. */}
+      {turn.final && hasMessageActions(turn.final) && (
+        <View style={styles.turnToolbar}>
+          <MessageToolbar message={turn.final} isDark={isDark} hovered={hovered} />
+        </View>
       )}
     </View>
   );
@@ -576,6 +636,10 @@ const styles = StyleSheet.create({
     width: "100%",
   },
   itemWrap: { paddingVertical: 2 },
+  turnToolbar: {
+    paddingHorizontal: 16,
+    paddingTop: 6,
+  },
   summaryWrap: {
     paddingHorizontal: 16,
     paddingTop: 10,

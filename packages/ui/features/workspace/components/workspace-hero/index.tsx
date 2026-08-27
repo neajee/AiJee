@@ -1,12 +1,10 @@
 import { useRef, useEffect, useMemo } from "react";
 import { Animated, StyleSheet, Text, View } from "react-native";
-import { GitBranch } from "lucide-react-native";
 
 import { Colors, Fonts } from "@/constants/theme";
-import { AnthaathiLogo } from "@/components/anthaathi-logo";
+import { PiDeckLogo } from "@/components/pideck-logo";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { useWorkspaceStore } from "@/features/workspace/store";
-import { useGitStatus } from "@pideck/client-sdk";
+import { useResponsiveLayout } from "@/features/navigation/hooks/use-responsive-layout";
 
 const GREETINGS = [
   "What are we building?",
@@ -92,31 +90,22 @@ function getGreeting(): string {
 export function WorkspaceHero() {
   const colorScheme = useColorScheme() ?? "light";
   const colors = Colors[colorScheme];
+  const { isWideScreen } = useResponsiveLayout();
 
   const isDark = colorScheme === "dark";
   const textPrimary = isDark ? "#fefdfd" : colors.text;
-  const textMuted = isDark ? "#cdc8c5" : colors.textTertiary;
 
   const greeting = useMemo(() => getGreeting(), []);
 
-  const selectedWorkspaceId = useWorkspaceStore((s) => s.selectedWorkspaceId);
-  const workspace = useWorkspaceStore((s) =>
-    s.workspaces.find((w) => w.id === selectedWorkspaceId),
-  );
-
-  const cwd = workspace?.path ?? null;
-  const { data: gitData } = useGitStatus(cwd);
-
-  const workspacePath = workspace?.path ?? "";
-
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(12)).current;
+  const markScale = useRef(new Animated.Value(0.94)).current;
 
   useEffect(() => {
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
-        duration: 400,
+        duration: 420,
         useNativeDriver: true,
       }),
       Animated.spring(slideAnim, {
@@ -125,8 +114,14 @@ export function WorkspaceHero() {
         friction: 14,
         useNativeDriver: true,
       }),
+      Animated.spring(markScale, {
+        toValue: 1,
+        tension: 90,
+        friction: 12,
+        useNativeDriver: true,
+      }),
     ]).start();
-  }, []);
+  }, [fadeAnim, slideAnim, markScale]);
 
   return (
     <View style={styles.container}>
@@ -139,25 +134,26 @@ export function WorkspaceHero() {
           },
         ]}
       >
-        <AnthaathiLogo size={48} isDark={isDark} />
+        <Animated.View style={{ transform: [{ scale: markScale }] }}>
+          <PiDeckLogo
+            size={isWideScreen ? 64 : 52}
+            color={textPrimary}
+            opacity={isDark ? 0.92 : 0.88}
+          />
+        </Animated.View>
 
-        <Text style={[styles.title, { color: textPrimary }]}>{greeting}</Text>
-
-        {/* Meta info */}
-        <View style={styles.metaContainer}>
-          <Text style={[styles.metaText, { color: textMuted }]}>
-            {workspacePath}
-          </Text>
-
-          {gitData?.branch && (
-            <View style={styles.branchRow}>
-              <GitBranch size={14} color={textMuted} strokeWidth={2} />
-              <Text style={[styles.metaText, { color: textMuted }]}>
-                {gitData.branch}
-              </Text>
-            </View>
-          )}
-        </View>
+        <Text
+          style={[
+            styles.title,
+            {
+              color: textPrimary,
+              fontSize: isWideScreen ? 26 : 21,
+              lineHeight: isWideScreen ? 34 : 29,
+            },
+          ]}
+        >
+          {greeting}
+        </Text>
       </Animated.View>
     </View>
   );
@@ -165,31 +161,21 @@ export function WorkspaceHero() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    paddingHorizontal: 24,
+    // The hero and the composer are centred together as one group, so the hero
+    // must give up space instead of pushing the composer off screen.
+    flexShrink: 1,
   },
   content: {
     alignItems: "center",
-    gap: 16,
+    gap: 20,
+    maxWidth: 620,
   },
   title: {
-    fontSize: 20,
     fontFamily: Fonts.sansMedium,
-    lineHeight: 36,
-  },
-  metaContainer: {
-    alignItems: "center",
-    gap: 16,
-  },
-  branchRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-  },
-  metaText: {
-    fontSize: 13,
-    fontFamily: Fonts.sansMedium,
-    lineHeight: 19.5,
+    textAlign: "center",
+    letterSpacing: -0.3,
   },
 });

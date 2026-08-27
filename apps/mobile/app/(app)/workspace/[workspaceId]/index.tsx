@@ -15,6 +15,7 @@ import { Colors, Fonts } from "@/constants/theme";
 import { useResponsiveLayout } from "@/features/navigation/hooks/use-responsive-layout";
 import { PromptInput } from "@/features/workspace/components/prompt-input";
 import { WorkspaceHero } from "@/features/workspace/components/workspace-hero";
+import { ComposerContextBar } from "@/features/workspace/components/composer-context-bar";
 import { WorkspaceSidebar } from "@/features/workspace/components/workspace-sidebar";
 import { WorkspaceRightPane } from "@/features/preview/components/workspace-right-pane";
 import { ModePickerDialog } from "@/features/workspace/components/mode-picker-dialog";
@@ -184,24 +185,33 @@ export default function WorkspaceScreen() {
       />
       <View style={styles.upperRow}>
         <View style={[styles.editorColumn, { backgroundColor: editorBg }]}>
-          {sending ? (
-            <View style={styles.sendingContainer}>
-              <ActivityIndicator size="small" color={isDark ? "#cdc8c5" : colors.textTertiary} />
-              <Text style={[styles.sendingText, { color: isDark ? "#cdc8c5" : colors.textTertiary }]}>
-                Starting session…
-              </Text>
+          {/* Hero and composer are one vertically centred group, so the mark,
+              the greeting and the input read as a single focal block. */}
+          <View style={styles.centerStack}>
+            {sending ? (
+              <View style={styles.sendingContainer}>
+                <ActivityIndicator size="small" color={isDark ? "#cdc8c5" : colors.textTertiary} />
+                <Text style={[styles.sendingText, { color: isDark ? "#cdc8c5" : colors.textTertiary }]}>
+                  Starting session…
+                </Text>
+              </View>
+            ) : (
+              <WorkspaceHero />
+            )}
+            <View>
+              {/* Project / environment / branch are the preconditions of the
+                  prompt, so they sit directly above the composer. */}
+              {!sending && <ComposerContextBar />}
+              <PromptInput
+                sessionId={preSessionId}
+                onSend={handleSend}
+                disabled={sending}
+                sessionReady={!!preSessionId}
+                errorMessage={alertMessage}
+                onClearError={clearAlert}
+              />
             </View>
-          ) : (
-            <WorkspaceHero />
-          )}
-          <PromptInput
-            sessionId={preSessionId}
-            onSend={handleSend}
-            disabled={sending}
-            sessionReady={!!preSessionId}
-            errorMessage={alertMessage}
-            onClearError={clearAlert}
-          />
+          </View>
         </View>
         {isWideScreen && (
           <WorkspaceSidebar>
@@ -219,6 +229,7 @@ const styles = StyleSheet.create({
   container: { flex: 1 },
   upperRow: { flex: 1, flexDirection: "row" },
   editorColumn: { flex: 1 },
-  sendingContainer: { flex: 1, alignItems: "center", justifyContent: "center", gap: 12 },
+  centerStack: { flex: 1, justifyContent: "center", gap: 20 },
+  sendingContainer: { alignItems: "center", justifyContent: "center", gap: 12, paddingVertical: 24 },
   sendingText: { fontSize: 14, fontFamily: Fonts.sansMedium },
 });

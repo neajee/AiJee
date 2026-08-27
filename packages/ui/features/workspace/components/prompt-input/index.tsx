@@ -65,7 +65,7 @@ interface PromptInputProps {
     options?: { queueBehavior?: QueueBehavior },
   ) => Promise<void> | void;
   isStreaming?: boolean;
-  onAbort?: () => void;
+  onAbort?: () => void | Promise<void>;
   disabled?: boolean;
   sessionReady?: boolean;
   allowTypingWhileDisabled?: boolean;
@@ -150,16 +150,28 @@ export function PromptInput({
   // --- UI state ---
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [hideBottomForKeyboard, setHideBottomForKeyboard] = useState(false);
-  const [mobileSheet, setMobileSheet] = useState<null | "model" | "effort">(null);
+  // One sheet now: the model picker carries the thinking level with it.
+  const [mobileSheet, setMobileSheet] = useState<null | 'model' | 'effort'>(null);
   const [toolbarPopoverOpen, setToolbarPopoverOpen] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const [entryDone, setEntryDone] = useState(false);
+  // Wide viewports fold the model/mode controls into the input card's action
+  // row, so the composer is a single line; narrow ones keep the separate strip
+  // below the card, where there is room for them.
+  const inlineToolbar = isWideScreen;
   const toolbarHiddenKeepLayout = !isWideScreen && !!mobileSheet;
   const toolbarCollapsed = !isWideScreen && hideBottomForKeyboard;
-  const toolbarOverlap = Platform.OS === "web" || isWideScreen ? -4 : -1;
+  const toolbarOverlap = inlineToolbar ? 0 : Platform.OS === "web" ? -4 : -1;
   const shouldOverlaySlashCommands = Platform.OS === "web" || isWideScreen;
   const toolbarSkeleton = useMemo(
     () => <ToolbarSkeleton isDark={theme.isDark} />,
+    [theme.isDark],
+  );
+  // The inline toolbar lives inside the action row, so it needs a chrome-less
+  // placeholder: passing null used to make the model control vanish entirely
+  // while the pre-session's config loaded on the workspace start page.
+  const inlineToolbarSkeleton = useMemo(
+    () => <ToolbarSkeleton inline isDark={theme.isDark} />,
     [theme.isDark],
   );
 
@@ -229,7 +241,11 @@ export function PromptInput({
   const hasDraft = trimmedText.length > 0 || attachments.length > 0;
   const showAbortButton = !!isStreaming && !hasDraft;
   const showQueueActions = !!isStreaming && hasDraft;
-  const queuedCount = agentSession.steeringQueue.length + agentSession.followUpQueue.length;
+  const queuedMessages = [
+    ...agentSession.steeringQueue.map((message) => ({ message, kind: "Steer" })),
+    ...agentSession.followUpQueue.map((message) => ({ message, kind: "Follow up" })),
+  ];
+  const queuedCount = queuedMessages.length;
 
   const textBeforeSpeechRef = useRef("");
   const handleSpeechInterim = useCallback((interim: string) => {
@@ -325,24 +341,17 @@ export function PromptInput({
     }
   }, [attachments, clearDraft, draftKey, hasDraft, onClearError, onSend, setText, setAttachments, trimmedText]);
 
-  const abortWithQueueRestore = useCallback(async () => {
-    if (sessionId) {
-      try {
-        const queued = await agentSession.clearQueue();
-        const restored = [...queued.steering, ...queued.followUp].join("\n");
-        if (restored) setText(restored);
-      } catch {
-        // Aborting remains the safe fallback if queue inspection fails.
-      }
-    }
-    onAbort?.();
-  }, [agentSession, onAbort, sessionId, setText]);
+  // Queued messages are display-only: pi 0.84.3 has no `clear_queue` RPC command,
+  // so PiDeck cannot drop them. Stopping only aborts the current run.
+  const requestAbort = useCallback(async () => {
+    await onAbort?.();
+  }, [onAbort]);
 
   const handleSubmit = useCallback(() => {
     if (sendDisabled) return;
-    if (showAbortButton) { void abortWithQueueRestore(); return; }
+    if (showAbortButton) { void requestAbort(); return; }
     sendDraft(isStreaming ? "steer" : undefined);
-  }, [abortWithQueueRestore, isStreaming, sendDraft, sendDisabled, showAbortButton]);
+  }, [requestAbort, isStreaming, sendDraft, sendDisabled, showAbortButton]);
 
   // --- Slash commands ---
   const handleTextChange = useCallback((value: string) => {
@@ -513,7 +522,7 @@ export function PromptInput({
 
     if (key === "Escape" && showAbortButton) {
       e.preventDefault?.();
-      void abortWithQueueRestore();
+      void requestAbort();
       return;
     }
 
@@ -522,7 +531,7 @@ export function PromptInput({
       e.preventDefault?.();
       handleSubmit();
     }
-  }, [abortWithQueueRestore, filteredCommands, handleSelectCommand, handleSubmit, showAbortButton, showCommands, slashIndex]);
+  }, [requestAbort, filteredCommands, handleSelectCommand, handleSubmit, showAbortButton, showCommands, slashIndex]);
 
   // =========================================================================
   // Render
@@ -565,9 +574,44 @@ export function PromptInput({
 
       <View style={styles.composerStack}>
         {queuedCount > 0 && (
-          <Text style={[styles.queueStatus, { color: theme.textMuted }]}>
-            {queuedCount} queued message{queuedCount === 1 ? "" : "s"}
-          </Text>
+          <View
+            style={[
+              styles.queuePanel,
+              {
+                backgroundColor: theme.isDark ? "#242422" : "#F2F0EB",
+                borderColor: theme.cardBorder,
+              },
+            ]}
+          >
+            <View style={styles.queueHeader}>
+              <Text style={[styles.queueStatus, { color: theme.textMuted }]}>
+                {queuedCount} queued message{queuedCount === 1 ? "" : "s"}
+              </Text>
+              <View style={styles.queueHeaderActions}>
+                {isStreaming && (
+                  <Pressable
+                    onPress={() => { void requestAbort(); }}
+                    accessibilityRole="button"
+                    accessibilityLabel="Stop generation"
+                    hitSlop={8}
+                  >
+                    <View style={styles.queueActionRow}>
+                      <Square size={10} color={theme.textMuted} strokeWidth={2} fill={theme.textMuted} />
+                      <Text style={[styles.queueActionLabel, { color: theme.textMuted }]}>Stop</Text>
+                    </View>
+                  </Pressable>
+                )}
+              </View>
+            </View>
+            {queuedMessages.map(({ message, kind }, index) => (
+              <View key={`${kind}-${index}`} style={styles.queuedMessageRow}>
+                <Text style={[styles.queuedMessageKind, { color: theme.textMuted }]}>{kind}</Text>
+                <Text style={[styles.queuedMessageText, { color: theme.textSecondary }]} numberOfLines={2}>
+                  {message}
+                </Text>
+              </View>
+            ))}
+          </View>
         )}
         {showCommands && (
           <SlashCommandDropdown
@@ -674,6 +718,26 @@ export function PromptInput({
             </Pressable>
           )}
           <View style={{ flex: 1 }} />
+          {/* Model, usage and send share the trailing edge: pick what runs, see
+              what it costs, then send. */}
+          {inlineToolbar && (
+            <Toolbar
+              inline
+              sessionId={sessionId}
+              isWideScreen={isWideScreen}
+              onOpenMobileSheet={(type) => setMobileSheet(type)}
+              onDropdownOpenChange={setToolbarPopoverOpen}
+              inputRef={inputRef}
+              skeleton={inlineToolbarSkeleton}
+              modeLabel={
+                sessionId && sessionReady && streamedMode
+                  ? formatAgentModeLabel(streamedMode)
+                  : null
+              }
+              ready={!!sessionReady && !!sessionId}
+              config={agentConfig}
+            />
+          )}
           {contextUsage ? (
             <ContextUsageRing used={contextUsage.used} total={contextUsage.total} isDark={theme.isDark} />
           ) : null}
@@ -726,30 +790,32 @@ export function PromptInput({
         </Animated.View>
       </View>
 
-      <View
-        style={[
-          styles.bottomControlsWrap,
-          toolbarPopoverOpen && styles.bottomControlsWrapElevated,
-          toolbarHiddenKeepLayout && styles.bottomControlsHidden,
-          toolbarCollapsed && styles.bottomControlsCollapsed,
-        ]}
-      >
-        <Toolbar
-          sessionId={sessionId}
-          isWideScreen={isWideScreen}
-          onOpenMobileSheet={setMobileSheet}
-          onDropdownOpenChange={setToolbarPopoverOpen}
-          inputRef={inputRef}
-          skeleton={toolbarSkeleton}
-          modeLabel={
-            sessionId && sessionReady && streamedMode
-              ? formatAgentModeLabel(streamedMode)
-              : null
-          }
-          ready={!!sessionReady && !!sessionId}
-          config={agentConfig}
-        />
-      </View>
+      {!inlineToolbar && (
+        <View
+          style={[
+            styles.bottomControlsWrap,
+            toolbarPopoverOpen && styles.bottomControlsWrapElevated,
+            toolbarHiddenKeepLayout && styles.bottomControlsHidden,
+            toolbarCollapsed && styles.bottomControlsCollapsed,
+          ]}
+        >
+          <Toolbar
+            sessionId={sessionId}
+            isWideScreen={isWideScreen}
+            onOpenMobileSheet={(type) => setMobileSheet(type)}
+            onDropdownOpenChange={setToolbarPopoverOpen}
+            inputRef={inputRef}
+            skeleton={toolbarSkeleton}
+            modeLabel={
+              sessionId && sessionReady && streamedMode
+                ? formatAgentModeLabel(streamedMode)
+                : null
+            }
+            ready={!!sessionReady && !!sessionId}
+            config={agentConfig}
+          />
+        </View>
+      )}
 
       {sessionReady && mobileSheet === "model" && (
         <MobileModelSheet visible sessionId={sessionId} onClose={closeMobileSheet} config={agentConfig} />
@@ -821,7 +887,9 @@ const styles = StyleSheet.create({
   },
   actionRow: {
     flexDirection: "row",
-    alignItems: "flex-end",
+    // Centred: the row now mixes 32px round buttons with the shorter model
+    // control, and bottom alignment would leave the text sitting low.
+    alignItems: "center",
     paddingHorizontal: 10,
     paddingBottom: 10,
   },
@@ -847,8 +915,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4,
   },
   sendButton: {
-    width: 36,
-    height: 36,
+    width: 32,
+    height: 32,
     borderRadius: 999,
     alignItems: "center",
     justifyContent: "center",
@@ -859,7 +927,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   queueActionButton: {
-    height: 36,
+    height: 32,
     borderRadius: 999,
     borderWidth: 0.633,
     paddingHorizontal: 14,
@@ -870,11 +938,51 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: Fonts.sansMedium,
   },
+  queuePanel: {
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: 10,
+    marginBottom: 8,
+    padding: 8,
+    gap: 6,
+  },
+  queueHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  queueHeaderActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
   queueStatus: {
     fontSize: 11,
     fontFamily: Fonts.sans,
-    paddingHorizontal: 4,
-    paddingBottom: 5,
+  },
+  queueActionRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 3,
+  },
+  queueActionLabel: {
+    fontSize: 11,
+    fontFamily: Fonts.sansMedium,
+  },
+  queuedMessageRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 8,
+  },
+  queuedMessageKind: {
+    width: 52,
+    fontSize: 10,
+    fontFamily: Fonts.sansMedium,
+  },
+  queuedMessageText: {
+    flex: 1,
+    fontSize: 12,
+    lineHeight: 17,
+    fontFamily: Fonts.sans,
   },
   bottomControlsWrap: {
     overflow: "visible",

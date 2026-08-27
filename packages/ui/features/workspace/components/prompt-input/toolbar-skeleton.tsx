@@ -12,7 +12,17 @@ import {
   TOOLBAR_WRAP_OFFSET,
 } from "./toolbar";
 
-export function ToolbarSkeleton({ isDark }: { isDark: boolean }) {
+export function ToolbarSkeleton({
+  isDark,
+  inline = false,
+}: {
+  isDark: boolean;
+  /**
+   * Inline skeletons stand in for the controls inside the input card's action
+   * row, so they carry no strip chrome and match the 32px control height.
+   */
+  inline?: boolean;
+}) {
   const opacity = useRef(new Animated.Value(0.4)).current;
 
   useEffect(() => {
@@ -37,6 +47,19 @@ export function ToolbarSkeleton({ isDark }: { isDark: boolean }) {
   const fill = isDark ? "#2A2A28" : "#E2E2DF";
   const bg = isDark ? "#1a1a1a" : "#F6F6F6";
   const border = isDark ? "#3b3a39" : "rgba(0,0,0,0.12)";
+
+  if (inline) {
+    return (
+      <Animated.View style={[styles.inlineTrack, { opacity }]}>
+        <View
+          style={[styles.inlinePill, styles.pillWide, { backgroundColor: fill }]}
+        />
+        <View
+          style={[styles.inlinePill, styles.pillNarrow, { backgroundColor: fill }]}
+        />
+      </Animated.View>
+    );
+  }
 
   return (
     <View style={styles.wrap}>
@@ -76,6 +99,16 @@ const styles = StyleSheet.create({
   },
   pill: {
     height: TOOLBAR_CONTROL_HEIGHT,
+    borderRadius: 6,
+  },
+  inlineTrack: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    paddingHorizontal: 4,
+  },
+  inlinePill: {
+    height: 32,
     borderRadius: 6,
   },
   pillWide: {
