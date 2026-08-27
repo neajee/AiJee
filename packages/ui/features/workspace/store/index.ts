@@ -6,6 +6,9 @@ import type { Workspace as ApiWorkspace } from '@pideck/client-sdk';
 import { sdk, unwrapApiData } from '@pideck/client-sdk';
 const { list2: list, create: apiCreate, delete2: apiDelete } = sdk;
 import { WorkspaceColors } from '@/constants/theme';
+import { useTasksStore } from '@/features/tasks/store';
+import { usePreviewStore } from '@/features/preview/store';
+import { useDesktopStore } from '@/features/desktop/store';
 
 const SELECTED_WORKSPACE_KEY = 'selected_workspace_id';
 const LAST_SESSION_KEY = 'last_session_by_workspace';
@@ -395,14 +398,28 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
 
   switchServer: async (serverId: string | null) => {
     if (serverId === get().currentServerId) return;
-    // Reset workspace state and load per-server persisted state
+    set({
+      workspaces: [],
+      selectedWorkspaceId: null,
+      pinnedWorkspaceIds: [],
+      lastSessionByWorkspace: {},
+      sessionWorkspaceById: {},
+      sessionNotifications: {},
+      currentServerId: serverId,
+      loading: true,
+      error: null,
+    });
+    useTasksStore.getState().resetServerState();
+    usePreviewStore.getState().resetServerState();
+    useDesktopStore.getState().resetServerState();
+
     const [restoredId, restoredSessionMap, restoredPinned] = await Promise.all([
       readSelectedId(serverId),
       readLastSessionMap(serverId),
       readPinnedIds(serverId),
     ]);
+    if (get().currentServerId !== serverId) return;
     set({
-      workspaces: [],
       selectedWorkspaceId: restoredId,
       pinnedWorkspaceIds: restoredPinned,
       lastSessionByWorkspace: restoredSessionMap,

@@ -1,9 +1,8 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { ChevronRight } from "lucide-react-native";
+import { Brain, ChevronRight } from "lucide-react-native";
 import Animated, {
   Easing,
-  FadeIn,
   useAnimatedStyle,
   useSharedValue,
   withRepeat,
@@ -109,6 +108,11 @@ export const ThinkingBlock = memo(function ThinkingBlock({
       ? `Thought for ${formatDuration(durationMs)}`
       : "Thought";
 
+  // While streaming and folded, the row *is* the live tail: icon, the line the
+  // model is on, and the disclosure. Two rows (a label plus a preview) spent a
+  // whole line saying "Thinking", which the moving text already says.
+  const headline = peek || label;
+
   return (
     <View>
       <Pressable
@@ -119,10 +123,20 @@ export const ThinkingBlock = memo(function ThinkingBlock({
         accessibilityState={{ expanded }}
         style={styles.header}
       >
+        <Animated.View style={breathStyle}>
+          <Brain size={12} color={colors.textTertiary} strokeWidth={1.8} />
+        </Animated.View>
         <Animated.Text
-          style={[styles.label, { color: colors.textTertiary }, breathStyle]}
+          style={[
+            styles.label,
+            peek ? styles.peekText : null,
+            { color: colors.textTertiary },
+            peek ? null : breathStyle,
+          ]}
+          numberOfLines={1}
+          ellipsizeMode="tail"
         >
-          {label}
+          {headline}
         </Animated.Text>
         {!!text && (
           <Animated.View style={chevronStyle}>
@@ -130,17 +144,6 @@ export const ThinkingBlock = memo(function ThinkingBlock({
           </Animated.View>
         )}
       </Pressable>
-
-      {!!peek && (
-        <Animated.Text
-          entering={FadeIn.duration(140)}
-          style={[styles.peek, { color: colors.textTertiary }]}
-          numberOfLines={1}
-          ellipsizeMode="tail"
-        >
-          {peek}
-        </Animated.Text>
-      )}
 
       <AnimatedCollapse expanded={expanded}>
         <Text style={[styles.text, { color: colors.textSecondary }]} selectable>
@@ -153,10 +156,9 @@ export const ThinkingBlock = memo(function ThinkingBlock({
 
 const styles = StyleSheet.create({
   header: {
-    alignSelf: "flex-start",
     flexDirection: "row",
     alignItems: "center",
-    gap: 4,
+    gap: 5,
     paddingVertical: 4,
   },
   label: {
@@ -164,11 +166,13 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.sansSemiBold,
     fontWeight: "600",
   },
-  peek: {
-    fontSize: 12,
-    lineHeight: 18,
+  /** The live tail reads as prose, so it drops the label's weight. */
+  peekText: {
+    flex: 1,
     fontFamily: Fonts.sans,
-    opacity: 0.8,
+    fontWeight: "400",
+    lineHeight: 18,
+    opacity: 0.85,
   },
   text: {
     fontSize: 12,

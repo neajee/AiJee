@@ -318,15 +318,21 @@ function AgentActionButton({
 function AgentBanner({ text, ok }: { text: string; ok: boolean }) {
   const m = useSettingsMetrics();
   const p = useSettingsPalette();
+  // Tinted from the palette rather than fixed iOS colours, so the banner keeps
+  // its contrast in both themes.
+  const tint = ok
+    ? p.isDark
+      ? 'rgba(63,185,80,0.14)'
+      : 'rgba(26,127,55,0.10)'
+    : p.isDark
+      ? 'rgba(248,81,73,0.14)'
+      : 'rgba(207,34,46,0.10)';
 
   return (
     <View
       style={[
         pkgStyles.messageBanner,
-        {
-          marginHorizontal: m.gutter,
-          backgroundColor: ok ? 'rgba(52,199,89,0.12)' : 'rgba(255,59,48,0.12)',
-        },
+        { marginHorizontal: m.gutter, backgroundColor: tint },
       ]}
     >
       {ok ? (
@@ -528,9 +534,9 @@ const pkgStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 5,
-    paddingHorizontal: 13,
-    paddingVertical: 8,
-    borderRadius: 999,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 6,
   },
   actionBtnText: {
     fontSize: 13,
@@ -550,9 +556,9 @@ const pkgStyles = StyleSheet.create({
     alignItems: 'center',
     gap: 7,
     marginBottom: 10,
-    paddingHorizontal: 11,
-    paddingVertical: 8,
-    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 7,
+    borderRadius: 6,
   },
   messageText: {
     fontFamily: Fonts.sans,

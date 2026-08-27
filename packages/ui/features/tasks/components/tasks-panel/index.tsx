@@ -13,7 +13,15 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useTasksStore } from '../../store';
 import { TasksPanelContent } from '../tasks-panel-content';
 
-export function TasksDropdown() {
+interface TasksDropdownProps {
+  /**
+   * Where the panel opens relative to its trigger. The composer toolbar sits at
+   * the bottom of the screen, so it needs the panel above the trigger.
+   */
+  placement?: "below" | "above";
+}
+
+export function TasksDropdown({ placement = "below" }: TasksDropdownProps) {
   const colorScheme = useColorScheme() ?? 'light';
   const colors = Colors[colorScheme];
   const isDark = colorScheme === 'dark';
@@ -41,6 +49,7 @@ export function TasksDropdown() {
       {...({ 'data-tasks-panel': true } as any)}
       style={[
         styles.panel,
+        placement === "above" ? styles.panelAbove : styles.panelBelow,
         { backgroundColor: popoverBg, borderColor },
       ]}
     >
@@ -61,7 +70,6 @@ export function TasksDropdown() {
 const styles = StyleSheet.create({
   panel: {
     position: 'absolute',
-    top: 30,
     right: 0,
     width: 340,
     maxHeight: 420,
@@ -74,6 +82,12 @@ const styles = StyleSheet.create({
       default: { elevation: 16 },
     }),
   } as any,
+  panelBelow: {
+    top: 30,
+  },
+  panelAbove: {
+    bottom: 34,
+  },
   panelHeader: {
     flexDirection: 'row',
     alignItems: 'center',

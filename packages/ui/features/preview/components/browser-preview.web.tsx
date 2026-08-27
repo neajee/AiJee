@@ -11,17 +11,16 @@ interface BrowserPreviewProps {
   target: PreviewTarget;
 }
 
-export function BrowserPreview({ serverUrl, accessToken, sessionId, target }: BrowserPreviewProps) {
+export function BrowserPreview({ serverUrl, sessionId, target }: BrowserPreviewProps) {
   const src = useMemo(
     () =>
       buildPreviewSrc({
         sessionId,
         hostname: target.hostname,
         port: target.port,
-        accessToken,
         serverUrl,
       }),
-    [sessionId, target.hostname, target.port, accessToken, serverUrl],
+    [sessionId, target.hostname, target.port, serverUrl],
   );
 
   const key = `${sessionId}_${target.hostname}_${target.port}`;

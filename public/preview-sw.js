@@ -2,6 +2,7 @@ const PREVIEW_HEADER_AUTH = "X-Proxy-Authorization";
 
 const clientToPreview = new Map();
 const pendingRefreshRequests = new Map();
+let currentAccessToken = null;
 
 function log(...args) {
   console.log("[preview-sw]", ...args);
@@ -31,6 +32,7 @@ self.addEventListener("message", (event) => {
 
   if (type === "UPDATE_TOKEN") {
     const { accessToken } = payload;
+    currentAccessToken = accessToken || null;
     for (const [, config] of clientToPreview.entries()) {
       config.accessToken = accessToken;
     }
@@ -45,6 +47,7 @@ self.addEventListener("message", (event) => {
       pendingRefreshRequests.delete(requestId);
       pending(accessToken || null);
     }
+    if (accessToken) currentAccessToken = accessToken;
     return;
   }
 
@@ -91,14 +94,14 @@ function parseConfigFromUrl(url) {
     sessionId: url.searchParams.get("__pi_s"),
     hostname: url.searchParams.get("__pi_h") || "localhost",
     port: url.searchParams.get("__pi_p"),
-    accessToken: url.searchParams.get("__pi_t"),
+    accessToken: currentAccessToken,
     serverUrl: url.searchParams.get("__pi_server"),
   };
 }
 
 async function handleInitialNavigation(event, url) {
   const config = parseConfigFromUrl(url);
-  log("initial nav config:", JSON.stringify(config));
+  log("initial nav config:", config.hostname + ":" + config.port);
 
   if (!config.sessionId || !config.port || !config.serverUrl) {
     log("ERROR: missing config params, passing through");
@@ -170,6 +173,7 @@ async function requestTokenRefresh(clientId, config) {
   });
 
   if (token) {
+    currentAccessToken = token;
     config.accessToken = token;
     clientToPreview.set(clientId, config);
     log("refresh: received new token for client", clientId);

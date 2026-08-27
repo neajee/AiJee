@@ -34,11 +34,8 @@ export function BrowserPreview({
       `__pi_h=${encodeURIComponent(target.hostname)}`,
       `__pi_p=${encodeURIComponent(String(target.port))}`,
     ];
-    if (accessToken) {
-      params.push(`__pi_t=${encodeURIComponent(accessToken)}`);
-    }
     return `${base}/?${params.join("&")}`;
-  }, [serverUrl, sessionId, target.hostname, target.port, accessToken]);
+  }, [serverUrl, sessionId, target.hostname, target.port]);
 
   // JS injected before any page content loads.
   // Patches fetch() and XMLHttpRequest so every request from the previewed
@@ -101,7 +98,12 @@ export function BrowserPreview({
   return (
     <WebView
       key={key}
-      source={{ uri }}
+      source={{
+        uri,
+        headers: accessToken
+          ? { "X-Proxy-Authorization": `Bearer ${accessToken}` }
+          : undefined,
+      }}
       injectedJavaScriptBeforeContentLoaded={injectedJS}
       style={styles.webview}
       originWhitelist={["*"]}

@@ -214,7 +214,6 @@ impl AgentProvider for PiAgentProvider {
             AgentCapability::Steer,
             AgentCapability::FollowUp,
             AgentCapability::Abort,
-            AgentCapability::ClearQueue,
             AgentCapability::GetState,
             AgentCapability::GetMessages,
             AgentCapability::SetModel,

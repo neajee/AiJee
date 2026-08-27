@@ -343,8 +343,17 @@ export class PiClient {
   // Commands
   // ---------------------------------------------------------------------------
 
+  /**
+   * Send a user message.
+   *
+   * Always goes through pi's `prompt` command: pi decides from its own live
+   * state whether to run immediately or queue as steering/follow-up. Calling
+   * `steer`/`follow_up` directly from the client would silently queue the
+   * message forever whenever the client's streaming flag is stale.
+   */
   async prompt(sessionId: string, message: string, options?: {
     images?: ImageContent[];
+    streamingBehavior?: "steer" | "followUp";
     workspaceId?: string;
     sessionFile?: string;
   }): Promise<void> {
@@ -352,6 +361,7 @@ export class PiClient {
       sessionId,
       message,
       images: options?.images,
+      streamingBehavior: options?.streamingBehavior,
       workspaceId: options?.workspaceId,
       sessionFile: options?.sessionFile,
     });
@@ -387,10 +397,6 @@ export class PiClient {
 
   async abort(sessionId: string): Promise<void> {
     return this.api.abort(sessionId);
-  }
-
-  async clearQueue(sessionId: string): Promise<{ steering: string[]; followUp: string[] }> {
-    return this.api.clearQueue(sessionId);
   }
 
   async setModel(sessionId: string, params: { provider: string; modelId: string }): Promise<void> {

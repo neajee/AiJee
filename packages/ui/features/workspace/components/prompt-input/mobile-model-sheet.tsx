@@ -15,6 +15,12 @@ interface MobileModelSheetProps {
   config: AgentConfigHandle;
 }
 
+/**
+ * Model and thinking level in one sheet, mirroring the single toolbar control
+ * on wide viewports: picking a model and picking how hard it thinks is one
+ * decision, so it should not cost two trips.
+ */
+
 function MobileModelSheetComponent({
   visible,
   sessionId,
@@ -99,7 +105,9 @@ function MobileModelSheetComponent({
           <View style={styles.handle}>
             <View style={[styles.handleBar, { backgroundColor: theme.isDark ? '#555' : '#CCC' }]} />
           </View>
-          <Text style={[styles.title, { color: theme.textPrimary }]}>Select Model</Text>
+          <Text style={[styles.title, { color: theme.textPrimary }]}>
+            Select Model
+          </Text>
           <View style={[styles.searchRow, { backgroundColor: theme.cardBg, borderColor: theme.cardBorder }]}>
             <TextInput
               ref={searchRef}
@@ -147,6 +155,7 @@ function MobileModelSheetComponent({
               </View>
             ))}
           </ScrollView>
+
         </Animated.View>
       </View>
     </Modal>

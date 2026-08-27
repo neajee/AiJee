@@ -22,10 +22,13 @@ import { ProviderIcon } from './provider-icons';
 import type { AgentConfigHandle } from '@pideck/client-sdk';
 import type { AgentMode } from '@/features/agent/mode';
 import { useAppMode } from '@/hooks/use-app-mode';
+import { TaskSelector } from '@/features/tasks/components/task-selector';
 
 interface ToolbarProps {
   sessionId?: string | null;
   isWideScreen: boolean;
+  /** Narrow viewports get the model + thinking sheet instead of a popover. */
+  /** Narrow viewports get a sheet matching the control that was pressed. */
   onOpenMobileSheet: (type: 'model' | 'effort') => void;
   onDropdownOpenChange?: (isOpen: boolean) => void;
   inputRef: React.RefObject<TextInput | null>;
@@ -33,8 +36,21 @@ interface ToolbarProps {
   modeLabel?: string | null;
   ready?: boolean;
   config: AgentConfigHandle;
+  /**
+   * Renders as a bare control group for placing inside the input card's action
+   * row, instead of the bordered strip that hangs below the card.
+   */
+  inline?: boolean;
 }
 
+/**
+ * Two independent controls, not one.
+ *
+ * The model and its thinking level are separate decisions that happen to sit
+ * beside each other: picking a model is a choice of provider, picking a level
+ * is a choice of how hard to think. Each opens its own popover so they are
+ * never misread as one setting.
+ */
 type DropdownType = null | 'model' | 'effort';
 
 export const TOOLBAR_WRAP_OFFSET = 10;
@@ -46,6 +62,14 @@ export const TOOLBAR_CONTROL_HEIGHT = Platform.OS === 'web' ? 26 : 30;
 export const TOOLBAR_ANDROID_MARGIN_TOP = Platform.OS === 'android' ? -4 : 0;
 export const TOOLBAR_MODE_TOGGLE_HEIGHT = TOOLBAR_CONTROL_HEIGHT + 2 + 2 * TOOLBAR_BORDER_WIDTH;
 
+/**
+ * Temporarily hidden: the task runner and the chat/plan switch are parked while
+ * the composer settles on one row. The logic stays wired up so flipping these
+ * back on is a one-line change.
+ */
+const SHOW_TASK_SELECTOR = false;
+const SHOW_MODE_TOGGLE = false;
+
 function ToolbarComponent({
   sessionId,
   isWideScreen,
@@ -56,6 +80,7 @@ function ToolbarComponent({
   modeLabel = null,
   ready = true,
   config,
+  inline = false,
 }: ToolbarProps) {
   const theme = usePromptTheme();
   const appMode = useAppMode();
@@ -73,6 +98,9 @@ function ToolbarComponent({
   const hasCachedState = agentState !== undefined;
   const showCachedToolbar = hasCachedModels && hasCachedState;
   const toolbarDisabled = !ready;
+  // Inline the control shares the action row with 32px round buttons, so its
+  // triggers match their height. The standalone strip keeps its own.
+  const controlHeight = inline ? 32 : TOOLBAR_CONTROL_HEIGHT;
 
   const currentModel = agentState?.model;
   const currentThinking = agentState?.thinkingLevel ?? 'medium';
@@ -168,6 +196,7 @@ function ToolbarComponent({
     setTimeout(() => inputRef.current?.focus(), 0);
   }, [config, inputRef]);
 
+  // Choosing a level closes its own popover, as choosing a model closes its.
   const handleSelectThinking = useCallback((level: ThinkingLevel) => {
     config.setThinkingLevel(level);
     setActiveDropdown(null);
@@ -191,8 +220,8 @@ function ToolbarComponent({
           setTimeout(() => inputRef.current?.focus(), 0);
           return null;
         }
+        setModelSearch('');
         if (type === 'model') {
-          setModelSearch('');
           const idx = flatModels.findIndex(
             (m) => m.modelId === currentModel?.id && m.provider === currentModel?.provider
           );
@@ -206,7 +235,7 @@ function ToolbarComponent({
         return type;
       });
     },
-    [flatModels, currentModel, currentThinking, inputRef, thinkingOptions]
+    [flatModels, currentModel, currentThinking, thinkingOptions, inputRef]
   );
 
   const handleSearchKeyPress = useCallback(
@@ -245,12 +274,14 @@ function ToolbarComponent({
 
   if (configError && !agentState) {
     return (
-      <View style={styles.wrap}>
+      <View style={inline ? styles.inlineWrap : styles.wrap}>
         <View
           style={[
-            styles.toolbar,
+            inline ? styles.inlineToolbar : styles.toolbar,
             styles.toolbarError,
-            { backgroundColor: theme.toolbarBg, borderColor: theme.toolbarBorder },
+            inline
+              ? null
+              : { backgroundColor: theme.toolbarBg, borderColor: theme.toolbarBorder },
           ]}
         >
           <Text style={[styles.errorText, { color: theme.textMuted }]} numberOfLines={1}>
@@ -275,21 +306,24 @@ function ToolbarComponent({
   }
 
   return (
-    <View style={[styles.wrap, activeDropdown && { zIndex: 10 }]}>
+    <View style={[inline ? styles.inlineWrap : styles.wrap, activeDropdown && { zIndex: 10 }]}>
       <View
         style={[
-          styles.toolbar,
-          { backgroundColor: theme.toolbarBg, borderColor: theme.toolbarBorder },
+          inline ? styles.inlineToolbar : styles.toolbar,
+          inline
+            ? null
+            : { backgroundColor: theme.toolbarBg, borderColor: theme.toolbarBorder },
         ]}
       >
+        {/* Model picker: its own control, its own popover. */}
         <View style={styles.popoverAnchor}>
           <Pressable
-            onPress={() => isWideScreen ? toggleDropdown('model') : onOpenMobileSheet('model')}
+            onPress={() => (isWideScreen ? toggleDropdown('model') : onOpenMobileSheet('model'))}
             disabled={toolbarDisabled}
             accessibilityRole="button"
             accessibilityLabel={`Model: ${currentModel?.name ?? 'Loading'}. Press to change.`}
             accessibilityState={{ expanded: activeDropdown === 'model', disabled: toolbarDisabled }}
-            style={({ pressed }) => [styles.button, (pressed || toolbarDisabled) && { opacity: 0.7 }]}
+            style={({ pressed }) => [styles.button, { height: controlHeight }, (pressed || toolbarDisabled) && { opacity: 0.7 }]}
           >
             <ProviderIcon provider={currentModel?.provider ?? ''} size={14} color={theme.textMuted} />
             <Text style={[styles.buttonText, { color: theme.textSecondary }]} numberOfLines={1}>
@@ -304,6 +338,9 @@ function ToolbarComponent({
               accessibilityLabel="Model selection"
               style={[
                 styles.popover,
+                // Inline the control sits on the right of the action row, so the
+                // panel hangs from that edge instead of overflowing the window.
+                inline ? { left: undefined, right: 0 } : null,
                 {
                   backgroundColor: theme.dropdownBg,
                   borderColor: theme.dropdownBorder,
@@ -386,9 +423,10 @@ function ToolbarComponent({
           )}
         </View>
 
+        {/* Thinking level: a separate control, so it is a distinct choice. */}
         <View style={styles.popoverAnchor}>
           <Pressable
-            onPress={() => isWideScreen ? toggleDropdown('effort') : onOpenMobileSheet('effort')}
+            onPress={() => (isWideScreen ? toggleDropdown('effort') : onOpenMobileSheet('effort'))}
             disabled={toolbarDisabled || thinkingDisabled}
             accessibilityRole="button"
             accessibilityLabel={
@@ -396,12 +434,10 @@ function ToolbarComponent({
                 ? `Thinking not supported by ${currentModel?.name ?? 'this model'}`
                 : `Thinking: ${thinkingLabel}. Press to change.`
             }
-            accessibilityState={{
-              expanded: activeDropdown === 'effort',
-              disabled: toolbarDisabled || thinkingDisabled,
-            }}
+            accessibilityState={{ expanded: activeDropdown === 'effort', disabled: toolbarDisabled || thinkingDisabled }}
             style={({ pressed }) => [
               styles.button,
+              { height: controlHeight },
               (pressed || toolbarDisabled || thinkingDisabled) && { opacity: 0.7 },
             ]}
           >
@@ -419,6 +455,9 @@ function ToolbarComponent({
               accessibilityLabel="Thinking level selection"
               style={[
                 styles.popover,
+                // Inline the control sits on the right of the action row, so the
+                // panel hangs from that edge instead of overflowing the window.
+                inline ? { left: undefined, right: 0 } : null,
                 {
                   backgroundColor: theme.dropdownBg,
                   borderColor: theme.dropdownBorder,
@@ -470,8 +509,18 @@ function ToolbarComponent({
           )}
         </View>
 
-        <View style={styles.spacer} />
-        {appMode === 'code' && <View
+
+        {/* Inline, the action row supplies the flexible gap; a spacer here would
+            compete with it for the leftover width. */}
+        {!inline && <View style={styles.spacer} />}
+        {/* Running a task acts on this session, so it belongs beside the send
+            controls rather than in the window bar. */}
+        {SHOW_TASK_SELECTOR && appMode === 'code' && isWideScreen && (
+          <View style={styles.taskSelector}>
+            <TaskSelector placement="above" />
+          </View>
+        )}
+        {SHOW_MODE_TOGGLE && appMode === 'code' && <View
           style={[
             styles.modeToggle,
             {
@@ -542,6 +591,18 @@ const styles = StyleSheet.create({
     marginHorizontal: TOOLBAR_HORIZONTAL_MARGIN,
     overflow: 'visible',
   },
+  /** Inline: no strip of its own, it is one item in the action row. */
+  inlineWrap: {
+    flexShrink: 1,
+    minWidth: 0,
+    marginLeft: 2,
+    overflow: 'visible',
+  },
+  inlineToolbar: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
   toolbar: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -578,6 +639,9 @@ const styles = StyleSheet.create({
   spacer: {
     flex: 1,
   },
+  taskSelector: {
+    marginRight: 6,
+  },
   button: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -585,7 +649,7 @@ const styles = StyleSheet.create({
     height: TOOLBAR_CONTROL_HEIGHT,
     paddingHorizontal: 8,
     borderRadius: 6,
-    maxWidth: 200,
+    maxWidth: 280,
   },
   buttonText: {
     fontSize: 12,
@@ -625,7 +689,7 @@ const styles = StyleSheet.create({
     bottom: '100%',
     left: 0,
     marginBottom: 6,
-    minWidth: 220,
+    minWidth: 260,
     borderRadius: 10,
     borderWidth: TOOLBAR_BORDER_WIDTH,
     overflow: 'hidden',

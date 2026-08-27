@@ -1,6 +1,7 @@
 import { type ReactNode } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { Redirect } from 'expo-router';
 import { ChevronLeft, ChevronRight } from 'lucide-react-native';
 
 import { Fonts } from '@/constants/theme';
@@ -21,11 +22,10 @@ import { SETTINGS_SECTIONS, type SettingsSection } from '../sections';
  *
  *  - narrow viewport → `SettingsIndexScreen` renders a drill-down list, one row
  *    per topic, and each topic gets its own screen (`SettingsDetailScreen`).
- *  - wide viewport   → the list would waste the space, so the index stacks
- *    every section on one scrollable page, as before.
- *
- * Detail screens stay reachable at any width so /settings/<slug> deep links and
- * browser back/forward keep working.
+ *  - wide viewport   → the topic list lives in the app sidebar instead, so
+ *    `/settings` has nothing of its own to show and redirects to the first
+ *    topic. That keeps the URL, the sidebar highlight and the content in sync,
+ *    so a reload or a back/forward lands where the user was.
  */
 
 // ─── Screen shell ─────────────────────────────────────────────
@@ -33,13 +33,24 @@ import { SETTINGS_SECTIONS, type SettingsSection } from '../sections';
 function SettingsScroll({ children }: { children: ReactNode }) {
   const insets = useSafeAreaInsets();
   const p = useSettingsPalette();
+  const phone = useSettingsPhoneLayout();
   const contentStyle = useSettingsContentStyle(insets.bottom);
 
   return (
     <View style={[styles.screen, { backgroundColor: p.bg }]}>
       <ScrollView
         style={styles.scroll}
-        contentContainerStyle={contentStyle}
+        contentContainerStyle={[
+          contentStyle,
+          !phone && {
+            maxWidth: '100%',
+            gap: 0,
+            paddingHorizontal: 0,
+            paddingTop: 0,
+            paddingBottom: 0,
+            flexGrow: 1,
+          },
+        ]}
         showsVerticalScrollIndicator={false}
       >
         {children}
@@ -62,6 +73,11 @@ export function SettingsIndexScreen({
   const m = useSettingsMetrics();
   const p = useSettingsPalette();
 
+  if (!phone) {
+    const first = SETTINGS_SECTIONS[0];
+    return first ? <Redirect href={`/settings/${first.slug}`} /> : null;
+  }
+
   return (
     <SettingsLayoutProvider phone={phone}>
       <SettingsScroll>
@@ -73,37 +89,79 @@ export function SettingsIndexScreen({
         >
           设置
         </Text>
-
-        {phone ? (
-          <SettingsGroup>
-            {SETTINGS_SECTIONS.map((section, i) => {
-              const isLast = i === SETTINGS_SECTIONS.length - 1;
-              // Topics that carry their own row resolve inline instead of
-              // pushing a screen (theme picker, agent version/update).
-              if (section.Row) {
-                const InlineRow = section.Row;
-                return <InlineRow key={section.slug} isLast={isLast} />;
-              }
-              return (
-                <SettingsRow
-                  key={section.slug}
-                  icon={section.icon}
-                  label={section.title}
-                  description={section.summary}
-                  isLast={isLast}
-                  onPress={() => onOpenSection(section)}
-                  right={
-                    <ChevronRight size={m.chevronSize} color={p.textTertiary} strokeWidth={2} />
-                  }
-                />
-              );
-            })}
-          </SettingsGroup>
-        ) : (
-          SETTINGS_SECTIONS.map(({ slug, Component }) => <Component key={slug} isDark={isDark} />)
-        )}
+        <SettingsGroup>
+          {SETTINGS_SECTIONS.map((section, i) => {
+            const isLast = i === SETTINGS_SECTIONS.length - 1;
+            if (section.Row) {
+              const InlineRow = section.Row;
+              return <InlineRow key={section.slug} isLast={isLast} />;
+            }
+            return (
+              <SettingsRow
+                key={section.slug}
+                icon={section.icon}
+                label={section.title}
+                description={section.summary}
+                isLast={isLast}
+                onPress={() => onOpenSection(section)}
+                right={
+                  <ChevronRight size={m.chevronSize} color={p.textTertiary} strokeWidth={2} />
+                }
+              />
+            );
+          })}
+        </SettingsGroup>
       </SettingsScroll>
     </SettingsLayoutProvider>
+  );
+}
+
+function SettingsDesktopSection({
+  section,
+  isDark,
+}: {
+  section: SettingsSection;
+  isDark: boolean;
+}) {
+  const m = useSettingsMetrics();
+  const p = useSettingsPalette();
+  const Component = section.Component;
+  // One inset for the header and the body, so the title sits on the same left
+  // edge as the rows underneath it.
+  const inset = m.gutter + 6;
+
+  return (
+    <View style={desktopStyles.detail}>
+      <View
+        style={[
+          desktopStyles.detailHeader,
+          { borderBottomColor: p.separator, paddingHorizontal: inset },
+        ]}
+      >
+        <View style={desktopStyles.detailHeaderCopy}>
+          <Text style={[desktopStyles.detailTitle, { color: p.text }]}>
+            {section.title}
+          </Text>
+          <Text style={[desktopStyles.detailSummary, { color: p.textTertiary }]}>
+            {section.summary}
+          </Text>
+        </View>
+      </View>
+      <ScrollView
+        style={desktopStyles.detailScroll}
+        contentContainerStyle={{
+          paddingHorizontal: inset,
+          paddingTop: m.groupGap,
+          paddingBottom: 32,
+          gap: m.groupGap,
+        }}
+        showsVerticalScrollIndicator={false}
+      >
+        <SettingsHeadingProvider visible={false}>
+          <Component isDark={isDark} />
+        </SettingsHeadingProvider>
+      </ScrollView>
+    </View>
   );
 }
 
@@ -123,13 +181,17 @@ export function SettingsDetailScreen({
 
   return (
     <SettingsLayoutProvider phone={phone}>
-      <SettingsDetailChrome title={section.title} onBack={onBack}>
-        {/* The screen title already names the section, so suppress the
-            in-content heading that the stacked page relies on. */}
-        <SettingsHeadingProvider visible={false}>
-          <Component isDark={isDark} />
-        </SettingsHeadingProvider>
-      </SettingsDetailChrome>
+      {phone ? (
+        <SettingsDetailChrome title={section.title} onBack={onBack}>
+          <SettingsHeadingProvider visible={false}>
+            <Component isDark={isDark} />
+          </SettingsHeadingProvider>
+        </SettingsDetailChrome>
+      ) : (
+        <SettingsScroll>
+          <SettingsDesktopSection section={section} isDark={isDark} />
+        </SettingsScroll>
+      )}
     </SettingsLayoutProvider>
   );
 }
@@ -228,6 +290,33 @@ const styles = StyleSheet.create({
   },
   navTitle: {
     fontFamily: Fonts.sansSemiBold,
+    flex: 1,
+  },
+});
+
+const desktopStyles = StyleSheet.create({
+  detail: {
+    flex: 1,
+    minWidth: 0,
+  },
+  detailHeader: {
+    minHeight: 52,
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  detailHeaderCopy: {
+    gap: 2,
+  },
+  detailTitle: {
+    fontSize: 15,
+    fontFamily: Fonts.sansSemiBold,
+  },
+  detailSummary: {
+    fontSize: 12,
+    fontFamily: Fonts.sans,
+  },
+  detailScroll: {
     flex: 1,
   },
 });

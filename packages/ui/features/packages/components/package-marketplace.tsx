@@ -1,82 +1,1080 @@
-import { useCallback, useEffect, useState } from 'react';
-import { Alert, Linking, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
-import { ExternalLink, PackageOpen, Search, ShieldAlert, X } from 'lucide-react-native';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  ActivityIndicator,
+  Linking,
+  Modal,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  useWindowDimensions,
+} from 'react-native';
+import { Download, ExternalLink, Search, ShieldAlert, X } from 'lucide-react-native';
+
 import { usePiClient } from '@pideck/client-sdk';
 import type { MarketplacePackage } from '@pideck/client-sdk';
-import { Colors, Fonts } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { Fonts } from '@/constants/theme';
+import {
+  useSettingsMetrics,
+  useSettingsPalette,
+  useSettingsPhoneLayout,
+} from '@/features/settings/components/settings-list';
 
-const CATEGORIES = ['all', 'Extension', 'Skill', 'Prompt', 'Theme'];
+/**
+ * The plugin marketplace.
+ *
+ * A standalone page rather than a settings section — browsing a registry wants
+ * the full width — but it borrows the settings palette and metrics so it reads
+ * as the same product as the sidebar next to it: greyscale, hairline borders,
+ * 6–8px radii. Nothing here is tinted for decoration; colour is reserved for
+ * the permission warning, which is the one thing worth interrupting for.
+ */
+
+const CATEGORIES: { value: string; label: string }[] = [
+  { value: 'all', label: '全部' },
+  { value: 'Extension', label: '扩展' },
+  { value: 'Skill', label: '技能' },
+  { value: 'Prompt', label: '提示词' },
+  { value: 'Theme', label: '主题' },
+];
+
+const SEARCH_DEBOUNCE_MS = 350;
+const CARD_MIN_WIDTH = 260;
+
+type Tab = 'discover' | 'installed';
+type Scope = 'global' | 'project';
 
 export function PackageMarketplace() {
   const client = usePiClient();
-  const dark = (useColorScheme() ?? 'light') === 'dark';
-  const colors = dark ? Colors.dark : Colors.light;
-  const accentBackground = dark ? '#D97706' : colors.tint;
-  const accentForeground = dark ? '#161616' : '#FFFFFF';
+  const m = useSettingsMetrics();
+  const p = useSettingsPalette();
+  const phone = useSettingsPhoneLayout();
+
+  const [tab, setTab] = useState<Tab>('discover');
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('all');
   const [items, setItems] = useState<MarketplacePackage[]>([]);
-  const [selected, setSelected] = useState<MarketplacePackage | null>(null);
-  const [scope, setScope] = useState<'global' | 'project'>('global');
-  const [version, setVersion] = useState('');
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState('');
-  const [installed, setInstalled] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const load = useCallback(async () => {
-    setLoading(true);
-    try {
-      const result = await client.api.marketplaceSearch({ query, category, limit: 30 });
-      setItems(result.packages);
-    } catch (error) { setMessage(error instanceof Error ? error.message : '加载插件失败'); }
-    finally { setLoading(false); }
-  }, [client, query, category]);
+  const [installedOutput, setInstalledOutput] = useState<string | null>(null);
+  const [installedLoading, setInstalledLoading] = useState(false);
 
-  useEffect(() => { void load(); }, [load]);
+  const [selected, setSelected] = useState<MarketplacePackage | null>(null);
+
+  // Typing shouldn't fire a request per keystroke, but waiting for Enter hides
+  // results from anyone who expects search-as-you-type.
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedQuery(query), SEARCH_DEBOUNCE_MS);
+    return () => clearTimeout(timer);
+  }, [query]);
+
+  const search = useCallback(
+    async (searchQuery: string, searchCategory: string) => {
+      setLoading(true);
+      setError(null);
+      try {
+        const result = await client.api.marketplaceSearch({
+          query: searchQuery,
+          category: searchCategory,
+          limit: 30,
+        });
+        setItems(result.packages);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : '加载插件失败');
+      } finally {
+        setLoading(false);
+      }
+    },
+    [client],
+  );
 
   useEffect(() => {
-    if (!selected || selected.readme !== undefined) return;
-    void client.api.marketplaceDetail(selected.name).then(setSelected).catch(() => {});
-  }, [client, selected]);
+    if (tab !== 'discover') return;
+    void search(debouncedQuery, category);
+  }, [tab, debouncedQuery, category, search]);
 
-  const showInstalled = async () => {
-    setInstalled(true);
+  const loadInstalled = useCallback(async () => {
+    setInstalledLoading(true);
+    setError(null);
     try {
       const result = await client.api.marketplaceInstalled();
-      setMessage(result.output || '暂无已安装插件');
-    } catch (error) { setMessage(error instanceof Error ? error.message : '读取已安装插件失败'); }
-  };
+      setInstalledOutput(result.output?.trim() || '暂无已安装插件');
+    } catch (e) {
+      setError(e instanceof Error ? e.message : '读取已安装插件失败');
+    } finally {
+      setInstalledLoading(false);
+    }
+  }, [client]);
 
-  const install = async () => {
-    if (!selected) return;
-    const target = version.trim() || selected.version;
-    const command = `pi install npm:${selected.name}@${target}${scope === 'project' ? ' --local' : ''}`;
-    const confirmed = await new Promise<boolean>((resolve) => {
-      if (typeof window !== 'undefined' && window.confirm) {
-        resolve(window.confirm(`该插件拥有完整系统权限。\n\n来源：${selected.repository ?? selected.npm_url}\n资源类型：${selected.package_types.join(', ')}\n将执行：${command}\n\n继续安装？`));
-      } else {
-        Alert.alert('安装安全提示', `插件拥有完整系统权限。\n来源：${selected.repository ?? selected.npm_url}\n将执行：${command}`, [{ text: '取消', style: 'cancel', onPress: () => resolve(false) }, { text: '继续', style: 'destructive', onPress: () => resolve(true) }]);
+  useEffect(() => {
+    if (tab === 'installed' && installedOutput === null) void loadInstalled();
+  }, [tab, installedOutput, loadInstalled]);
+
+  const openDetail = useCallback(
+    async (pkg: MarketplacePackage) => {
+      setSelected(pkg);
+      if (pkg.readme !== undefined && pkg.readme !== null) return;
+      // The list response omits the readme; fetch it once the panel is open so
+      // the grid stays cheap.
+      try {
+        const detail = await client.api.marketplaceDetail(pkg.name);
+        setSelected((current) => (current?.name === pkg.name ? detail : current));
+      } catch {
+        // Keep the list data on screen; the readme is optional.
       }
-    });
-    if (!confirmed) return;
-    setMessage('正在安装…');
-    try {
-      const result = await client.api.marketplaceOperation({ operation: 'install', name: selected.name, version: target, scope, lock_version: true, workspace_id: null });
-      setMessage(result.output || '安装完成');
-    } catch (error) { setMessage(error instanceof Error ? error.message : '安装失败'); }
-  };
+    },
+    [client],
+  );
 
-  return <View style={[styles.page, { backgroundColor: colors.background }]}>
-    <View style={styles.header}><View><Text style={[styles.title, { color: colors.text }]}>插件广场</Text><Text style={[styles.subtitle, { color: colors.textSecondary }]}>从npm Registry发现可信的Pi插件包</Text></View><View style={styles.headerActions}><Pressable onPress={() => { setInstalled(false); void load(); }}><Text style={{ color: !installed ? colors.tint : colors.textSecondary }}>发现</Text></Pressable><Pressable onPress={showInstalled}><Text style={{ color: installed ? colors.tint : colors.textSecondary }}>已安装</Text></Pressable><PackageOpen size={28} color={colors.tint} /></View></View>
-    <View style={[styles.search, { borderColor: colors.border, backgroundColor: colors.surface }]}><Search size={18} color={colors.textTertiary} /><TextInput value={query} onChangeText={setQuery} onSubmitEditing={load} placeholder="搜索插件名称或关键词" placeholderTextColor={colors.textTertiary} style={[styles.input, { color: colors.text }]} returnKeyType="search" /></View>
-    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
-      {CATEGORIES.map((item) => <Pressable key={item} onPress={() => setCategory(item)} style={[styles.chip, { borderColor: colors.border }, category === item && { backgroundColor: accentBackground, borderColor: accentBackground }]}><Text style={{ color: category === item ? accentForeground : colors.textSecondary }}>{item === 'all' ? '全部' : item}</Text></Pressable>)}
-    </ScrollView>
-    {message ? <Text style={[styles.message, { color: colors.textSecondary }]} numberOfLines={2}>{message}</Text> : null}
-    <ScrollView contentContainerStyle={styles.grid}>{loading ? <Text style={{ color: colors.textSecondary }}>加载中…</Text> : items.map((item) => <Pressable key={item.name} onPress={() => { setSelected(item); setVersion(item.version); }} style={[styles.card, { backgroundColor: colors.surface, borderColor: colors.border }]}><View style={styles.cardTop}><Text style={[styles.name, { color: colors.text }]} numberOfLines={1}>{item.name}</Text><Text style={[styles.version, { color: colors.textTertiary }]}>v{item.version}</Text></View><Text style={[styles.description, { color: colors.textSecondary }]} numberOfLines={2}>{item.description || '作者未提供介绍'}</Text><View style={styles.cardBottom}><Text style={[styles.meta, { color: colors.textTertiary }]}>{item.package_types.join(' · ')}</Text><Text style={[styles.meta, { color: colors.textTertiary }]}>{item.downloads ? `${item.downloads.toLocaleString()} weekly` : 'npm'}</Text></View></Pressable>)}</ScrollView>
-    {selected ? <View style={[styles.modal, { backgroundColor: colors.background, borderColor: colors.border }]}><View style={styles.modalHeader}><Text style={[styles.modalTitle, { color: colors.text }]} numberOfLines={1}>{selected.name}</Text><Pressable onPress={() => setSelected(null)}><X size={22} color={colors.textSecondary} /></Pressable></View><Text style={[styles.description, { color: colors.textSecondary }]}>{selected.description || '作者未提供介绍'}</Text><Text style={[styles.detail, { color: colors.textSecondary }]}>类型：{selected.package_types.join('、')}  ·  当前版本：{selected.version}</Text><View style={styles.scopeRow}>{(['global', 'project'] as const).map((value) => <Pressable key={value} onPress={() => setScope(value)} style={[styles.scope, { borderColor: colors.border }, scope === value && { backgroundColor: colors.tint, borderColor: colors.tint }]}><Text style={{ color: scope === value ? '#fff' : colors.text }}>{value === 'global' ? '全局安装' : '项目安装'}</Text></Pressable>)}</View><TextInput value={version} onChangeText={setVersion} placeholder="版本（默认最新）" placeholderTextColor={colors.textTertiary} style={[styles.versionInput, { color: colors.text, borderColor: colors.border }]} /><View style={styles.warning}><ShieldAlert size={18} color="#D97706" /><Text style={styles.warningText}>插件拥有完整系统权限，请确认来源和资源类型后安装。</Text></View><Pressable onPress={install} style={[styles.install, { backgroundColor: colors.tint }]}><Text style={styles.installText}>确认安装</Text></Pressable>{selected.repository ? <Pressable onPress={() => Linking.openURL(selected.repository!)} style={styles.link}><ExternalLink size={15} color={colors.tint} /><Text style={{ color: colors.tint }}>打开仓库</Text></Pressable> : null}{selected.readme ? <ScrollView style={styles.readme}><Text style={[styles.readmeText, { color: colors.textSecondary }]}>{selected.readme}</Text></ScrollView> : null}</View> : null}
-  </View>;
+  const handleInstalled = useCallback(
+    (output: string) => {
+      setInstalledOutput(output.trim() || '安装完成');
+      setSelected(null);
+      setTab('installed');
+    },
+    [],
+  );
+
+  const gutter = phone ? m.gutter : m.gutter + 6;
+
+  return (
+    <View style={[styles.page, { backgroundColor: p.bg }]}>
+      <View style={[styles.header, { paddingHorizontal: gutter, borderBottomColor: p.separator }]}>
+        <View style={styles.headerCopy}>
+          <Text style={[styles.title, { color: p.text, fontSize: m.titleSize - 4 }]}>
+            插件广场
+          </Text>
+          <Text style={[styles.subtitle, { color: p.textTertiary, fontSize: m.descSize }]}>
+            从 npm 发现 Pi 的扩展、技能与主题
+          </Text>
+        </View>
+        <Segmented
+          options={[
+            { value: 'discover', label: '发现' },
+            { value: 'installed', label: '已安装' },
+          ]}
+          value={tab}
+          onChange={(value) => setTab(value as Tab)}
+        />
+      </View>
+
+      {tab === 'discover' ? (
+        <ScrollView
+          style={styles.scroll}
+          contentContainerStyle={{ padding: gutter, gap: m.groupGap }}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={{ gap: 10 }}>
+            <SearchField
+              value={query}
+              onChangeText={setQuery}
+              onSubmit={() => void search(query, category)}
+            />
+            <View style={styles.chips}>
+              {CATEGORIES.map((item) => (
+                <Chip
+                  key={item.value}
+                  label={item.label}
+                  active={category === item.value}
+                  onPress={() => setCategory(item.value)}
+                />
+              ))}
+            </View>
+          </View>
+
+          {error ? <Notice text={error} tone="error" /> : null}
+
+          {loading ? (
+            <View style={styles.centered}>
+              <ActivityIndicator size="small" color={p.textTertiary} />
+            </View>
+          ) : items.length === 0 ? (
+            <Text style={[styles.emptyText, { color: p.textTertiary, fontSize: m.descSize }]}>
+              没有匹配的插件。
+            </Text>
+          ) : (
+            <View style={styles.grid}>
+              {items.map((item) => (
+                <PackageCard
+                  key={item.name}
+                  pkg={item}
+                  single={phone}
+                  onPress={() => void openDetail(item)}
+                />
+              ))}
+            </View>
+          )}
+        </ScrollView>
+      ) : (
+        <InstalledView
+          output={installedOutput}
+          loading={installedLoading}
+          error={error}
+          onRefresh={loadInstalled}
+          gutter={gutter}
+        />
+      )}
+
+      <PackageDetail
+        pkg={selected}
+        onClose={() => setSelected(null)}
+        onInstalled={handleInstalled}
+      />
+    </View>
+  );
 }
 
-const styles = StyleSheet.create({ page: { flex: 1, padding: 28, maxWidth: 1120, width: '100%', alignSelf: 'center' }, header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }, headerActions: { flexDirection: 'row', alignItems: 'center', gap: 16 }, title: { fontFamily: Fonts.sansSemiBold, fontSize: 28 }, subtitle: { marginTop: 6, fontSize: 14 }, search: { flexDirection: 'row', alignItems: 'center', gap: 10, borderWidth: 1, borderRadius: 12, paddingHorizontal: 14 }, input: { flex: 1, height: 46, fontSize: 15 }, chips: { gap: 8, paddingVertical: 16 }, chip: { borderWidth: 1, borderRadius: 18, paddingHorizontal: 14, paddingVertical: 8 }, message: { marginBottom: 10 }, grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, paddingBottom: 80 }, card: { width: 300, minHeight: 132, borderWidth: 1, borderRadius: 14, padding: 16 }, cardTop: { flexDirection: 'row', justifyContent: 'space-between', gap: 10 }, name: { flex: 1, fontFamily: Fonts.sansSemiBold, fontSize: 16 }, version: { fontFamily: Fonts.mono, fontSize: 12 }, description: { marginTop: 10, lineHeight: 20, fontSize: 14 }, cardBottom: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 14 }, meta: { fontSize: 12 }, modal: { position: 'absolute', right: 20, top: 20, bottom: 20, width: 390, borderWidth: 1, borderRadius: 18, padding: 22, shadowColor: '#000', shadowOpacity: .2, shadowRadius: 18, elevation: 8 }, modalHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 }, modalTitle: { flex: 1, fontFamily: Fonts.sansSemiBold, fontSize: 20 }, detail: { marginTop: 14, fontSize: 13 }, scopeRow: { flexDirection: 'row', gap: 8, marginTop: 18 }, scope: { borderWidth: 1, borderRadius: 8, padding: 9 }, versionInput: { borderWidth: 1, borderRadius: 8, height: 42, paddingHorizontal: 12, marginTop: 12 }, warning: { flexDirection: 'row', gap: 8, marginTop: 16, padding: 12, backgroundColor: '#FEF3C7', borderRadius: 8 }, warningText: { flex: 1, color: '#92400E', fontSize: 12, lineHeight: 17 }, install: { borderRadius: 9, alignItems: 'center', paddingVertical: 12, marginTop: 16 }, installText: { color: '#fff', fontFamily: Fonts.sansSemiBold }, link: { flexDirection: 'row', gap: 6, alignItems: 'center', justifyContent: 'center', marginTop: 14 }, readme: { marginTop: 18 }, readmeText: { fontSize: 13, lineHeight: 19 } });
+// ─── Header controls ──────────────────────────────────────────
+
+function Segmented({
+  options,
+  value,
+  onChange,
+}: {
+  options: { value: string; label: string }[];
+  value: string;
+  onChange: (value: string) => void;
+}) {
+  const m = useSettingsMetrics();
+  const p = useSettingsPalette();
+
+  return (
+    <View
+      style={[
+        styles.segmented,
+        { backgroundColor: p.tile, borderRadius: m.tileRadius + 2 },
+      ]}
+    >
+      {options.map((option) => {
+        const active = option.value === value;
+        return (
+          <Pressable
+            key={option.value}
+            onPress={() => onChange(option.value)}
+            accessibilityRole="button"
+            accessibilityState={{ selected: active }}
+            accessibilityLabel={option.label}
+            style={({ pressed, hovered }: any) => [
+              styles.segment,
+              { borderRadius: m.tileRadius },
+              active && { backgroundColor: p.card, borderColor: p.separator },
+              !active && hovered && { backgroundColor: p.pressed },
+              pressed && { opacity: 0.6 },
+            ]}
+          >
+            <Text
+              style={{
+                fontSize: m.descSize,
+                fontFamily: active ? Fonts.sansMedium : Fonts.sans,
+                color: active ? p.text : p.textTertiary,
+              }}
+            >
+              {option.label}
+            </Text>
+          </Pressable>
+        );
+      })}
+    </View>
+  );
+}
+
+function SearchField({
+  value,
+  onChangeText,
+  onSubmit,
+}: {
+  value: string;
+  onChangeText: (v: string) => void;
+  onSubmit: () => void;
+}) {
+  const m = useSettingsMetrics();
+  const p = useSettingsPalette();
+
+  return (
+    <View
+      style={[
+        styles.search,
+        { backgroundColor: p.tile, borderColor: p.separator, borderRadius: m.tileRadius },
+      ]}
+    >
+      <Search size={14} color={p.textTertiary} strokeWidth={1.8} />
+      <TextInput
+        value={value}
+        onChangeText={onChangeText}
+        onSubmitEditing={onSubmit}
+        placeholder="搜索插件名称或关键词"
+        placeholderTextColor={p.textTertiary}
+        returnKeyType="search"
+        autoCapitalize="none"
+        autoCorrect={false}
+        accessibilityLabel="搜索插件"
+        style={[styles.searchInput, { color: p.text, fontSize: m.valueSize }]}
+      />
+      {value ? (
+        <Pressable
+          onPress={() => onChangeText('')}
+          accessibilityRole="button"
+          accessibilityLabel="清空搜索"
+          hitSlop={6}
+          style={({ pressed }) => [pressed && { opacity: 0.6 }]}
+        >
+          <X size={13} color={p.textTertiary} strokeWidth={2} />
+        </Pressable>
+      ) : null}
+    </View>
+  );
+}
+
+function Chip({
+  label,
+  active,
+  onPress,
+}: {
+  label: string;
+  active: boolean;
+  onPress: () => void;
+}) {
+  const m = useSettingsMetrics();
+  const p = useSettingsPalette();
+
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityState={{ selected: active }}
+      accessibilityLabel={label}
+      style={({ pressed, hovered }: any) => [
+        styles.chip,
+        { borderColor: active ? p.border : p.separator },
+        active && { backgroundColor: p.tile },
+        !active && hovered && { backgroundColor: p.pressed },
+        pressed && { opacity: 0.6 },
+      ]}
+    >
+      <Text
+        style={{
+          fontSize: m.descSize,
+          fontFamily: active ? Fonts.sansMedium : Fonts.sans,
+          color: active ? p.text : p.textSecondary,
+        }}
+      >
+        {label}
+      </Text>
+    </Pressable>
+  );
+}
+
+// ─── List ─────────────────────────────────────────────────────
+
+function PackageCard({
+  pkg,
+  single,
+  onPress,
+}: {
+  pkg: MarketplacePackage;
+  /** Narrow viewport: one card per row instead of a wrapping grid. */
+  single: boolean;
+  onPress: () => void;
+}) {
+  const m = useSettingsMetrics();
+  const p = useSettingsPalette();
+
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={`${pkg.name} 详情`}
+      style={({ pressed, hovered }: any) => [
+        styles.card,
+        {
+          backgroundColor: p.card,
+          borderColor: p.separator,
+          borderRadius: m.cardRadius,
+          padding: m.gutter,
+          width: single ? '100%' : undefined,
+          flexBasis: single ? undefined : CARD_MIN_WIDTH,
+        },
+        hovered && { borderColor: p.border, backgroundColor: p.isDark ? p.tile : p.card },
+        pressed && { opacity: 0.75 },
+      ]}
+    >
+      <View style={styles.cardTop}>
+        <Text
+          style={[styles.cardName, { color: p.text, fontSize: m.labelSize }]}
+          numberOfLines={1}
+        >
+          {pkg.name}
+        </Text>
+        <Text style={[styles.version, { color: p.textTertiary }]}>v{pkg.version}</Text>
+      </View>
+      <Text
+        style={[styles.cardDesc, { color: p.textSecondary, fontSize: m.descSize }]}
+        numberOfLines={2}
+      >
+        {pkg.description || '作者未提供介绍'}
+      </Text>
+      <View style={styles.cardBottom}>
+        <Text style={[styles.meta, { color: p.textTertiary }]} numberOfLines={1}>
+          {pkg.package_types.join(' · ') || 'npm'}
+        </Text>
+        {pkg.downloads ? (
+          <Text style={[styles.meta, { color: p.textTertiary }]}>
+            {pkg.downloads.toLocaleString()} 次/周
+          </Text>
+        ) : null}
+      </View>
+    </Pressable>
+  );
+}
+
+function InstalledView({
+  output,
+  loading,
+  error,
+  onRefresh,
+  gutter,
+}: {
+  output: string | null;
+  loading: boolean;
+  error: string | null;
+  onRefresh: () => void;
+  gutter: number;
+}) {
+  const m = useSettingsMetrics();
+  const p = useSettingsPalette();
+
+  return (
+    <ScrollView
+      style={styles.scroll}
+      contentContainerStyle={{ padding: gutter, gap: 10 }}
+      showsVerticalScrollIndicator={false}
+    >
+      <View style={styles.installedHeader}>
+        <Text style={{ fontSize: m.headerSize, fontFamily: Fonts.sansMedium, color: p.textSecondary }}>
+          服务器上已安装的插件
+        </Text>
+        <SecondaryButton label="刷新" onPress={onRefresh} />
+      </View>
+
+      {error ? <Notice text={error} tone="error" /> : null}
+
+      {/* The server returns the CLI's own output. Showing it verbatim in a mono
+          block is honest about that, and keeps every line readable. */}
+      <View
+        style={[
+          styles.outputBlock,
+          { backgroundColor: p.tile, borderColor: p.separator, borderRadius: m.cardRadius },
+        ]}
+      >
+        {loading ? (
+          <ActivityIndicator size="small" color={p.textTertiary} />
+        ) : (
+          <Text style={[styles.outputText, { color: p.textSecondary }]} selectable>
+            {output ?? ''}
+          </Text>
+        )}
+      </View>
+    </ScrollView>
+  );
+}
+
+// ─── Detail dialog ────────────────────────────────────────────
+
+function PackageDetail({
+  pkg,
+  onClose,
+  onInstalled,
+}: {
+  pkg: MarketplacePackage | null;
+  onClose: () => void;
+  onInstalled: (output: string) => void;
+}) {
+  const client = usePiClient();
+  const m = useSettingsMetrics();
+  const p = useSettingsPalette();
+  const phone = useSettingsPhoneLayout();
+  const { height: screenHeight } = useWindowDimensions();
+
+  const [scope, setScope] = useState<Scope>('global');
+  const [version, setVersion] = useState('');
+  const [confirming, setConfirming] = useState(false);
+  const [installing, setInstalling] = useState(false);
+  const [failure, setFailure] = useState<string | null>(null);
+  const nameRef = useRef<string | null>(null);
+
+  // Reset the form whenever a different package opens the dialog.
+  useEffect(() => {
+    if (!pkg || nameRef.current === pkg.name) return;
+    nameRef.current = pkg.name;
+    setScope('global');
+    setVersion(pkg.version);
+    setConfirming(false);
+    setInstalling(false);
+    setFailure(null);
+  }, [pkg]);
+
+  const target = version.trim() || pkg?.version || 'latest';
+  const command = useMemo(() => {
+    if (!pkg) return '';
+    return `pi install npm:${pkg.name}@${target}${scope === 'project' ? ' --local' : ''}`;
+  }, [pkg, target, scope]);
+
+  const install = useCallback(async () => {
+    if (!pkg) return;
+    setInstalling(true);
+    setFailure(null);
+    try {
+      const result = await client.api.marketplaceOperation({
+        operation: 'install',
+        name: pkg.name,
+        version: target,
+        scope,
+        lock_version: true,
+        workspace_id: null,
+      });
+      onInstalled(result.output || '安装完成');
+    } catch (e) {
+      setFailure(e instanceof Error ? e.message : '安装失败');
+      setConfirming(false);
+    } finally {
+      setInstalling(false);
+    }
+  }, [client, pkg, target, scope, onInstalled]);
+
+  if (!pkg) return null;
+
+  const maxHeight = Math.min(screenHeight - 64, 680);
+
+  return (
+    <Modal visible transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent>
+      <View style={styles.backdropWrap}>
+        <Pressable
+          style={[styles.backdrop, { backgroundColor: p.isDark ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.28)' }]}
+          onPress={onClose}
+          accessibilityLabel="关闭详情"
+        />
+        <View
+          style={[
+            styles.dialog,
+            {
+              backgroundColor: p.card,
+              borderColor: p.border,
+              borderRadius: phone ? 0 : m.cardRadius + 4,
+              width: phone ? '100%' : 560,
+              height: phone ? '100%' : undefined,
+              maxHeight: phone ? undefined : maxHeight,
+            },
+          ]}
+        >
+          <View style={[styles.dialogHeader, { borderBottomColor: p.separator, padding: m.gutter }]}>
+            <View style={styles.dialogTitleCol}>
+              <Text
+                style={[styles.dialogTitle, { color: p.text, fontSize: m.labelSize + 2 }]}
+                numberOfLines={1}
+              >
+                {pkg.name}
+              </Text>
+              <Text style={[styles.meta, { color: p.textTertiary }]}>
+                v{pkg.version}
+                {pkg.author ? ` · ${pkg.author}` : ''}
+                {pkg.package_types.length ? ` · ${pkg.package_types.join('、')}` : ''}
+              </Text>
+            </View>
+            <Pressable
+              onPress={onClose}
+              accessibilityRole="button"
+              accessibilityLabel="关闭"
+              hitSlop={8}
+              style={({ pressed, hovered }: any) => [
+                styles.iconButton,
+                hovered && { backgroundColor: p.pressed },
+                pressed && { opacity: 0.6 },
+              ]}
+            >
+              <X size={16} color={p.textSecondary} strokeWidth={2} />
+            </Pressable>
+          </View>
+
+          <ScrollView
+            contentContainerStyle={{ padding: m.gutter, gap: 14 }}
+            showsVerticalScrollIndicator={false}
+          >
+            <Text style={{ color: p.textSecondary, fontSize: m.valueSize, lineHeight: m.valueSize * 1.5 }}>
+              {pkg.description || '作者未提供介绍'}
+            </Text>
+
+            <View style={{ gap: 6 }}>
+              <FieldLabel text="安装范围" />
+              <Segmented
+                options={[
+                  { value: 'global', label: '全局' },
+                  { value: 'project', label: '当前项目' },
+                ]}
+                value={scope}
+                onChange={(value) => setScope(value as Scope)}
+              />
+            </View>
+
+            <View style={{ gap: 6 }}>
+              <FieldLabel text="版本" />
+              <TextInput
+                value={version}
+                onChangeText={setVersion}
+                placeholder={pkg.version}
+                placeholderTextColor={p.textTertiary}
+                autoCapitalize="none"
+                autoCorrect={false}
+                accessibilityLabel="安装版本"
+                style={[
+                  styles.input,
+                  {
+                    color: p.text,
+                    backgroundColor: p.tile,
+                    borderColor: p.separator,
+                    borderRadius: m.tileRadius,
+                  },
+                ]}
+              />
+            </View>
+
+            <Notice
+              text="插件以完整系统权限运行。安装前请确认来源可信。"
+              tone="warning"
+            />
+
+            {failure ? <Notice text={failure} tone="error" /> : null}
+
+            <View style={[styles.commandBlock, { backgroundColor: p.tile, borderColor: p.separator, borderRadius: m.tileRadius }]}>
+              <Text style={[styles.commandText, { color: p.textSecondary }]} selectable>
+                {command}
+              </Text>
+            </View>
+
+            {pkg.readme ? (
+              <View style={{ gap: 6 }}>
+                <FieldLabel text="README" />
+                <View
+                  style={[
+                    styles.readme,
+                    { backgroundColor: p.tile, borderColor: p.separator, borderRadius: m.tileRadius },
+                  ]}
+                >
+                  <Text style={[styles.readmeText, { color: p.textSecondary }]} selectable>
+                    {pkg.readme.trim()}
+                  </Text>
+                </View>
+              </View>
+            ) : null}
+          </ScrollView>
+
+          <View style={[styles.dialogFooter, { borderTopColor: p.separator, padding: m.gutter }]}>
+            {pkg.repository || pkg.homepage ? (
+              <Pressable
+                onPress={() => Linking.openURL((pkg.repository ?? pkg.homepage)!)}
+                accessibilityRole="link"
+                accessibilityLabel="打开仓库"
+                style={({ pressed, hovered }: any) => [
+                  styles.linkButton,
+                  hovered && { backgroundColor: p.pressed },
+                  pressed && { opacity: 0.6 },
+                ]}
+              >
+                <ExternalLink size={13} color={p.textSecondary} strokeWidth={1.8} />
+                <Text style={{ fontSize: m.descSize, fontFamily: Fonts.sans, color: p.textSecondary }}>
+                  仓库
+                </Text>
+              </Pressable>
+            ) : (
+              <View />
+            )}
+            <PrimaryButton
+              label="安装"
+              icon={Download}
+              busy={installing}
+              onPress={() => setConfirming(true)}
+            />
+          </View>
+
+          {/* An inline confirm layer rather than a second Modal: stacked modals
+              misbehave on native, and the risk being confirmed is about the very
+              package described behind this layer. */}
+          {confirming ? (
+            <View style={[styles.confirmLayer, { backgroundColor: p.isDark ? 'rgba(0,0,0,0.65)' : 'rgba(255,255,255,0.8)' }]}>
+              <View
+                style={[
+                  styles.confirmCard,
+                  { backgroundColor: p.card, borderColor: p.border, borderRadius: m.cardRadius },
+                ]}
+              >
+                <View style={styles.confirmHead}>
+                  <ShieldAlert size={16} color={p.destructive} strokeWidth={2} />
+                  <Text style={{ fontSize: m.labelSize, fontFamily: Fonts.sansMedium, color: p.text }}>
+                    确认安装
+                  </Text>
+                </View>
+                <Text style={{ fontSize: m.descSize, color: p.textSecondary, lineHeight: m.descSize * 1.5 }}>
+                  {`将执行 ${command}\n来源：${pkg.repository ?? pkg.npm_url}\n插件拥有完整系统权限。`}
+                </Text>
+                <View style={styles.confirmActions}>
+                  <SecondaryButton label="取消" onPress={() => setConfirming(false)} />
+                  <PrimaryButton
+                    label="继续安装"
+                    busy={installing}
+                    onPress={() => void install()}
+                  />
+                </View>
+              </View>
+            </View>
+          ) : null}
+        </View>
+      </View>
+    </Modal>
+  );
+}
+
+// ─── Shared bits ──────────────────────────────────────────────
+
+function FieldLabel({ text }: { text: string }) {
+  const m = useSettingsMetrics();
+  const p = useSettingsPalette();
+  return (
+    <Text style={{ fontSize: m.descSize, fontFamily: Fonts.sansMedium, color: p.textTertiary }}>
+      {text}
+    </Text>
+  );
+}
+
+function Notice({ text, tone }: { text: string; tone: 'warning' | 'error' }) {
+  const m = useSettingsMetrics();
+  const p = useSettingsPalette();
+  const color = tone === 'error' ? p.destructive : p.isDark ? '#D29922' : '#9A6700';
+  const background =
+    tone === 'error'
+      ? p.isDark
+        ? 'rgba(248,81,73,0.14)'
+        : 'rgba(207,34,46,0.10)'
+      : p.isDark
+        ? 'rgba(210,153,34,0.14)'
+        : 'rgba(154,103,0,0.10)';
+
+  return (
+    <View style={[styles.notice, { backgroundColor: background, borderRadius: m.tileRadius }]}>
+      <ShieldAlert size={13} color={color} strokeWidth={2} />
+      <Text style={{ flex: 1, fontSize: m.descSize, color, lineHeight: m.descSize * 1.45 }}>
+        {text}
+      </Text>
+    </View>
+  );
+}
+
+function PrimaryButton({
+  label,
+  icon: Icon,
+  busy,
+  onPress,
+}: {
+  label: string;
+  icon?: React.ComponentType<{ size?: number; color?: string; strokeWidth?: number }>;
+  busy?: boolean;
+  onPress: () => void;
+}) {
+  const m = useSettingsMetrics();
+  const p = useSettingsPalette();
+
+  return (
+    <Pressable
+      onPress={onPress}
+      disabled={busy}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      style={({ pressed }) => [
+        styles.button,
+        { backgroundColor: p.accent, borderColor: p.accent, borderRadius: m.tileRadius },
+        (pressed || busy) && { opacity: 0.6 },
+      ]}
+    >
+      {busy ? (
+        <ActivityIndicator size="small" color={p.onAccent} />
+      ) : (
+        <>
+          {Icon ? <Icon size={13} color={p.onAccent} strokeWidth={2.2} /> : null}
+          <Text style={{ fontSize: m.descSize, fontFamily: Fonts.sansMedium, color: p.onAccent }}>
+            {label}
+          </Text>
+        </>
+      )}
+    </Pressable>
+  );
+}
+
+function SecondaryButton({ label, onPress }: { label: string; onPress: () => void }) {
+  const m = useSettingsMetrics();
+  const p = useSettingsPalette();
+
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      style={({ pressed, hovered }: any) => [
+        styles.button,
+        { borderColor: p.separator, borderRadius: m.tileRadius },
+        hovered && { backgroundColor: p.pressed },
+        pressed && { opacity: 0.6 },
+      ]}
+    >
+      <Text style={{ fontSize: m.descSize, fontFamily: Fonts.sansMedium, color: p.text }}>
+        {label}
+      </Text>
+    </Pressable>
+  );
+}
+
+const styles = StyleSheet.create({
+  page: {
+    flex: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+    minHeight: 52,
+    paddingVertical: 8,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  headerCopy: {
+    flex: 1,
+    gap: 2,
+  },
+  title: {
+    fontFamily: Fonts.sansSemiBold,
+  },
+  subtitle: {
+    fontFamily: Fonts.sans,
+  },
+  scroll: {
+    flex: 1,
+  },
+  segmented: {
+    flexDirection: 'row',
+    gap: 2,
+    padding: 2,
+  },
+  segment: {
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: 'transparent',
+  },
+  search: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    height: 34,
+    paddingHorizontal: 10,
+    borderWidth: StyleSheet.hairlineWidth,
+  },
+  searchInput: {
+    flex: 1,
+    height: '100%',
+    fontFamily: Fonts.sans,
+    ...(Platform.OS === 'web' ? { outlineStyle: 'none' as any } : null),
+  },
+  chips: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+  },
+  chip: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 6,
+    borderWidth: StyleSheet.hairlineWidth,
+  },
+  centered: {
+    paddingVertical: 32,
+    alignItems: 'center',
+  },
+  emptyText: {
+    fontFamily: Fonts.sans,
+    paddingVertical: 8,
+  },
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 10,
+  },
+  card: {
+    flexGrow: 1,
+    minWidth: CARD_MIN_WIDTH,
+    maxWidth: 420,
+    gap: 8,
+    borderWidth: StyleSheet.hairlineWidth,
+  },
+  cardTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  cardName: {
+    flex: 1,
+    fontFamily: Fonts.sansMedium,
+  },
+  version: {
+    fontSize: 11,
+    fontFamily: Fonts.mono,
+  },
+  cardDesc: {
+    fontFamily: Fonts.sans,
+    lineHeight: 18,
+  },
+  cardBottom: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 8,
+  },
+  meta: {
+    fontSize: 11,
+    fontFamily: Fonts.sans,
+  },
+  installedHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  outputBlock: {
+    padding: 12,
+    borderWidth: StyleSheet.hairlineWidth,
+  },
+  outputText: {
+    fontSize: 12,
+    lineHeight: 18,
+    fontFamily: Fonts.mono,
+  },
+  backdropWrap: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  dialog: {
+    maxWidth: '100%',
+    borderWidth: StyleSheet.hairlineWidth,
+    overflow: 'hidden',
+    boxShadow: '0px 12px 32px rgba(0, 0, 0, 0.22)',
+    elevation: 12,
+  },
+  dialogHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  dialogTitleCol: {
+    flex: 1,
+    gap: 3,
+  },
+  dialogTitle: {
+    fontFamily: Fonts.sansSemiBold,
+  },
+  iconButton: {
+    width: 26,
+    height: 26,
+    borderRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  input: {
+    height: 32,
+    paddingHorizontal: 10,
+    fontSize: 13,
+    fontFamily: Fonts.mono,
+    borderWidth: StyleSheet.hairlineWidth,
+    ...(Platform.OS === 'web' ? { outlineStyle: 'none' as any } : null),
+  },
+  notice: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 7,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+  },
+  commandBlock: {
+    padding: 10,
+    borderWidth: StyleSheet.hairlineWidth,
+  },
+  commandText: {
+    fontSize: 12,
+    lineHeight: 17,
+    fontFamily: Fonts.mono,
+  },
+  readme: {
+    padding: 10,
+    maxHeight: 220,
+    borderWidth: StyleSheet.hairlineWidth,
+  },
+  readmeText: {
+    fontSize: 12,
+    lineHeight: 18,
+    fontFamily: Fonts.mono,
+  },
+  dialogFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+    borderTopWidth: StyleSheet.hairlineWidth,
+  },
+  linkButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    borderRadius: 6,
+  },
+  button: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 5,
+    minHeight: 32,
+    paddingHorizontal: 14,
+    borderWidth: StyleSheet.hairlineWidth,
+  },
+  confirmLayer: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  confirmCard: {
+    width: '100%',
+    maxWidth: 380,
+    gap: 12,
+    padding: 16,
+    borderWidth: StyleSheet.hairlineWidth,
+  },
+  confirmHead: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  confirmActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 8,
+  },
+});

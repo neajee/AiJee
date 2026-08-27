@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { Animated, StyleSheet, View } from "react-native";
 import { Minus } from "lucide-react-native";
 
-import { useAgentSession, useIsSessionActive } from "@pideck/client-sdk";
+import { useAgentSession } from "@pideck/client-sdk";
 
 const DOT_COUNT = 3;
 const DOT_SIZE = 3.5;
@@ -23,10 +23,10 @@ export function SessionActivityIndicator({
   idlePlaceholder = true,
 }: SessionActivityIndicatorProps) {
   const { isStreaming } = useAgentSession(sessionId);
-  // Only the session on screen streams through this client; every other one is
-  // known to be running from the server's active-session list, so both count.
-  const isActive = useIsSessionActive(sessionId);
-  const isWorking = isStreaming || isActive;
+  // Reduced for every session, not just the one on screen, so a background
+  // session mid-turn animates too. "Active" is deliberately not used here: a
+  // live process that already answered is idle, and would spin forever.
+  const isWorking = isStreaming;
   const dotAnims = useRef(
     Array.from({ length: DOT_COUNT }, () => new Animated.Value(0.35)),
   ).current;

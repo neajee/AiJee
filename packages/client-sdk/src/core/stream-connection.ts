@@ -3,6 +3,7 @@ import { PIDECK_STREAM_PATH } from "../protocol";
 import type { ConnectionState } from "../types";
 import type { StreamEventEnvelope } from "../types/stream-events";
 import { XhrEventSource } from "./event-source";
+import { extractActiveSessionIds } from "./active-sessions";
 
 const RECONNECT_BASE_MS = 1000;
 const RECONNECT_MAX_MS = 30_000;
@@ -165,8 +166,9 @@ export class StreamConnection {
           this._instanceId$.next(raw["instance_id"] as string);
           return;
         }
-        if (raw["type"] === "active_sessions" && Array.isArray(raw["session_ids"])) {
-          this._activeSessions$.next(raw["session_ids"] as string[]);
+        const activeSessionIds = extractActiveSessionIds(raw);
+        if (activeSessionIds) {
+          this._activeSessions$.next(activeSessionIds);
           return;
         }
       } catch { /* not a control event, continue */ }

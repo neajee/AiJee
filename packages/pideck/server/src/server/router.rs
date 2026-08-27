@@ -1,5 +1,5 @@
 use axum::Router;
-use axum::routing::{any, delete, get, post};
+use axum::routing::{any, delete, get, patch, post};
 
 use crate::routes;
 use crate::server::state::AppState;
@@ -79,6 +79,14 @@ fn workspace_routes() -> Router<AppState> {
         .route(
             "/workspaces/{id}/sessions/{session_id}",
             delete(routes::workspace::sessions_delete),
+        )
+        .route(
+            "/workspaces/{id}/sessions/{session_id}",
+            patch(routes::workspace::sessions_rename),
+        )
+        .route(
+            "/workspaces/{id}/sessions/{session_id}/archive",
+            post(routes::workspace::sessions_archive),
         )
         .route(
             "/workspaces/{id}/sessions/{session_id}/tree",
@@ -172,7 +180,6 @@ fn agent_routes() -> Router<AppState> {
         .route("/agent/steer", post(routes::agent::steer))
         .route("/agent/follow-up", post(routes::agent::follow_up))
         .route("/agent/abort", post(routes::agent::abort))
-        .route("/agent/clear-queue", post(routes::agent::clear_queue))
         .route("/agent/state", post(routes::agent::get_state))
         .route("/agent/messages", post(routes::agent::get_messages))
         .route("/agent/new-session", post(routes::agent::new_session))

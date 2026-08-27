@@ -77,7 +77,7 @@ function MobileEffortSheetComponent({
           <View style={styles.handle}>
             <View style={[styles.handleBar, { backgroundColor: theme.isDark ? '#555' : '#CCC' }]} />
           </View>
-          <Text style={[styles.title, { color: theme.textPrimary }]}>Thinking Level</Text>
+          <Text style={[styles.title, { color: theme.textPrimary }]}>思考深度</Text>
           {thinkingOptions.map((item) => {
             const isActive = item.level === currentThinking;
             return (

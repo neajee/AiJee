@@ -541,6 +541,111 @@ pub async fn sessions_branch(
 }
 
 #[utoipa::path(
+    patch,
+    path = "/api/workspaces/{id}/sessions/{session_id}",
+    request_body = SessionRenameRequest,
+    params(
+        ("id" = String, Path, description = "Workspace ID"),
+        ("session_id" = String, Path, description = "Session UUID"),
+    ),
+    responses(
+        (status = 200, description = "Session renamed"),
+        (status = 400, description = "Invalid name", body = ErrorBody),
+        (status = 401, description = "Unauthorized", body = ErrorBody),
+        (status = 404, description = "Not found", body = ErrorBody),
+        (status = 500, description = "Rename failed", body = ErrorBody),
+    ),
+    security(("bearer_auth" = [])),
+    tag = "sessions"
+)]
+pub async fn sessions_rename(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    Path((id, session_id)): Path<(String, String)>,
+    Json(req): Json<SessionRenameRequest>,
+) -> (StatusCode, Json<ApiResponse<String>>) {
+    if let Err((code, msg)) = require_auth(&state, &headers).await {
+        return (code, Json(ApiResponse::err(msg)));
+    }
+    let name = req.name.trim().to_string();
+    if name.is_empty() || name.chars().count() > 200 {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(ApiResponse::err("Session name must be 1-200 characters")),
+        );
+    }
+    let ws = resolve_workspace!(&state, &id);
+    let base = state.config.sessions_base_path();
+    let cwd = ws.path;
+    match tokio::task::spawn_blocking(move || {
+        session::rename_session(&base, &cwd, &session_id, &name)
+    })
+    .await
+    .unwrap()
+    {
+        Ok(true) => (
+            StatusCode::OK,
+            Json(ApiResponse::ok("Session renamed".to_string())),
+        ),
+        Ok(false) => (
+            StatusCode::NOT_FOUND,
+            Json(ApiResponse::err("Session not found")),
+        ),
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(ApiResponse::err(format!("Failed to rename session: {e}"))),
+        ),
+    }
+}
+
+#[utoipa::path(
+    post,
+    path = "/api/workspaces/{id}/sessions/{session_id}/archive",
+    params(
+        ("id" = String, Path, description = "Workspace ID"),
+        ("session_id" = String, Path, description = "Session UUID"),
+    ),
+    responses(
+        (status = 200, description = "Session archived"),
+        (status = 401, description = "Unauthorized", body = ErrorBody),
+        (status = 404, description = "Not found", body = ErrorBody),
+        (status = 500, description = "Archive failed", body = ErrorBody),
+    ),
+    security(("bearer_auth" = [])),
+    tag = "sessions"
+)]
+pub async fn sessions_archive(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    Path((id, session_id)): Path<(String, String)>,
+) -> (StatusCode, Json<ApiResponse<String>>) {
+    if let Err((code, msg)) = require_auth(&state, &headers).await {
+        return (code, Json(ApiResponse::err(msg)));
+    }
+    let ws = resolve_workspace!(&state, &id);
+    let _ = state.agent.kill_session(&session_id).await;
+    let base = state.config.sessions_base_path();
+    let cwd = ws.path;
+    match tokio::task::spawn_blocking(move || session::archive_session(&base, &cwd, &session_id))
+        .await
+        .unwrap()
+    {
+        Ok(true) => (
+            StatusCode::OK,
+            Json(ApiResponse::ok("Session archived".to_string())),
+        ),
+        Ok(false) => (
+            StatusCode::NOT_FOUND,
+            Json(ApiResponse::err("Session not found")),
+        ),
+        Err(e) => (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(ApiResponse::err(format!("Failed to archive session: {e}"))),
+        ),
+    }
+}
+
+#[utoipa::path(
     delete,
     path = "/api/workspaces/{id}/sessions/{session_id}",
     params(

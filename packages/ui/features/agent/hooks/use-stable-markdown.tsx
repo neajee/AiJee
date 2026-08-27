@@ -14,6 +14,7 @@ import { Renderer } from "react-native-marked";
 import type { ReactNode } from "react";
 import type { TextStyle, ViewStyle } from "react-native";
 import { MarkdownCodeBlock } from "../components/message-list/markdown-code-block";
+import { MarkdownTable } from "../components/message-list/markdown-table";
 
 interface ParserLike {
   parse(tokens?: Token[]): ReactNode[];
@@ -37,6 +38,24 @@ class StableRenderer extends Renderer {
         key={`code-${language ?? "plain"}-${text.length}`}
         code={text}
         language={language}
+        isDark={this.isDark}
+      />
+    );
+  }
+
+  /**
+   * The stock table sizes columns off the window width, which overflows the
+   * message column. This one measures against the container instead.
+   */
+  override table(
+    header: ReactNode[][],
+    rows: ReactNode[][][],
+  ): ReactNode {
+    return (
+      <MarkdownTable
+        key={this.getKey()}
+        header={header}
+        rows={rows}
         isDark={this.isDark}
       />
     );

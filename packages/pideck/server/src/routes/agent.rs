@@ -1792,25 +1792,6 @@ pub async fn abort(
     forward_command(&state, &req.session_id, json!({"type": "abort"})).await
 }
 
-#[utoipa::path(
-    post,
-    path = "/api/agent/clear-queue",
-    request_body = AgentSessionIdRequest,
-    responses((status = 200, description = "Queued messages cleared")),
-    security(("bearer_auth" = [])),
-    tag = "agent"
-)]
-pub async fn clear_queue(
-    State(state): State<AppState>,
-    headers: HeaderMap,
-    Json(req): Json<AgentSessionIdRequest>,
-) -> (StatusCode, Json<ApiResponse<Value>>) {
-    if let Err((code, msg)) = require_auth(&state, &headers).await {
-        return auth_err(code, msg);
-    }
-    forward_command(&state, &req.session_id, json!({"type": "clear_queue"})).await
-}
-
 // --- State ---
 
 #[utoipa::path(

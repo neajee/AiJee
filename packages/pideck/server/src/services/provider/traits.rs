@@ -18,7 +18,6 @@ pub enum AgentCapability {
     Steer,
     FollowUp,
     Abort,
-    ClearQueue,
     GetState,
     GetMessages,
     SetModel,
@@ -85,7 +84,6 @@ pub enum AgentCommand {
         images: Option<Vec<ImageContent>>,
     },
     Abort,
-    ClearQueue,
     GetState,
     GetMessages,
     SetModel {
@@ -187,7 +185,6 @@ impl AgentCommand {
                 cmd
             }
             Self::Abort => json!({"type": "abort"}),
-            Self::ClearQueue => json!({"type": "clear_queue"}),
             Self::GetState => json!({"type": "get_state"}),
             Self::GetMessages => json!({"type": "get_messages"}),
             Self::SetModel { provider, model_id } => {
@@ -890,10 +887,6 @@ mod tests {
 
     #[test]
     fn serializes_new_rpc_commands() {
-        assert_eq!(
-            AgentCommand::ClearQueue.to_json(),
-            json!({"type": "clear_queue"})
-        );
         assert_eq!(
             AgentCommand::GetEntries {
                 since: Some("entry-1".to_string())

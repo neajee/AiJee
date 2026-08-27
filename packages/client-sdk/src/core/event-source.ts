@@ -10,6 +10,8 @@ export interface EventSourceEvent {
 
 type Listener = (event: EventSourceEvent) => void;
 
+const MAX_XHR_RESPONSE_CHARS = 1_048_576;
+
 interface EventSourceOptions {
   headers?: Record<string, string | { toString(): string }>;
   body?: string;
@@ -91,6 +93,13 @@ export class XhrEventSource {
           xhr.readyState === XMLHttpRequest.DONE
         ) {
           this.processChunk(xhr.responseText ?? "");
+          if (
+            xhr.readyState === XMLHttpRequest.LOADING &&
+            xhr.responseText.length >= MAX_XHR_RESPONSE_CHARS &&
+            this.lastIndexProcessed > 0
+          ) {
+            this.rotateConnection(xhr);
+          }
         }
       } else if (xhr.status !== 0) {
         this.emitError(xhr.responseText, xhr.status, xhr.readyState);
@@ -119,6 +128,17 @@ export class XhrEventSource {
     } else {
       xhr.send();
     }
+  }
+
+  private rotateConnection(xhr: XMLHttpRequest): void {
+    if (this.xhr !== xhr || this.readyState === XhrEventSource.CLOSED) return;
+    xhr.onreadystatechange = null;
+    xhr.onerror = null;
+    xhr.ontimeout = null;
+    xhr.onloadend = null;
+    this.xhr = null;
+    xhr.abort();
+    this.open();
   }
 
   private emitError(message: string, status: number, state: number): void {

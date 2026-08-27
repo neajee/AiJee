@@ -119,23 +119,29 @@ const PHONE_METRICS: SettingsMetrics = {
   switchScale: 1,
 };
 
+/**
+ * Wide viewports read as part of the app shell, so this set is tuned to the
+ * sidebar next to it: same 13.5px label, same 6–8px radii, same hairline
+ * borders. Anything chunkier makes settings look like a different product
+ * bolted onto the side of the project tree.
+ */
 const DESKTOP_METRICS: SettingsMetrics = {
-  gutter: 14,
-  groupGap: 16,
-  cardRadius: 10,
-  rowMinHeight: 40,
-  rowPaddingV: 9,
-  tileSize: 24,
+  gutter: 12,
+  groupGap: 14,
+  cardRadius: 8,
+  rowMinHeight: 36,
+  rowPaddingV: 8,
+  tileSize: 22,
   tileRadius: 6,
-  tileIcon: 14,
-  labelSize: 14,
+  tileIcon: 13,
+  labelSize: 13.5,
   descSize: 12,
   valueSize: 13,
-  headerSize: 12,
+  headerSize: 11,
   headerInset: 4,
-  titleSize: 22,
+  titleSize: 20,
   chevronSize: 14,
-  switchScale: 0.85,
+  switchScale: 0.8,
   contentMaxWidth: 640,
 };
 

@@ -73,7 +73,6 @@ export function buildPreviewSrc(params: {
   sessionId: string;
   hostname: string;
   port: number;
-  accessToken?: string;
   serverUrl: string;
 }): string {
   const qs = new URLSearchParams({
@@ -82,9 +81,6 @@ export function buildPreviewSrc(params: {
     __pi_p: String(params.port),
     __pi_server: params.serverUrl,
   });
-  if (params.accessToken) {
-    qs.set("__pi_t", params.accessToken);
-  }
   return `${params.serverUrl}/?${qs.toString()}`;
 }
 

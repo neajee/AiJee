@@ -30,6 +30,7 @@ export interface DisplayInitEvent {
 
 export interface UseVncSessionOptions {
     wsUrl: string;
+    websocketProtocols?: string[];
     password?: string | null;
     autoConnect?: boolean;
     onFramebufferUpdate?: (event: FramebufferUpdateEvent) => void;
@@ -104,6 +105,7 @@ export function useVncSession(options: UseVncSessionOptions): UseVncSessionResul
 
         const transport = new vnc.WebSocketRemoteDisplayBoundary({
             url: opts.wsUrl,
+            protocols: opts.websocketProtocols,
             binaryType: 'arraybuffer',
 
             onOpen: () => {

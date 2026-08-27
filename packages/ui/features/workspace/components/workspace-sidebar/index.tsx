@@ -4,23 +4,36 @@ import {
   Easing,
   PanResponder,
   Platform,
-  Pressable,
   StyleSheet,
   View,
 } from "react-native";
-import { PanelRight, PanelRightClose } from "lucide-react-native";
 import * as SecureStore from "expo-secure-store";
 
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import {
+  SeamToggle,
+  SEAM_TOGGLE_HEIGHT,
+  SEAM_TOGGLE_WIDTH,
+} from "@/components/ui/seam-toggle";
 
 const PANEL_DEFAULT = 280;
 const PANEL_MIN = 180;
 const PANEL_MAX = 480;
-/** Rail left behind when the panel is closed — room for the toggle only. */
-const COLLAPSED_WIDTH = 32;
-/** Invisible grab strip straddling the panel seam, bolt-style. */
-const SEAM_HIT_WIDTH = 12;
+/**
+ * Closed, the panel takes no width at all: a leftover rail showed up as a bare
+ * strip of the screen's own background next to the editor. The pill moves
+ * inside the content instead, so nothing is left behind.
+ */
+const COLLAPSED_WIDTH = 0;
+/**
+ * Invisible grab strip straddling the panel seam, bolt-style.
+ *
+ * Wide enough to catch a hurried pointer; what lights up inside it is a narrow
+ * bar, so the target being generous never shows as a broad grey band.
+ */
+const SEAM_HIT_WIDTH = 22;
+const SEAM_BAR_WIDTH = 4;
 const COLLAPSE_DURATION = 200;
 const SIDEBAR_WIDTH_KEY = "workspace_sidebar_width";
 const SIDEBAR_COLLAPSED_KEY = "workspace_sidebar_collapsed";
@@ -111,14 +124,10 @@ export function WorkspaceSidebar({ children }: WorkspaceSidebarProps) {
   // bolt tints the seam with a single translucent grey for hover and drag.
   const seamTint = "rgba(136,136,136,0.16)";
   const seamDragTint = "rgba(136,136,136,0.26)";
-  const buttonHoverBg = isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)";
-  const iconColor = colors.textSecondary;
-  const iconHoverColor = colors.text;
 
   const [isCollapsed, setIsCollapsed] = useState(sidebarCollapsedCache);
   const [isResizing, setIsResizing] = useState(false);
   const [isSeamHovered, setIsSeamHovered] = useState(false);
-  const [isToggleHovered, setIsToggleHovered] = useState(false);
   const [panelWidth, setPanelWidth] = useState(sidebarWidthCache);
   const panelWidthRef = useRef(sidebarWidthCache);
   const panelStartRef = useRef(sidebarWidthCache);
@@ -252,14 +261,6 @@ export function WorkspaceSidebar({ children }: WorkspaceSidebarProps) {
         }
       : {};
 
-  const webToggleHoverProps =
-    Platform.OS === "web"
-      ? {
-          onMouseEnter: () => setIsToggleHovered(true),
-          onMouseLeave: () => setIsToggleHovered(false),
-        }
-      : {};
-
   const toggleCollapsed = () => {
     setIsCollapsed((prev) => {
       const next = !prev;
@@ -285,50 +286,45 @@ export function WorkspaceSidebar({ children }: WorkspaceSidebarProps) {
         )}
       </View>
 
-      {/* Toggle sits in the pane's own 44px header row, flush right. */}
-      <Pressable
-        onPress={toggleCollapsed}
-        accessibilityRole="button"
-        accessibilityLabel={isCollapsed ? "Open side panel" : "Close side panel"}
-        {...{ title: isCollapsed ? "Open side panel" : "Close side panel" }}
-        {...webToggleHoverProps}
-        hitSlop={4}
-        style={({ pressed }: any) => [
-          styles.toggleButton,
-          isCollapsed ? styles.toggleCollapsed : styles.toggleExpanded,
-          (isToggleHovered || pressed) && { backgroundColor: buttonHoverBg },
+      {/* Same control as the left sidebar's, on this panel's own seam. Closed,
+          it tucks just inside the window edge instead of hanging off it. */}
+      <View
+        style={[
+          styles.seamToggleWrap,
+          {
+            left: isCollapsed
+              ? -(SEAM_TOGGLE_WIDTH + 8)
+              : -SEAM_TOGGLE_WIDTH / 2,
+          },
         ]}
+        pointerEvents="box-none"
       >
-        {isCollapsed ? (
-          <PanelRight
-            size={16}
-            color={isToggleHovered ? iconHoverColor : iconColor}
-            strokeWidth={1.75}
-          />
-        ) : (
-          <PanelRightClose
-            size={16}
-            color={isToggleHovered ? iconHoverColor : iconColor}
-            strokeWidth={1.75}
-          />
-        )}
-      </Pressable>
+        <SeamToggle
+          chevron={isCollapsed ? "left" : "right"}
+          onPress={toggleCollapsed}
+          label={isCollapsed ? "Open side panel" : "Close side panel"}
+        />
+      </View>
 
       {!isCollapsed && (
         <View
           {...panelResizer.panHandlers}
           {...webSeamHoverProps}
-          style={[
-            styles.seam,
-            {
-              backgroundColor: seamActive
-                ? isResizing
-                  ? seamDragTint
-                  : seamTint
-                : "transparent",
-            },
-          ]}
-        />
+          style={styles.seam}
+        >
+          <View
+            style={[
+              styles.seamBar,
+              {
+                backgroundColor: seamActive
+                  ? isResizing
+                    ? seamDragTint
+                    : seamTint
+                  : "transparent",
+              },
+            ]}
+          />
+        </View>
       )}
     </Animated.View>
   );
@@ -350,25 +346,21 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: -(SEAM_HIT_WIDTH / 2),
     width: SEAM_HIT_WIDTH,
+    alignItems: "center",
     zIndex: 20,
     cursor: "col-resize",
   } as any,
-  toggleButton: {
-    position: "absolute",
-    width: 24,
-    height: 24,
-    borderRadius: 6,
-    alignItems: "center",
-    justifyContent: "center",
-    zIndex: 21,
-    cursor: "pointer",
-  } as any,
-  toggleExpanded: {
-    top: 10,
-    right: 8,
+  seamBar: {
+    width: SEAM_BAR_WIDTH,
+    height: "100%",
+    borderRadius: SEAM_BAR_WIDTH / 2,
   },
-  toggleCollapsed: {
-    top: 10,
-    left: (COLLAPSED_WIDTH - 24) / 2,
+  seamToggleWrap: {
+    position: "absolute",
+    top: "50%",
+    marginTop: -SEAM_TOGGLE_HEIGHT / 2,
+    width: SEAM_TOGGLE_WIDTH,
+    height: SEAM_TOGGLE_HEIGHT,
+    zIndex: 30,
   },
 });

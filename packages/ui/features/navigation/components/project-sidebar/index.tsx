@@ -9,11 +9,14 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from "react-native";
 import { useRouter, usePathname } from "expo-router";
 import {
+  Archive as ArchiveIcon,
   ChevronDown,
+  ChevronLeft,
   ChevronRight,
   Folder,
   FolderOpen,
@@ -24,7 +27,7 @@ import {
   RefreshCw,
   Settings,
   PackageOpen,
-  Square,
+  Pencil,
   SquarePen,
 } from "lucide-react-native";
 
@@ -33,9 +36,8 @@ import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useWorkspaceStore } from "@/features/workspace/store";
 import {
   useWorkspaceSessions as useSessions,
-  usePiClient,
-  useIsSessionActive,
-  useActiveSessions,
+  useIsSessionStreaming,
+  useStreamingSessions,
 } from "@pideck/client-sdk";
 import type { SessionListItem } from "@pideck/client-sdk";
 import { requestBrowserNotificationPermission } from "@/features/agent/browser-notifications";
@@ -44,7 +46,9 @@ import { AnimatedListItem } from "@/components/ui/animated-list-item";
 import { NewWorkspaceDialog } from "@/features/workspace/components/new-workspace-dialog";
 import { EditWorkspaceDialog } from "@/features/workspace/components/edit-workspace-dialog";
 import { WorkspaceContextMenu, MENU_WIDTH } from "../workspace-context-menu";
+import { SidebarHeader } from "../sidebar-header";
 import type { Workspace } from "@/features/workspace/types";
+import { SETTINGS_SECTIONS } from "@/features/settings/sections";
 
 /** Sessions sit under their project, indented to clear the folder icon. */
 const SESSION_INDENT = 28;
@@ -74,22 +78,26 @@ export function ProjectSidebar() {
   const removeWorkspace = useWorkspaceStore((s) => s.removeWorkspace);
   const fetchWorkspaces = useWorkspaceStore((s) => s.fetchWorkspaces);
   const getLastSession = useWorkspaceStore((s) => s.getLastSession);
+  const clearLastSession = useWorkspaceStore((s) => s.clearLastSession);
+  const clearSessionNotification = useWorkspaceStore(
+    (s) => s.clearSessionNotification,
+  );
   const sessionWorkspaceById = useWorkspaceStore((s) => s.sessionWorkspaceById);
   const sessionNotifications = useWorkspaceStore((s) => s.sessionNotifications);
-  const activeSessions = useActiveSessions();
+  const streamingSessions = useStreamingSessions();
 
   /**
-   * Which projects have something running or something finished-but-unseen.
+   * Which projects have something working or something finished-but-unseen.
    *
    * `workspace.runningSessions` is never populated by the server, so activity is
-   * derived from the live session list mapped back to projects — a mapping the
-   * session lists and turn-end events fill in as they load.
+   * derived from the sessions currently mid-turn, mapped back to projects — a
+   * mapping the session lists and turn-end events fill in as they load.
    */
   const activityByWorkspace = useMemo(() => {
     const activity: Record<string, { running: boolean; unread: boolean }> = {};
     const touch = (id: string) =>
       (activity[id] ??= { running: false, unread: false });
-    activeSessions.forEach((sessionId) => {
+    streamingSessions.forEach((sessionId) => {
       const workspaceId = sessionWorkspaceById[sessionId];
       if (workspaceId) touch(workspaceId).running = true;
     });
@@ -98,7 +106,7 @@ export function ProjectSidebar() {
       if (workspaceId) touch(workspaceId).unread = true;
     });
     return activity;
-  }, [activeSessions, sessionWorkspaceById, sessionNotifications]);
+  }, [streamingSessions, sessionWorkspaceById, sessionNotifications]);
 
   const [showNewDialog, setShowNewDialog] = useState(false);
   const [editWorkspace, setEditWorkspace] = useState<Workspace | null>(null);
@@ -116,6 +124,25 @@ export function ProjectSidebar() {
   const sessionMatch = pathname.match(/\/workspace\/[^/]+\/s\/([^/]+)/);
   const selectedSessionId = sessionMatch?.[1] ?? null;
 
+  const handleArchivedSession = useCallback(
+    (workspaceId: string, sessionId: string) => {
+      if (getLastSession(workspaceId) === sessionId) {
+        clearLastSession(workspaceId);
+      }
+      clearSessionNotification(sessionId);
+      if (selectedSessionId === sessionId) {
+        router.replace(`/workspace/${workspaceId}`);
+      }
+    },
+    [
+      clearLastSession,
+      clearSessionNotification,
+      getLastSession,
+      router,
+      selectedSessionId,
+    ],
+  );
+
   const { pinned, rest } = useMemo(() => {
     const pinnedSet = new Set(pinnedIds);
     return {
@@ -126,23 +153,6 @@ export function ProjectSidebar() {
       rest: workspaces.filter((w) => !pinnedSet.has(w.id)),
     };
   }, [workspaces, pinnedIds]);
-
-  const handleOpenWorkspace = useCallback(
-    (id: string) => {
-      selectWorkspace(id);
-      setOverrides((prev) => {
-        if (prev[id] === undefined) return prev;
-        // Opening a project always reveals it.
-        const { [id]: _dropped, ...others } = prev;
-        return others;
-      });
-      const lastSession = getLastSession(id);
-      router.replace(
-        lastSession ? `/workspace/${id}/s/${lastSession}` : `/workspace/${id}`,
-      );
-    },
-    [selectWorkspace, getLastSession, router],
-  );
 
   const handleToggleWorkspace = useCallback(
     (id: string, isOpen: boolean) => {
@@ -272,6 +282,7 @@ export function ProjectSidebar() {
             selectedSessionId={isSelected ? selectedSessionId : null}
             refreshToken={refreshToken}
             onSelect={handleSelectSession}
+            onArchived={handleArchivedSession}
             isDark={isDark}
           />
         )}
@@ -281,6 +292,11 @@ export function ProjectSidebar() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
+      {/* Server and search in one row; collapsing lives on the seam. */}
+      <View style={[styles.serverRow, { borderBottomColor: colors.border }]}>
+        <SidebarHeader />
+      </View>
+
       <View style={styles.top}>
         <SidebarRow
           icon={<SquarePen size={15} color={colors.text} strokeWidth={1.8} />}
@@ -375,11 +391,9 @@ export function ProjectSidebar() {
         pinned={
           !!contextMenu.workspace && pinnedIds.includes(contextMenu.workspace.id)
         }
+        workspacePath={contextMenu.workspace?.path ?? null}
         onTogglePin={() => {
           if (contextMenu.workspace) togglePinned(contextMenu.workspace.id);
-        }}
-        onOpen={() => {
-          if (contextMenu.workspace) handleOpenWorkspace(contextMenu.workspace.id);
         }}
         onNewSession={() => {
           if (contextMenu.workspace) handleNewSessionIn(contextMenu.workspace.id);
@@ -390,6 +404,71 @@ export function ProjectSidebar() {
         }}
         onClose={() => setContextMenu((prev) => ({ ...prev, visible: false }))}
       />
+    </View>
+  );
+}
+
+export function SettingsSidebar() {
+  const colorScheme = useColorScheme() ?? "light";
+  const colors = Colors[colorScheme];
+  const isDark = colorScheme === "dark";
+  const router = useRouter();
+  const pathname = usePathname();
+  const selectedWorkspaceId = useWorkspaceStore((s) => s.selectedWorkspaceId);
+  const routeSlug = pathname.match(/^\/settings\/([^/]+)/)?.[1];
+  const activeSlug = routeSlug ?? SETTINGS_SECTIONS[0]?.slug;
+
+  const handleBack = () => {
+    if (selectedWorkspaceId) {
+      router.replace(`/workspace/${selectedWorkspaceId}`);
+      return;
+    }
+    router.replace("/");
+  };
+
+  return (
+    <View
+      style={[styles.container, { backgroundColor: colors.background }]}
+    >
+      <View style={[styles.serverRow, { borderBottomColor: colors.border }]}>
+        <SidebarHeader />
+      </View>
+      <View style={styles.top}>
+        <SidebarRow
+          icon={<ChevronLeft size={15} color={colors.textSecondary} strokeWidth={1.8} />}
+          label="返回"
+          onPress={handleBack}
+          isDark={isDark}
+        />
+      </View>
+      <View style={styles.settingsHeader}>
+        <Text style={[styles.settingsTitle, { color: colors.text }]}>设置</Text>
+      </View>
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.settingsContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {SETTINGS_SECTIONS.map((section) => {
+          const Icon = section.icon;
+          return (
+            <SidebarRow
+              key={section.slug}
+              icon={
+                <Icon
+                  size={15}
+                  color={section.slug === activeSlug ? colors.text : colors.textSecondary}
+                  strokeWidth={1.8}
+                />
+              }
+              label={section.title}
+              isActive={section.slug === activeSlug}
+              onPress={() => router.push(`/settings/${section.slug}` as any)}
+              isDark={isDark}
+            />
+          );
+        })}
+      </ScrollView>
     </View>
   );
 }
@@ -725,12 +804,14 @@ function WorkspaceSessions({
   selectedSessionId,
   refreshToken,
   onSelect,
+  onArchived,
   isDark,
 }: {
   workspaceId: string;
   selectedSessionId: string | null;
   refreshToken: number;
   onSelect: (workspaceId: string, sessionId: string) => void;
+  onArchived: (workspaceId: string, sessionId: string) => void;
   isDark: boolean;
 }) {
   const colors = isDark ? Colors.dark : Colors.light;
@@ -742,6 +823,8 @@ function WorkspaceSessions({
     hasNextPage,
     fetchNextPage,
     refetch,
+    renameSession,
+    archiveSession,
   } = useSessions(workspaceId);
 
   // Teaches the store which project each session belongs to, so a finished turn
@@ -799,6 +882,11 @@ function WorkspaceSessions({
             isSelected={session.id === selectedSessionId}
             hasUnread={!!sessionNotifications[session.id]}
             onPress={() => onSelect(workspaceId, session.id)}
+            onRename={(name) => renameSession(session.id, name)}
+            onArchive={async () => {
+              await archiveSession(session.id);
+              onArchived(workspaceId, session.id);
+            }}
             isDark={isDark}
           />
         </AnimatedListItem>
@@ -862,35 +950,82 @@ function SessionRow({
   isSelected,
   hasUnread,
   onPress,
+  onRename,
+  onArchive,
   isDark,
 }: {
   session: SessionListItem;
   isSelected: boolean;
   hasUnread: boolean;
   onPress: () => void;
+  onRename: (name: string) => Promise<void>;
+  onArchive: () => Promise<void>;
   isDark: boolean;
 }) {
   const colors = isDark ? Colors.dark : Colors.light;
-  const client = usePiClient();
-  const isActive = useIsSessionActive(session.id);
+  const isWorking = useIsSessionStreaming(session.id);
   const [hovered, setHovered] = useState(false);
-  const [killing, setKilling] = useState(false);
   const title = session.display_name ?? session.id;
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(title);
+  const [busy, setBusy] = useState<"rename" | "archive" | null>(null);
   const hoverBg = isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.035)";
   const selectedBg = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)";
+  const showActions = hovered || isSelected;
 
-  const handleKill = useCallback(async () => {
-    setKilling(true);
-    try {
-      await client.killSession(session.id);
-    } finally {
-      setKilling(false);
+  useEffect(() => {
+    if (!editing) setDraft(title);
+  }, [editing, title]);
+
+  const commitRename = useCallback(async () => {
+    const name = draft.trim();
+    if (!name || name === title) {
+      setEditing(false);
+      setDraft(title);
+      return;
     }
-  }, [client, session.id]);
+    setBusy("rename");
+    try {
+      await onRename(name);
+      setEditing(false);
+    } catch {
+      Alert.alert("重命名失败", "无法保存对话名称，请重试。");
+    } finally {
+      setBusy(null);
+    }
+  }, [draft, onRename, title]);
+
+  const handleArchive = useCallback(async () => {
+    if (busy) return;
+    setBusy("archive");
+    try {
+      await onArchive();
+    } catch {
+      setBusy(null);
+      Alert.alert("归档失败", "无法归档该对话，请重试。");
+    }
+  }, [busy, onArchive]);
+
+  const status = (
+    <View style={styles.sessionLead}>
+      {isWorking ? (
+        <SessionActivityIndicator
+          sessionId={session.id}
+          color={colors.textSecondary}
+          idlePlaceholder={false}
+        />
+      ) : hasUnread ? (
+        <View
+          style={[
+            styles.dot,
+            { backgroundColor: isDark ? "#3FB950" : "#1A7F37" },
+          ]}
+        />
+      ) : null}
+    </View>
+  );
 
   return (
-    // Same reason as the workspace row: hover has to live on a View so reaching
-    // the stop button doesn't end it.
     <View
       style={[
         styles.sessionRow,
@@ -901,61 +1036,65 @@ function SessionRow({
       onPointerEnter={() => setHovered(true)}
       onPointerLeave={() => setHovered(false)}
     >
-      <Pressable
-        onPress={onPress}
-        style={({ pressed }) => [styles.sessionMain, pressed && { opacity: 0.7 }]}
-      >
-        <Text
-          style={[
-            styles.sessionLabel,
-            {
-              color: isSelected ? colors.text : colors.textSecondary,
-              fontFamily: isSelected ? Fonts.sansMedium : Fonts.sans,
-            },
-          ]}
-          numberOfLines={1}
-        >
-          {title}
-        </Text>
-      </Pressable>
-      {/* Working: animated dots. Finished but unseen: a green dot until read. */}
-      {isActive && !hovered && (
-        <SessionActivityIndicator
-          sessionId={session.id}
-          color={colors.textSecondary}
-          idlePlaceholder={false}
-        />
-      )}
-      {!isActive && !hovered && hasUnread && (
-        <View
-          style={[styles.dot, { backgroundColor: isDark ? "#3FB950" : "#1A7F37" }]}
-        />
-      )}
-      {hovered && isActive && (
+      {editing ? (
+        <View style={styles.sessionMain}>
+          {status}
+          <TextInput
+            autoFocus
+            selectTextOnFocus
+            underlineColorAndroid="transparent"
+            value={draft}
+            onChangeText={setDraft}
+            onSubmitEditing={() => void commitRename()}
+            onKeyPress={(event) => {
+              if (event.nativeEvent.key === "Escape") setEditing(false);
+            }}
+            editable={busy !== "rename"}
+            maxLength={200}
+            selectionColor={colors.tint}
+            style={[
+              styles.sessionInput,
+              { color: colors.text, fontFamily: Fonts.sansMedium },
+            ]}
+          />
+        </View>
+      ) : (
         <Pressable
-          onPress={(e) => {
-            e.stopPropagation();
-            handleKill();
-          }}
-          disabled={killing}
-          accessibilityLabel="停止该对话"
-          style={({ pressed }) => [
-            styles.killButton,
-            { backgroundColor: isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)" },
-            pressed && { opacity: 0.6 },
-          ]}
+          onPress={onPress}
+          style={({ pressed }) => [styles.sessionMain, pressed && { opacity: 0.7 }]}
         >
-          {killing ? (
-            <ActivityIndicator size={10} color={colors.textTertiary} />
-          ) : (
-            <Square
-              size={10}
-              color={isDark ? "#ef4444" : "#dc2626"}
-              strokeWidth={2}
-              fill={isDark ? "#ef4444" : "#dc2626"}
-            />
-          )}
+          {status}
+          <Text
+            style={[
+              styles.sessionLabel,
+              {
+                color: isSelected ? colors.text : colors.textSecondary,
+                fontFamily: isSelected ? Fonts.sansMedium : Fonts.sans,
+              },
+            ]}
+            numberOfLines={1}
+          >
+            {title}
+          </Text>
         </Pressable>
+      )}
+      {showActions && !editing && (
+        <View style={styles.sessionActions}>
+          <RowAction
+            label="重命名对话"
+            onPress={() => setEditing(true)}
+            isDark={isDark}
+          >
+            <Pencil size={11} color={colors.textTertiary} strokeWidth={1.8} />
+          </RowAction>
+          <RowAction label="归档对话" onPress={() => void handleArchive()} isDark={isDark}>
+            {busy === "archive" ? (
+              <ActivityIndicator size={10} color={colors.textTertiary} />
+            ) : (
+              <ArchiveIcon size={11} color={colors.textTertiary} strokeWidth={1.8} />
+            )}
+          </RowAction>
+        </View>
       )}
     </View>
   );
@@ -966,9 +1105,28 @@ const styles = StyleSheet.create({
     flex: 1,
     height: "100%",
   },
+  serverRow: {
+    borderBottomWidth: 0.633,
+    zIndex: 20,
+  },
   top: {
     paddingHorizontal: 8,
     paddingTop: 8,
+  },
+  settingsHeader: {
+    paddingHorizontal: 15,
+    paddingTop: 14,
+    paddingBottom: 10,
+  },
+  settingsTitle: {
+    fontSize: 16,
+    lineHeight: 22,
+    fontFamily: Fonts.sansSemiBold,
+  },
+  settingsContent: {
+    gap: 3,
+    paddingHorizontal: 8,
+    paddingBottom: 12,
   },
   scroll: {
     flex: 1,
@@ -1056,7 +1214,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 6,
     height: 26,
-    paddingLeft: SESSION_INDENT,
+    paddingLeft: 8,
     paddingRight: 7,
     borderRadius: 6,
   },
@@ -1064,13 +1222,33 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: "row",
     alignItems: "center",
+    gap: 4,
     height: "100%",
     minWidth: 0,
+  },
+  sessionLead: {
+    width: 16,
+    alignItems: "center",
+    justifyContent: "center",
   },
   sessionLabel: {
     flex: 1,
     fontSize: 12.5,
     lineHeight: 18,
+  },
+  sessionInput: {
+    flex: 1,
+    minWidth: 0,
+    height: 22,
+    paddingHorizontal: 0,
+    paddingVertical: 0,
+    fontSize: 12.5,
+    lineHeight: 18,
+  },
+  sessionActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 1,
   },
   sessionLoading: {
     alignSelf: "flex-start",
@@ -1093,13 +1271,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 18,
     fontFamily: Fonts.sans,
-  },
-  killButton: {
-    width: 18,
-    height: 18,
-    borderRadius: 4,
-    alignItems: "center",
-    justifyContent: "center",
   },
   empty: {
     fontSize: 12.5,

@@ -136,6 +136,11 @@ Response:
 
 #### clear_queue
 
+> **Not implemented by pi 0.84.3.** Sending it returns
+> `{"success": false, "error": "Unknown command: clear_queue"}`. PiDeck therefore
+> exposes no clear-queue endpoint; queued messages are display-only until pi ships
+> this command.
+
 Remove queued steering and follow-up messages and return their text.
 
 ```json

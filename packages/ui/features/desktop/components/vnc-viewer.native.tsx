@@ -92,8 +92,8 @@ export function VncViewer({
     const wsUrl = useMemo(() => {
         const url = new URL(serverUrl);
         const wsScheme = url.protocol === 'https:' ? 'wss' : 'ws';
-        return `${wsScheme}://${url.host}/api/desktop/ws?access_token=${encodeURIComponent(accessToken)}`;
-    }, [serverUrl, accessToken]);
+        return `${wsScheme}://${url.host}/api/desktop/ws`;
+    }, [serverUrl]);
 
     const blitRect = useCallback((
         fb: Uint8ClampedArray,
@@ -216,6 +216,7 @@ export function VncViewer({
 
     const session = useVncSession({
         wsUrl,
+        websocketProtocols: ['binary', `pideck-auth.${accessToken}`],
         password: vncPassword,
         autoConnect: true,
         onFramebufferUpdate: handleFramebufferUpdate,

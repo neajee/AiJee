@@ -54,6 +54,8 @@ export interface WorkspaceSessionsHandle extends WorkspaceSessionsState {
   fetchNextPage: () => void;
   refetch: () => void;
   deleteSession: (sessionId: string) => Promise<void>;
+  renameSession: (sessionId: string, name: string) => Promise<void>;
+  archiveSession: (sessionId: string) => Promise<void>;
 }
 
 export function useWorkspaceSessions(
@@ -63,6 +65,7 @@ export function useWorkspaceSessions(
   const { api } = client;
   const state$ = useRef(new BehaviorSubject<InternalState>(INITIAL_STATE));
   const workspaceIdRef = useRef(workspaceId);
+  const requestIdRef = useRef(0);
   const refreshTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   workspaceIdRef.current = workspaceId;
 
@@ -76,11 +79,13 @@ export function useWorkspaceSessions(
     async (page: number, append: boolean) => {
       const wid = workspaceIdRef.current;
       if (!wid) return;
+      const requestId = ++requestIdRef.current;
       try {
         const data = await api.listWorkspaceSessions(wid, {
           page,
           limit: PAGE_SIZE,
         });
+        if (workspaceIdRef.current !== wid || requestIdRef.current !== requestId) return;
         const items = data.items ?? [];
         const prev = append ? state$.current.value.sessions : [];
         emit({
@@ -94,6 +99,7 @@ export function useWorkspaceSessions(
           error: null,
         });
       } catch (e: any) {
+        if (workspaceIdRef.current !== wid || requestIdRef.current !== requestId) return;
         emit({
           isLoading: false,
           isFetchingNextPage: false,
@@ -106,6 +112,7 @@ export function useWorkspaceSessions(
   );
 
   useEffect(() => {
+    ++requestIdRef.current;
     state$.current.next(INITIAL_STATE);
     if (!workspaceId) return;
     loadPage(1, false);
@@ -155,6 +162,37 @@ export function useWorkspaceSessions(
     [api, refetch],
   );
 
+  const renameSession = useCallback(
+    async (sessionId: string, name: string) => {
+      const wid = workspaceIdRef.current;
+      if (!wid) return;
+      await api.renameWorkspaceSession(wid, sessionId, name);
+      const current = state$.current.value;
+      emit({
+        sessions: current.sessions.map((session) =>
+          session.id === sessionId
+            ? { ...session, display_name: name }
+            : session,
+        ),
+      });
+    },
+    [api, emit],
+  );
+
+  const archiveSession = useCallback(
+    async (sessionId: string) => {
+      const wid = workspaceIdRef.current;
+      if (!wid) return;
+      await api.archiveWorkspaceSession(wid, sessionId);
+      const current = state$.current.value;
+      emit({
+        sessions: current.sessions.filter((session) => session.id !== sessionId),
+        total: Math.max(0, current.total - 1),
+      });
+    },
+    [api, emit],
+  );
+
   useEffect(() => {
     if (!workspaceId) return;
     const subscription = client.events$.subscribe((event) => {
@@ -187,5 +225,12 @@ export function useWorkspaceSessions(
     [snapshot],
   );
 
-  return { ...publicState, fetchNextPage, refetch, deleteSession };
+  return {
+    ...publicState,
+    fetchNextPage,
+    refetch,
+    deleteSession,
+    renameSession,
+    archiveSession,
+  };
 }

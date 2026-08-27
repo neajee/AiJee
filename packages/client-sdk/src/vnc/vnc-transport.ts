@@ -17,6 +17,7 @@ export type RemoteDisplaySocketMessage =
 
 export interface RemoteDisplaySocketBoundaryOptions {
     url: string;
+    protocols?: string | string[];
     binaryType?: BinaryType;
     parseControlMessage?: (text: string) => unknown;
     onOpen?: () => void;
@@ -79,7 +80,9 @@ export class WebSocketRemoteDisplayBoundary {
     connect(): void {
         if (this.disposed) return;
         try { this.socket?.close?.(); } catch {}
-        const socket = new WebSocket(this.options.url);
+        const socket = this.options.protocols
+            ? new WebSocket(this.options.url, this.options.protocols)
+            : new WebSocket(this.options.url);
         socket.binaryType = this.options.binaryType || 'arraybuffer';
         socket.addEventListener('open', () => {
             if (this.disposed || this.socket !== socket) return;

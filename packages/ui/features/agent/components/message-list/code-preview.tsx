@@ -10,6 +10,8 @@ interface CodePreviewProps {
   language?: string;
   diffLanguage?: string;
   showLineNumbers?: boolean;
+  /** Stretch to the parent's height instead of sizing to the code. */
+  fill?: boolean;
   /**
    * Drop the surface, border and radius so a parent can own the chrome
    * (used by the markdown code block, which adds its own header row).
@@ -326,6 +328,7 @@ export const CodePreview = memo(function CodePreview({
   language,
   diffLanguage,
   showLineNumbers = true,
+  fill = false,
   bare = false,
 }: CodePreviewProps) {
   const colors = isDark ? Colors.dark : Colors.light;
@@ -334,11 +337,12 @@ export const CodePreview = memo(function CodePreview({
 
   return (
     <View
-      style={
+      style={[
         bare
           ? styles.bareContainer
-          : [styles.container, { backgroundColor: colors.surfaceRaised, borderColor: colors.border }]
-      }
+          : [styles.container, { backgroundColor: colors.surfaceRaised, borderColor: colors.border }],
+        fill && styles.fillContainer,
+      ]}
     >
       <ScrollView
         style={maxHeight ? { maxHeight } : undefined}
@@ -383,6 +387,9 @@ const styles = StyleSheet.create({
   },
   bareContainer: {
     overflow: "hidden",
+  },
+  fillContainer: {
+    flex: 1,
   },
   row: {
     flexDirection: "row",

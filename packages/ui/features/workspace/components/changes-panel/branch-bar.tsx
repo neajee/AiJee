@@ -1,25 +1,17 @@
 import { StyleSheet, Text, View } from "react-native";
-import {
-  GitBranch,
-  ArrowUp,
-  ArrowDown,
-  RefreshCw,
-} from "lucide-react-native";
+import { GitBranch, ArrowUp, ArrowDown } from "lucide-react-native";
 
 import { Fonts } from "@/constants/theme";
-import { IconButton } from "./icon-button";
 import { useChangesTheme } from "./use-theme-colors";
 
 export function BranchBar({
   branch,
   ahead,
   behind,
-  onRefresh,
 }: {
   branch: string;
   ahead: number;
   behind: number;
-  onRefresh: () => void;
 }) {
   const { textPrimary, textMuted, dividerColor } = useChangesTheme();
 
@@ -52,11 +44,6 @@ export function BranchBar({
           )}
         </View>
       )}
-      <IconButton
-        onPress={onRefresh}
-        title="Refresh"
-        icon={<RefreshCw size={12} color={textMuted} strokeWidth={2} />}
-      />
     </View>
   );
 }
@@ -67,7 +54,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 6,
     paddingHorizontal: 12,
-    height: 34,
+    height: 28,
     borderBottomWidth: 0.633,
   },
   branchText: {

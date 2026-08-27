@@ -10,11 +10,13 @@ interface UseAgentSessionOptions {
 }
 
 export interface AgentSessionHandle extends SessionState {
-  prompt: (message: string, options?: { images?: ImageContent[] }) => Promise<void>;
+  prompt: (
+    message: string,
+    options?: { images?: ImageContent[]; streamingBehavior?: "steer" | "followUp" },
+  ) => Promise<void>;
   steer: (message: string, options?: { images?: ImageContent[] }) => Promise<void>;
   followUp: (message: string, options?: { images?: ImageContent[] }) => Promise<void>;
   abort: () => Promise<void>;
-  clearQueue: () => Promise<{ steering: string[]; followUp: string[] }>;
   loadOlderMessages: () => Promise<void>;
   sendExtensionUiResponse: (params: {
     id: string;
@@ -74,10 +76,14 @@ export function useAgentSession(
   }, [client, sessionId, options?.workspaceId, options?.sessionFile]);
 
   const prompt = useCallback(
-    (message: string, opts?: { images?: ImageContent[] }) => {
+    (
+      message: string,
+      opts?: { images?: ImageContent[]; streamingBehavior?: "steer" | "followUp" },
+    ) => {
       if (!sessionId) return Promise.resolve();
       return client.prompt(sessionId, message, {
         images: opts?.images,
+        streamingBehavior: opts?.streamingBehavior,
         workspaceId: options?.workspaceId,
         sessionFile: options?.sessionFile,
       });
@@ -114,11 +120,6 @@ export function useAgentSession(
     return client.abort(sessionId);
   }, [client, sessionId]);
 
-  const clearQueue = useCallback(() => {
-    if (!sessionId) return Promise.resolve({ steering: [], followUp: [] });
-    return client.clearQueue(sessionId);
-  }, [client, sessionId]);
-
   const loadOlderMessages = useCallback(() => {
     if (!sessionId) return Promise.resolve();
     return client.loadOlderMessages(sessionId);
@@ -138,7 +139,6 @@ export function useAgentSession(
     steer,
     followUp,
     abort,
-    clearQueue,
     loadOlderMessages,
     sendExtensionUiResponse,
   };

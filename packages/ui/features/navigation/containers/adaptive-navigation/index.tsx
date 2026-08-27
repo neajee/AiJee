@@ -18,13 +18,12 @@ import { usePathname } from "expo-router";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useResponsiveLayout } from "../../hooks/use-responsive-layout";
-import { HeaderBar } from "../../components/header-bar";
 import { MobileHeaderBar } from "../../components/mobile-header-bar";
 import { WorkspaceSheet } from "../../components/workspace-sheet";
 import { MobileChangesSheet } from "../../components/mobile-changes-sheet";
 import { MobileFilesSheet } from "../../components/mobile-files-sheet";
 import { MobilePreviewSheet } from "../../components/mobile-preview-sheet";
-import { ProjectSidebar } from "../../components/project-sidebar";
+import { ProjectSidebar, SettingsSidebar } from "../../components/project-sidebar";
 import { useAuthStore } from "@/features/auth/store";
 import { useWorkspaceStore } from "@/features/workspace/store";
 import { useAppMode } from "@/hooks/use-app-mode";
@@ -33,6 +32,11 @@ import { ConnectionStatusBanner } from "@/features/agent/components/connection-s
 import { TasksSheet } from "@/features/tasks/components/tasks-sheet";
 import { TaskOutputSheet } from "@/features/tasks/components/task-output-sheet";
 import { TaskOutputPanel } from "@/features/tasks/components/task-output-panel";
+import {
+  SeamToggle,
+  SEAM_TOGGLE_HEIGHT,
+  SEAM_TOGGLE_WIDTH,
+} from "@/components/ui/seam-toggle";
 
 const SIDEBAR_DEFAULT = 280;
 /** Width of the invisible left-edge strip that reveals a hidden sidebar. */
@@ -143,6 +147,7 @@ export function AdaptiveNavigation({ children }: AdaptiveNavigationProps) {
   }, [isPersistent]);
 
   const pathname = usePathname();
+  const settingsMode = pathname.startsWith("/settings");
   const mobilePreviewSessionMatch = pathname.match(/^\/workspace\/[^/]+\/s\/([^/]+)$/);
   const mobilePreviewSessionId = mobilePreviewSessionMatch?.[1] ?? null;
 
@@ -188,14 +193,6 @@ export function AdaptiveNavigation({ children }: AdaptiveNavigationProps) {
         style={[styles.wideContainer, { backgroundColor: isDesktopMode && desktopImmersive ? '#000' : colors.background }]}
         edges={isDesktopMode && desktopImmersive ? [] : ["top"]}
       >
-        {hasServer && !isDesktopMode ? (
-          <HeaderBar
-            onToggleSidebar={handleToggleSidebar}
-            sidebarVisible={isPersistent}
-          />
-        ) : (
-          <View style={{ height: 0 }} />
-        )}
         <View style={styles.bodyRow}>
           {showSidebar && showPersistentSidebar && sidebarMounted && (
             <Animated.View
@@ -208,7 +205,7 @@ export function AdaptiveNavigation({ children }: AdaptiveNavigationProps) {
               <View
                 style={{ width: sidebarWidth, flex: 1 }}
               >
-                <ProjectSidebar />
+                {settingsMode ? <SettingsSidebar /> : <ProjectSidebar />}
               </View>
             </Animated.View>
           )}
@@ -262,11 +259,38 @@ export function AdaptiveNavigation({ children }: AdaptiveNavigationProps) {
                     },
                   ]}
                 >
-                  <ProjectSidebar />
+                  {settingsMode ? <SettingsSidebar /> : <ProjectSidebar />}
                 </Animated.View>
               </>
             )}
           </Animated.View>
+
+          {/* One control on the seam, always reachable: its position doubles as
+              the sidebar's state, so a collapsed sidebar is never a dead edge. */}
+          {showSidebar && isCodeMode && (
+            <Animated.View
+              pointerEvents="box-none"
+              style={[
+                styles.seamPillWrap,
+                {
+                  left: Animated.subtract(
+                    animatedSidebarWidth,
+                    SEAM_TOGGLE_WIDTH / 2,
+                  ),
+                },
+              ]}
+            >
+              <SeamToggle
+                chevron={isPersistent ? "left" : "right"}
+                onPress={handleToggleSidebar}
+                label={isPersistent ? "Collapse sidebar" : "Expand sidebar"}
+                // Hovering the pill peeks the hidden sidebar too, so the whole
+                // left edge behaves the same way.
+                onHoverIn={handleHoverZoneIn}
+                onHoverOut={handleHoverZoneOut}
+              />
+            </Animated.View>
+          )}
         </View>
         {hasServer && <ConnectionStatusBanner />}
       </SafeAreaView>
@@ -394,5 +418,13 @@ const styles = StyleSheet.create({
     bottom: 0,
     width: SIDEBAR_DEFAULT,
     zIndex: 11,
+  },
+  seamPillWrap: {
+    position: "absolute",
+    top: "50%",
+    marginTop: -SEAM_TOGGLE_HEIGHT / 2,
+    width: SEAM_TOGGLE_WIDTH,
+    height: SEAM_TOGGLE_HEIGHT,
+    zIndex: 30,
   },
 });

@@ -63,7 +63,6 @@ export function FilesPanel() {
         onViewFile={setViewingFile}
         expandedDirs={expandedDirs}
         onToggleDir={handleToggleDir}
-        showActions
       />
     </View>
   );

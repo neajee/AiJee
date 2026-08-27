@@ -1,7 +1,7 @@
 use axum::Json;
+use axum::extract::State;
 use axum::extract::ws::{Message, WebSocket, WebSocketUpgrade};
-use axum::extract::{Query, State};
-use axum::http::{HeaderMap, StatusCode};
+use axum::http::{HeaderMap, StatusCode, header::SEC_WEBSOCKET_PROTOCOL};
 use axum::response::IntoResponse;
 use futures_util::{SinkExt, StreamExt};
 use tokio::io::{AsyncReadExt, AsyncWriteExt};
@@ -30,11 +30,6 @@ pub struct StartDesktopRequest {
     pub backend_id: Option<String>,
     pub de_id: Option<String>,
     pub resolution: Option<String>,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct WsQuery {
-    pub access_token: Option<String>,
 }
 
 #[utoipa::path(
@@ -159,9 +154,19 @@ pub async fn vnc_websocket(
     ws: WebSocketUpgrade,
     State(state): State<AppState>,
     headers: HeaderMap,
-    Query(params): Query<WsQuery>,
 ) -> impl IntoResponse {
-    let access_token = auth::extract_token(&headers).or(params.access_token);
+    let access_token = auth::extract_token(&headers).or_else(|| {
+        headers
+            .get(SEC_WEBSOCKET_PROTOCOL)
+            .and_then(|value| value.to_str().ok())
+            .and_then(|protocols| {
+                protocols
+                    .split(',')
+                    .map(str::trim)
+                    .find_map(|protocol| protocol.strip_prefix("pideck-auth."))
+            })
+            .map(str::to_owned)
+    });
 
     let token = match access_token {
         Some(t) => t,

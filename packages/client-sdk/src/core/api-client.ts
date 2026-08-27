@@ -312,16 +312,6 @@ export class ApiClient {
     unwrapResult(result);
   }
 
-  async clearQueue(sessionId: string): Promise<{
-    steering: string[];
-    followUp: string[];
-  }> {
-    const result = await sdk.clearQueue({
-      body: { session_id: sessionId },
-    });
-    return unwrapResult(result);
-  }
-
   // ---------------------------------------------------------------------------
   // Agent — state & config
   // ---------------------------------------------------------------------------
@@ -798,6 +788,28 @@ export class ApiClient {
     sessionId: string,
   ): Promise<void> {
     const result = await sdk.sessionsDelete({
+      path: { id: workspaceId, session_id: sessionId },
+    });
+    unwrapResult(result);
+  }
+
+  async renameWorkspaceSession(
+    workspaceId: string,
+    sessionId: string,
+    name: string,
+  ): Promise<void> {
+    const result = await sdk.sessionsRename({
+      path: { id: workspaceId, session_id: sessionId },
+      body: { name },
+    });
+    unwrapResult(result);
+  }
+
+  async archiveWorkspaceSession(
+    workspaceId: string,
+    sessionId: string,
+  ): Promise<void> {
+    const result = await sdk.sessionsArchive({
       path: { id: workspaceId, session_id: sessionId },
     });
     unwrapResult(result);

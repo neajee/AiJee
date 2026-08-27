@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import {
+  Linking,
   Modal,
   Platform,
   Pressable,
@@ -9,7 +10,9 @@ import {
   useWindowDimensions,
 } from "react-native";
 import {
-  FolderOpen,
+  ExternalLink,
+  Github,
+  Gitlab,
   Pencil,
   Pin,
   PinOff,
@@ -19,6 +22,8 @@ import {
 
 import { Colors, Fonts } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useGitStatus, useNestedRepos } from "@pideck/client-sdk";
+import { remotesToLinks, type RemoteLink } from "@/features/workspace/utils/git-remote-url";
 
 /** Exported so callers can right-align the menu under an anchor button. */
 export const MENU_WIDTH = 170;
@@ -40,9 +45,9 @@ interface WorkspaceContextMenuProps {
   y: number;
   /** When set, the menu offers pinning. */
   pinned?: boolean;
+  /** Working tree of the project, used to offer its git remotes. */
+  workspacePath?: string | null;
   onTogglePin?: () => void;
-  /** Opens the project's most recent session. */
-  onOpen?: () => void;
   onNewSession?: () => void;
   onEdit: () => void;
   onDelete: () => void;
@@ -64,8 +69,8 @@ export function WorkspaceContextMenu({
   x,
   y,
   pinned,
+  workspacePath,
   onTogglePin,
-  onOpen,
   onNewSession,
   onEdit,
   onDelete,
@@ -74,6 +79,22 @@ export function WorkspaceContextMenu({
   const colorScheme = useColorScheme() ?? "light";
   const isDark = colorScheme === "dark";
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
+
+  // Only asked for while the menu is up: the remotes are a menu detail, not
+  // something the sidebar needs to keep warm.
+  const cwd = visible ? workspacePath ?? null : null;
+  const { data: gitData } = useGitStatus(cwd);
+  const { repos: nestedRepos } = useNestedRepos(cwd);
+
+  const repoLinks: (RemoteLink & { repoPath?: string })[] = [
+    ...remotesToLinks(gitData?.remotes),
+    ...(nestedRepos ?? []).flatMap((repo) =>
+      remotesToLinks(repo.remotes).map((link) => ({
+        ...link,
+        repoPath: repo.path,
+      })),
+    ),
+  ];
 
   const textPrimary = isDark ? "#fefdfd" : Colors[colorScheme].text;
   const textDanger = "#E5484D";
@@ -96,7 +117,10 @@ export function WorkspaceContextMenu({
   if (!visible) return null;
 
   const itemCount =
-    2 + (onTogglePin ? 1 : 0) + (onOpen ? 1 : 0) + (onNewSession ? 1 : 0);
+    2 +
+    (onTogglePin ? 1 : 0) +
+    (onNewSession ? 1 : 0) +
+    repoLinks.length;
   const menuHeight = itemCount * ITEM_HEIGHT + MENU_PADDING * 2;
   // Flip near the edges so the menu never opens partly offscreen.
   const left = Math.max(
@@ -131,18 +155,6 @@ export function WorkspaceContextMenu({
           { top, left, backgroundColor: menuBg, borderColor: menuBorder },
         ]}
       >
-        {onOpen && (
-          <MenuItem
-            icon={FolderOpen}
-            label="打开项目"
-            color={textPrimary}
-            hoverBg={hoverBg}
-            onPress={() => {
-              onClose();
-              onOpen();
-            }}
-          />
-        )}
         {onNewSession && (
           <MenuItem
             icon={SquarePen}
@@ -155,7 +167,35 @@ export function WorkspaceContextMenu({
             }}
           />
         )}
-        {(onOpen || onNewSession) && separator}
+        {onNewSession && separator}
+        {repoLinks.length > 0 && (
+          <>
+            {repoLinks.map((link, i) => (
+              <MenuItem
+                key={`${link.browserUrl}-${i}`}
+                icon={
+                  link.host === "github"
+                    ? Github
+                    : link.host === "gitlab"
+                      ? Gitlab
+                      : ExternalLink
+                }
+                label={
+                  link.repoPath
+                    ? `${link.label}: ${link.repoPath.split("/").pop()}`
+                    : `在 ${link.label} 打开`
+                }
+                color={textPrimary}
+                hoverBg={hoverBg}
+                onPress={() => {
+                  onClose();
+                  Linking.openURL(link.browserUrl);
+                }}
+              />
+            ))}
+            {separator}
+          </>
+        )}
         {onTogglePin && (
           <MenuItem
             icon={pinned ? PinOff : Pin}

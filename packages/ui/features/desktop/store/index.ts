@@ -55,6 +55,7 @@ interface DesktopState {
   stopDesktop: () => Promise<void>;
   setDesktopInfo: (info: any) => void;
   setImmersive: (value: boolean) => void;
+  resetServerState: () => void;
 }
 
 const INITIAL_INFO: DesktopInfo = {
@@ -75,6 +76,8 @@ const INITIAL_CURRENT: CurrentDesktopInfo = {
   session_type: 'unknown',
 };
 
+let serverStateGeneration = 0;
+
 export const useDesktopStore = create<DesktopState>((set, get) => ({
   backends: [],
   desktopEnvironments: [],
@@ -86,8 +89,10 @@ export const useDesktopStore = create<DesktopState>((set, get) => ({
   immersive: false,
 
   fetchBackends: async () => {
+    const generation = serverStateGeneration;
     try {
       const res = await client.get({ url: '/api/desktop/backends' });
+      if (generation !== serverStateGeneration) return;
       const body = res.data as any;
       if (body?.success && body.data) {
         set({
@@ -103,8 +108,10 @@ export const useDesktopStore = create<DesktopState>((set, get) => ({
   },
 
   fetchStatus: async () => {
+    const generation = serverStateGeneration;
     try {
       const res = await client.get({ url: '/api/desktop/status' });
+      if (generation !== serverStateGeneration) return;
       const body = res.data as any;
       if (body?.success && body.data) {
         set({ desktopInfo: body.data });
@@ -115,12 +122,14 @@ export const useDesktopStore = create<DesktopState>((set, get) => ({
   },
 
   startActual: async () => {
+    const generation = serverStateGeneration;
     set({ loading: true });
     try {
       const res = await client.post({
         url: '/api/desktop/start',
         body: { mode: 'actual' },
       });
+      if (generation !== serverStateGeneration) return;
       const body = res.data as any;
       if (body?.success && body.data) {
         set({ desktopInfo: body.data, loading: false });
@@ -135,6 +144,7 @@ export const useDesktopStore = create<DesktopState>((set, get) => ({
         });
       }
     } catch (e: any) {
+      if (generation !== serverStateGeneration) return;
       set({
         loading: false,
         desktopInfo: {
@@ -147,6 +157,7 @@ export const useDesktopStore = create<DesktopState>((set, get) => ({
   },
 
   startVirtual: async (backendId: string, deId: string, resolution?: string) => {
+    const generation = serverStateGeneration;
     set({ loading: true });
     try {
       const res = await client.post({
@@ -158,6 +169,7 @@ export const useDesktopStore = create<DesktopState>((set, get) => ({
           resolution: resolution ?? null,
         },
       });
+      if (generation !== serverStateGeneration) return;
       const body = res.data as any;
       if (body?.success && body.data) {
         set({ desktopInfo: body.data, loading: false });
@@ -172,6 +184,7 @@ export const useDesktopStore = create<DesktopState>((set, get) => ({
         });
       }
     } catch (e: any) {
+      if (generation !== serverStateGeneration) return;
       set({
         loading: false,
         desktopInfo: {
@@ -192,9 +205,11 @@ export const useDesktopStore = create<DesktopState>((set, get) => ({
   },
 
   stopDesktop: async () => {
+    const generation = serverStateGeneration;
     set({ stopping: true });
     try {
       const res = await client.post({ url: '/api/desktop/stop' });
+      if (generation !== serverStateGeneration) return;
       const body = res.data as any;
       if (body?.success) {
         set({ desktopInfo: INITIAL_INFO, stopping: false });
@@ -202,8 +217,23 @@ export const useDesktopStore = create<DesktopState>((set, get) => ({
         set({ stopping: false });
       }
     } catch (e) {
+      if (generation !== serverStateGeneration) return;
       console.error('Failed to stop desktop:', e);
       set({ stopping: false });
     }
+  },
+
+  resetServerState: () => {
+    ++serverStateGeneration;
+    set({
+      backends: [],
+      desktopEnvironments: [],
+      currentDesktop: INITIAL_CURRENT,
+      desktopInfo: INITIAL_INFO,
+      loading: false,
+      stopping: false,
+      backendsLoaded: false,
+      immersive: false,
+    });
   },
 }));

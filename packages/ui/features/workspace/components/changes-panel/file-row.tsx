@@ -1,5 +1,7 @@
+import { useState } from "react";
 import {
   ActivityIndicator,
+  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -10,7 +12,18 @@ import { Fonts } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { STATUS_COLORS, statusLabel } from "./constants";
 import { DiffView } from "./diff-view";
+import { FileTypeBadge } from "../file-type-badge";
 
+/** Reserved on touch, where there is no hover to overlay the actions on. */
+export const ROW_ACTIONS_WIDTH = 50;
+
+/**
+ * One changed file.
+ *
+ * The path leads and the filename ends it in full: the directory is context and
+ * may lose its middle, the name never does. Churn sits right after the name
+ * rather than in a far-right column, so a row reads as one phrase.
+ */
 export function FileRow({
   path,
   status,
@@ -23,6 +36,7 @@ export function FileRow({
   textPrimary,
   textMuted,
   hoverBg,
+  dividerColor,
   actions,
 }: {
   path: string;
@@ -36,65 +50,95 @@ export function FileRow({
   textPrimary: string;
   textMuted: string;
   hoverBg: string;
+  dividerColor: string;
   actions?: React.ReactNode;
 }) {
   const colorScheme = useColorScheme() ?? "light";
   const isDark = colorScheme === "dark";
-  const filename = path.split("/").pop() ?? path;
-  const dir = path.includes("/")
-    ? path.slice(0, path.lastIndexOf("/") + 1)
-    : "";
-  const badge = statusLabel(status);
-  const badgeColor = STATUS_COLORS[badge] ?? textMuted;
+  const isWeb = Platform.OS === "web";
   const selectedBg = isDark ? "#1e1e1e" : "#E8E8E8";
 
+  const slash = path.lastIndexOf("/");
+  const dir = slash >= 0 ? path.slice(0, slash) : "";
+  const name = slash >= 0 ? path.slice(slash) : path;
+
+  // Modified is the default state of a working tree, so only the states that
+  // change what exists get a letter.
+  const badge = statusLabel(status);
+  const showBadge = badge !== "M";
+  const badgeColor = STATUS_COLORS[badge] ?? textMuted;
+
+  // Hover lives on the wrapper so moving onto an action button keeps it up.
+  const [hovered, setHovered] = useState(false);
+
   return (
-    <View>
+    <View
+      {...(isWeb
+        ? {
+            onPointerEnter: () => setHovered(true),
+            onPointerLeave: () => setHovered(false),
+          }
+        : {})}
+    >
       <Pressable
         onPress={onPress}
         {...{ title: path }}
         accessibilityLabel={`${path} (${status})`}
-        style={({ pressed, hovered }: any) => [
+        style={({ pressed, hovered: rowHovered }: any) => [
           styles.fileRow,
+          { borderBottomColor: dividerColor },
           isSelected && { backgroundColor: selectedBg },
-          !isSelected && (pressed || hovered) && { backgroundColor: hoverBg },
+          !isSelected && (pressed || rowHovered) && { backgroundColor: hoverBg },
         ]}
       >
-        <Text style={[styles.statusBadge, { color: badgeColor }]}>
-          {badge}
-        </Text>
-        <View style={styles.fileName}>
+        <FileTypeBadge path={path} fallbackColor={textMuted} />
+
+        {/* Only the directory may be cut, and it is cut from its own end so the
+            filename beside it always shows whole. */}
+        {dir.length > 0 && (
           <Text
-            style={[styles.fileNameText, { color: textPrimary }]}
+            style={[styles.dirText, { color: textMuted }]}
             numberOfLines={1}
           >
-            {filename}
+            {dir}
           </Text>
-          {dir.length > 0 && (
-            <Text
-              style={[styles.fileDirText, { color: textMuted }]}
-              numberOfLines={1}
-            >
-              {dir}
-            </Text>
-          )}
-        </View>
-        {(additions != null || deletions != null) && (
-          <View style={styles.lineStats}>
-            {(additions ?? 0) > 0 && (
-              <Text style={[styles.additionsStat, { color: "#26A269" }]}>
-                +{additions}
-              </Text>
-            )}
-            {(deletions ?? 0) > 0 && (
-              <Text style={[styles.deletionsStat, { color: "#E5484D" }]}>
-                -{deletions}
-              </Text>
-            )}
-          </View>
         )}
-        {actions && <View style={styles.fileActionsWrap}>{actions}</View>}
+        <Text style={[styles.nameText, { color: textPrimary }]} numberOfLines={1}>
+          {name}
+        </Text>
+
+        {(additions ?? 0) > 0 && (
+          <Text style={[styles.stat, { color: "#26A269" }]}>+{additions}</Text>
+        )}
+        {(deletions ?? 0) > 0 && (
+          <Text style={[styles.stat, { color: "#E5484D" }]}>−{deletions}</Text>
+        )}
+        {showBadge && (
+          <Text style={[styles.statusBadge, { color: badgeColor }]}>
+            {badge}
+          </Text>
+        )}
+
+        <View style={styles.filler} />
+
+        {actions &&
+          (isWeb ? (
+            // Hovering means a pointer, and a pointer means the metadata can be
+            // covered for a moment instead of surrendering 50px on every row.
+            <View
+              style={[
+                styles.fileActionsOverlay,
+                { backgroundColor: isSelected ? selectedBg : hoverBg },
+                !hovered && ({ opacity: 0, pointerEvents: "none" } as any),
+              ]}
+            >
+              {actions}
+            </View>
+          ) : (
+            <View style={styles.fileActionsWrap}>{actions}</View>
+          ))}
       </Pressable>
+
       {isSelected && (
         <View
           style={[
@@ -121,50 +165,50 @@ const styles = StyleSheet.create({
   fileRow: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 5,
+    paddingLeft: 4,
+    paddingRight: 8,
     minHeight: 30,
+    borderBottomWidth: 0.633,
+  },
+  dirText: {
+    flexShrink: 1,
+    fontSize: 12,
+    fontFamily: Fonts.sans,
+  },
+  nameText: {
+    flexShrink: 0,
+    fontSize: 12,
+    fontFamily: Fonts.sansMedium,
+  },
+  stat: {
+    marginLeft: 6,
+    fontSize: 11,
+    fontFamily: Fonts.mono,
   },
   statusBadge: {
-    fontSize: 11,
-    fontFamily: Fonts.sansBold,
-    width: 14,
-    textAlign: "center",
+    marginLeft: 6,
+    fontSize: 10.5,
+    fontFamily: Fonts.mono,
   },
-  fileName: {
-    flex: 1,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    overflow: "hidden",
-  },
-  fileNameText: {
-    fontSize: 13,
-    fontFamily: Fonts.sans,
+  filler: {
+    flexGrow: 1,
     flexShrink: 0,
-  },
-  fileDirText: {
-    fontSize: 11,
-    fontFamily: Fonts.sans,
-    flexShrink: 1,
+    minWidth: 8,
   },
   fileActionsWrap: {
+    width: ROW_ACTIONS_WIDTH,
     flexDirection: "row",
     alignItems: "center",
+    justifyContent: "flex-end",
   },
-  lineStats: {
+  fileActionsOverlay: {
+    position: "absolute",
+    right: 0,
+    top: 0,
+    bottom: 0,
+    paddingHorizontal: 8,
     flexDirection: "row",
-    gap: 4,
-    marginRight: 4,
-  },
-  additionsStat: {
-    fontSize: 11,
-    fontFamily: Fonts.sansMedium,
-  },
-  deletionsStat: {
-    fontSize: 11,
-    fontFamily: Fonts.sansMedium,
+    alignItems: "center",
   },
   diffContainer: {
     marginHorizontal: 8,

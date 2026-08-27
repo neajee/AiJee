@@ -40,9 +40,11 @@ interface TasksState {
   appendLogLine: (taskId: string, line: string) => void;
   updateTaskStatus: (taskId: string, status: TaskInfo['status'], exitCode?: number | null) => void;
   addTaskInstance: (info: TaskInfo) => void;
+  resetServerState: () => void;
 }
 
 const DEFAULT_OUTPUT_HEIGHT = 200;
+let serverStateGeneration = 0;
 
 export const useTasksStore = create<TasksState>((set, get) => ({
   definitions: [],
@@ -66,8 +68,10 @@ export const useTasksStore = create<TasksState>((set, get) => ({
   setOutputPanelHeight: (height) => set({ outputPanelHeight: Math.max(100, Math.min(500, height)) }),
 
   fetchConfig: async (workspaceId) => {
+    const generation = serverStateGeneration;
     try {
       const result = await getConfig({ path: { workspace_id: workspaceId } });
+      if (generation !== serverStateGeneration) return;
       const config = unwrapApiData(result.data);
       if (config) {
         const tasks = config.tasks;
@@ -84,25 +88,31 @@ export const useTasksStore = create<TasksState>((set, get) => ({
         set({ definitions: [], hasConfig: false, selectedTaskLabel: null });
       }
     } catch (e: any) {
+      if (generation !== serverStateGeneration) return;
       set({ definitions: [], hasConfig: false, error: e.message });
     }
   },
 
   fetchInstances: async (workspaceId) => {
+    const generation = serverStateGeneration;
     try {
       const result = await listTasks({ path: { workspace_id: workspaceId } });
+      if (generation !== serverStateGeneration) return;
       const instances = unwrapApiData(result.data);
       if (instances) {
         set({ instances, error: null });
       }
     } catch (e: any) {
+      if (generation !== serverStateGeneration) return;
       set({ error: e.message });
     }
   },
 
   fetchLogs: async (taskId) => {
+    const generation = serverStateGeneration;
     try {
       const result = await getLogs({ path: { task_id: taskId } });
+      if (generation !== serverStateGeneration) return;
       const logs = unwrapApiData(result.data);
       if (logs) {
         set((s) => ({
@@ -110,16 +120,19 @@ export const useTasksStore = create<TasksState>((set, get) => ({
         }));
       }
     } catch (e: any) {
+      if (generation !== serverStateGeneration) return;
       set({ error: e.message });
     }
   },
 
   startTask: async (label, workspaceId) => {
+    const generation = serverStateGeneration;
     set({ loading: true, error: null });
     try {
       const result = await apiStartTask({
         body: { label, workspace_id: workspaceId },
       });
+      if (generation !== serverStateGeneration) return;
       const info = unwrapApiData(result.data);
       if (info) {
         set((s) => ({
@@ -136,11 +149,13 @@ export const useTasksStore = create<TasksState>((set, get) => ({
         });
       }
     } catch (e: any) {
+      if (generation !== serverStateGeneration) return;
       set({ loading: false, error: e.message });
     }
   },
 
   stopTask: async (taskId) => {
+    const generation = serverStateGeneration;
     const previous = get().instances.find((i) => i.id === taskId);
     if (!previous) return;
 
@@ -157,6 +172,7 @@ export const useTasksStore = create<TasksState>((set, get) => ({
 
     try {
       const result = await apiStopTask({ body: { task_id: taskId } });
+      if (generation !== serverStateGeneration) return;
       const info = unwrapApiData(result.data);
       if (info) {
         set((s) => ({
@@ -168,6 +184,7 @@ export const useTasksStore = create<TasksState>((set, get) => ({
         throw new Error(extractApiErrorMessage(result.error, 'Failed to stop task'));
       }
     } catch (e: any) {
+      if (generation !== serverStateGeneration) return;
       // Restore the previous status so the UI doesn't lie about a live process.
       set((s) => ({
         error: e?.message ?? 'Failed to stop task',
@@ -177,9 +194,11 @@ export const useTasksStore = create<TasksState>((set, get) => ({
   },
 
   restartTask: async (taskId) => {
+    const generation = serverStateGeneration;
     set({ loading: true, error: null });
     try {
       const result = await apiRestartTask({ body: { task_id: taskId } });
+      if (generation !== serverStateGeneration) return;
       const info = unwrapApiData(result.data);
       if (info) {
         set((s) => ({
@@ -200,18 +219,22 @@ export const useTasksStore = create<TasksState>((set, get) => ({
         });
       }
     } catch (e: any) {
+      if (generation !== serverStateGeneration) return;
       set({ loading: false, error: e.message });
     }
   },
 
   removeTask: async (taskId) => {
+    const generation = serverStateGeneration;
     try {
       await apiRemoveTask({ path: { task_id: taskId } });
+      if (generation !== serverStateGeneration) return;
       set((s) => ({
         instances: s.instances.filter((i) => i.id !== taskId),
         selectedTaskId: s.selectedTaskId === taskId ? null : s.selectedTaskId,
       }));
     } catch (e: any) {
+      if (generation !== serverStateGeneration) return;
       set({ error: e.message });
     }
   },
@@ -239,4 +262,21 @@ export const useTasksStore = create<TasksState>((set, get) => ({
     set((s) => ({
       instances: [...s.instances.filter((i) => i.id !== info.id), info],
     })),
+
+  resetServerState: () => {
+    ++serverStateGeneration;
+    set({
+      definitions: [],
+      instances: [],
+      logsById: {},
+      panelOpen: false,
+      selectedTaskId: null,
+      selectedTaskLabel: null,
+      loading: false,
+      error: null,
+      hasConfig: false,
+      outputPanelVisible: false,
+      outputPanelHeight: DEFAULT_OUTPUT_HEIGHT,
+    });
+  },
 }));

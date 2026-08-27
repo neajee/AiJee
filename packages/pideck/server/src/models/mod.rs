@@ -411,6 +411,11 @@ pub struct SessionListItem {
     pub file_path: String,
 }
 
+#[derive(Debug, Deserialize, ToSchema)]
+pub struct SessionRenameRequest {
+    pub name: String,
+}
+
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct PaginatedSessions {
     pub items: Vec<SessionListItem>,

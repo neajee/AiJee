@@ -21,6 +21,7 @@ export function useSpeechRecognition(
   const [audioLevel, setAudioLevel] = useState(0);
   const clearError = useCallback(() => setError(null), []);
   const analyserRef = useRef<AnalyserNode | null>(null);
+  const meterSourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
   const levelFrameRef = useRef<number>(0);
 
   const mode = useSpeechSettingsStore((s) => s.mode);
@@ -37,12 +38,82 @@ export function useSpeechRecognition(
   const chunksRef = useRef<Blob[]>([]);
   const wsRef = useRef<WebSocket | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
+  const audioSourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
+  const audioProcessorRef = useRef<ScriptProcessorNode | null>(null);
+  const mountedRef = useRef(true);
 
   const onInterimRef = useRef(onInterim);
   const onFinalRef = useRef(onFinal);
   useEffect(() => { onInterimRef.current = onInterim; }, [onInterim]);
   useEffect(() => { onFinalRef.current = onFinal; }, [onFinal]);
   const sessionRef = useRef(0);
+
+  const getWebMicrophone = useCallback(async () => {
+    if (typeof navigator === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
+      throw new Error('Microphone access requires HTTPS or localhost in a supported browser');
+    }
+    return navigator.mediaDevices.getUserMedia({ audio: true });
+  }, []);
+
+  const releaseWebResources = useCallback(() => {
+    ++sessionRef.current;
+    if (levelFrameRef.current) {
+      cancelAnimationFrame(levelFrameRef.current);
+      levelFrameRef.current = 0;
+    }
+    analyserRef.current?.disconnect();
+    analyserRef.current = null;
+    meterSourceRef.current?.disconnect();
+    meterSourceRef.current = null;
+
+    const recognition = webRecognitionRef.current;
+    webRecognitionRef.current = null;
+    if (recognition) {
+      recognition.onresult = null;
+      recognition.onerror = null;
+      recognition.onend = null;
+      try { recognition.abort(); } catch {}
+    }
+
+    const recorder = mediaRecorderRef.current;
+    mediaRecorderRef.current = null;
+    if (recorder) {
+      recorder.ondataavailable = null;
+      recorder.onstop = null;
+      if (recorder.state !== 'inactive') {
+        try { recorder.stop(); } catch {}
+      }
+    }
+    chunksRef.current = [];
+
+    const ws = wsRef.current;
+    wsRef.current = null;
+    if (ws) {
+      ws.onopen = null;
+      ws.onmessage = null;
+      ws.onerror = null;
+      ws.onclose = null;
+      if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) {
+        ws.close();
+      }
+    }
+
+    if (audioProcessorRef.current) {
+      audioProcessorRef.current.onaudioprocess = null;
+      audioProcessorRef.current.disconnect();
+      audioProcessorRef.current = null;
+    }
+    audioSourceRef.current?.disconnect();
+    audioSourceRef.current = null;
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+    streamRef.current = null;
+
+    const audioContext = audioContextRef.current;
+    audioContextRef.current = null;
+    if (audioContext && audioContext.state !== 'closed') {
+      void audioContext.close().catch(() => {});
+    }
+  }, []);
 
   // Native audio recorder (hook must be called unconditionally)
   const nativeRecorder = useAudioRecorder({ ...RecordingPresets.HIGH_QUALITY, isMeteringEnabled: true });
@@ -68,6 +139,7 @@ export function useSpeechRecognition(
       const source = ctx.createMediaStreamSource(stream);
       source.connect(analyser);
       analyserRef.current = analyser;
+      meterSourceRef.current = source;
 
       const dataArray = new Uint8Array(analyser.frequencyBinCount);
       const tick = () => {
@@ -90,7 +162,10 @@ export function useSpeechRecognition(
       cancelAnimationFrame(levelFrameRef.current);
       levelFrameRef.current = 0;
     }
+    analyserRef.current?.disconnect();
     analyserRef.current = null;
+    meterSourceRef.current?.disconnect();
+    meterSourceRef.current = null;
     setAudioLevel(0);
   }, []);
 
@@ -140,16 +215,19 @@ export function useSpeechRecognition(
     setIsListening(true);
     setError(null);
 
-    navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+    getWebMicrophone().then((stream) => {
+      if (!mountedRef.current || sessionRef.current !== session) {
+        stream.getTracks().forEach((track) => track.stop());
+        return;
+      }
       streamRef.current = stream;
       startMetering(stream);
     }).catch(() => {});
-  }, [startMetering]);
+  }, [getWebMicrophone, startMetering]);
 
   // --- API mode on web: record full audio, transcribe on stop ---
   const startApiWeb = useCallback(async () => {
     try {
-      ++sessionRef.current;
       setError(null);
       chunksRef.current = [];
 
@@ -158,7 +236,12 @@ export function useSpeechRecognition(
         return;
       }
 
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const session = ++sessionRef.current;
+      const stream = await getWebMicrophone();
+      if (!mountedRef.current || sessionRef.current !== session) {
+        stream.getTracks().forEach((track) => track.stop());
+        return;
+      }
       streamRef.current = stream;
 
       const mimeType = MediaRecorder.isTypeSupported('audio/webm;codecs=opus')
@@ -178,9 +261,10 @@ export function useSpeechRecognition(
       setIsListening(true);
       startMetering(stream);
     } catch (e: any) {
+      releaseWebResources();
       setError(e.message || 'Microphone access denied');
     }
-  }, [apiKey, startMetering]);
+  }, [apiKey, getWebMicrophone, releaseWebResources, startMetering]);
 
   const stopApiWeb = useCallback(async () => {
     const mediaRecorder = mediaRecorderRef.current;
@@ -386,14 +470,21 @@ export function useSpeechRecognition(
       };
 
       // Get microphone and stream PCM16 audio at 24kHz
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const stream = await getWebMicrophone();
+      if (!mountedRef.current || sessionRef.current !== session) {
+        stream.getTracks().forEach((track) => track.stop());
+        ws.close();
+        return;
+      }
       streamRef.current = stream;
 
       const audioContext = new AudioContext({ sampleRate: 24000 });
       audioContextRef.current = audioContext;
       const source = audioContext.createMediaStreamSource(stream);
+      audioSourceRef.current = source;
 
       const processor = audioContext.createScriptProcessor(4096, 1, 1);
+      audioProcessorRef.current = processor;
       processor.onaudioprocess = (e) => {
         if (!ws || ws.readyState !== WebSocket.OPEN) return;
         const float32 = e.inputBuffer.getChannelData(0);
@@ -419,33 +510,33 @@ export function useSpeechRecognition(
       startMetering(stream);
       setIsListening(true);
     } catch (e: any) {
+      releaseWebResources();
       setError(e.message || 'Failed to start realtime transcription');
     }
-  }, [apiKey, apiBaseUrl, wsModel, startMetering]);
+  }, [apiKey, apiBaseUrl, wsModel, getWebMicrophone, releaseWebResources, startMetering]);
 
   const stopWsRealtime = useCallback(async () => {
-    audioContextRef.current?.close();
-    audioContextRef.current = null;
-    streamRef.current?.getTracks().forEach((t) => t.stop());
-    streamRef.current = null;
-
-    const ws = wsRef.current;
-    if (ws) {
-      ws.onmessage = null;
-      ws.onerror = null;
-      ws.onclose = null;
-      if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) {
-        ws.close();
-      }
-      wsRef.current = null;
-    }
-
+    releaseWebResources();
     setIsListening(false);
-  }, []);
+  }, [releaseWebResources]);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      releaseWebResources();
+      if (Platform.OS !== 'web') {
+        void nativeRecorder.stop().catch(() => {});
+        void setAudioModeAsync({ allowsRecording: false }).catch(() => {});
+      }
+    };
+  }, [nativeRecorder, releaseWebResources]);
 
   // --- Public interface ---
   const start = useCallback(async () => {
     if (Platform.OS === 'web') {
+      releaseWebResources();
+      setAudioLevel(0);
       if (mode === 'builtin') {
         startBuiltinWeb();
       } else if (useRealtimeWs) {
@@ -460,7 +551,7 @@ export function useSpeechRecognition(
         await startApiNative();
       }
     }
-  }, [mode, useRealtimeWs, startBuiltinWeb, startApiWeb, startWsRealtime, startApiNative]);
+  }, [mode, useRealtimeWs, releaseWebResources, startBuiltinWeb, startApiWeb, startWsRealtime, startApiNative]);
 
   const stop = useCallback(async () => {
     stopMetering();
@@ -471,13 +562,13 @@ export function useSpeechRecognition(
     }
     if (Platform.OS === 'web') {
       if (mode === 'builtin' && webRecognitionRef.current) {
-        webRecognitionRef.current.abort();
-        webRecognitionRef.current = null;
+        releaseWebResources();
         setIsListening(false);
       } else if (mode === 'api' && useRealtimeWs) {
         await stopWsRealtime();
       } else if (mode === 'api') {
         await stopApiWeb();
+        releaseWebResources();
       }
     } else {
       if (mode === 'api') {
@@ -486,7 +577,7 @@ export function useSpeechRecognition(
         setIsListening(false);
       }
     }
-  }, [mode, useRealtimeWs, stopApiWeb, stopWsRealtime, stopApiNative, stopMetering]);
+  }, [mode, useRealtimeWs, releaseWebResources, stopApiWeb, stopWsRealtime, stopApiNative, stopMetering]);
 
   return { isListening, start, stop, error, clearError, audioLevel };
 }

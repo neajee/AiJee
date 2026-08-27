@@ -1,13 +1,16 @@
 export type Tab = "changes" | "files" | "history";
 
+/**
+ * Colour is spent only where it carries a warning.
+ *
+ * Nearly every row in a working tree is modified, so a yellow M on all of them
+ * is noise that also drowns out the rare deletion. Modified, renamed, copied and
+ * untracked stay neutral and lean on the letter; added and deleted keep their
+ * colour because they are the two that change what exists.
+ */
 export const STATUS_COLORS: Record<string, string> = {
-  M: "#C4A000",
   A: "#26A269",
   D: "#E5484D",
-  R: "#3B82F6",
-  C: "#3B82F6",
-  U: "#9CA3AF",
-  "?": "#9CA3AF",
 };
 
 export function statusLabel(s: string): string {

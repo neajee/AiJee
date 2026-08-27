@@ -11,6 +11,32 @@ export function useActiveSessions(): Set<string> {
   return useObservable(client.activeSessions$, EMPTY_SET);
 }
 
+/**
+ * Sessions whose agent is mid-turn.
+ *
+ * Prefer this over {@link useActiveSessions} for "is it working?" — an active
+ * session may simply have a live process sitting idle.
+ */
+export function useStreamingSessions(): Set<string> {
+  const client = usePiClient();
+  return useObservable(client.streamingSessions$, EMPTY_SET);
+}
+
+export function useIsSessionStreaming(sessionId: string | null): boolean {
+  const client = usePiClient();
+
+  const streaming$ = useMemo(() => {
+    if (!sessionId) return null;
+    const sid = sessionId;
+    return client.streamingSessions$.pipe(
+      map((set) => set.has(sid)),
+      distinctUntilChanged(),
+    );
+  }, [client, sessionId]);
+
+  return useObservable(streaming$!, false);
+}
+
 export function useIsSessionActive(sessionId: string | null): boolean {
   const client = usePiClient();
 

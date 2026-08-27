@@ -25,7 +25,6 @@ function normalizePath(path?: string) {
 
 export function buildPreviewUrl(params: {
   serverUrl: string;
-  accessToken?: string;
   sessionId: string;
   target: PreviewTarget;
 }) {
@@ -34,9 +33,6 @@ export function buildPreviewUrl(params: {
   const url = new URL(pathname ? `${basePath}/${pathname}` : `${basePath}/`);
   if (search) {
     url.search = search;
-  }
-  if (params.accessToken) {
-    url.searchParams.set("access_token", params.accessToken);
   }
   return url.toString();
 }

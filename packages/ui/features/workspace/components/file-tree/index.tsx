@@ -1,8 +1,6 @@
 import { useCallback, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
-  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -13,36 +11,40 @@ import {
 import {
   ChevronRight,
   ChevronDown,
-  Folder,
-  FileText,
   ArrowLeft,
-  Upload,
-  Download,
-  FilePlus,
-  FolderPlus,
-  Trash2,
+  Search,
   X,
-  Check,
 } from "lucide-react-native";
-
 import { Colors, Fonts } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import {
-  useFileList,
-  useFileRead,
-  usePiClient,
-} from "@pideck/client-sdk";
+import { useFileList, useFileRead } from "@pideck/client-sdk";
 import type { FsEntry } from "@pideck/client-sdk";
-import {
-  pickAndUploadFiles,
-  downloadFile,
-  type UploadProgressSnapshot,
-} from "@/features/files/utils/file-transfer";
+import { FileTypeBadge } from "../file-type-badge";
 
-function formatSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+/** Tree geometry, bolt's: a small left margin and a narrow step per level. */
+const NODE_INDENT = 6;
+const NODE_STEP = 8;
+
+/**
+ * Names matching the filter, directories that were opened by hand kept alongside.
+ *
+ * Levels load one directory at a time, so a filter can only speak for the names
+ * it has: it narrows each loaded level rather than searching the whole tree. An
+ * open directory stays visible even when its own name misses, otherwise typing
+ * would close the branch you are looking inside.
+ */
+function applyFilter(
+  entries: FsEntry[],
+  query: string,
+  expandedDirs: Set<string>,
+): FsEntry[] {
+  if (!query) return entries;
+  const needle = query.toLowerCase();
+  return entries.filter(
+    (entry) =>
+      entry.name.toLowerCase().includes(needle) ||
+      (entry.is_dir && expandedDirs.has(entry.path)),
+  );
 }
 
 interface FileTreeProps {
@@ -51,299 +53,80 @@ interface FileTreeProps {
   onViewFile: (path: string | null) => void;
   expandedDirs: Set<string>;
   onToggleDir: (path: string) => void;
-  /** Show the action bar with upload/create/download buttons */
-  showActions?: boolean;
 }
 
+/**
+ * Read-only file tree.
+ *
+ * Browsing is the whole job here: creating, uploading and deleting files belongs
+ * to the agent, so no row or header carries a mutation.
+ */
 export function FileTree({
   rootPath,
   viewingFile,
   onViewFile,
   expandedDirs,
   onToggleDir,
-  showActions = false,
 }: FileTreeProps) {
   const colorScheme = useColorScheme() ?? "light";
+  const colors = Colors[colorScheme];
   const isDark = colorScheme === "dark";
-  const textMuted = isDark ? "#cdc8c5" : Colors[colorScheme].textTertiary;
-  const [refreshKey, setRefreshKey] = useState(0);
+  const textMuted = isDark ? "#cdc8c5" : colors.textTertiary;
+  const textPrimary = isDark ? "#fefdfd" : colors.text;
+  const fieldBg = isDark ? "#1a1a1a" : "#F0F0F0";
+  const fieldBorder = isDark ? "#323131" : "rgba(0,0,0,0.08)";
+  const hoverBg = isDark ? "#252525" : "#E8E8E8";
 
-  const handleRefresh = useCallback(() => {
-    setRefreshKey((value) => value + 1);
-  }, []);
+  const [query, setQuery] = useState("");
 
   if (viewingFile) {
-    return (
-      <FileViewer
-        filePath={viewingFile}
-        onBack={() => onViewFile(null)}
-        onRefresh={handleRefresh}
-        showActions={showActions}
-      />
-    );
+    return <FileViewer filePath={viewingFile} onBack={() => onViewFile(null)} />;
   }
 
   return (
     <View style={styles.treeContainer}>
-      {showActions && (
-        <FileActionBar rootPath={rootPath} onRefresh={handleRefresh} />
-      )}
+      <View style={styles.filterRow}>
+        <View
+          style={[
+            styles.filterField,
+            { backgroundColor: fieldBg, borderColor: fieldBorder },
+          ]}
+        >
+          <Search size={13} color={textMuted} strokeWidth={2} />
+          <TextInput
+            value={query}
+            onChangeText={setQuery}
+            placeholder="Filter files…"
+            placeholderTextColor={textMuted}
+            style={[styles.filterInput, { color: textPrimary }]}
+            autoCapitalize="none"
+            autoCorrect={false}
+            accessibilityLabel="Filter files"
+          />
+          {query.length > 0 && (
+            <Pressable
+              onPress={() => setQuery("")}
+              hitSlop={6}
+              accessibilityLabel="Clear filter"
+              {...{ title: "Clear filter" }}
+              style={({ pressed, hovered }: any) => [
+                styles.filterClear,
+                (pressed || hovered) && { backgroundColor: hoverBg },
+              ]}
+            >
+              <X size={12} color={textMuted} strokeWidth={2} />
+            </Pressable>
+          )}
+        </View>
+      </View>
       <FileTreeRoot
         rootPath={rootPath}
-        refreshKey={refreshKey}
         textMuted={textMuted}
         onFilePress={(p) => onViewFile(p)}
         expandedDirs={expandedDirs}
         onToggleDir={onToggleDir}
-        onRefresh={handleRefresh}
-        showActions={showActions}
+        query={query.trim()}
       />
-    </View>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Action bar: Upload, New File, New Folder
-// ---------------------------------------------------------------------------
-
-function FileActionBar({
-  rootPath,
-  onRefresh,
-}: {
-  rootPath: string;
-  onRefresh: () => void;
-}) {
-  const colorScheme = useColorScheme() ?? "light";
-  const isDark = colorScheme === "dark";
-  const colors = Colors[colorScheme];
-  const { api } = usePiClient();
-
-  const textMuted = isDark ? "#8B8685" : colors.textTertiary;
-  const textPrimary = isDark ? "#fefdfd" : colors.text;
-  const barBg = isDark ? "#1a1a1a" : "#F0F0F0";
-  const barBorder = isDark ? "#323131" : "rgba(0,0,0,0.08)";
-  const hoverBg = isDark ? "#252525" : "#E8E8E8";
-  const progressTrack = isDark ? "#2a2a2a" : "#E5E5E5";
-  const progressFill = isDark ? "#6E8DFF" : "#4F46E5";
-
-  const [showNewFile, setShowNewFile] = useState(false);
-  const [showNewFolder, setShowNewFolder] = useState(false);
-  const [newName, setNewName] = useState("");
-  const [creating, setCreating] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState<UploadProgressSnapshot | null>(null);
-
-  const isUploading = !!uploadProgress?.uploading;
-
-  const handleUpload = useCallback(async () => {
-    try {
-      const uploaded = await pickAndUploadFiles(api, rootPath, setUploadProgress);
-      if (uploaded.length > 0) {
-        onRefresh();
-      }
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : "Upload failed";
-      if (Platform.OS === "web") {
-        window.alert(msg);
-      } else {
-        Alert.alert("Error", msg);
-      }
-    }
-  }, [api, rootPath, onRefresh]);
-
-  const handleCreateFile = useCallback(async () => {
-    if (!newName.trim() || creating || isUploading) return;
-    setCreating(true);
-    try {
-      const path = `${rootPath.replace(/\/$/, "")}/${newName.trim()}`;
-      await api.fsWrite(path, "");
-      setShowNewFile(false);
-      setNewName("");
-      onRefresh();
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : "Failed to create file";
-      if (Platform.OS === "web") {
-        window.alert(msg);
-      } else {
-        Alert.alert("Error", msg);
-      }
-    } finally {
-      setCreating(false);
-    }
-  }, [api, rootPath, newName, creating, isUploading, onRefresh]);
-
-  const handleCreateFolder = useCallback(async () => {
-    if (!newName.trim() || creating || isUploading) return;
-    setCreating(true);
-    try {
-      const path = `${rootPath.replace(/\/$/, "")}/${newName.trim()}`;
-      await api.fsMkdir(path);
-      setShowNewFolder(false);
-      setNewName("");
-      onRefresh();
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : "Failed to create folder";
-      if (Platform.OS === "web") {
-        window.alert(msg);
-      } else {
-        Alert.alert("Error", msg);
-      }
-    } finally {
-      setCreating(false);
-    }
-  }, [api, rootPath, newName, creating, isUploading, onRefresh]);
-
-  const cancelInline = useCallback(() => {
-    setShowNewFile(false);
-    setShowNewFolder(false);
-    setNewName("");
-  }, []);
-
-  return (
-    <View style={[styles.actionBar, { backgroundColor: barBg, borderBottomColor: barBorder }]}>
-      {showNewFile || showNewFolder ? (
-        <View style={styles.inlineCreateRow}>
-          <TextInput
-            style={[
-              styles.inlineInput,
-              {
-                color: isDark ? "#fefdfd" : colors.text,
-                backgroundColor: isDark ? "#252525" : "#FFFFFF",
-                borderColor: barBorder,
-              },
-            ]}
-            placeholder={showNewFile ? "file-name.txt" : "folder-name"}
-            placeholderTextColor={textMuted}
-            value={newName}
-            onChangeText={setNewName}
-            autoFocus
-            editable={!isUploading}
-            onSubmitEditing={showNewFile ? handleCreateFile : handleCreateFolder}
-          />
-          <Pressable
-            onPress={showNewFile ? handleCreateFile : handleCreateFolder}
-            disabled={!newName.trim() || creating || isUploading}
-            style={({ pressed, hovered }: any) => [
-              styles.actionBtn,
-              (pressed || hovered) && { backgroundColor: hoverBg },
-              (!newName.trim() || creating || isUploading) && { opacity: 0.4 },
-            ]}
-          >
-            {creating ? (
-              <ActivityIndicator size={12} />
-            ) : (
-              <Check size={14} color="#34C759" strokeWidth={2} />
-            )}
-          </Pressable>
-          <Pressable
-            onPress={cancelInline}
-            disabled={isUploading}
-            style={({ pressed, hovered }: any) => [
-              styles.actionBtn,
-              (pressed || hovered) && { backgroundColor: hoverBg },
-              isUploading && { opacity: 0.4 },
-            ]}
-          >
-            <X size={14} color={textMuted} strokeWidth={2} />
-          </Pressable>
-        </View>
-      ) : (
-        <View style={styles.actionBtnRow}>
-          <Pressable
-            onPress={handleUpload}
-            disabled={isUploading || creating}
-            style={({ pressed, hovered }: any) => [
-              styles.actionBtn,
-              (pressed || hovered) && { backgroundColor: hoverBg },
-              (isUploading || creating) && { opacity: 0.4 },
-            ]}
-            accessibilityLabel="Upload file"
-            {...{ title: "Upload file" }}
-          >
-            {isUploading ? (
-              <ActivityIndicator size={12} />
-            ) : (
-              <Upload size={14} color={textMuted} strokeWidth={1.8} />
-            )}
-          </Pressable>
-          <Pressable
-            onPress={() => {
-              setShowNewFile(true);
-              setShowNewFolder(false);
-              setNewName("");
-            }}
-            disabled={isUploading}
-            style={({ pressed, hovered }: any) => [
-              styles.actionBtn,
-              (pressed || hovered) && { backgroundColor: hoverBg },
-              isUploading && { opacity: 0.4 },
-            ]}
-            accessibilityLabel="New file"
-            {...{ title: "New file" }}
-          >
-            <FilePlus size={14} color={textMuted} strokeWidth={1.8} />
-          </Pressable>
-          <Pressable
-            onPress={() => {
-              setShowNewFolder(true);
-              setShowNewFile(false);
-              setNewName("");
-            }}
-            disabled={isUploading}
-            style={({ pressed, hovered }: any) => [
-              styles.actionBtn,
-              (pressed || hovered) && { backgroundColor: hoverBg },
-              isUploading && { opacity: 0.4 },
-            ]}
-            accessibilityLabel="New folder"
-            {...{ title: "New folder" }}
-          >
-            <FolderPlus size={14} color={textMuted} strokeWidth={1.8} />
-          </Pressable>
-        </View>
-      )}
-
-      {!!uploadProgress && uploadProgress.items.length > 0 && (
-        <View style={[styles.uploadPanel, { borderTopColor: barBorder }]}>
-          <View style={styles.uploadHeaderRow}>
-            <Text style={[styles.uploadHeaderText, { color: textPrimary }]}>
-              Uploading {uploadProgress.completed}/{uploadProgress.total}
-            </Text>
-            <Text style={[styles.uploadHeaderMeta, { color: textMuted }]}>
-              {uploadProgress.totalProgress}%
-            </Text>
-          </View>
-          <View style={[styles.progressTrack, { backgroundColor: progressTrack }]}>
-            <View
-              style={[
-                styles.progressFill,
-                { backgroundColor: progressFill, width: `${uploadProgress.totalProgress}%` },
-              ]}
-            />
-          </View>
-          <View style={styles.uploadList}>
-            {uploadProgress.items.slice(0, 4).map((item) => (
-              <View key={item.id} style={styles.uploadItemRow}>
-                <Text style={[styles.uploadItemName, { color: textPrimary }]} numberOfLines={1}>
-                  {item.name}
-                </Text>
-                <Text
-                  style={[
-                    styles.uploadItemMeta,
-                    { color: item.status === "error" ? "#E5484D" : textMuted },
-                  ]}
-                  numberOfLines={1}
-                >
-                  {item.status === "success"
-                    ? "Done"
-                    : item.status === "error"
-                      ? item.error ?? "Failed"
-                      : `${item.progress}%`}
-                </Text>
-              </View>
-            ))}
-          </View>
-        </View>
-      )}
     </View>
   );
 }
@@ -354,24 +137,20 @@ function FileActionBar({
 
 function FileTreeRoot({
   rootPath,
-  refreshKey,
   textMuted,
   onFilePress,
   expandedDirs,
   onToggleDir,
-  onRefresh,
-  showActions,
+  query,
 }: {
   rootPath: string;
-  refreshKey: number;
   textMuted: string;
   onFilePress: (path: string) => void;
   expandedDirs: Set<string>;
   onToggleDir: (path: string) => void;
-  onRefresh: () => void;
-  showActions?: boolean;
+  query: string;
 }) {
-  const { entries, isLoading, error } = useFileList(rootPath, refreshKey);
+  const { entries, isLoading, error } = useFileList(rootPath);
 
   if (isLoading) {
     return <ActivityIndicator style={{ marginTop: 32 }} />;
@@ -393,10 +172,16 @@ function FileTreeRoot({
     );
   }
 
-  const sorted = [...entries].sort((a, b) => {
+  const sorted = applyFilter(entries, query, expandedDirs).sort((a, b) => {
     if (a.is_dir !== b.is_dir) return a.is_dir ? -1 : 1;
     return a.name.localeCompare(b.name);
   });
+
+  if (query && sorted.length === 0) {
+    return (
+      <Text style={[styles.emptyText, { color: textMuted }]}>No matches</Text>
+    );
+  }
 
   return (
     <ScrollView
@@ -412,9 +197,7 @@ function FileTreeRoot({
           onFilePress={onFilePress}
           expandedDirs={expandedDirs}
           onToggleDir={onToggleDir}
-          onRefresh={onRefresh}
-          refreshKey={refreshKey}
-          showActions={showActions}
+          query={query}
         />
       ))}
     </ScrollView>
@@ -431,18 +214,14 @@ function FileTreeNode({
   onFilePress,
   expandedDirs,
   onToggleDir,
-  onRefresh,
-  refreshKey,
-  showActions,
+  query,
 }: {
   entry: FsEntry;
   depth: number;
   onFilePress: (path: string) => void;
   expandedDirs: Set<string>;
   onToggleDir: (path: string) => void;
-  onRefresh: () => void;
-  refreshKey: number;
-  showActions?: boolean;
+  query: string;
 }) {
   const colorScheme = useColorScheme() ?? "light";
   const colors = Colors[colorScheme];
@@ -451,11 +230,11 @@ function FileTreeNode({
   const textPrimary = isDark ? "#fefdfd" : colors.text;
   const textMuted = isDark ? "#cdc8c5" : colors.textTertiary;
   const hoverBg = isDark ? "#252525" : "#E8E8E8";
-  const iconColor = isDark ? "#8B8685" : "#888";
-  const dirIconColor = isDark ? "#C4A000" : "#B5920B";
+  // Directories are told apart by the caret and the heavier name alone, so no
+  // saturated folder icon competes with the name; files show their kind.
+  const iconColor = isDark ? "#6f6b69" : "#B0B0B0";
 
   const expanded = entry.is_dir && expandedDirs.has(entry.path);
-  const { api } = usePiClient();
 
   const handlePress = useCallback(() => {
     if (entry.is_dir) {
@@ -465,92 +244,41 @@ function FileTreeNode({
     }
   }, [entry, onFilePress, onToggleDir]);
 
-  const handleDelete = useCallback(() => {
-    const doDelete = async () => {
-      try {
-        await api.fsDelete(entry.path);
-        onRefresh();
-      } catch (e) {
-        const msg = e instanceof Error ? e.message : "Delete failed";
-        if (Platform.OS === "web") {
-          // eslint-disable-next-line no-alert
-          window.alert(msg);
-        } else {
-          Alert.alert("Error", msg);
-        }
-      }
-    };
-
-    if (Platform.OS === "web") {
-      // eslint-disable-next-line no-alert
-      if (window.confirm(`Delete "${entry.name}"?`)) {
-        doDelete();
-      }
-    } else {
-      Alert.alert("Delete", `Delete "${entry.name}"?`, [
-        { text: "Cancel", style: "cancel" },
-        { text: "Delete", style: "destructive", onPress: doDelete },
-      ]);
-    }
-  }, [api, entry, onRefresh]);
-
   return (
     <View>
-      <View style={styles.nodeRow}>
-        <Pressable
-          onPress={handlePress}
-          {...{ title: entry.path }}
-          style={({ pressed, hovered }: any) => [
-            styles.row,
-            { paddingLeft: 12 + depth * 16 },
-            (pressed || hovered) && { backgroundColor: hoverBg },
-          ]}
-        >
-          {entry.is_dir ? (
-            <>
-              {expanded ? (
-                <ChevronDown size={14} color={textMuted} strokeWidth={2} />
-              ) : (
-                <ChevronRight size={14} color={textMuted} strokeWidth={2} />
-              )}
-              <Folder size={14} color={dirIconColor} strokeWidth={1.8} />
-            </>
-          ) : (
-            <>
-              <View style={styles.chevronSpacer} />
-              <FileText size={14} color={iconColor} strokeWidth={1.8} />
-            </>
-          )}
-          <Text
-            style={[
-              styles.name,
-              { color: textPrimary },
-              entry.is_dir && styles.dirName,
-            ]}
-            numberOfLines={1}
-          >
-            {entry.name}
-          </Text>
-          {!entry.is_dir && entry.size > 0 && (
-            <Text style={[styles.size, { color: textMuted }]}>
-              {formatSize(entry.size)}
-            </Text>
-          )}
-        </Pressable>
-        {showActions && (
-          <Pressable
-            onPress={handleDelete}
-            style={({ pressed, hovered }: any) => [
-              styles.inlineDeleteBtn,
-              (pressed || hovered) && { backgroundColor: hoverBg },
-            ]}
-            accessibilityLabel={`Delete ${entry.name}`}
-            {...{ title: `Delete ${entry.name}` }}
-          >
-            <Trash2 size={12} color="#E5484D" strokeWidth={1.8} />
-          </Pressable>
+      <Pressable
+        onPress={handlePress}
+        {...{ title: entry.path }}
+        style={({ pressed, hovered }: any) => [
+          styles.row,
+          { paddingLeft: NODE_INDENT + depth * NODE_STEP },
+          (pressed || hovered) && { backgroundColor: hoverBg },
+        ]}
+      >
+        {/* One glyph slot per row, bolt's: a caret for directories, the file's
+            kind for files, so names line up at the same x within a level. */}
+        {entry.is_dir ? (
+          <View style={styles.iconSlot}>
+            {expanded ? (
+              <ChevronDown size={13} color={textMuted} strokeWidth={2} />
+            ) : (
+              <ChevronRight size={13} color={textMuted} strokeWidth={2} />
+            )}
+          </View>
+        ) : (
+          <FileTypeBadge path={entry.path} fallbackColor={iconColor} />
         )}
-      </View>
+        <Text
+          style={[
+            styles.name,
+            { color: textPrimary },
+            entry.is_dir && styles.dirName,
+          ]}
+          numberOfLines={1}
+        >
+          {entry.name}
+        </Text>
+      </Pressable>
       {expanded && (
         <ExpandedDir
           dirPath={entry.path}
@@ -558,9 +286,7 @@ function FileTreeNode({
           onFilePress={onFilePress}
           expandedDirs={expandedDirs}
           onToggleDir={onToggleDir}
-          onRefresh={onRefresh}
-          refreshKey={refreshKey}
-          showActions={showActions}
+          query={query}
         />
       )}
     </View>
@@ -577,28 +303,29 @@ function ExpandedDir({
   onFilePress,
   expandedDirs,
   onToggleDir,
-  onRefresh,
-  refreshKey,
-  showActions,
+  query,
 }: {
   dirPath: string;
   depth: number;
   onFilePress: (path: string) => void;
   expandedDirs: Set<string>;
   onToggleDir: (path: string) => void;
-  onRefresh: () => void;
-  refreshKey: number;
-  showActions?: boolean;
+  query: string;
 }) {
   const colorScheme = useColorScheme() ?? "light";
   const isDark = colorScheme === "dark";
   const textMuted = isDark ? "#cdc8c5" : Colors[colorScheme].textTertiary;
 
-  const { entries, isLoading } = useFileList(dirPath, refreshKey);
+  const { entries, isLoading } = useFileList(dirPath);
 
   if (isLoading) {
     return (
-      <View style={{ paddingLeft: 12 + depth * 16, paddingVertical: 4 }}>
+      <View
+        style={{
+          paddingLeft: NODE_INDENT + depth * NODE_STEP,
+          paddingVertical: 4,
+        }}
+      >
         <ActivityIndicator size="small" />
       </View>
     );
@@ -609,7 +336,7 @@ function ExpandedDir({
       <Text
         style={[
           styles.emptyDir,
-          { color: textMuted, paddingLeft: 12 + depth * 16 },
+          { color: textMuted, paddingLeft: NODE_INDENT + depth * NODE_STEP },
         ]}
       >
         Empty
@@ -617,7 +344,7 @@ function ExpandedDir({
     );
   }
 
-  const sorted = [...entries].sort((a, b) => {
+  const sorted = applyFilter(entries, query, expandedDirs).sort((a, b) => {
     if (a.is_dir !== b.is_dir) return a.is_dir ? -1 : 1;
     return a.name.localeCompare(b.name);
   });
@@ -632,9 +359,7 @@ function ExpandedDir({
           onFilePress={onFilePress}
           expandedDirs={expandedDirs}
           onToggleDir={onToggleDir}
-          onRefresh={onRefresh}
-          refreshKey={refreshKey}
-          showActions={showActions}
+          query={query}
         />
       ))}
     </View>
@@ -642,24 +367,19 @@ function ExpandedDir({
 }
 
 // ---------------------------------------------------------------------------
-// File viewer with download button
+// File viewer
 // ---------------------------------------------------------------------------
 
 function FileViewer({
   filePath,
   onBack,
-  onRefresh,
-  showActions,
 }: {
   filePath: string;
   onBack: () => void;
-  onRefresh: () => void;
-  showActions?: boolean;
 }) {
   const colorScheme = useColorScheme() ?? "light";
   const colors = Colors[colorScheme];
   const isDark = colorScheme === "dark";
-  const { api } = usePiClient();
 
   const textPrimary = isDark ? "#fefdfd" : colors.text;
   const textMuted = isDark ? "#cdc8c5" : colors.textTertiary;
@@ -672,56 +392,6 @@ function FileViewer({
   const fileName = filePath.split("/").pop() ?? filePath;
 
   const { data: fileData, isLoading, error: fileError } = useFileRead(filePath);
-
-  const [downloading, setDownloading] = useState(false);
-
-  const handleDownload = useCallback(async () => {
-    if (downloading) return;
-    setDownloading(true);
-    try {
-      await downloadFile(api, filePath, fileName);
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : "Download failed";
-      if (Platform.OS === "web") {
-        // eslint-disable-next-line no-alert
-        window.alert(msg);
-      } else {
-        Alert.alert("Error", msg);
-      }
-    } finally {
-      setDownloading(false);
-    }
-  }, [api, filePath, fileName, downloading]);
-
-  const handleDelete = useCallback(() => {
-    const doDelete = async () => {
-      try {
-        await api.fsDelete(filePath);
-        onRefresh();
-        onBack();
-      } catch (e) {
-        const msg = e instanceof Error ? e.message : "Delete failed";
-        if (Platform.OS === "web") {
-          // eslint-disable-next-line no-alert
-          window.alert(msg);
-        } else {
-          Alert.alert("Error", msg);
-        }
-      }
-    };
-
-    if (Platform.OS === "web") {
-      // eslint-disable-next-line no-alert
-      if (window.confirm(`Delete "${fileName}"?`)) {
-        doDelete();
-      }
-    } else {
-      Alert.alert("Delete", `Delete "${fileName}"?`, [
-        { text: "Cancel", style: "cancel" },
-        { text: "Delete", style: "destructive", onPress: doDelete },
-      ]);
-    }
-  }, [api, filePath, fileName, onBack, onRefresh]);
 
   return (
     <View style={styles.viewerContainer}>
@@ -743,50 +413,17 @@ function FileViewer({
         >
           <ArrowLeft size={14} color={textMuted} strokeWidth={2} />
         </Pressable>
-        <FileText size={13} color={textMuted} strokeWidth={1.8} />
+        <FileTypeBadge path={filePath} fallbackColor={textMuted} />
         <Text
           style={[styles.viewerFileName, { color: textPrimary }]}
           numberOfLines={1}
         >
           {fileName}
         </Text>
-        {fileData && (
+        {fileData?.truncated && (
           <Text style={[styles.viewerMeta, { color: textMuted }]}>
-            {formatSize(fileData.size)}
-            {fileData.truncated ? " (truncated)" : ""}
+            truncated
           </Text>
-        )}
-        {showActions && (
-          <>
-            <Pressable
-              onPress={handleDownload}
-              disabled={downloading}
-              accessibilityLabel="Download file"
-              {...{ title: "Download file" }}
-              style={({ pressed, hovered }: any) => [
-                styles.viewerActionBtn,
-                (pressed || hovered) && { backgroundColor: hoverBg },
-                downloading && { opacity: 0.5 },
-              ]}
-            >
-              {downloading ? (
-                <ActivityIndicator size={12} />
-              ) : (
-                <Download size={13} color={textMuted} strokeWidth={1.8} />
-              )}
-            </Pressable>
-            <Pressable
-              onPress={handleDelete}
-              accessibilityLabel="Delete file"
-              {...{ title: "Delete file" }}
-              style={({ pressed, hovered }: any) => [
-                styles.viewerActionBtn,
-                (pressed || hovered) && { backgroundColor: hoverBg },
-              ]}
-            >
-              <Trash2 size={13} color="#E5484D" strokeWidth={1.8} />
-            </Pressable>
-          </>
         )}
       </View>
 
@@ -795,17 +432,14 @@ function FileViewer({
         <ActivityIndicator style={{ marginTop: 32 }} />
       ) : fileError ? (
         <View style={styles.viewerMessageWrap}>
-          <Text style={[styles.emptyText, { color: textMuted }]}> 
+          <Text style={[styles.emptyText, { color: textMuted }]}>
             {fileError.includes("non-UTF8")
-              ? "Binary file preview is not available. Use download to open it."
+              ? "Binary file preview is not available."
               : "Cannot read file"}
           </Text>
         </View>
       ) : fileData ? (
-        <ScrollView
-          style={{ flex: 1 }}
-          showsVerticalScrollIndicator={false}
-        >
+        <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
           {fileData.content.split("\n").map((line, i) => (
             <View
               key={i}
@@ -842,21 +476,46 @@ const styles = StyleSheet.create({
   content: {
     paddingBottom: 12,
   },
-  nodeRow: {
-    flexDirection: "row",
-    alignItems: "center",
+  filterRow: {
+    paddingHorizontal: 6,
+    paddingTop: 6,
+    paddingBottom: 4,
   },
-  row: {
-    flex: 1,
+  filterField: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    paddingVertical: 4,
-    paddingRight: 8,
-    minHeight: 28,
+    height: 28,
+    paddingHorizontal: 8,
+    borderRadius: 6,
+    borderWidth: 0.633,
   },
-  chevronSpacer: {
-    width: 14,
+  filterInput: {
+    flex: 1,
+    fontSize: 12,
+    fontFamily: Fonts.sans,
+    padding: 0,
+    outlineStyle: "none",
+  } as any,
+  filterClear: {
+    width: 18,
+    height: 18,
+    borderRadius: 4,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    paddingVertical: 2,
+    paddingRight: 6,
+    minHeight: 22,
+  },
+  iconSlot: {
+    width: 22,
+    alignItems: "center",
+    justifyContent: "center",
   },
   name: {
     fontSize: 13,
@@ -865,10 +524,6 @@ const styles = StyleSheet.create({
   },
   dirName: {
     fontFamily: Fonts.sansMedium,
-  },
-  size: {
-    fontSize: 11,
-    fontFamily: Fonts.sans,
   },
   emptyText: {
     fontSize: 13,
@@ -881,98 +536,6 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.sans,
     paddingVertical: 4,
     fontStyle: "italic",
-  },
-
-  // Action bar
-  actionBar: {
-    minHeight: 34,
-    paddingHorizontal: 8,
-    justifyContent: "center",
-    borderBottomWidth: 0.633,
-  },
-  actionBtnRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 2,
-  },
-  actionBtn: {
-    width: 28,
-    height: 28,
-    borderRadius: 6,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  inlineCreateRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    paddingVertical: 3,
-  },
-  inlineInput: {
-    flex: 1,
-    height: 26,
-    borderRadius: 5,
-    borderWidth: 0.633,
-    paddingHorizontal: 8,
-    fontSize: 12,
-    fontFamily: Fonts.mono,
-  },
-  inlineDeleteBtn: {
-    width: 24,
-    height: 24,
-    borderRadius: 4,
-    alignItems: "center",
-    justifyContent: "center",
-    marginRight: 4,
-  },
-  uploadPanel: {
-    marginTop: 6,
-    paddingTop: 8,
-    paddingBottom: 6,
-    borderTopWidth: 0.633,
-    gap: 6,
-  },
-  uploadHeaderRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    gap: 8,
-  },
-  uploadHeaderText: {
-    fontSize: 12,
-    fontFamily: Fonts.sansMedium,
-  },
-  uploadHeaderMeta: {
-    fontSize: 11,
-    fontFamily: Fonts.mono,
-  },
-  progressTrack: {
-    height: 6,
-    borderRadius: 999,
-    overflow: "hidden",
-  },
-  progressFill: {
-    height: "100%",
-    borderRadius: 999,
-  },
-  uploadList: {
-    gap: 4,
-  },
-  uploadItemRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-  },
-  uploadItemName: {
-    flex: 1,
-    fontSize: 12,
-    fontFamily: Fonts.sans,
-  },
-  uploadItemMeta: {
-    maxWidth: 140,
-    fontSize: 11,
-    fontFamily: Fonts.sans,
-    textAlign: "right",
   },
 
   // File viewer
@@ -1001,13 +564,6 @@ const styles = StyleSheet.create({
   viewerMeta: {
     fontSize: 11,
     fontFamily: Fonts.sans,
-  },
-  viewerActionBtn: {
-    width: 28,
-    height: 28,
-    borderRadius: 6,
-    alignItems: "center",
-    justifyContent: "center",
   },
   viewerMessageWrap: {
     flex: 1,

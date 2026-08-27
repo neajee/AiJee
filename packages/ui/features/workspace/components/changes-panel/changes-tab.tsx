@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import {
   Alert,
   Platform,
@@ -33,16 +33,18 @@ interface SelectedFile {
   staged: boolean;
 }
 
+function byPath(a: FileEntry, b: FileEntry) {
+  return a.path.localeCompare(b.path);
+}
+
 export function ChangesTab({
   staged,
   unstaged,
   untracked,
   stagedOpen,
   unstagedOpen,
-  untrackedOpen,
   onToggleStaged,
   onToggleUnstaged,
-  onToggleUntracked,
   selectedFile,
   diffContent,
   diffLoading,
@@ -56,10 +58,8 @@ export function ChangesTab({
   untracked: string[];
   stagedOpen: boolean;
   unstagedOpen: boolean;
-  untrackedOpen: boolean;
   onToggleStaged: () => void;
   onToggleUnstaged: () => void;
-  onToggleUntracked: () => void;
   selectedFile: SelectedFile | null;
   diffContent: string | null | undefined;
   diffLoading: boolean;
@@ -68,8 +68,16 @@ export function ChangesTab({
   onUnstage: (paths: string[]) => void;
   onDiscard: (paths: string[]) => void;
 }) {
-  const { textPrimary, textMuted, sectionBg, hoverBg } = useChangesTheme();
+  const { textPrimary, textMuted, sectionBg, hoverBg, dividerColor } =
+    useChangesTheme();
   const totalChanges = staged.length + unstaged.length + untracked.length;
+
+  // A new file is a change like any other, so untracked paths join the working
+  // set instead of getting a section of their own.
+  const changed = useMemo<FileEntry[]>(
+    () => [...unstaged, ...untracked.map((path) => ({ path, status: "?" }))],
+    [unstaged, untracked],
+  );
 
   const confirmDiscard = useCallback(
     (paths: string[]) => {
@@ -104,96 +112,127 @@ export function ChangesTab({
   return (
     <>
       {staged.length > 0 && (
-        <StagedSection
-          files={staged}
+        <Section
+          title="Staged"
+          count={staged.length}
           isOpen={stagedOpen}
           onToggle={onToggleStaged}
-          selectedFile={selectedFile}
-          diffContent={diffContent}
-          diffLoading={diffLoading}
-          onFilePress={onFilePress}
-          onUnstage={onUnstage}
           textPrimary={textPrimary}
           textMuted={textMuted}
           sectionBg={sectionBg}
-          hoverBg={hoverBg}
-        />
+          headerActions={
+            <IconButton
+              onPress={() => onUnstage(staged.map((f) => f.path))}
+              title="Unstage all"
+              icon={<Minus size={14} color={textMuted} strokeWidth={2} />}
+            />
+          }
+        >
+          <FileList
+            files={staged}
+            keyPrefix="s"
+            staged
+            selectedFile={selectedFile}
+            diffContent={diffContent}
+            diffLoading={diffLoading}
+            onFilePress={onFilePress}
+            textPrimary={textPrimary}
+            textMuted={textMuted}
+            hoverBg={hoverBg}
+            dividerColor={dividerColor}
+            renderActions={(path) => (
+              <IconButton
+                onPress={() => onUnstage([path])}
+                title="Unstage"
+                icon={<Minus size={13} color={textMuted} strokeWidth={2} />}
+              />
+            )}
+          />
+        </Section>
       )}
 
-      {unstaged.length > 0 && (
-        <UnstagedSection
-          files={unstaged}
+      {changed.length > 0 && (
+        <Section
+          title="Changes"
+          count={changed.length}
           isOpen={unstagedOpen}
           onToggle={onToggleUnstaged}
-          selectedFile={selectedFile}
-          diffContent={diffContent}
-          diffLoading={diffLoading}
-          onFilePress={onFilePress}
-          onStage={onStage}
-          onDiscard={confirmDiscard}
           textPrimary={textPrimary}
           textMuted={textMuted}
           sectionBg={sectionBg}
-          hoverBg={hoverBg}
-        />
-      )}
-
-      {untracked.length > 0 && (
-        <UntrackedSection
-          files={untracked}
-          isOpen={untrackedOpen}
-          onToggle={onToggleUntracked}
-          onStage={onStage}
-          textPrimary={textPrimary}
-          textMuted={textMuted}
-          sectionBg={sectionBg}
-          hoverBg={hoverBg}
-        />
+          headerActions={
+            <>
+              {unstaged.length > 0 && (
+                <IconButton
+                  onPress={() => confirmDiscard(unstaged.map((f) => f.path))}
+                  title="Discard all changes"
+                  icon={<Undo2 size={13} color={textMuted} strokeWidth={2} />}
+                />
+              )}
+              <IconButton
+                onPress={() => onStage(changed.map((f) => f.path))}
+                title="Stage all changes"
+                style={{ marginLeft: 4 }}
+                icon={<Plus size={14} color={textMuted} strokeWidth={2} />}
+              />
+            </>
+          }
+        >
+          <FileList
+            files={changed}
+            keyPrefix="u"
+            selectedFile={selectedFile}
+            diffContent={diffContent}
+            diffLoading={diffLoading}
+            onFilePress={onFilePress}
+            textPrimary={textPrimary}
+            textMuted={textMuted}
+            hoverBg={hoverBg}
+            dividerColor={dividerColor}
+            renderActions={(path, status) => (
+              <View style={styles.fileActions}>
+                {/* An untracked file has no previous version to revert to. */}
+                {status !== "?" && (
+                  <IconButton
+                    onPress={() => confirmDiscard([path])}
+                    title="Discard changes"
+                    icon={<Undo2 size={12} color={textMuted} strokeWidth={2} />}
+                  />
+                )}
+                <IconButton
+                  onPress={() => onStage([path])}
+                  title="Stage"
+                  icon={<Plus size={13} color={textMuted} strokeWidth={2} />}
+                />
+              </View>
+            )}
+          />
+        </Section>
       )}
     </>
   );
 }
 
-function SectionChevron({
-  open,
-  color,
-}: {
-  open: boolean;
-  color: string;
-}) {
-  return open ? (
-    <ChevronDown size={14} color={color} strokeWidth={2} />
-  ) : (
-    <ChevronRight size={14} color={color} strokeWidth={2} />
-  );
-}
-
-function StagedSection({
-  files,
+function Section({
+  title,
+  count,
   isOpen,
   onToggle,
-  selectedFile,
-  diffContent,
-  diffLoading,
-  onFilePress,
-  onUnstage,
+  headerActions,
+  children,
   textPrimary,
   textMuted,
   sectionBg,
-  hoverBg,
 }: {
-  files: FileEntry[];
+  title: string;
+  count: number;
   isOpen: boolean;
   onToggle: () => void;
-  selectedFile: SelectedFile | null;
-  diffContent: string | null | undefined;
-  diffLoading: boolean;
-  onFilePress: (path: string, staged: boolean) => void;
-  onUnstage: (paths: string[]) => void;
+  headerActions?: React.ReactNode;
+  children: React.ReactNode;
   textPrimary: string;
   textMuted: string;
   sectionBg: string;
-  hoverBg: string;
 }) {
   return (
     <View style={styles.section}>
@@ -201,212 +240,86 @@ function StagedSection({
         style={[styles.sectionHeader, { backgroundColor: sectionBg }]}
         onPress={onToggle}
       >
-        <SectionChevron open={isOpen} color={textMuted} />
+        {isOpen ? (
+          <ChevronDown size={14} color={textMuted} strokeWidth={2} />
+        ) : (
+          <ChevronRight size={14} color={textMuted} strokeWidth={2} />
+        )}
         <Text style={[styles.sectionTitle, { color: textPrimary }]}>
-          Staged
+          {title}
         </Text>
-        <Text style={[styles.sectionCount, { color: textMuted }]}>
-          {files.length}
-        </Text>
+        <Text style={[styles.sectionCount, { color: textMuted }]}>{count}</Text>
         <View style={{ flex: 1 }} />
-        <IconButton
-          onPress={() => onUnstage(files.map((f) => f.path))}
-          title="Unstage all"
-          icon={<Minus size={14} color={textMuted} strokeWidth={2} />}
-        />
+        {headerActions}
       </Pressable>
-      {isOpen &&
-        files.map((f) => {
-          const isSelected =
-            selectedFile?.path === f.path && selectedFile?.staged === true;
-          return (
-            <FileRow
-              key={`s-${f.path}`}
-              path={f.path}
-              status={f.status}
-              additions={f.additions}
-              deletions={f.deletions}
-              isSelected={isSelected}
-              diffContent={isSelected ? diffContent : null}
-              diffLoading={isSelected && diffLoading}
-              onPress={() => onFilePress(f.path, true)}
-              textPrimary={textPrimary}
-              textMuted={textMuted}
-              hoverBg={hoverBg}
-              actions={
-                <IconButton
-                  onPress={() => onUnstage([f.path])}
-                  title="Unstage"
-                  icon={
-                    <Minus size={13} color={textMuted} strokeWidth={2} />
-                  }
-                />
-              }
-            />
-          );
-        })}
+      {isOpen && children}
     </View>
   );
 }
 
-function UnstagedSection({
+/**
+ * The changed files, flat and sorted by path.
+ *
+ * Directory headings were an answer to rows that could not fit their path; rows
+ * that keep the filename intact and let the directory truncate need no headings,
+ * and a flat list keeps sibling files next to each other by sort order anyway.
+ */
+function FileList({
   files,
-  isOpen,
-  onToggle,
+  keyPrefix,
+  staged = false,
   selectedFile,
   diffContent,
   diffLoading,
   onFilePress,
-  onStage,
-  onDiscard,
+  renderActions,
   textPrimary,
   textMuted,
-  sectionBg,
   hoverBg,
+  dividerColor,
 }: {
   files: FileEntry[];
-  isOpen: boolean;
-  onToggle: () => void;
+  keyPrefix: string;
+  staged?: boolean;
   selectedFile: SelectedFile | null;
   diffContent: string | null | undefined;
   diffLoading: boolean;
-  onFilePress: (path: string, staged: boolean) => void;
-  onStage: (paths: string[]) => void;
-  onDiscard: (paths: string[]) => void;
+  onFilePress?: (path: string, staged: boolean) => void;
+  renderActions: (path: string, status: string) => React.ReactNode;
   textPrimary: string;
   textMuted: string;
-  sectionBg: string;
   hoverBg: string;
+  dividerColor: string;
 }) {
-  return (
-    <View style={styles.section}>
-      <Pressable
-        style={[styles.sectionHeader, { backgroundColor: sectionBg }]}
-        onPress={onToggle}
-      >
-        <SectionChevron open={isOpen} color={textMuted} />
-        <Text style={[styles.sectionTitle, { color: textPrimary }]}>
-          Changes
-        </Text>
-        <Text style={[styles.sectionCount, { color: textMuted }]}>
-          {files.length}
-        </Text>
-        <View style={{ flex: 1 }} />
-        <IconButton
-          onPress={() => onDiscard(files.map((f) => f.path))}
-          title="Discard all changes"
-          icon={<Undo2 size={13} color={textMuted} strokeWidth={2} />}
-        />
-        <IconButton
-          onPress={() => onStage(files.map((f) => f.path))}
-          title="Stage all changes"
-          style={{ marginLeft: 4 }}
-          icon={<Plus size={14} color={textMuted} strokeWidth={2} />}
-        />
-      </Pressable>
-      {isOpen &&
-        files.map((f) => {
-          const isSelected =
-            selectedFile?.path === f.path && selectedFile?.staged === false;
-          return (
-            <FileRow
-              key={`u-${f.path}`}
-              path={f.path}
-              status={f.status}
-              additions={f.additions}
-              deletions={f.deletions}
-              isSelected={isSelected}
-              diffContent={isSelected ? diffContent : null}
-              diffLoading={isSelected && diffLoading}
-              onPress={() => onFilePress(f.path, false)}
-              textPrimary={textPrimary}
-              textMuted={textMuted}
-              hoverBg={hoverBg}
-              actions={
-                <View style={styles.fileActions}>
-                  <IconButton
-                    onPress={() => onDiscard([f.path])}
-                    title="Discard changes"
-                    icon={
-                      <Undo2 size={12} color={textMuted} strokeWidth={2} />
-                    }
-                  />
-                  <IconButton
-                    onPress={() => onStage([f.path])}
-                    title="Stage"
-                    icon={
-                      <Plus size={13} color={textMuted} strokeWidth={2} />
-                    }
-                  />
-                </View>
-              }
-            />
-          );
-        })}
-    </View>
-  );
-}
+  const sorted = useMemo(() => [...files].sort(byPath), [files]);
 
-function UntrackedSection({
-  files,
-  isOpen,
-  onToggle,
-  onStage,
-  textPrimary,
-  textMuted,
-  sectionBg,
-  hoverBg,
-}: {
-  files: string[];
-  isOpen: boolean;
-  onToggle: () => void;
-  onStage: (paths: string[]) => void;
-  textPrimary: string;
-  textMuted: string;
-  sectionBg: string;
-  hoverBg: string;
-}) {
   return (
-    <View style={styles.section}>
-      <Pressable
-        style={[styles.sectionHeader, { backgroundColor: sectionBg }]}
-        onPress={onToggle}
-      >
-        <SectionChevron open={isOpen} color={textMuted} />
-        <Text style={[styles.sectionTitle, { color: textPrimary }]}>
-          Untracked
-        </Text>
-        <Text style={[styles.sectionCount, { color: textMuted }]}>
-          {files.length}
-        </Text>
-        <View style={{ flex: 1 }} />
-        <IconButton
-          onPress={() => onStage(files)}
-          title="Stage all untracked"
-          icon={<Plus size={14} color={textMuted} strokeWidth={2} />}
-        />
-      </Pressable>
-      {isOpen &&
-        files.map((p) => (
+    <>
+      {sorted.map((file) => {
+        const isSelected =
+          selectedFile?.path === file.path && selectedFile?.staged === staged;
+        return (
           <FileRow
-            key={`t-${p}`}
-            path={p}
-            status="?"
+            key={`${keyPrefix}-${file.path}`}
+            path={file.path}
+            status={file.status}
+            additions={file.additions}
+            deletions={file.deletions}
+            isSelected={isSelected}
+            diffContent={isSelected ? diffContent : null}
+            diffLoading={isSelected && diffLoading}
+            onPress={
+              onFilePress ? () => onFilePress(file.path, staged) : undefined
+            }
             textPrimary={textPrimary}
             textMuted={textMuted}
             hoverBg={hoverBg}
-            actions={
-              <IconButton
-                onPress={() => onStage([p])}
-                title="Stage"
-                icon={
-                  <Plus size={13} color={textMuted} strokeWidth={2} />
-                }
-              />
-            }
+            dividerColor={dividerColor}
+            actions={renderActions(file.path, file.status)}
           />
-        ))}
-    </View>
+        );
+      })}
+    </>
   );
 }
 
@@ -444,6 +357,6 @@ const styles = StyleSheet.create({
   },
   fileActions: {
     flexDirection: "row",
-    gap: 6,
+    gap: 2,
   },
 });

@@ -31,7 +31,6 @@ export function ChangesPanel() {
   const [commitMsg, setCommitMsg] = useState("");
   const [stagedOpen, setStagedOpen] = useState(true);
   const [unstagedOpen, setUnstagedOpen] = useState(true);
-  const [untrackedOpen, setUntrackedOpen] = useState(true);
   const [selectedFile, setSelectedFile] = useState<{
     path: string;
     staged: boolean;
@@ -63,7 +62,6 @@ export function ChangesPanel() {
     discard,
     commit,
     isCommitting,
-    refresh,
   } = useGitStatus(cwd);
 
   const { entries: logEntries, isLoading: logLoading } = useGitLog(
@@ -81,7 +79,6 @@ export function ChangesPanel() {
     setCommitMsg("");
     setStagedOpen(true);
     setUnstagedOpen(true);
-    setUntrackedOpen(true);
     setSelectedFile(null);
     setViewingFile(null);
     setExpandedDirs(new Set());
@@ -138,7 +135,6 @@ export function ChangesPanel() {
           branch={gitData.branch}
           ahead={gitData.ahead}
           behind={gitData.behind}
-          onRefresh={refresh}
         />
       )}
 
@@ -161,7 +157,6 @@ export function ChangesPanel() {
               onViewFile={setViewingFile}
               expandedDirs={expandedDirs}
               onToggleDir={handleToggleDir}
-              showActions
             />
           ) : (
             <Text style={[styles.emptyText, { color: textMuted }]}>
@@ -193,10 +188,8 @@ export function ChangesPanel() {
                 untracked={untracked}
                 stagedOpen={stagedOpen}
                 unstagedOpen={unstagedOpen}
-                untrackedOpen={untrackedOpen}
                 onToggleStaged={() => setStagedOpen((p) => !p)}
                 onToggleUnstaged={() => setUnstagedOpen((p) => !p)}
-                onToggleUntracked={() => setUntrackedOpen((p) => !p)}
                 selectedFile={selectedFile}
                 diffContent={fileDiffData?.diff}
                 diffLoading={diffLoading}

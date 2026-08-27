@@ -7,7 +7,12 @@ import { useTasksStore } from '../store';
 import { useWorkspaceStore } from '@/features/workspace/store';
 import { TasksDropdown } from './tasks-panel';
 
-export function TaskSelector() {
+export function TaskSelector({
+  placement = 'below',
+}: {
+  /** Passed to the dropdown: the composer toolbar has to open upwards. */
+  placement?: 'below' | 'above';
+}) {
   const panelOpen = useTasksStore((s) => s.panelOpen);
   const togglePanel = useTasksStore((s) => s.togglePanel);
   const instances = useTasksStore((s) => s.instances);
@@ -84,7 +89,7 @@ export function TaskSelector() {
         </Pressable>
       </View>
 
-      {panelOpen && <TasksDropdown />}
+      {panelOpen && <TasksDropdown placement={placement} />}
     </View>
   );
 }

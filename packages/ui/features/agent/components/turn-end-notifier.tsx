@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from "react";
 import { Platform } from "react-native";
 import { usePathname } from "expo-router";
-import { useTurnEnd, type TurnEndEvent } from "@pideck/client-sdk";
+import { usePiClient, useTurnEnd, type TurnEndEvent } from "@pideck/client-sdk";
 
 import { useWorkspaceStore } from "@/features/workspace/store";
 import { useAppSettingsStore } from "@/features/settings/store";
@@ -41,6 +41,28 @@ export function TurnEndNotifier() {
   useEffect(() => {
     if (!settingsLoaded) loadSettings();
   }, [settingsLoaded, loadSettings]);
+
+  /*
+   * Learn which project each streaming session belongs to.
+   *
+   * The sidebar needs this to show activity on a folded project, and the server
+   * only tags `message_start` with a workspace id (the rest are stripped to keep
+   * delta events small), so that is the event worth listening for.
+   */
+  const client = usePiClient();
+  const mappedRef = useRef<Set<string>>(new Set());
+  const registerRef = useRef(registerSessionWorkspace);
+  registerRef.current = registerSessionWorkspace;
+  useEffect(() => {
+    const sub = client.events$.subscribe((envelope) => {
+      const sessionId = envelope.session_id;
+      const workspaceId = envelope.workspace_id;
+      if (!sessionId || !workspaceId || mappedRef.current.has(sessionId)) return;
+      mappedRef.current.add(sessionId);
+      registerRef.current(sessionId, workspaceId);
+    });
+    return () => sub.unsubscribe();
+  }, [client]);
 
   const handleTurnEnd = useCallback(
     ({ sessionId, workspaceId }: TurnEndEvent) => {

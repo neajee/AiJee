@@ -1121,7 +1121,6 @@ fn json_to_agent_command(json: &Value) -> Result<AgentCommand, String> {
                 .and_then(|v| serde_json::from_value(v.clone()).ok()),
         }),
         "abort" => Ok(AgentCommand::Abort),
-        "clear_queue" => Ok(AgentCommand::ClearQueue),
         "get_state" => Ok(AgentCommand::GetState),
         "get_messages" => Ok(AgentCommand::GetMessages),
         "set_model" => Ok(AgentCommand::SetModel {

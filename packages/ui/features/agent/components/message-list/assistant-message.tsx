@@ -21,6 +21,20 @@ interface AssistantMessageProps {
   isDark: boolean;
 }
 
+/**
+ * Whether a message has settled into something worth offering actions on.
+ *
+ * The turn owns the action row (it has to come after the file-change card), so
+ * the decision lives here next to the toolbar it gates.
+ */
+export function hasMessageActions(message: ChatMessage) {
+  return (
+    !message.isStreaming &&
+    message.stopReason === "stop" &&
+    (!!message.text || !!message.errorMessage)
+  );
+}
+
 export const AssistantMessage = memo(function AssistantMessage({
   message,
   isDark,
@@ -31,22 +45,9 @@ export const AssistantMessage = memo(function AssistantMessage({
   const hasText = !!message.text;
   const hasError = !!message.errorMessage;
   const isStreaming = !!message.isStreaming;
-  const isFinalResponse = message.stopReason === "stop";
-  const showToolbar = !isStreaming && isFinalResponse && (!!message.text || !!message.errorMessage);
-
-  const [hovered, setHovered] = useState(false);
-  const isWeb = Platform.OS === "web";
 
   return (
-    <View
-      style={styles.container}
-      {...(isWeb
-        ? {
-            onPointerEnter: () => setHovered(true),
-            onPointerLeave: () => setHovered(false),
-          }
-        : {})}
-    >
+    <View style={styles.container}>
       {hasText && (
         <View style={styles.textBlock}>
           <AssistantMarkdown text={message.text} isStreaming={isStreaming} />
@@ -69,17 +70,13 @@ export const AssistantMessage = memo(function AssistantMessage({
       {isStreaming && !hasText && (
         <StreamingCursor color={colors.textTertiary} />
       )}
-
-      {showToolbar && (
-        <MessageToolbar message={message} isDark={isDark} hovered={hovered} />
-      )}
     </View>
   );
 });
 
 const FADE = { duration: 150, easing: Easing.out(Easing.cubic) };
 
-const MessageToolbar = memo(function MessageToolbar({
+export const MessageToolbar = memo(function MessageToolbar({
   message,
   isDark,
   hovered,

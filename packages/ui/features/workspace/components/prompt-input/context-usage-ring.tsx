@@ -21,8 +21,11 @@ export function ContextUsageRing({
 }) {
   const [showTooltip, setShowTooltip] = useState(false);
   const ratio = Math.min(used / total, 1);
-  const size = 20;
-  const stroke = 3;
+  // Sized to sit on the same optical line as the 32px round send button beside
+  // it: same box height, slightly smaller mark so it reads as a status, not a
+  // second button.
+  const size = 18;
+  const stroke = 2.5;
   const radius = (size - stroke) / 2;
   const circumference = 2 * Math.PI * radius;
   const filled = circumference * ratio;
@@ -85,13 +88,14 @@ const styles = StyleSheet.create({
   wrap: {
     justifyContent: "center",
     alignSelf: "center",
-    marginRight: 6,
-    height: 36,
+    marginRight: 8,
+    height: 32,
+    width: 32,
     alignItems: "center",
   },
   tooltip: {
     position: "absolute",
-    bottom: 40,
+    bottom: 36,
     right: -8,
     borderRadius: 8,
     borderWidth: 0.633,

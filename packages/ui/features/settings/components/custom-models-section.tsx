@@ -932,11 +932,10 @@ const sectionWebStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 6,
-    paddingVertical: 11,
-    minHeight: 40,
-    borderRadius: 10,
+    paddingVertical: 9,
+    minHeight: 36,
+    borderRadius: 8,
     borderWidth: StyleSheet.hairlineWidth,
-    borderStyle: 'dashed',
   },
   addButtonText: {
     fontSize: 13,
@@ -951,7 +950,7 @@ const sectionWebStyles = StyleSheet.create({
 
 const cardWebStyles = StyleSheet.create({
   card: {
-    borderRadius: 10,
+    borderRadius: 8,
     borderWidth: StyleSheet.hairlineWidth,
     overflow: 'hidden',
   },
@@ -959,9 +958,9 @@ const cardWebStyles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    minHeight: 40,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    minHeight: 36,
   },
   headerLeft: {
     flexDirection: 'row',
@@ -970,9 +969,9 @@ const cardWebStyles = StyleSheet.create({
     flex: 1,
   },
   providerIcon: {
-    width: 26,
-    height: 26,
-    borderRadius: 7,
+    width: 22,
+    height: 22,
+    borderRadius: 6,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -981,7 +980,7 @@ const cardWebStyles = StyleSheet.create({
     gap: 2,
   },
   providerName: {
-    fontSize: 14,
+    fontSize: 13.5,
     fontFamily: Fonts.sansMedium,
   },
   providerMeta: {
@@ -998,7 +997,7 @@ const cardWebStyles = StyleSheet.create({
     borderRadius: 6,
   },
   body: {
-    padding: 14,
+    padding: 12,
     gap: 12,
   },
   modelsSection: {
@@ -1040,9 +1039,9 @@ const cardWebStyles = StyleSheet.create({
     flex: 1,
     fontSize: 13,
     fontFamily: Fonts.mono,
-    height: 34,
+    height: 32,
     paddingHorizontal: 10,
-    borderRadius: 8,
+    borderRadius: 6,
     borderWidth: StyleSheet.hairlineWidth,
   },
   addModelIconBtn: {
@@ -1061,8 +1060,8 @@ const modelWebStyles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 12,
-    paddingVertical: 9,
-    minHeight: 38,
+    paddingVertical: 8,
+    minHeight: 34,
     gap: 8,
   },
   info: {
@@ -1099,8 +1098,8 @@ const modelWebStyles = StyleSheet.create({
   },
   smallBtn: {
     paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
+    paddingVertical: 7,
+    borderRadius: 6,
     borderWidth: StyleSheet.hairlineWidth,
   },
   smallBtnText: {
@@ -1120,9 +1119,9 @@ const fieldWebStyles = StyleSheet.create({
   input: {
     fontSize: 13,
     fontFamily: Fonts.sans,
-    height: 34,
+    height: 32,
     paddingHorizontal: 10,
-    borderRadius: 8,
+    borderRadius: 6,
     borderWidth: StyleSheet.hairlineWidth,
   },
 });
@@ -1135,8 +1134,8 @@ const apiWebStyles = StyleSheet.create({
   },
   chip: {
     paddingHorizontal: 10,
-    paddingVertical: 7,
-    borderRadius: 8,
+    paddingVertical: 6,
+    borderRadius: 6,
     borderWidth: StyleSheet.hairlineWidth,
   },
   chipText: {
@@ -1147,7 +1146,7 @@ const apiWebStyles = StyleSheet.create({
 
 const addWebStyles = StyleSheet.create({
   formTitle: {
-    fontSize: 14,
+    fontSize: 13.5,
     fontFamily: Fonts.sansMedium,
     marginBottom: 2,
   },
@@ -1159,8 +1158,8 @@ const addWebStyles = StyleSheet.create({
   },
   btn: {
     paddingHorizontal: 14,
-    paddingVertical: 9,
-    borderRadius: 8,
+    paddingVertical: 8,
+    borderRadius: 6,
     borderWidth: StyleSheet.hairlineWidth,
   },
   btnText: {

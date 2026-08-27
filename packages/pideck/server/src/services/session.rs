@@ -1,6 +1,10 @@
-use serde_json::Value;
+use chrono::{SecondsFormat, Utc};
+use serde_json::{Value, json};
 use std::collections::{HashMap, HashSet};
+use std::fs::OpenOptions;
+use std::io::Write;
 use std::path::{Path, PathBuf};
+use uuid::Uuid;
 
 use crate::models::{
     PaginatedSessions, SessionDetail, SessionEntry, SessionHeader, SessionListItem, SessionTreeNode,
@@ -555,6 +559,53 @@ pub fn delete_session(base_path: &Path, cwd: &str, session_id: &str) -> bool {
     }
 }
 
+pub fn rename_session(
+    base_path: &Path,
+    cwd: &str,
+    session_id: &str,
+    name: &str,
+) -> std::io::Result<bool> {
+    let Some(file_path) = find_session_file(base_path, cwd, session_id) else {
+        return Ok(false);
+    };
+    let content = std::fs::read_to_string(&file_path)?;
+    let parent_id = content
+        .lines()
+        .rev()
+        .find_map(|line| serde_json::from_str::<Value>(line).ok())
+        .filter(|entry| entry.get("type").and_then(Value::as_str) != Some("session"))
+        .and_then(|entry| entry.get("id").and_then(Value::as_str).map(str::to_owned));
+    let entry = json!({
+        "type": "session_info",
+        "id": Uuid::new_v4().simple().to_string(),
+        "parentId": parent_id,
+        "timestamp": Utc::now().to_rfc3339_opts(SecondsFormat::Millis, true),
+        "name": name,
+    });
+    let mut file = OpenOptions::new().append(true).open(file_path)?;
+    if !content.ends_with('\n') {
+        writeln!(file)?;
+    }
+    writeln!(file, "{}", serde_json::to_string(&entry)?)?;
+    Ok(true)
+}
+
+pub fn archive_session(base_path: &Path, cwd: &str, session_id: &str) -> std::io::Result<bool> {
+    let Some(file_path) = find_session_file(base_path, cwd, session_id) else {
+        return Ok(false);
+    };
+    let Some(file_name) = file_path.file_name() else {
+        return Ok(false);
+    };
+    let archive_dir = file_path
+        .parent()
+        .expect("session file must have a parent")
+        .join(".archive");
+    std::fs::create_dir_all(&archive_dir)?;
+    std::fs::rename(&file_path, archive_dir.join(file_name))?;
+    Ok(true)
+}
+
 fn find_session_file(base_path: &Path, cwd: &str, session_id: &str) -> Option<PathBuf> {
     let dir_name = cwd_to_dir_name(cwd);
     let session_dir = base_path.join(&dir_name);
@@ -862,4 +913,36 @@ fn read_first_line(path: &Path) -> Option<String> {
     let mut line = String::new();
     reader.read_line(&mut line).ok()?;
     Some(line.trim().to_string())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn rename_then_archive_preserves_session_file() {
+        let root = std::env::temp_dir().join(format!("pideck-session-{}", Uuid::new_v4()));
+        let cwd = "/tmp/pideck-test-workspace";
+        let session_dir = root.join(cwd_to_dir_name(cwd));
+        std::fs::create_dir_all(&session_dir).expect("create session dir");
+        let session_file = session_dir.join("session.jsonl");
+        std::fs::write(
+            &session_file,
+            concat!(
+                "{\"type\":\"session\",\"version\":3,\"id\":\"session-1\",\"timestamp\":\"2026-01-01T00:00:00.000Z\",\"cwd\":\"/tmp/pideck-test-workspace\"}\n",
+                "{\"type\":\"message\",\"id\":\"entry-1\",\"parentId\":null,\"timestamp\":\"2026-01-01T00:00:01.000Z\",\"message\":{\"role\":\"user\",\"content\":\"hello\"}}\n"
+            ),
+        )
+        .expect("write session");
+
+        assert!(rename_session(&root, cwd, "session-1", "Renamed").expect("rename"));
+        let sessions = list_sessions(&root, cwd, 1, 20);
+        assert_eq!(sessions.items[0].display_name.as_deref(), Some("Renamed"));
+
+        assert!(archive_session(&root, cwd, "session-1").expect("archive"));
+        assert!(list_sessions(&root, cwd, 1, 20).items.is_empty());
+        assert!(session_dir.join(".archive/session.jsonl").exists());
+
+        std::fs::remove_dir_all(root).expect("remove test dir");
+    }
 }

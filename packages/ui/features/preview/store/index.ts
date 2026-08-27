@@ -30,6 +30,7 @@ interface PreviewState {
   selectTarget: (sessionId: string, targetId: string | null) => void;
   setPaneOpen: (sessionId: string, open: boolean) => void;
   togglePane: (sessionId: string) => void;
+  resetServerState: () => void;
 }
 
 function normalizeLabel(target: Partial<PreviewTarget> & { port: number; hostname: string }) {
@@ -208,6 +209,12 @@ export const usePreviewStore = create<PreviewState>((set, get) => ({
         [sessionId]: !(state.paneOpenBySession[sessionId] ?? false),
       },
     })),
+
+  resetServerState: () => set({
+    targetsBySession: {},
+    selectedTargetIdBySession: {},
+    paneOpenBySession: {},
+  }),
 }));
 
 const SET_EVENT_TYPES = new Set([

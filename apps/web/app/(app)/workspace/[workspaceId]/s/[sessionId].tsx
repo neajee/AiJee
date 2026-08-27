@@ -107,15 +107,14 @@ export default function SessionScreen() {
         });
       }
 
-      const behavior = options?.queueBehavior ?? (agentSession.isStreaming ? "steer" : undefined);
-      const sendFn = behavior === "steer"
-        ? agentSession.steer
-        : behavior === "followUp"
-          ? agentSession.followUp
-          : agentSession.prompt;
+      // Always send through `prompt` and let pi decide from its own live state
+      // whether to run now or queue. Picking steer/followUp here from a possibly
+      // stale local isStreaming flag could queue the message in an idle agent,
+      // where nothing ever drains it and the message is silently lost.
+      const streamingBehavior = options?.queueBehavior ?? "steer";
 
       try {
-        await sendFn(text, images ? { images } : undefined);
+        await agentSession.prompt(text, { images, streamingBehavior });
       } catch (error) {
         setAlertMessage(
           error instanceof Error ? error.message : "Failed to send prompt",
@@ -126,14 +125,16 @@ export default function SessionScreen() {
     [inputBlockedByConnection, sessionId, agentSession],
   );
 
-  const handleAbort = useCallback(() => {
+  const handleAbort = useCallback(async () => {
     if (!sessionId) return;
     setAlertMessage(null);
-    agentSession.abort().catch((error) => {
+    try {
+      await agentSession.abort();
+    } catch (error) {
       setAlertMessage(
         error instanceof Error ? error.message : "Failed to abort",
       );
-    });
+    }
   }, [sessionId, agentSession]);
 
   const clearAlert = useCallback(() => setAlertMessage(null), []);

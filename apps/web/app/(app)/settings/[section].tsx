@@ -4,18 +4,22 @@ import { Redirect, useLocalSearchParams, useRouter } from 'expo-router';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { SettingsDetailScreen } from '@/features/settings/components/settings-screens';
 import { findSettingsSection } from '@/features/settings/sections';
+import { useWorkspaceStore } from '@/features/workspace/store';
 
 export default function SettingsSectionScreen() {
   const router = useRouter();
   const isDark = (useColorScheme() ?? 'light') === 'dark';
   const { section: slug } = useLocalSearchParams<{ section: string }>();
   const section = findSettingsSection(slug);
+  const selectedWorkspaceId = useWorkspaceStore((s) => s.selectedWorkspaceId);
 
   const handleBack = useCallback(() => {
-    // Deep links land here with no history, so fall back to the index.
-    if (router.canGoBack()) router.back();
-    else router.navigate('/settings');
-  }, [router]);
+    if (selectedWorkspaceId) {
+      router.replace(`/workspace/${selectedWorkspaceId}`);
+      return;
+    }
+    router.replace('/');
+  }, [router, selectedWorkspaceId]);
 
   if (!section) return <Redirect href="/settings" />;
 

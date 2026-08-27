@@ -561,6 +561,10 @@ export type SessionModeResponse = {
     session_id: string;
 };
 
+export type SessionRenameRequest = {
+    name: string;
+};
+
 export type SessionTreeNode = {
     children: Array<SessionTreeNode>;
     entry_type: string;
@@ -795,20 +799,6 @@ export type BashErrors = {
 export type BashResponses = {
     /**
      * Bash output
-     */
-    200: unknown;
-};
-
-export type ClearQueueData = {
-    body: AgentSessionIdRequest;
-    path?: never;
-    query?: never;
-    url: '/api/agent/clear-queue';
-};
-
-export type ClearQueueResponses = {
-    /**
-     * Queued messages cleared
      */
     200: unknown;
 };
@@ -3522,6 +3512,90 @@ export type SessionsGetResponses = {
 };
 
 export type SessionsGetResponse = SessionsGetResponses[keyof SessionsGetResponses];
+
+export type SessionsRenameData = {
+    body: SessionRenameRequest;
+    path: {
+        /**
+         * Workspace ID
+         */
+        id: string;
+        /**
+         * Session UUID
+         */
+        session_id: string;
+    };
+    query?: never;
+    url: '/api/workspaces/{id}/sessions/{session_id}';
+};
+
+export type SessionsRenameErrors = {
+    /**
+     * Invalid name
+     */
+    400: ErrorBody;
+    /**
+     * Unauthorized
+     */
+    401: ErrorBody;
+    /**
+     * Not found
+     */
+    404: ErrorBody;
+    /**
+     * Rename failed
+     */
+    500: ErrorBody;
+};
+
+export type SessionsRenameError = SessionsRenameErrors[keyof SessionsRenameErrors];
+
+export type SessionsRenameResponses = {
+    /**
+     * Session renamed
+     */
+    200: unknown;
+};
+
+export type SessionsArchiveData = {
+    body?: never;
+    path: {
+        /**
+         * Workspace ID
+         */
+        id: string;
+        /**
+         * Session UUID
+         */
+        session_id: string;
+    };
+    query?: never;
+    url: '/api/workspaces/{id}/sessions/{session_id}/archive';
+};
+
+export type SessionsArchiveErrors = {
+    /**
+     * Unauthorized
+     */
+    401: ErrorBody;
+    /**
+     * Not found
+     */
+    404: ErrorBody;
+    /**
+     * Archive failed
+     */
+    500: ErrorBody;
+};
+
+export type SessionsArchiveError = SessionsArchiveErrors[keyof SessionsArchiveErrors];
+
+export type SessionsArchiveResponses = {
+    /**
+     * Session archived
+     */
+    200: unknown;
+};
 
 export type SessionsBranchData = {
     body?: never;
