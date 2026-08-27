@@ -3,6 +3,7 @@ import {
   ActivityIndicator,
   FlatList,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -20,6 +21,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { ArrowDown, ChevronRight } from "lucide-react-native";
 import { useAgentSession } from "@pideck/client-sdk";
+import { useWorkspaceStore } from "@/features/workspace/store";
 import { Colors, Fonts } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import type { ChatMessage, TurnFileStats } from "../../types";
@@ -37,6 +39,8 @@ import { AssistantMessage } from "./assistant-message";
 import { AssistantMarkdown } from "./assistant-markdown";
 import { SystemMessage } from "./system-message";
 import { ToolCallGroup } from "./tool-call";
+import { ToolBody, ToolHeader, ToolSurface } from "./tool-call/tool-disclosure";
+import { basename, collectFileChanges, relativePath, type TurnFileChange } from "./utils";
 import { ThinkingBlock } from "./thinking-block";
 
 interface MessageListProps {
@@ -220,20 +224,95 @@ function useTurnElapsed(active: boolean, startedAt: number): number {
 }
 
 const SUMMARY_BLOCKS = 5;
+/** Rows past this many get a scroll cap instead of an ever-taller card. */
+const SUMMARY_SCROLL_AFTER = 8;
+const SUMMARY_ROW_HEIGHT = 22;
 
+const FileChangeRow = memo(function FileChangeRow({
+  change,
+  root,
+  addColor,
+  removeColor,
+  isDark,
+}: {
+  change: TurnFileChange;
+  root: string | null;
+  addColor: string;
+  removeColor: string;
+  isDark: boolean;
+}) {
+  const colors = isDark ? Colors.dark : Colors.light;
+  const created = change.kind === "created";
+  const shown = relativePath(change.path, root);
+  const name = basename(shown);
+  const dir = shown.slice(0, shown.length - name.length);
+
+  return (
+    <View style={styles.fileRow}>
+      <Text
+        style={[styles.fileKind, { color: created ? addColor : colors.textTertiary }]}
+        accessibilityLabel={created ? "created" : "edited"}
+      >
+        {created ? "A" : "M"}
+      </Text>
+      {/* Head-truncated with a dimmed directory: the filename is what is read. */}
+      <Text style={styles.filePath} numberOfLines={1} ellipsizeMode="head">
+        {dir ? <Text style={{ color: colors.textTertiary }}>{dir}</Text> : null}
+        <Text style={{ color: colors.text }}>{name}</Text>
+      </Text>
+      <View style={styles.fileCounts}>
+        {change.added > 0 && (
+          <Text style={[styles.fileCount, { color: addColor }]}>+{change.added}</Text>
+        )}
+        {change.removed > 0 && (
+          <Text style={[styles.fileCount, { color: removeColor }]}>{"−"}{change.removed}</Text>
+        )}
+      </View>
+    </View>
+  );
+});
+
+/**
+ * What a turn did to the working tree, as a card at the very end of the turn.
+ *
+ * Collapsed it reads as a list-card header: what changed on the leading edge,
+ * how much on the trailing edge. Expanded it lists every file the turn
+ * touched, biggest churn first. The file list is derived from the turn's tool
+ * calls, so a session without retained tool calls renders the header alone,
+ * without a disclosure affordance.
+ */
 const TurnSummary = memo(function TurnSummary({
   stats,
+  changes,
   isDark,
 }: {
   stats: TurnFileStats;
+  changes: TurnFileChange[];
   isDark: boolean;
 }) {
+  const colors = isDark ? Colors.dark : Colors.light;
+  const [expanded, setExpanded] = useState(false);
+  const toggle = useCallback(() => setExpanded((prev) => !prev), []);
+
+  // Tool paths are absolute; the workspace root is what makes them readable.
+  const root = useWorkspaceStore((s) => {
+    const id = s.selectedWorkspaceId;
+    return s.workspaces.find((w) => w.id === id)?.path ?? null;
+  });
+
+  // Biggest change first: the cap below means the tail may go unseen.
+  const ordered = useMemo(
+    () =>
+      [...changes].sort(
+        (a, b) => b.added + b.removed - (a.added + a.removed),
+      ),
+    [changes],
+  );
+
   const totalFiles = stats.filesEdited + stats.filesCreated;
-  if (totalFiles === 0) return null;
 
   const addColor = isDark ? "#3FB950" : "#1A7F37";
   const removeColor = isDark ? "#F85149" : "#CF222E";
-  const textColor = isDark ? Colors.dark.textTertiary : Colors.light.textTertiary;
 
   const totalLines = stats.linesAdded + stats.linesRemoved;
   let addBlocks = 0;
@@ -248,24 +327,66 @@ const TurnSummary = memo(function TurnSummary({
     removeBlocks = SUMMARY_BLOCKS - addBlocks;
   }
 
+  if (totalFiles === 0) return null;
+
+  const expandable = ordered.length > 0;
+
   return (
     <View style={styles.summaryWrap}>
-      <Text style={styles.summaryLineCount}>
-        {stats.linesAdded > 0 && <Text style={{ color: addColor }}>+{stats.linesAdded}</Text>}
-        {stats.linesAdded > 0 && stats.linesRemoved > 0 && " "}
-        {stats.linesRemoved > 0 && <Text style={{ color: removeColor }}>{"−"}{stats.linesRemoved}</Text>}
-      </Text>
-      <View style={styles.summaryBlocks}>
-        {Array.from({ length: addBlocks }).map((_, i) => (
-          <View key={`a-${i}`} style={[styles.summaryBlock, { backgroundColor: addColor }]} />
-        ))}
-        {Array.from({ length: removeBlocks }).map((_, i) => (
-          <View key={`r-${i}`} style={[styles.summaryBlock, { backgroundColor: removeColor }]} />
-        ))}
-      </View>
-      <Text style={[styles.summaryText, { color: textColor }]}>
-        {totalFiles} {totalFiles === 1 ? "file" : "files"}
-      </Text>
+      <ToolSurface isDark={isDark} padded={false}>
+        <View style={styles.summaryHeader}>
+          <ToolHeader
+            expanded={expanded}
+            expandable={expandable}
+            onToggle={toggle}
+            isDark={isDark}
+            accessibilityLabel={`${expanded ? "Collapse" : "Expand"} the list of changed files`}
+          >
+            <Text style={[styles.summaryTitle, { color: colors.textSecondary }]}>
+              {totalFiles} {totalFiles === 1 ? "file" : "files"} changed
+            </Text>
+            {/* Keeps the counts on the trailing edge, next to the chevron. */}
+            <View style={styles.summarySpacer} />
+            <Text style={styles.summaryLineCount}>
+              {stats.linesAdded > 0 && <Text style={{ color: addColor }}>+{stats.linesAdded}</Text>}
+              {stats.linesAdded > 0 && stats.linesRemoved > 0 && " "}
+              {stats.linesRemoved > 0 && <Text style={{ color: removeColor }}>{"−"}{stats.linesRemoved}</Text>}
+            </Text>
+            <View style={styles.summaryBlocks}>
+              {Array.from({ length: addBlocks }).map((_, i) => (
+                <View key={`a-${i}`} style={[styles.summaryBlock, { backgroundColor: addColor }]} />
+              ))}
+              {Array.from({ length: removeBlocks }).map((_, i) => (
+                <View key={`r-${i}`} style={[styles.summaryBlock, { backgroundColor: removeColor }]} />
+              ))}
+            </View>
+          </ToolHeader>
+        </View>
+
+        {expandable && (
+          <ToolBody expanded={expanded}>
+            <ScrollView
+              style={[styles.summaryList, { borderTopColor: colors.border }]}
+              contentContainerStyle={styles.summaryListContent}
+              // A turn can touch dozens of files; cap it like any tool body.
+              nestedScrollEnabled
+              scrollEnabled={ordered.length > SUMMARY_SCROLL_AFTER}
+              showsVerticalScrollIndicator={false}
+            >
+              {ordered.map((change) => (
+                <FileChangeRow
+                  key={change.path}
+                  change={change}
+                  root={root}
+                  addColor={addColor}
+                  removeColor={removeColor}
+                  isDark={isDark}
+                />
+              ))}
+            </ScrollView>
+          </ToolBody>
+        )}
+      </ToolSurface>
     </View>
   );
 });
@@ -338,6 +459,14 @@ const TurnBlock = memo(function TurnBlock({
 
   const toggle = useCallback(() => setOverride(!expanded), [expanded]);
 
+  // Only worth deriving once the turn reports it touched something.
+  const fileChanges = useMemo(() => {
+    if (!turn.fileStats) return [];
+    return collectFileChanges(
+      turn.steps.flatMap((step) => (step.kind === "tools" ? step.toolCalls : [])),
+    );
+  }, [turn.fileStats, turn.steps]);
+
   const elapsedMs = useTurnElapsed(active, turn.startedAt);
   const settledMs = turn.durationMs && turn.durationMs > 0 ? turn.durationMs : null;
   const label = active
@@ -397,12 +526,14 @@ const TurnBlock = memo(function TurnBlock({
         </Animated.View>
       )}
 
-      {turn.fileStats && <TurnSummary stats={turn.fileStats} isDark={isDark} />}
       {turn.final && <AssistantMessage message={turn.final} isDark={isDark} />}
       {turn.aborted && (
         <Text style={[styles.turnNotice, { color: colors.textTertiary }]}>
           Stopped
         </Text>
+      )}
+      {turn.fileStats && (
+        <TurnSummary stats={turn.fileStats} changes={fileChanges} isDark={isDark} />
       )}
     </View>
   );
@@ -446,11 +577,60 @@ const styles = StyleSheet.create({
   },
   itemWrap: { paddingVertical: 2 },
   summaryWrap: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
     paddingHorizontal: 16,
     paddingTop: 10,
+  },
+  summaryHeader: {
+    paddingHorizontal: 10,
+    paddingVertical: 3,
+  },
+  summaryTitle: {
+    fontSize: 12,
+    lineHeight: 18,
+    fontFamily: Fonts.sans,
+  },
+  summarySpacer: {
+    flex: 1,
+  },
+  summaryList: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    maxHeight: SUMMARY_ROW_HEIGHT * SUMMARY_SCROLL_AFTER + 12,
+  },
+  summaryListContent: {
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+  },
+  fileRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    height: SUMMARY_ROW_HEIGHT,
+  },
+  fileKind: {
+    width: 9,
+    fontSize: 10,
+    lineHeight: 16,
+    fontFamily: Fonts.mono,
+    fontWeight: "600",
+  },
+  filePath: {
+    flex: 1,
+    fontSize: 12,
+    lineHeight: 18,
+    fontFamily: Fonts.mono,
+  },
+  fileCounts: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    gap: 6,
+    // Keeps the numbers in a column instead of ragged against the path.
+    minWidth: 68,
+  },
+  fileCount: {
+    fontSize: 11,
+    lineHeight: 16,
+    fontFamily: Fonts.mono,
+    fontWeight: "600",
   },
   summaryLineCount: {
     fontSize: 12,
@@ -466,13 +646,8 @@ const styles = StyleSheet.create({
   },
   summaryBlock: {
     width: 5,
-    height: 12,
+    height: 10,
     borderRadius: 1,
-  },
-  summaryText: {
-    fontSize: 12,
-    lineHeight: 16,
-    fontFamily: Fonts.sans,
   },
   dividerWrap: {
     flexDirection: "row",

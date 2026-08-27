@@ -1,5 +1,13 @@
 import type { ToolCallInfo } from "../../types";
 
+/** One file touched during a turn, as derived from the turn's tool calls. */
+export interface TurnFileChange {
+  path: string;
+  kind: "created" | "edited";
+  added: number;
+  removed: number;
+}
+
 function unescapeJsonString(s: string): string {
   return s
     .replace(/\\n/g, "\n")
@@ -68,6 +76,27 @@ export function basename(path: string): string {
   return parts[parts.length - 1] || path;
 }
 
+/**
+ * Shortens an absolute tool path for display, relative to the workspace root.
+ *
+ * Anything outside the workspace (or a path that is already relative) is
+ * returned untouched rather than guessed at, so a path is never shown as
+ * belonging somewhere it does not.
+ */
+export function relativePath(path: string, root: string | null | undefined): string {
+  if (!path) return path;
+  const normalized = path.replace(/\\/g, "/");
+  if (!root) return normalized;
+
+  const normalizedRoot = root.replace(/\\/g, "/").replace(/\/+$/, "");
+  if (!normalizedRoot) return normalized;
+  if (normalized === normalizedRoot) return basename(normalized);
+  if (normalized.startsWith(`${normalizedRoot}/`)) {
+    return normalized.slice(normalizedRoot.length + 1);
+  }
+  return normalized;
+}
+
 export function countLines(text: string): number {
   if (!text) return 0;
   return text.split("\n").length;
@@ -94,4 +123,92 @@ export function toolDisplayName(name: string): string {
     case "download": return "Download";
     default: return name;
   }
+}
+
+// Same predicates the edit tool row uses, so the summary card and the row
+// never disagree about a file's +/- counts.
+const DIFF_ADD = /^\+(?!\+)/;
+const DIFF_REMOVE = /^-(?!-)/;
+
+function countDiff(diff: string): { added: number; removed: number } {
+  let added = 0;
+  let removed = 0;
+  for (const line of diff.split("\n")) {
+    if (DIFF_ADD.test(line)) added++;
+    else if (DIFF_REMOVE.test(line)) removed++;
+  }
+  return { added, removed };
+}
+
+/**
+ * An `edit` call whose result carries no diff (older sessions, or a call still
+ * streaming) still has the replaced text in its arguments.
+ */
+function editFallbackDiff(parsed: Record<string, unknown>): string {
+  const blocks = Array.isArray(parsed.edits)
+    ? parsed.edits.map((item) => {
+        const value = item as { oldText?: unknown; newText?: unknown };
+        return {
+          oldText: typeof value.oldText === "string" ? value.oldText : "",
+          newText: typeof value.newText === "string" ? value.newText : "",
+        };
+      })
+    : [
+        {
+          oldText: typeof parsed.oldText === "string" ? parsed.oldText : "",
+          newText: typeof parsed.newText === "string" ? parsed.newText : "",
+        },
+      ];
+
+  return blocks
+    .flatMap((block) => {
+      const lines: string[] = [];
+      if (block.oldText) lines.push(...block.oldText.split("\n").map((l) => `-${l}`));
+      if (block.newText) lines.push(...block.newText.split("\n").map((l) => `+${l}`));
+      return lines;
+    })
+    .join("\n");
+}
+
+/**
+ * Per-file changes for a turn, derived from its `edit` and `write` calls.
+ *
+ * The backend's `turnFileStats` only carries totals, so the expandable file
+ * list is reconstructed here. Sessions whose tool calls were not retained
+ * yield an empty list, and the summary card then stays collapsed-only.
+ */
+export function collectFileChanges(toolCalls: ToolCallInfo[]): TurnFileChange[] {
+  const byPath = new Map<string, TurnFileChange>();
+
+  for (const tc of toolCalls) {
+    if (tc.name !== "edit" && tc.name !== "write") continue;
+    // A failed or cancelled call left the file untouched.
+    if (tc.isError || tc.status === "cancelled" || tc.status === "error") continue;
+
+    const parsed = parseToolArguments(tc.arguments);
+    const path = typeof parsed.path === "string" ? parsed.path : "";
+    if (!path) continue;
+
+    const entry = byPath.get(path) ?? {
+      path,
+      kind: tc.name === "write" ? ("created" as const) : ("edited" as const),
+      added: 0,
+      removed: 0,
+    };
+
+    if (tc.name === "write") {
+      // A write counts as a creation even when it overwrote a file, matching
+      // how the backend fills `filesCreated`.
+      entry.kind = "created";
+      entry.added += countLines(typeof parsed.content === "string" ? parsed.content : "");
+    } else {
+      const counts = countDiff(tc.diff?.trim() || editFallbackDiff(parsed));
+      entry.added += counts.added;
+      entry.removed += counts.removed;
+    }
+
+    byPath.set(path, entry);
+  }
+
+  return [...byPath.values()];
 }
