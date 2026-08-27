@@ -16,6 +16,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { PiClientProvider, type PiClientConfig } from '@pideck/client-sdk';
 import { AdaptiveNavigation } from '@/features/navigation/containers/adaptive-navigation';
 import { TaskEventSubscriber } from '@/features/tasks/components/task-event-subscriber';
+import { TurnEndNotifier } from '@/features/agent/components/turn-end-notifier';
 import { PreviewEventSubscriber } from '@/features/preview/components/preview-event-subscriber';
 import { DesktopEventSubscriber } from '@/features/desktop/components/desktop-event-subscriber';
 import { usePreviewServiceWorker, usePreviewTokenSync } from '@/features/preview/service-worker';
@@ -358,6 +359,7 @@ export default function AppLayout() {
   return (
     <PiClientProvider config={piClientConfig}>
       <TaskEventSubscriber />
+      <TurnEndNotifier />
       <PreviewEventSubscriber />
       <DesktopEventSubscriber />
       <AdaptiveNavigation>

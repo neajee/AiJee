@@ -44,6 +44,9 @@ export default function SessionScreen() {
   const clearWorkspaceNotification = useWorkspaceStore(
     (s) => s.clearWorkspaceNotification,
   );
+  const clearSessionNotification = useWorkspaceStore(
+    (s) => s.clearSessionNotification,
+  );
   const setLastSession = useWorkspaceStore((s) => s.setLastSession);
 
   useEffect(() => {
@@ -51,6 +54,11 @@ export default function SessionScreen() {
     selectWorkspace(workspaceId);
     clearWorkspaceNotification(workspaceId);
   }, [workspaceId, selectWorkspace, clearWorkspaceNotification]);
+
+  // Reading the session is what marks it seen.
+  useEffect(() => {
+    if (sessionId) clearSessionNotification(sessionId);
+  }, [sessionId, clearSessionNotification]);
 
   useEffect(() => {
     if (workspaceId && sessionId) {

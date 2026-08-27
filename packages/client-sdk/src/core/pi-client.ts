@@ -21,11 +21,13 @@ export class PiClient {
   private readonly _sessionStates = new Map<string, BehaviorSubject<SessionState>>();
   private readonly _sessionListStates = new Map<string, BehaviorSubject<SessionListState>>();
   private readonly _activeSessionIds$ = new BehaviorSubject<Set<string>>(new Set());
+  private readonly _streamingSessionIds$ = new BehaviorSubject<Set<string>>(new Set());
   private readonly _config: PiClientConfig;
   private readonly _serverRestart$ = new Subject<void>();
   private readonly _fileSystemChanged$ = new Subject<void>();
   private _instanceId: string | null = null;
   private _activeSessionIds = new Set<string>();
+  private _streamingSessionIds = new Set<string>();
   private _viewedSessionId: string | null = null;
   private _pendingActiveSession: string | null | undefined = undefined;
   private readonly _highWaterMarks = new Map<string, number>();
@@ -70,6 +72,17 @@ export class PiClient {
     this._stream.activeSessions$.subscribe((sessionIds) => {
       this._activeSessionIds = new Set(sessionIds);
       this._activeSessionIds$.next(this._activeSessionIds);
+      // A session whose process is gone cannot still be mid-turn. Without this,
+      // a turn that ends by the agent exiting would spin forever.
+      if (this._streamingSessionIds.size > 0) {
+        const stillStreaming = new Set(
+          [...this._streamingSessionIds].filter((id) => this._activeSessionIds.has(id)),
+        );
+        if (stillStreaming.size !== this._streamingSessionIds.size) {
+          this._streamingSessionIds = stillStreaming;
+          this._streamingSessionIds$.next(stillStreaming);
+        }
+      }
     });
   }
 
@@ -103,6 +116,22 @@ export class PiClient {
 
   get activeSessions$(): Observable<Set<string>> {
     return this._activeSessionIds$.asObservable();
+  }
+
+  /**
+   * Sessions whose agent is mid-turn.
+   *
+   * Distinct from `activeSessions$`, which only says a process is alive: an
+   * agent that finished its answer minutes ago is still "active". Every event
+   * is reduced for every session, not just the one on screen, so this stays
+   * accurate for sessions the UI has never opened.
+   */
+  get streamingSessions$(): Observable<Set<string>> {
+    return this._streamingSessionIds$.asObservable();
+  }
+
+  isSessionStreaming(sessionId: string): boolean {
+    return this._streamingSessionIds.has(sessionId);
   }
 
   isSessionActive(sessionId: string): boolean {
@@ -442,6 +471,7 @@ export class PiClient {
     if (nextState !== currentState) {
       subject.next(nextState);
     }
+    this._trackStreamingSession(sessionId, nextState.isStreaming);
 
     if (envelope.type === "turn_end") {
       this._fileSystemChanged$.next();
@@ -522,6 +552,10 @@ export class PiClient {
         isLoadingOlderMessages: false,
         isStreaming: this._activeSessionIds.has(sessionId) ? true : current.isStreaming,
       });
+      this._trackStreamingSession(
+        sessionId,
+        this._activeSessionIds.has(sessionId) ? true : current.isStreaming,
+      );
     } catch {
       const current = subject.getValue();
       subject.next({ ...current, isReady: true, isLoading: false, isLoadingOlderMessages: false });
@@ -536,6 +570,9 @@ export class PiClient {
       this._knownStreamSessionIds.clear();
       this._highWaterMarks.clear();
       this._deltaHighWaterMarks.clear();
+      // The old server's turns are over whatever their last event said.
+      this._streamingSessionIds = new Set();
+      this._streamingSessionIds$.next(this._streamingSessionIds);
       this._serverRestart$.next();
     }
     this._instanceId = instanceId;
@@ -544,6 +581,20 @@ export class PiClient {
   // ---------------------------------------------------------------------------
   // Internal — subject factories
   // ---------------------------------------------------------------------------
+
+  private _trackStreamingSession(sessionId: string, streaming: boolean): void {
+    if (!sessionId) return;
+    const known = this._streamingSessionIds.has(sessionId);
+    if (streaming === known) return;
+    const next = new Set(this._streamingSessionIds);
+    if (streaming) {
+      next.add(sessionId);
+    } else {
+      next.delete(sessionId);
+    }
+    this._streamingSessionIds = next;
+    this._streamingSessionIds$.next(next);
+  }
 
   private _getOrCreateSessionSubject(sessionId: string): BehaviorSubject<SessionState> {
     let subject = this._sessionStates.get(sessionId);

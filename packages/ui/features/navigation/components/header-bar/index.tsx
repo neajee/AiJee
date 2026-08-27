@@ -272,7 +272,7 @@ export function HeaderBar({
                 <Pressable
                   onPress={() => {
                     setPopoverVisible(false);
-                    router.push("/servers");
+                    router.push("/settings/servers");
                   }}
                   style={({ pressed, hovered }: any) => [
                     styles.popoverFooterBtn,
@@ -283,7 +283,7 @@ export function HeaderBar({
                   <Text
                     style={[styles.popoverFooterText, { color: textMuted }]}
                   >
-                    Manage Servers
+                    管理服务器
                   </Text>
                 </Pressable>
               </View>

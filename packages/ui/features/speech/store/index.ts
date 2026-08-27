@@ -62,13 +62,13 @@ export const useSpeechSettingsStore = create<SpeechSettingsState>((set, get) => 
 
   load: async () => {
     const stored = await readFromStore();
-    set({ ...DEFAULTS, ...stored, loaded: true });
+    set({ ...DEFAULTS, ...stored, mode: 'builtin', loaded: true });
   },
 
   update: async (partial) => {
     const current = get();
     const next: SpeechSettings = {
-      mode: partial.mode ?? current.mode,
+      mode: 'builtin',
       apiBaseUrl: partial.apiBaseUrl ?? current.apiBaseUrl,
       apiKey: partial.apiKey ?? current.apiKey,
       model: partial.model ?? current.model,

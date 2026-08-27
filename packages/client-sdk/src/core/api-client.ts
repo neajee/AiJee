@@ -20,6 +20,10 @@ import type {
   GitWorktree,
   NestedGitReposResponse,
   PackageStatus,
+  MarketplacePackage,
+  PackageSearchResponse,
+  PackageOperationRequest,
+  OperationResult,
   TaskInfo,
   TasksConfig,
   TaskLogs,
@@ -1122,6 +1126,26 @@ export class ApiClient {
   async packageLogs(limit?: number): Promise<TaskLogs> {
     const result = await sdk.logs({ query: { limit } });
     return unwrapResult<TaskLogs>(result);
+  }
+
+  async marketplaceSearch(params?: { query?: string; category?: string; page?: number; limit?: number }): Promise<PackageSearchResponse> {
+    const result = await sdk.marketplaceSearch({ query: params });
+    return unwrapResult<PackageSearchResponse>(result);
+  }
+
+  async marketplaceDetail(name: string): Promise<MarketplacePackage> {
+    const result = await sdk.marketplaceDetail({ path: { name } });
+    return unwrapResult<MarketplacePackage>(result);
+  }
+
+  async marketplaceInstalled(): Promise<OperationResult> {
+    const result = await sdk.marketplaceInstalled({});
+    return unwrapResult<OperationResult>(result);
+  }
+
+  async marketplaceOperation(request: PackageOperationRequest): Promise<OperationResult> {
+    const result = await sdk.marketplaceOperation({ body: request });
+    return unwrapResult<OperationResult>(result);
   }
 
   // ---------------------------------------------------------------------------

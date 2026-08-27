@@ -18,6 +18,10 @@ use crate::services;
         routes::package::install,
         routes::package::update,
         routes::package::logs,
+        routes::package::marketplace_search,
+        routes::package::marketplace_detail,
+        routes::package::marketplace_installed,
+        routes::package::marketplace_operation,
         routes::workspace::list,
         routes::workspace::get,
         routes::workspace::create,
@@ -131,6 +135,10 @@ use crate::services;
         models::PackageStatus,
         models::OperationLog,
         models::OperationResult,
+        models::MarketplacePackage,
+        models::PackageSearchResponse,
+        models::InstalledPackage,
+        models::PackageOperationRequest,
         models::ErrorBody,
         models::Workspace,
         models::WorkspaceStatus,
@@ -272,7 +280,14 @@ mod tests {
             .as_object()
             .expect("CustomModelEntry.properties");
 
-        for field in ["id", "reasoning", "input", "contextWindow", "maxTokens", "cost"] {
+        for field in [
+            "id",
+            "reasoning",
+            "input",
+            "contextWindow",
+            "maxTokens",
+            "cost",
+        ] {
             assert!(props.contains_key(field), "missing property {field}");
         }
         assert!(

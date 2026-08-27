@@ -30,6 +30,19 @@ fn auth_routes() -> Router<AppState> {
 
 fn package_routes() -> Router<AppState> {
     Router::new()
+        .route("/packages", get(routes::package::marketplace_search))
+        .route(
+            "/packages/installed",
+            get(routes::package::marketplace_installed),
+        )
+        .route(
+            "/packages/operation",
+            post(routes::package::marketplace_operation),
+        )
+        .route(
+            "/packages/{*name}",
+            get(routes::package::marketplace_detail),
+        )
         .route("/package/status", get(routes::package::status))
         .route("/package/install", post(routes::package::install))
         .route("/package/update", post(routes::package::update))

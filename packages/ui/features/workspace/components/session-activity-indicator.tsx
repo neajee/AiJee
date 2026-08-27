@@ -2,21 +2,31 @@ import { useEffect, useRef } from "react";
 import { Animated, StyleSheet, View } from "react-native";
 import { Minus } from "lucide-react-native";
 
-import { useAgentSession } from "@pideck/client-sdk";
+import { useAgentSession, useIsSessionActive } from "@pideck/client-sdk";
 
 const DOT_COUNT = 3;
-const DOT_SIZE = 4;
+const DOT_SIZE = 3.5;
 
 interface SessionActivityIndicatorProps {
   sessionId: string;
   color: string;
+  /**
+   * Draws a dash while the session is idle so lists stay aligned. Off for
+   * layouts where the indicator trails the title and absence reads as "idle".
+   */
+  idlePlaceholder?: boolean;
 }
 
 export function SessionActivityIndicator({
   sessionId,
   color,
+  idlePlaceholder = true,
 }: SessionActivityIndicatorProps) {
-  const { isStreaming: isWorking } = useAgentSession(sessionId);
+  const { isStreaming } = useAgentSession(sessionId);
+  // Only the session on screen streams through this client; every other one is
+  // known to be running from the server's active-session list, so both count.
+  const isActive = useIsSessionActive(sessionId);
+  const isWorking = isStreaming || isActive;
   const dotAnims = useRef(
     Array.from({ length: DOT_COUNT }, () => new Animated.Value(0.35)),
   ).current;
@@ -58,7 +68,9 @@ export function SessionActivityIndicator({
   }, [dotAnims, isWorking]);
 
   if (!isWorking) {
-    return <Minus size={14} color={color} strokeWidth={2} />;
+    return idlePlaceholder ? (
+      <Minus size={14} color={color} strokeWidth={2} />
+    ) : null;
   }
 
   return (
@@ -89,7 +101,7 @@ export function SessionActivityIndicator({
 
 const styles = StyleSheet.create({
   row: {
-    width: 14,
+    width: 16,
     height: 14,
     flexDirection: "row",
     alignItems: "center",

@@ -18,14 +18,13 @@ import { usePathname } from "expo-router";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useResponsiveLayout } from "../../hooks/use-responsive-layout";
-import { NavigationRail } from "../../components/navigation-rail";
 import { HeaderBar } from "../../components/header-bar";
 import { MobileHeaderBar } from "../../components/mobile-header-bar";
 import { WorkspaceSheet } from "../../components/workspace-sheet";
 import { MobileChangesSheet } from "../../components/mobile-changes-sheet";
 import { MobileFilesSheet } from "../../components/mobile-files-sheet";
 import { MobilePreviewSheet } from "../../components/mobile-preview-sheet";
-import { SessionSidebar } from "@/features/workspace/components/session-sidebar";
+import { ProjectSidebar } from "../../components/project-sidebar";
 import { useAuthStore } from "@/features/auth/store";
 import { useWorkspaceStore } from "@/features/workspace/store";
 import { useAppMode } from "@/hooks/use-app-mode";
@@ -36,7 +35,8 @@ import { TaskOutputSheet } from "@/features/tasks/components/task-output-sheet";
 import { TaskOutputPanel } from "@/features/tasks/components/task-output-panel";
 
 const SIDEBAR_DEFAULT = 280;
-const RAIL_WIDTH = 64;
+/** Width of the invisible left-edge strip that reveals a hidden sidebar. */
+const HOVER_ZONE_WIDTH = 12;
 
 type SidebarMode = "persistent" | "hover";
 
@@ -55,7 +55,9 @@ export function AdaptiveNavigation({ children }: AdaptiveNavigationProps) {
   const isCodeMode = appMode === "code";
   const isDesktopMode = appMode === "desktop";
   const desktopImmersive = useDesktopStore((s) => s.immersive);
-  const showSessions = hasServer && hasWorkspaces;
+  // The sidebar is also where a first project gets added, so it stays even
+  // when there is nothing in it yet.
+  const showSidebar = hasServer;
   const [sheetVisible, setSheetVisible] = useState(false);
   const [changesSheetVisible, setChangesSheetVisible] = useState(false);
   const [filesSheetVisible, setFilesSheetVisible] = useState(false);
@@ -74,13 +76,13 @@ export function AdaptiveNavigation({ children }: AdaptiveNavigationProps) {
   const persistentAnim = useRef(new Animated.Value(1)).current;
   const hoverAnim = useRef(new Animated.Value(0)).current;
   const codeModeAnim = useRef(new Animated.Value(isCodeMode ? 1 : 0)).current;
-  const [railMounted, setRailMounted] = useState(isCodeMode);
+  const [sidebarMounted, setSidebarMounted] = useState(isCodeMode);
 
   const isPersistent = sidebarMode === "persistent";
 
   useEffect(() => {
     if (isCodeMode) {
-      setRailMounted(true);
+      setSidebarMounted(true);
     }
     Animated.spring(codeModeAnim, {
       toValue: isCodeMode ? 1 : 0,
@@ -89,7 +91,7 @@ export function AdaptiveNavigation({ children }: AdaptiveNavigationProps) {
       useNativeDriver: false,
     }).start(({ finished }) => {
       if (finished && !isCodeMode) {
-        setRailMounted(false);
+        setSidebarMounted(false);
       }
     });
   }, [isCodeMode, codeModeAnim]);
@@ -124,11 +126,11 @@ export function AdaptiveNavigation({ children }: AdaptiveNavigationProps) {
     setHoverVisible(false);
   }, []);
 
-  const handleRailHoverIn = useCallback(() => {
+  const handleHoverZoneIn = useCallback(() => {
     if (!isPersistent) setHoverVisible(true);
   }, [isPersistent]);
 
-  const handleRailHoverOut = useCallback(() => {
+  const handleHoverZoneOut = useCallback(() => {
     if (!isPersistent) setHoverVisible(false);
   }, [isPersistent]);
 
@@ -145,11 +147,6 @@ export function AdaptiveNavigation({ children }: AdaptiveNavigationProps) {
   const mobilePreviewSessionId = mobilePreviewSessionMatch?.[1] ?? null;
 
   if (isWideScreen) {
-    const animatedRailWidth = codeModeAnim.interpolate({
-      inputRange: [0, 1],
-      outputRange: [0, RAIL_WIDTH],
-    });
-
     const animatedSidebarWidth = Animated.multiply(
       persistentAnim,
       Animated.multiply(codeModeAnim, sidebarWidth),
@@ -163,7 +160,7 @@ export function AdaptiveNavigation({ children }: AdaptiveNavigationProps) {
     const contentBorderRadius = Animated.multiply(
       persistentAnim.interpolate({
         inputRange: [0, 1],
-        outputRange: [12, 0],
+        outputRange: [12, 10],
       }),
       codeModeAnim,
     );
@@ -175,7 +172,7 @@ export function AdaptiveNavigation({ children }: AdaptiveNavigationProps) {
 
     const webHoverProps =
       Platform.OS === "web"
-        ? { onMouseEnter: handleRailHoverIn, onMouseLeave: handleRailHoverOut }
+        ? { onMouseEnter: handleHoverZoneIn, onMouseLeave: handleHoverZoneOut }
         : {};
 
     const webSidebarHoverProps =
@@ -200,22 +197,7 @@ export function AdaptiveNavigation({ children }: AdaptiveNavigationProps) {
           <View style={{ height: 0 }} />
         )}
         <View style={styles.bodyRow}>
-          {hasServer && railMounted && (
-            <Animated.View
-              style={{
-                width: animatedRailWidth,
-                overflow: "hidden",
-                height: "100%",
-              }}
-              {...webHoverProps}
-            >
-              <View style={{ width: RAIL_WIDTH, height: "100%" }}>
-                <NavigationRail />
-              </View>
-            </Animated.View>
-          )}
-
-          {showSessions && showPersistentSidebar && railMounted && (
+          {showSidebar && showPersistentSidebar && sidebarMounted && (
             <Animated.View
               style={{
                 width: animatedSidebarWidth,
@@ -226,7 +208,7 @@ export function AdaptiveNavigation({ children }: AdaptiveNavigationProps) {
               <View
                 style={{ width: sidebarWidth, flex: 1 }}
               >
-                <SessionSidebar />
+                <ProjectSidebar />
               </View>
             </Animated.View>
           )}
@@ -238,9 +220,12 @@ export function AdaptiveNavigation({ children }: AdaptiveNavigationProps) {
                 ? {
                     borderLeftWidth: contentBorderWidth,
                     borderTopWidth: contentBorderWidth,
+                    borderRightWidth: contentBorderWidth,
                     borderLeftColor: contentBorder,
                     borderTopColor: contentBorder,
+                    borderRightColor: contentBorder,
                     borderTopLeftRadius: contentBorderRadius,
+                    borderTopRightRadius: contentBorderRadius,
                   }
                 : {},
             ]}
@@ -251,8 +236,13 @@ export function AdaptiveNavigation({ children }: AdaptiveNavigationProps) {
 
             {isCodeMode && <TaskOutputPanel />}
 
-            {showSessions && !isPersistent && isCodeMode && (
+            {showSidebar && !isPersistent && isCodeMode && (
               <>
+                {/* With no rail left to hover, the window edge is the trigger. */}
+                <View
+                  {...webHoverProps}
+                  style={styles.hoverZone}
+                />
                 <Animated.View
                   style={[
                     styles.overlay,
@@ -272,7 +262,7 @@ export function AdaptiveNavigation({ children }: AdaptiveNavigationProps) {
                     },
                   ]}
                 >
-                  <SessionSidebar />
+                  <ProjectSidebar />
                 </Animated.View>
               </>
             )}
@@ -388,6 +378,14 @@ const styles = StyleSheet.create({
   overlay: {
     ...StyleSheet.absoluteFillObject,
     zIndex: 10,
+  },
+  hoverZone: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    bottom: 0,
+    width: HOVER_ZONE_WIDTH,
+    zIndex: 12,
   },
   hoverSidebar: {
     position: "absolute",

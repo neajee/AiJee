@@ -12,7 +12,6 @@ import {
   Palette,
   RefreshCw,
   Sun,
-  Trash2,
   Volume2,
 } from 'lucide-react-native';
 
@@ -202,28 +201,6 @@ export function NotificationsPanel() {
 }
 
 // ─── 数据 ─────────────────────────────────────────────────────
-
-export function DataPanel() {
-  const m = useSettingsMetrics();
-  const p = useSettingsPalette();
-  const update = useAppSettingsStore((s) => s.update);
-
-  return (
-    <SettingsGroup header="数据" footer="仅影响本机保存的偏好，不会改动服务器上的会话。">
-      <SettingsRow
-        icon={Trash2}
-        label="清除本地数据"
-        description="清除缓存的本地数据与偏好设置"
-        tone="destructive"
-        isLast
-        onPress={() => {
-          update({ themeMode: 'system', pushNotifications: true, soundEffects: false });
-        }}
-        right={<ChevronRight size={m.chevronSize} color={p.textTertiary} strokeWidth={2} />}
-      />
-    </SettingsGroup>
-  );
-}
 
 // ─── 关于 / Pi Agent ─────────────────────────────────────────
 
@@ -463,13 +440,13 @@ export function AboutPanel() {
 
   const versionText = loading
     ? '正在检查更新…'
-    : pkg
-      ? pkg.installed
-        ? `已安装 ${pkg.installed_version ?? '未知'}${
-            hasUpdate ? ` · 最新 ${pkg.latest_version}` : ''
-          }`
-        : `未安装${pkg.latest_version ? ` · 最新 ${pkg.latest_version}` : ''}`
-      : (agent.error ?? '');
+    : hasUpdate
+      ? `可更新至 ${pkg?.latest_version}`
+      : pkg?.installed
+        ? ''
+        : pkg?.latest_version
+          ? `未安装 · 可安装 ${pkg.latest_version}`
+          : (agent.error ?? '');
 
   let right: React.ReactNode;
   if (loading) {
@@ -485,10 +462,9 @@ export function AboutPanel() {
     );
   } else if (pkg) {
     right = (
-      <View style={pkgStyles.upToDate}>
-        <CheckCircle2 size={13} color={p.success} strokeWidth={2.2} />
-        <Text style={[pkgStyles.upToDateText, { color: p.success }]}>已是最新</Text>
-      </View>
+      <Text style={{ fontSize: m.valueSize, fontFamily: Fonts.sans, color: p.textTertiary }}>
+        {pkg.installed_version ?? pkg.latest_version ?? '—'}
+      </Text>
     );
   } else {
     right = <AlertCircle size={16} color={p.destructive} strokeWidth={2} />;
@@ -500,7 +476,7 @@ export function AboutPanel() {
     <SettingsGroup header="关于" footer={`PiDeck · ${PLATFORM_LABEL}`}>
       <SettingsRow
         icon={Download}
-        label={pkg?.name ?? 'Pi Agent'}
+        label="智能体版本"
         description={versionText || undefined}
         right={right}
       />

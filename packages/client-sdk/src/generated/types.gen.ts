@@ -182,15 +182,35 @@ export type CreateWorkspaceRequest = {
 };
 
 export type CustomModelEntry = {
+    api?: string | null;
+    baseUrl?: string | null;
     contextWindow?: number | null;
+    cost?: null | ModelCost;
     id: string;
+    /**
+     * Accepted input modalities, e.g. `["text", "image"]`.
+     */
     input?: Array<string> | null;
     maxTokens?: number | null;
     name?: string | null;
     reasoning?: boolean | null;
+    /**
+     * `null` for a level marks it unsupported; a missing key means "provider default".
+     */
+    thinkingLevelMap?: {
+        [key: string]: unknown;
+    } | null;
+    [key: string]: unknown | (string | null) | (string | null) | (number | null) | (null | ModelCost) | string | (Array<string> | null) | (number | null) | (string | null) | (boolean | null) | ({
+        [key: string]: unknown;
+    } | null) | undefined;
 };
 
 export type CustomModelsConfig = {
+    /**
+     * Set when models.json exists but could not be parsed. The UI must refuse
+     * to save in that case, otherwise it would overwrite a file it cannot see.
+     */
+    parseError?: string | null;
     providers?: {
         [key: string]: CustomProvider;
     };
@@ -201,6 +221,8 @@ export type CustomProvider = {
     apiKey?: string | null;
     baseUrl?: string | null;
     models?: Array<CustomModelEntry>;
+    name?: string | null;
+    [key: string]: unknown | (string | null) | (string | null) | (string | null) | Array<CustomModelEntry> | (string | null) | undefined;
 };
 
 export type ErrorBody = {
@@ -360,6 +382,12 @@ export type ImageContent = {
     type: string;
 };
 
+export type InstalledPackage = {
+    name: string;
+    scope: string;
+    version?: string | null;
+};
+
 export type LoginRequest = {
     password: string;
     username: string;
@@ -367,6 +395,27 @@ export type LoginRequest = {
 
 export type LogoutRequest = {
     refresh_token?: string | null;
+};
+
+export type MarketplacePackage = {
+    author?: string | null;
+    description?: string | null;
+    downloads?: number | null;
+    homepage?: string | null;
+    name: string;
+    npm_url: string;
+    package_types: Array<string>;
+    readme?: string | null;
+    repository?: string | null;
+    updated_at?: string | null;
+    version: string;
+};
+
+export type ModelCost = {
+    cacheRead: number;
+    cacheWrite: number;
+    input: number;
+    output: number;
 };
 
 export type NestedGitRepo = {
@@ -394,6 +443,21 @@ export type OperationResult = {
     operation: string;
     output: string;
     success: boolean;
+};
+
+export type PackageOperationRequest = {
+    lock_version?: boolean | null;
+    name: string;
+    operation: string;
+    scope: string;
+    version?: string | null;
+    workspace_id?: string | null;
+};
+
+export type PackageSearchResponse = {
+    from_cache: boolean;
+    packages: Array<MarketplacePackage>;
+    total: number;
 };
 
 export type PackageStatus = {
@@ -2734,6 +2798,65 @@ export type UpdateResponses = {
 
 export type UpdateResponse = UpdateResponses[keyof UpdateResponses];
 
+export type MarketplaceSearchData = {
+    body?: never;
+    path?: never;
+    query?: {
+        query?: string | null;
+        category?: string | null;
+        page?: number | null;
+        limit?: number | null;
+    };
+    url: '/api/packages';
+};
+
+export type MarketplaceSearchResponses = {
+    200: PackageSearchResponse;
+};
+
+export type MarketplaceSearchResponse = MarketplaceSearchResponses[keyof MarketplaceSearchResponses];
+
+export type MarketplaceInstalledData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/api/packages/installed';
+};
+
+export type MarketplaceInstalledResponses = {
+    200: OperationResult;
+};
+
+export type MarketplaceInstalledResponse = MarketplaceInstalledResponses[keyof MarketplaceInstalledResponses];
+
+export type MarketplaceOperationData = {
+    body: PackageOperationRequest;
+    path?: never;
+    query?: never;
+    url: '/api/packages/operation';
+};
+
+export type MarketplaceOperationResponses = {
+    200: OperationResult;
+};
+
+export type MarketplaceOperationResponse = MarketplaceOperationResponses[keyof MarketplaceOperationResponses];
+
+export type MarketplaceDetailData = {
+    body?: never;
+    path: {
+        name: string;
+    };
+    query?: never;
+    url: '/api/packages/{name}';
+};
+
+export type MarketplaceDetailResponses = {
+    200: MarketplacePackage;
+};
+
+export type MarketplaceDetailResponse = MarketplaceDetailResponses[keyof MarketplaceDetailResponses];
+
 export type SessionHistoryData = {
     body?: never;
     path: {
@@ -3627,5 +3750,5 @@ export type VersionResponses = {
 export type VersionResponse2 = VersionResponses[keyof VersionResponses];
 
 export type ClientOptions = {
-    baseUrl: 'http://127.0.0.1:5457' | (string & {});
+    baseUrl: 'http://127.0.0.1:5454' | (string & {});
 };

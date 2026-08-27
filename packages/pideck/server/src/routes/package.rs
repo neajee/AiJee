@@ -1,8 +1,11 @@
 use axum::Json;
-use axum::extract::State;
+use axum::extract::{Path, State};
 use axum::http::{HeaderMap, StatusCode};
 
-use crate::models::{ApiResponse, ErrorBody, OperationLog, OperationResult, PackageStatus};
+use crate::models::{
+    ApiResponse, ErrorBody, MarketplacePackage, OperationLog, OperationResult,
+    PackageOperationRequest, PackageSearchResponse, PackageStatus,
+};
 use crate::routes::auth::require_auth;
 use crate::server::state::AppState;
 use crate::services::package;
@@ -130,6 +133,137 @@ pub async fn logs(
         Err(e) => (
             StatusCode::INTERNAL_SERVER_ERROR,
             Json(ApiResponse::err(format!("Failed to fetch logs: {e}"))),
+        ),
+    }
+}
+
+#[derive(serde::Deserialize, utoipa::IntoParams)]
+pub struct MarketplaceQuery {
+    pub query: Option<String>,
+    pub category: Option<String>,
+    pub page: Option<u32>,
+    pub limit: Option<u32>,
+}
+
+#[utoipa::path(get, path = "/api/packages", params(MarketplaceQuery), responses((status = 200, body = PackageSearchResponse)), security(("bearer_auth" = [])), tag = "packages")]
+pub async fn marketplace_search(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    axum::extract::Query(params): axum::extract::Query<MarketplaceQuery>,
+) -> (StatusCode, Json<ApiResponse<PackageSearchResponse>>) {
+    if let Err((code, msg)) = require_auth(&state, &headers).await {
+        return (code, Json(ApiResponse::err(msg)));
+    }
+    match package::search(
+        &state.http_client,
+        params.query.as_deref(),
+        params.category.as_deref(),
+        params.page.unwrap_or(0),
+        params.limit.unwrap_or(20).min(50),
+    )
+    .await
+    {
+        Ok(value) => (StatusCode::OK, Json(ApiResponse::ok(value))),
+        Err(error) => (
+            StatusCode::BAD_GATEWAY,
+            Json(ApiResponse::err(format!(
+                "Registry request failed: {error}"
+            ))),
+        ),
+    }
+}
+
+#[utoipa::path(get, path = "/api/packages/{name}", params(("name" = String, Path)), responses((status = 200, body = MarketplacePackage)), security(("bearer_auth" = [])), tag = "packages")]
+pub async fn marketplace_detail(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    Path(name): Path<String>,
+) -> (StatusCode, Json<ApiResponse<MarketplacePackage>>) {
+    if let Err((code, msg)) = require_auth(&state, &headers).await {
+        return (code, Json(ApiResponse::err(msg)));
+    }
+    if !package::validate_name(&name) {
+        return (
+            StatusCode::BAD_REQUEST,
+            Json(ApiResponse::err("Invalid package name")),
+        );
+    }
+    match package::detail(&state.http_client, &name).await {
+        Ok(value) => (StatusCode::OK, Json(ApiResponse::ok(value))),
+        Err(error) => (
+            StatusCode::BAD_GATEWAY,
+            Json(ApiResponse::err(format!(
+                "Registry request failed: {error}"
+            ))),
+        ),
+    }
+}
+
+#[utoipa::path(get, path = "/api/packages/installed", responses((status = 200, body = OperationResult)), security(("bearer_auth" = [])), tag = "packages")]
+pub async fn marketplace_installed(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+) -> (StatusCode, Json<ApiResponse<OperationResult>>) {
+    if let Err((code, msg)) = require_auth(&state, &headers).await {
+        return (code, Json(ApiResponse::err(msg)));
+    }
+    let result = package::installed(&state.config.pi_binary());
+    (StatusCode::OK, Json(ApiResponse::ok(result)))
+}
+
+#[utoipa::path(post, path = "/api/packages/operation", request_body = PackageOperationRequest, responses((status = 200, body = OperationResult)), security(("bearer_auth" = [])), tag = "packages")]
+pub async fn marketplace_operation(
+    State(state): State<AppState>,
+    headers: HeaderMap,
+    Json(request): Json<PackageOperationRequest>,
+) -> (StatusCode, Json<ApiResponse<OperationResult>>) {
+    if let Err((code, msg)) = require_auth(&state, &headers).await {
+        return (code, Json(ApiResponse::err(msg)));
+    }
+    let workspace_path = if request.scope == "project" {
+        let Some(id) = request.workspace_id.as_deref() else {
+            return (
+                StatusCode::BAD_REQUEST,
+                Json(ApiResponse::err("Project scope requires workspace_id")),
+            );
+        };
+        match state.db.get_workspace(id) {
+            Ok(Some(workspace)) => Some(std::path::PathBuf::from(workspace.path)),
+            Ok(None) => {
+                return (
+                    StatusCode::NOT_FOUND,
+                    Json(ApiResponse::err("Workspace not found")),
+                );
+            }
+            Err(error) => {
+                return (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    Json(ApiResponse::err(error.to_string())),
+                );
+            }
+        }
+    } else {
+        None
+    };
+    let result = match request.operation.as_str() {
+        "install" => package::operation(
+            &state.config.pi_binary(),
+            &request,
+            workspace_path.as_deref(),
+        ),
+        "remove" | "update" => package::remove_or_update(
+            &state.config.pi_binary(),
+            &request,
+            &request.operation,
+            workspace_path.as_deref(),
+        ),
+        _ => Err(anyhow::anyhow!("Unsupported package operation")),
+    };
+    match result {
+        Ok(value) => (StatusCode::OK, Json(ApiResponse::ok(value))),
+        Err(error) => (
+            StatusCode::BAD_REQUEST,
+            Json(ApiResponse::err(error.to_string())),
         ),
     }
 }

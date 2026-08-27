@@ -138,7 +138,7 @@ export function WorkspaceSheet({ visible, onClose }: WorkspaceSheetProps) {
   }, [dismiss]);
 
   const handleServersPress = useCallback(() => {
-    router.push('/servers');
+    router.push('/settings/servers');
     dismiss();
   }, [router, dismiss]);
 
@@ -319,7 +319,7 @@ export function WorkspaceSheet({ visible, onClose }: WorkspaceSheetProps) {
           >
             <MaterialIcons name="dns" size={18} color={colors.icon} />
             <Text style={[styles.footerLabel, { color: textSecondary }]}>
-              Servers
+              连接
             </Text>
           </Pressable>
           <Pressable

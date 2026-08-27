@@ -271,8 +271,8 @@ mod tests {
             }
         });
 
-        let parsed: CustomModelsConfig =
-            serde_json::from_value(original.clone()).expect("schema should accept pi's models.json");
+        let parsed: CustomModelsConfig = serde_json::from_value(original.clone())
+            .expect("schema should accept pi's models.json");
         let written = serde_json::to_value(&parsed).expect("serialize");
 
         assert_eq!(
@@ -328,7 +328,10 @@ mod tests {
         .expect("parse");
 
         let written = serde_json::to_string(&parsed).expect("serialize");
-        assert_eq!(written, r#"{"providers":{"p":{"baseUrl":"u","models":[{"id":"m"}]}}}"#);
+        assert_eq!(
+            written,
+            r#"{"providers":{"p":{"baseUrl":"u","models":[{"id":"m"}]}}}"#
+        );
     }
 
     #[test]

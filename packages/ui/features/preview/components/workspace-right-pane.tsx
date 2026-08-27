@@ -81,7 +81,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    paddingHorizontal: 8,
+    paddingLeft: 8,
+    // Keeps the tabs clear of the sidebar's collapse button, which floats here.
+    paddingRight: 40,
     paddingVertical: 8,
     borderBottomWidth: 0.633,
   },

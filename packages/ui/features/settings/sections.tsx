@@ -4,20 +4,18 @@ import {
   Cpu,
   Info,
   Layers,
-  Mic,
   Palette,
-  Trash2,
+  Wifi,
 } from 'lucide-react-native';
 
 import { AgentModesSection } from './components/agent-modes-section';
 import { CustomModelsSection } from './components/custom-models-section';
-import { SpeechSettings } from '../speech/components/speech-settings';
+import { ServersSection } from '../servers/components/servers-section';
 import {
   AboutPanel,
   AboutRow,
   AppearancePanel,
   AppearanceRow,
-  DataPanel,
   NotificationsPanel,
 } from './panels';
 
@@ -50,6 +48,13 @@ export interface SettingsSection {
  */
 export const SETTINGS_SECTIONS: SettingsSection[] = [
   {
+    slug: 'servers',
+    title: '连接',
+    summary: '服务器地址与登录凭据',
+    icon: Wifi,
+    Component: ({ isDark }) => <ServersSection isDark={isDark} />,
+  },
+  {
     slug: 'modes',
     title: 'Agent 模式',
     summary: '预设的系统提示与工具组合',
@@ -64,25 +69,11 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
     Component: ({ isDark }) => <CustomModelsSection isDark={isDark} />,
   },
   {
-    slug: 'speech',
-    title: '语音识别',
-    summary: '内置语音或 Whisper 兼容服务',
-    icon: Mic,
-    Component: () => <SpeechSettings />,
-  },
-  {
     slug: 'notifications',
     title: '通知',
     summary: '推送提醒与音效',
     icon: Bell,
     Component: NotificationsPanel,
-  },
-  {
-    slug: 'data',
-    title: '数据',
-    summary: '清除本机缓存与偏好',
-    icon: Trash2,
-    Component: DataPanel,
   },
   {
     slug: 'appearance',

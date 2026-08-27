@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useEffect } from "react";
 import {
   Modal,
   Platform,
@@ -6,31 +6,74 @@ import {
   StyleSheet,
   Text,
   View,
+  useWindowDimensions,
 } from "react-native";
-import { Pencil, Trash2 } from "lucide-react-native";
+import {
+  FolderOpen,
+  Pencil,
+  Pin,
+  PinOff,
+  SquarePen,
+  Trash2,
+} from "lucide-react-native";
 
 import { Colors, Fonts } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 
+/** Exported so callers can right-align the menu under an anchor button. */
+export const MENU_WIDTH = 170;
+const ITEM_HEIGHT = 33;
+const MENU_PADDING = 8;
+const SCREEN_MARGIN = 8;
+
+type IconType = React.ComponentType<{
+  size?: number;
+  color?: string;
+  strokeWidth?: number;
+  fill?: string;
+}>;
+
 interface WorkspaceContextMenuProps {
   visible: boolean;
+  /** Viewport coordinates of the click, long press, or anchor button. */
   x: number;
   y: number;
+  /** When set, the menu offers pinning. */
+  pinned?: boolean;
+  onTogglePin?: () => void;
+  /** Opens the project's most recent session. */
+  onOpen?: () => void;
+  onNewSession?: () => void;
   onEdit: () => void;
   onDelete: () => void;
   onClose: () => void;
 }
 
+/**
+ * The workspace actions menu, opened by the row's ⋯ button, a right-click, or a
+ * long press.
+ *
+ * It renders inside a `Modal` rather than next to the row it belongs to: the
+ * sidebar hosting those rows lives in an `overflow: hidden` animated container,
+ * and every React Native View is `position: relative`, so an absolutely
+ * positioned menu would be measured against the row and then clipped away. A
+ * modal escapes both, which also makes the coordinates viewport-based.
+ */
 export function WorkspaceContextMenu({
   visible,
   x,
   y,
+  pinned,
+  onTogglePin,
+  onOpen,
+  onNewSession,
   onEdit,
   onDelete,
   onClose,
 }: WorkspaceContextMenuProps) {
   const colorScheme = useColorScheme() ?? "light";
   const isDark = colorScheme === "dark";
+  const { width: screenWidth, height: screenHeight } = useWindowDimensions();
 
   const textPrimary = isDark ? "#fefdfd" : Colors[colorScheme].text;
   const textDanger = "#E5484D";
@@ -38,62 +81,144 @@ export function WorkspaceContextMenu({
   const menuBorder = isDark ? "#3b3a39" : "rgba(0,0,0,0.12)";
   const hoverBg = isDark ? "#333" : "#F0F0F0";
 
-  const menuRef = useRef<View>(null);
-
+  // While the menu is open, a right-click anywhere dismisses it instead of
+  // stacking the browser's own menu on top.
   useEffect(() => {
     if (!visible || Platform.OS !== "web") return;
-    const handler = () => onClose();
-    document.addEventListener("click", handler);
-    document.addEventListener("contextmenu", handler);
-    return () => {
-      document.removeEventListener("click", handler);
-      document.removeEventListener("contextmenu", handler);
+    const handler = (event: Event) => {
+      event.preventDefault();
+      onClose();
     };
+    document.addEventListener("contextmenu", handler);
+    return () => document.removeEventListener("contextmenu", handler);
   }, [visible, onClose]);
 
   if (!visible) return null;
 
+  const itemCount =
+    2 + (onTogglePin ? 1 : 0) + (onOpen ? 1 : 0) + (onNewSession ? 1 : 0);
+  const menuHeight = itemCount * ITEM_HEIGHT + MENU_PADDING * 2;
+  // Flip near the edges so the menu never opens partly offscreen.
+  const left = Math.max(
+    SCREEN_MARGIN,
+    Math.min(x, screenWidth - MENU_WIDTH - SCREEN_MARGIN),
+  );
+  const top = Math.max(
+    SCREEN_MARGIN,
+    Math.min(y, screenHeight - menuHeight - SCREEN_MARGIN),
+  );
+
+  const separator = (
+    <View style={[styles.separator, { backgroundColor: menuBorder }]} />
+  );
+
   return (
-    <View
-      ref={menuRef}
-      style={[
-        styles.menu,
-        {
-          top: y,
-          left: x,
-          backgroundColor: menuBg,
-          borderColor: menuBorder,
-        },
-      ]}
+    <Modal
+      visible
+      transparent
+      animationType="none"
+      onRequestClose={onClose}
+      statusBarTranslucent
     >
       <Pressable
-        onPress={() => {
-          onClose();
-          onEdit();
-        }}
-        style={({ pressed, hovered }: any) => [
-          styles.menuItem,
-          (pressed || hovered) && { backgroundColor: hoverBg },
+        style={StyleSheet.absoluteFill}
+        onPress={onClose}
+        accessibilityLabel="关闭菜单"
+      />
+      <View
+        style={[
+          styles.menu,
+          { top, left, backgroundColor: menuBg, borderColor: menuBorder },
         ]}
       >
-        <Pencil size={14} color={textPrimary} strokeWidth={1.8} />
-        <Text style={[styles.menuText, { color: textPrimary }]}>Edit</Text>
-      </Pressable>
-      <View style={[styles.separator, { backgroundColor: menuBorder }]} />
-      <Pressable
-        onPress={() => {
-          onClose();
-          onDelete();
-        }}
-        style={({ pressed, hovered }: any) => [
-          styles.menuItem,
-          (pressed || hovered) && { backgroundColor: hoverBg },
-        ]}
-      >
-        <Trash2 size={14} color={textDanger} strokeWidth={1.8} />
-        <Text style={[styles.menuText, { color: textDanger }]}>Delete</Text>
-      </Pressable>
-    </View>
+        {onOpen && (
+          <MenuItem
+            icon={FolderOpen}
+            label="打开项目"
+            color={textPrimary}
+            hoverBg={hoverBg}
+            onPress={() => {
+              onClose();
+              onOpen();
+            }}
+          />
+        )}
+        {onNewSession && (
+          <MenuItem
+            icon={SquarePen}
+            label="新对话"
+            color={textPrimary}
+            hoverBg={hoverBg}
+            onPress={() => {
+              onClose();
+              onNewSession();
+            }}
+          />
+        )}
+        {(onOpen || onNewSession) && separator}
+        {onTogglePin && (
+          <MenuItem
+            icon={pinned ? PinOff : Pin}
+            label={pinned ? "取消置顶" : "置顶"}
+            color={textPrimary}
+            hoverBg={hoverBg}
+            onPress={() => {
+              onClose();
+              onTogglePin();
+            }}
+          />
+        )}
+        <MenuItem
+          icon={Pencil}
+          label="编辑"
+          color={textPrimary}
+          hoverBg={hoverBg}
+          onPress={() => {
+            onClose();
+            onEdit();
+          }}
+        />
+        {separator}
+        <MenuItem
+          icon={Trash2}
+          label="删除"
+          color={textDanger}
+          hoverBg={hoverBg}
+          onPress={() => {
+            onClose();
+            onDelete();
+          }}
+        />
+      </View>
+    </Modal>
+  );
+}
+
+function MenuItem({
+  icon: Icon,
+  label,
+  color,
+  hoverBg,
+  onPress,
+}: {
+  icon: IconType;
+  label: string;
+  color: string;
+  hoverBg: string;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityLabel={label}
+      style={({ pressed, hovered }: any) => [
+        styles.menuItem,
+        (pressed || hovered) && { backgroundColor: hoverBg },
+      ]}
+    >
+      <Icon size={14} color={color} strokeWidth={1.8} />
+      <Text style={[styles.menuText, { color }]}>{label}</Text>
+    </Pressable>
   );
 }
 
@@ -101,10 +226,10 @@ const styles = StyleSheet.create({
   menu: {
     position: "absolute",
     zIndex: 1000,
-    minWidth: 160,
+    width: MENU_WIDTH,
     borderRadius: 8,
     borderWidth: 0.633,
-    paddingVertical: 4,
+    paddingVertical: MENU_PADDING / 2,
     boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.15)",
     elevation: 10,
   },

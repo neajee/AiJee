@@ -1089,7 +1089,10 @@ mod tests {
         let dir = std::env::temp_dir().join(format!("pideck-task-{}", uuid::Uuid::new_v4()));
         std::fs::create_dir_all(&dir).unwrap();
         let marker = dir.join("marker");
-        let def = definition(&format!("sh -c 'sleep 1; touch {}' &\nwait", marker.display()));
+        let def = definition(&format!(
+            "sh -c 'sleep 1; touch {}' &\nwait",
+            marker.display()
+        ));
 
         let info = mgr
             .start_task("test", "ws1", dir.to_str().unwrap(), &def)

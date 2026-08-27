@@ -1,6 +1,14 @@
 import { type ReactNode, useEffect, useRef, useState } from "react";
-import { PanResponder, Platform, Pressable, StyleSheet, View } from "react-native";
-import { ChevronLeft, ChevronRight, GripVertical } from "lucide-react-native";
+import {
+  Animated,
+  Easing,
+  PanResponder,
+  Platform,
+  Pressable,
+  StyleSheet,
+  View,
+} from "react-native";
+import { PanelRight, PanelRightClose } from "lucide-react-native";
 import * as SecureStore from "expo-secure-store";
 
 import { Colors } from "@/constants/theme";
@@ -9,7 +17,11 @@ import { useColorScheme } from "@/hooks/use-color-scheme";
 const PANEL_DEFAULT = 280;
 const PANEL_MIN = 180;
 const PANEL_MAX = 480;
-const RAIL_WIDTH = 28;
+/** Rail left behind when the panel is closed — room for the toggle only. */
+const COLLAPSED_WIDTH = 32;
+/** Invisible grab strip straddling the panel seam, bolt-style. */
+const SEAM_HIT_WIDTH = 12;
+const COLLAPSE_DURATION = 200;
 const SIDEBAR_WIDTH_KEY = "workspace_sidebar_width";
 const SIDEBAR_COLLAPSED_KEY = "workspace_sidebar_collapsed";
 
@@ -96,15 +108,27 @@ export function WorkspaceSidebar({ children }: WorkspaceSidebarProps) {
   const isDark = colorScheme === "dark";
 
   const sidebarBorder = isDark ? "#323131" : "rgba(0,0,0,0.08)";
-  const railBg = isDark ? "#151515" : "#FAFAFA";
-  const railHoverBg = isDark ? "#202020" : "#F2F2F2";
-  const iconColor = isDark ? "#8B8685" : colors.textTertiary;
+  // bolt tints the seam with a single translucent grey for hover and drag.
+  const seamTint = "rgba(136,136,136,0.16)";
+  const seamDragTint = "rgba(136,136,136,0.26)";
+  const buttonHoverBg = isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)";
+  const iconColor = colors.textSecondary;
+  const iconHoverColor = colors.text;
 
   const [isCollapsed, setIsCollapsed] = useState(sidebarCollapsedCache);
   const [isResizing, setIsResizing] = useState(false);
+  const [isSeamHovered, setIsSeamHovered] = useState(false);
+  const [isToggleHovered, setIsToggleHovered] = useState(false);
   const [panelWidth, setPanelWidth] = useState(sidebarWidthCache);
   const panelWidthRef = useRef(sidebarWidthCache);
   const panelStartRef = useRef(sidebarWidthCache);
+  const isResizingRef = useRef(false);
+  const widthAnim = useRef(
+    new Animated.Value(
+      sidebarCollapsedCache ? COLLAPSED_WIDTH : sidebarWidthCache,
+    ),
+  ).current;
+  const [contentMounted, setContentMounted] = useState(!sidebarCollapsedCache);
 
   useEffect(() => {
     let cancelled = false;
@@ -124,6 +148,7 @@ export function WorkspaceSidebar({ children }: WorkspaceSidebarProps) {
           sidebarWidthLoaded = true;
           panelWidthRef.current = nextWidth;
           setPanelWidth(nextWidth);
+          if (!sidebarCollapsedCache) widthAnim.setValue(nextWidth);
         }),
       );
     }
@@ -149,6 +174,23 @@ export function WorkspaceSidebar({ children }: WorkspaceSidebarProps) {
     };
   }, []);
 
+  // Width is animated on collapse only; dragging drives it imperatively so the
+  // panel tracks the pointer without a queued animation per move.
+  useEffect(() => {
+    if (isResizingRef.current) return;
+
+    if (!isCollapsed) setContentMounted(true);
+
+    Animated.timing(widthAnim, {
+      toValue: isCollapsed ? COLLAPSED_WIDTH : panelWidth,
+      duration: COLLAPSE_DURATION,
+      easing: Easing.bezier(0.4, 0, 0.2, 1),
+      useNativeDriver: false,
+    }).start(({ finished }) => {
+      if (finished && isCollapsed) setContentMounted(false);
+    });
+  }, [isCollapsed, panelWidth, widthAnim]);
+
   const persistWidth = (width: number) => {
     const nextWidth = clampWidth(width);
     sidebarWidthCache = nextWidth;
@@ -163,6 +205,7 @@ export function WorkspaceSidebar({ children }: WorkspaceSidebarProps) {
       onMoveShouldSetPanResponder: () => !isCollapsed,
       onPanResponderGrant: () => {
         panelStartRef.current = panelWidthRef.current;
+        isResizingRef.current = true;
         setIsResizing(true);
         if (Platform.OS === "web") {
           document.body.style.cursor = "col-resize";
@@ -175,9 +218,11 @@ export function WorkspaceSidebar({ children }: WorkspaceSidebarProps) {
           Math.min(PANEL_MAX, panelStartRef.current - gs.dx),
         );
         panelWidthRef.current = newWidth;
+        widthAnim.setValue(newWidth);
         setPanelWidth(newWidth);
       },
       onPanResponderRelease: () => {
+        isResizingRef.current = false;
         setIsResizing(false);
         persistWidth(panelWidthRef.current);
         if (Platform.OS === "web") {
@@ -186,6 +231,7 @@ export function WorkspaceSidebar({ children }: WorkspaceSidebarProps) {
         }
       },
       onPanResponderTerminate: () => {
+        isResizingRef.current = false;
         setIsResizing(false);
         persistWidth(panelWidthRef.current);
         if (Platform.OS === "web") {
@@ -196,68 +242,95 @@ export function WorkspaceSidebar({ children }: WorkspaceSidebarProps) {
     }),
   ).current;
 
+  const seamActive = isSeamHovered || isResizing;
+
+  const webSeamHoverProps =
+    Platform.OS === "web"
+      ? {
+          onMouseEnter: () => setIsSeamHovered(true),
+          onMouseLeave: () => setIsSeamHovered(false),
+        }
+      : {};
+
+  const webToggleHoverProps =
+    Platform.OS === "web"
+      ? {
+          onMouseEnter: () => setIsToggleHovered(true),
+          onMouseLeave: () => setIsToggleHovered(false),
+        }
+      : {};
+
+  const toggleCollapsed = () => {
+    setIsCollapsed((prev) => {
+      const next = !prev;
+      sidebarCollapsedCache = next;
+      void saveStoredCollapsed(next);
+      return next;
+    });
+  };
+
   return (
-    <View
+    <Animated.View
       style={[
         styles.container,
         {
-          borderLeftColor: sidebarBorder,
-          width: isCollapsed ? RAIL_WIDTH : panelWidth,
+          width: widthAnim,
+          borderLeftColor: isCollapsed ? "transparent" : sidebarBorder,
         },
       ]}
     >
-      <View
-        style={[
-          styles.rail,
-          {
-            backgroundColor: railBg,
-            borderRightColor: sidebarBorder,
-            borderRightWidth: isCollapsed ? 0 : 0.633,
-          },
-        ]}
-      >
-        <Pressable
-          onPress={() => {
-            setIsCollapsed((prev) => {
-              const next = !prev;
-              sidebarCollapsedCache = next;
-              void saveStoredCollapsed(next);
-              return next;
-            });
-          }}
-          accessibilityRole="button"
-          accessibilityLabel={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
-          {...{
-            title: isCollapsed ? "Expand sidebar" : "Collapse sidebar",
-          }}
-          style={({ hovered, pressed }: any) => [
-            styles.toggleButton,
-            (hovered || pressed) && { backgroundColor: railHoverBg },
-          ]}
-        >
-          {isCollapsed ? (
-            <ChevronLeft size={16} color={iconColor} strokeWidth={2} />
-          ) : (
-            <ChevronRight size={16} color={iconColor} strokeWidth={2} />
-          )}
-        </Pressable>
-
-        {!isCollapsed && (
-          <View
-            {...panelResizer.panHandlers}
-            hitSlop={{ left: 8, right: 8 }}
-            style={[
-              styles.resizeHandle,
-              isResizing && { backgroundColor: railHoverBg },
-            ]}
-          >
-            <GripVertical size={14} color={iconColor} strokeWidth={1.8} />
-          </View>
+      <View style={styles.clip}>
+        {contentMounted && (
+          <View style={{ width: panelWidth, flex: 1 }}>{children}</View>
         )}
       </View>
 
-      {!isCollapsed && <View style={styles.content}>{children}</View>}
-    </View>
+      {/* Toggle sits in the pane's own 44px header row, flush right. */}
+      <Pressable
+        onPress={toggleCollapsed}
+        accessibilityRole="button"
+        accessibilityLabel={isCollapsed ? "Open side panel" : "Close side panel"}
+        {...{ title: isCollapsed ? "Open side panel" : "Close side panel" }}
+        {...webToggleHoverProps}
+        hitSlop={4}
+        style={({ pressed }: any) => [
+          styles.toggleButton,
+          isCollapsed ? styles.toggleCollapsed : styles.toggleExpanded,
+          (isToggleHovered || pressed) && { backgroundColor: buttonHoverBg },
+        ]}
+      >
+        {isCollapsed ? (
+          <PanelRight
+            size={16}
+            color={isToggleHovered ? iconHoverColor : iconColor}
+            strokeWidth={1.75}
+          />
+        ) : (
+          <PanelRightClose
+            size={16}
+            color={isToggleHovered ? iconHoverColor : iconColor}
+            strokeWidth={1.75}
+          />
+        )}
+      </Pressable>
+
+      {!isCollapsed && (
+        <View
+          {...panelResizer.panHandlers}
+          {...webSeamHoverProps}
+          style={[
+            styles.seam,
+            {
+              backgroundColor: seamActive
+                ? isResizing
+                  ? seamDragTint
+                  : seamTint
+                : "transparent",
+            },
+          ]}
+        />
+      )}
+    </Animated.View>
   );
 }
 
@@ -265,26 +338,37 @@ const styles = StyleSheet.create({
   container: {
     borderLeftWidth: 0.633,
     flexDirection: "row",
+    position: "relative",
+  },
+  clip: {
+    flex: 1,
     overflow: "hidden",
   },
-  rail: {
-    width: RAIL_WIDTH,
-    alignItems: "center",
-  },
-  toggleButton: {
-    width: "100%",
-    height: 32,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  resizeHandle: {
-    flex: 1,
-    width: "100%",
-    alignItems: "center",
-    justifyContent: "center",
+  seam: {
+    position: "absolute",
+    top: 0,
+    bottom: 0,
+    left: -(SEAM_HIT_WIDTH / 2),
+    width: SEAM_HIT_WIDTH,
+    zIndex: 20,
     cursor: "col-resize",
   } as any,
-  content: {
-    flex: 1,
+  toggleButton: {
+    position: "absolute",
+    width: 24,
+    height: 24,
+    borderRadius: 6,
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 21,
+    cursor: "pointer",
+  } as any,
+  toggleExpanded: {
+    top: 10,
+    right: 8,
+  },
+  toggleCollapsed: {
+    top: 10,
+    left: (COLLAPSED_WIDTH - 24) / 2,
   },
 });

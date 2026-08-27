@@ -9,15 +9,20 @@ import { WorkspaceColors } from '@/constants/theme';
 
 const SELECTED_WORKSPACE_KEY = 'selected_workspace_id';
 const LAST_SESSION_KEY = 'last_session_by_workspace';
+const PINNED_WORKSPACES_KEY = 'pinned_workspace_ids';
 // Per-server keys use a suffix: selected_workspace_id:<serverId>
 const SERVER_SELECTED_KEY_PREFIX = 'selected_workspace_id:';
 const SERVER_SESSION_KEY_PREFIX = 'last_session_by_workspace:';
+const SERVER_PINNED_KEY_PREFIX = 'pinned_workspace_ids:';
 
 function serverSelectedKey(serverId: string) {
   return `${SERVER_SELECTED_KEY_PREFIX}${serverId}`;
 }
 function serverSessionKey(serverId: string) {
   return `${SERVER_SESSION_KEY_PREFIX}${serverId}`;
+}
+function serverPinnedKey(serverId: string) {
+  return `${SERVER_PINNED_KEY_PREFIX}${serverId}`;
 }
 
 async function readStorageItem(key: string): Promise<string | null> {
@@ -85,6 +90,31 @@ async function writeLastSessionMap(map: Record<string, string>, serverId?: strin
   }
 }
 
+/** Pinned projects are a local preference: nothing about them is server state. */
+async function readPinnedIds(serverId?: string | null): Promise<string[]> {
+  try {
+    let raw: string | null = null;
+    if (serverId) {
+      raw = await readStorageItem(serverPinnedKey(serverId));
+    }
+    if (!raw) {
+      raw = await readStorageItem(PINNED_WORKSPACES_KEY);
+    }
+    const parsed = raw ? JSON.parse(raw) : [];
+    return Array.isArray(parsed) ? parsed.filter((id) => typeof id === 'string') : [];
+  } catch {
+    return [];
+  }
+}
+
+async function writePinnedIds(ids: string[], serverId?: string | null) {
+  const json = JSON.stringify(ids);
+  await writeStorageItem(PINNED_WORKSPACES_KEY, json);
+  if (serverId) {
+    await writeStorageItem(serverPinnedKey(serverId), json);
+  }
+}
+
 function mapApiWorkspace(ws: ApiWorkspace, index: number): Workspace {
   return {
     id: ws.id,
@@ -125,14 +155,19 @@ function mergeWorkspaceUiState(
 interface WorkspaceState {
   workspaces: Workspace[];
   selectedWorkspaceId: string | null;
+  /** Ids the user pinned, in the order they were pinned. */
+  pinnedWorkspaceIds: string[];
   lastSessionByWorkspace: Record<string, string>;
   sessionWorkspaceById: Record<string, string>;
+  /** Session ids with an unseen "turn finished" event. */
+  sessionNotifications: Record<string, true>;
   currentServerId: string | null;
   loading: boolean;
   error: string | null;
 
   fetchWorkspaces: (serverId?: string | null) => Promise<void>;
   selectWorkspace: (id: string) => void;
+  togglePinnedWorkspace: (id: string) => void;
   setLastSession: (workspaceId: string, sessionId: string) => void;
   getLastSession: (workspaceId: string) => string | null;
   clearLastSession: (workspaceId: string) => void;
@@ -146,14 +181,19 @@ interface WorkspaceState {
   getWorkspaceForSession: (sessionId: string) => string | null;
   markWorkspaceNotification: (workspaceId: string) => void;
   clearWorkspaceNotification: (workspaceId: string) => void;
+  /** Sessions that finished a turn while the user was looking elsewhere. */
+  markSessionNotification: (sessionId: string) => void;
+  clearSessionNotification: (sessionId: string) => void;
   switchServer: (serverId: string | null) => Promise<void>;
 }
 
 export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
   workspaces: [],
   selectedWorkspaceId: null,
+  pinnedWorkspaceIds: [],
   lastSessionByWorkspace: {},
   sessionWorkspaceById: {},
+  sessionNotifications: {},
   currentServerId: null,
   loading: false,
   error: null,
@@ -161,11 +201,18 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
   fetchWorkspaces: async (serverId?: string | null) => {
     const sid = serverId ?? get().currentServerId;
     // Restore per-server state
-    const [restoredId, restoredSessionMap] = await Promise.all([
+    const [restoredId, restoredSessionMap, restoredPinned] = await Promise.all([
       readSelectedId(sid),
       readLastSessionMap(sid),
+      readPinnedIds(sid),
     ]);
-    set({ loading: true, error: null, lastSessionByWorkspace: restoredSessionMap, currentServerId: sid });
+    set({
+      loading: true,
+      error: null,
+      lastSessionByWorkspace: restoredSessionMap,
+      pinnedWorkspaceIds: restoredPinned,
+      currentServerId: sid,
+    });
     const result = await list();
     if (result.error) {
       set({ loading: false, error: 'Failed to fetch workspaces' });
@@ -183,6 +230,15 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
   selectWorkspace: (id) => {
     set({ selectedWorkspaceId: id });
     writeSelectedId(id, get().currentServerId);
+  },
+
+  togglePinnedWorkspace: (id) => {
+    const current = get().pinnedWorkspaceIds;
+    const next = current.includes(id)
+      ? current.filter((pinned) => pinned !== id)
+      : [...current, id];
+    set({ pinnedWorkspaceIds: next });
+    writePinnedIds(next, get().currentServerId);
   },
 
   setLastSession: (workspaceId, sessionId) => {
@@ -282,6 +338,25 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
     return get().sessionWorkspaceById[sessionId] ?? null;
   },
 
+  markSessionNotification: (sessionId) =>
+    set((state) =>
+      state.sessionNotifications[sessionId]
+        ? state
+        : {
+            sessionNotifications: {
+              ...state.sessionNotifications,
+              [sessionId]: true,
+            },
+          },
+    ),
+
+  clearSessionNotification: (sessionId) =>
+    set((state) => {
+      if (!state.sessionNotifications[sessionId]) return state;
+      const { [sessionId]: _seen, ...rest } = state.sessionNotifications;
+      return { sessionNotifications: rest };
+    }),
+
   markWorkspaceNotification: (workspaceId) =>
     set((state) => {
       let changed = false;
@@ -321,15 +396,18 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
   switchServer: async (serverId: string | null) => {
     if (serverId === get().currentServerId) return;
     // Reset workspace state and load per-server persisted state
-    const [restoredId, restoredSessionMap] = await Promise.all([
+    const [restoredId, restoredSessionMap, restoredPinned] = await Promise.all([
       readSelectedId(serverId),
       readLastSessionMap(serverId),
+      readPinnedIds(serverId),
     ]);
     set({
       workspaces: [],
       selectedWorkspaceId: restoredId,
+      pinnedWorkspaceIds: restoredPinned,
       lastSessionByWorkspace: restoredSessionMap,
       sessionWorkspaceById: {},
+      sessionNotifications: {},
       currentServerId: serverId,
       loading: false,
       error: null,

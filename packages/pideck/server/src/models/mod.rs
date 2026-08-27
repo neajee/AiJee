@@ -101,6 +101,45 @@ pub struct OperationResult {
     pub output: String,
 }
 
+#[derive(Debug, Serialize, Deserialize, ToSchema, Clone)]
+pub struct MarketplacePackage {
+    pub name: String,
+    pub version: String,
+    pub description: Option<String>,
+    pub author: Option<String>,
+    pub updated_at: Option<String>,
+    pub downloads: Option<u64>,
+    pub repository: Option<String>,
+    pub homepage: Option<String>,
+    pub npm_url: String,
+    pub package_types: Vec<String>,
+    pub readme: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, ToSchema, Clone)]
+pub struct PackageSearchResponse {
+    pub packages: Vec<MarketplacePackage>,
+    pub total: u64,
+    pub from_cache: bool,
+}
+
+#[derive(Debug, Serialize, Deserialize, ToSchema, Clone)]
+pub struct InstalledPackage {
+    pub name: String,
+    pub version: Option<String>,
+    pub scope: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, ToSchema)]
+pub struct PackageOperationRequest {
+    pub operation: String,
+    pub name: String,
+    pub version: Option<String>,
+    pub scope: String,
+    pub lock_version: Option<bool>,
+    pub workspace_id: Option<String>,
+}
+
 #[derive(Debug, Serialize, Deserialize, ToSchema)]
 pub struct HealthResponse {
     pub status: String,

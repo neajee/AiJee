@@ -1,0 +1,1116 @@
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  ActivityIndicator,
+  Alert,
+  Animated,
+  Easing,
+  Platform,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import { useRouter, usePathname } from "expo-router";
+import {
+  ChevronDown,
+  ChevronRight,
+  Folder,
+  FolderOpen,
+  Loader2,
+  MoreHorizontal,
+  Pin,
+  Plus,
+  RefreshCw,
+  Settings,
+  PackageOpen,
+  Square,
+  SquarePen,
+} from "lucide-react-native";
+
+import { Colors, Fonts } from "@/constants/theme";
+import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useWorkspaceStore } from "@/features/workspace/store";
+import {
+  useWorkspaceSessions as useSessions,
+  usePiClient,
+  useIsSessionActive,
+  useActiveSessions,
+} from "@pideck/client-sdk";
+import type { SessionListItem } from "@pideck/client-sdk";
+import { requestBrowserNotificationPermission } from "@/features/agent/browser-notifications";
+import { SessionActivityIndicator } from "@/features/workspace/components/session-activity-indicator";
+import { AnimatedListItem } from "@/components/ui/animated-list-item";
+import { NewWorkspaceDialog } from "@/features/workspace/components/new-workspace-dialog";
+import { EditWorkspaceDialog } from "@/features/workspace/components/edit-workspace-dialog";
+import { WorkspaceContextMenu, MENU_WIDTH } from "../workspace-context-menu";
+import type { Workspace } from "@/features/workspace/types";
+
+/** Sessions sit under their project, indented to clear the folder icon. */
+const SESSION_INDENT = 28;
+/** Longer session lists fold: a project is recognised by its recent work. */
+const SESSION_PREVIEW_COUNT = 5;
+
+/**
+ * The single left sidebar: every project in one list, the pinned ones first,
+ * each expanding to show its sessions.
+ *
+ * This replaces the older split of a 64px icon rail for switching projects and
+ * a separate panel listing only the current project's sessions — switching and
+ * browsing were the same intent spread across two surfaces.
+ */
+export function ProjectSidebar() {
+  const colorScheme = useColorScheme() ?? "light";
+  const colors = Colors[colorScheme];
+  const isDark = colorScheme === "dark";
+  const router = useRouter();
+  const pathname = usePathname();
+
+  const workspaces = useWorkspaceStore((s) => s.workspaces);
+  const selectedWorkspaceId = useWorkspaceStore((s) => s.selectedWorkspaceId);
+  const pinnedIds = useWorkspaceStore((s) => s.pinnedWorkspaceIds);
+  const selectWorkspace = useWorkspaceStore((s) => s.selectWorkspace);
+  const togglePinned = useWorkspaceStore((s) => s.togglePinnedWorkspace);
+  const removeWorkspace = useWorkspaceStore((s) => s.removeWorkspace);
+  const fetchWorkspaces = useWorkspaceStore((s) => s.fetchWorkspaces);
+  const getLastSession = useWorkspaceStore((s) => s.getLastSession);
+  const sessionWorkspaceById = useWorkspaceStore((s) => s.sessionWorkspaceById);
+  const sessionNotifications = useWorkspaceStore((s) => s.sessionNotifications);
+  const activeSessions = useActiveSessions();
+
+  /**
+   * Which projects have something running or something finished-but-unseen.
+   *
+   * `workspace.runningSessions` is never populated by the server, so activity is
+   * derived from the live session list mapped back to projects — a mapping the
+   * session lists and turn-end events fill in as they load.
+   */
+  const activityByWorkspace = useMemo(() => {
+    const activity: Record<string, { running: boolean; unread: boolean }> = {};
+    const touch = (id: string) =>
+      (activity[id] ??= { running: false, unread: false });
+    activeSessions.forEach((sessionId) => {
+      const workspaceId = sessionWorkspaceById[sessionId];
+      if (workspaceId) touch(workspaceId).running = true;
+    });
+    Object.keys(sessionNotifications).forEach((sessionId) => {
+      const workspaceId = sessionWorkspaceById[sessionId];
+      if (workspaceId) touch(workspaceId).unread = true;
+    });
+    return activity;
+  }, [activeSessions, sessionWorkspaceById, sessionNotifications]);
+
+  const [showNewDialog, setShowNewDialog] = useState(false);
+  const [editWorkspace, setEditWorkspace] = useState<Workspace | null>(null);
+  const [refreshToken, setRefreshToken] = useState(0);
+  const [refreshing, setRefreshing] = useState(false);
+  // Only holds projects whose state differs from the default (selected = open).
+  const [overrides, setOverrides] = useState<Record<string, boolean>>({});
+  const [contextMenu, setContextMenu] = useState<{
+    visible: boolean;
+    x: number;
+    y: number;
+    workspace: Workspace | null;
+  }>({ visible: false, x: 0, y: 0, workspace: null });
+
+  const sessionMatch = pathname.match(/\/workspace\/[^/]+\/s\/([^/]+)/);
+  const selectedSessionId = sessionMatch?.[1] ?? null;
+
+  const { pinned, rest } = useMemo(() => {
+    const pinnedSet = new Set(pinnedIds);
+    return {
+      // Pinned order follows the order they were pinned in, not the list order.
+      pinned: pinnedIds
+        .map((id) => workspaces.find((w) => w.id === id))
+        .filter((w): w is Workspace => !!w),
+      rest: workspaces.filter((w) => !pinnedSet.has(w.id)),
+    };
+  }, [workspaces, pinnedIds]);
+
+  const handleOpenWorkspace = useCallback(
+    (id: string) => {
+      selectWorkspace(id);
+      setOverrides((prev) => {
+        if (prev[id] === undefined) return prev;
+        // Opening a project always reveals it.
+        const { [id]: _dropped, ...others } = prev;
+        return others;
+      });
+      const lastSession = getLastSession(id);
+      router.replace(
+        lastSession ? `/workspace/${id}/s/${lastSession}` : `/workspace/${id}`,
+      );
+    },
+    [selectWorkspace, getLastSession, router],
+  );
+
+  const handleToggleWorkspace = useCallback(
+    (id: string, isOpen: boolean) => {
+      setOverrides((prev) => ({ ...prev, [id]: !isOpen }));
+    },
+    [],
+  );
+
+  const handleSelectSession = useCallback(
+    (workspaceId: string, sessionId: string) => {
+      if (workspaceId !== selectedWorkspaceId) selectWorkspace(workspaceId);
+      router.navigate(`/workspace/${workspaceId}/s/${sessionId}`);
+    },
+    [selectedWorkspaceId, selectWorkspace, router],
+  );
+
+  const handleNewSessionIn = useCallback(
+    (workspaceId: string) => {
+      selectWorkspace(workspaceId);
+      requestBrowserNotificationPermission();
+      router.navigate(`/workspace/${workspaceId}`);
+    },
+    [selectWorkspace, router],
+  );
+
+  const handleNewSession = useCallback(() => {
+    if (!selectedWorkspaceId) return;
+    requestBrowserNotificationPermission();
+    router.navigate(`/workspace/${selectedWorkspaceId}`);
+  }, [selectedWorkspaceId, router]);
+
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await fetchWorkspaces();
+      setRefreshToken((n) => n + 1);
+    } finally {
+      setRefreshing(false);
+    }
+  }, [fetchWorkspaces]);
+
+  const handleContextMenu = useCallback((ws: Workspace, e: any) => {
+    if (Platform.OS !== "web") return;
+    e.preventDefault?.();
+    const nativeEvent = e.nativeEvent ?? e;
+    setContextMenu({
+      visible: true,
+      // The menu is a modal over the viewport, so viewport coordinates are the
+      // right frame of reference — page coordinates drift once anything scrolls.
+      x: nativeEvent.clientX ?? nativeEvent.pageX ?? 0,
+      y: nativeEvent.clientY ?? nativeEvent.pageY ?? 0,
+      workspace: ws,
+    });
+  }, []);
+
+  /** Touch has no right button, so a long press opens the same menu. */
+  const handleLongPress = useCallback((ws: Workspace, e: any) => {
+    const nativeEvent = e?.nativeEvent ?? {};
+    setContextMenu({
+      visible: true,
+      x: nativeEvent.pageX ?? 24,
+      y: nativeEvent.pageY ?? 120,
+      workspace: ws,
+    });
+  }, []);
+
+  /**
+   * Opens the menu anchored to the row's ⋯ button rather than to a cursor, so
+   * touch and keyboard users get the same actions as a right-click.
+   */
+  const handleMenuAt = useCallback(
+    (ws: Workspace, x: number, y: number) => {
+      setContextMenu({ visible: true, x, y, workspace: ws });
+    },
+    [],
+  );
+
+  const handleDelete = useCallback(
+    (ws: Workspace) => {
+      if (Platform.OS === "web") {
+        if (window.confirm(`删除项目「${ws.title}」？`)) {
+          removeWorkspace(ws.id);
+        }
+        return;
+      }
+      Alert.alert("删除项目", `删除「${ws.title}」？`, [
+        { text: "取消", style: "cancel" },
+        {
+          text: "删除",
+          style: "destructive",
+          onPress: () => removeWorkspace(ws.id),
+        },
+      ]);
+    },
+    [removeWorkspace],
+  );
+
+  const renderWorkspace = (ws: Workspace) => {
+    const isSelected = ws.id === selectedWorkspaceId;
+    const isOpen = overrides[ws.id] ?? isSelected;
+
+    return (
+      <View key={ws.id}>
+        <View
+          {...({ onContextMenu: (e: any) => handleContextMenu(ws, e) } as any)}
+        >
+          <WorkspaceRow
+            workspace={ws}
+            isSelected={isSelected}
+            isOpen={isOpen}
+            isPinned={pinnedIds.includes(ws.id)}
+            isRunning={activityByWorkspace[ws.id]?.running ?? false}
+            hasUnread={
+              (activityByWorkspace[ws.id]?.unread ?? false) ||
+              ws.hasNotifications
+            }
+            onPress={() => handleToggleWorkspace(ws.id, isOpen)}
+            onTogglePin={() => togglePinned(ws.id)}
+            onMenu={(x, y) => handleMenuAt(ws, x, y)}
+            onLongPress={(e) => handleLongPress(ws, e)}
+            isDark={isDark}
+          />
+        </View>
+        {isOpen && (
+          <WorkspaceSessions
+            workspaceId={ws.id}
+            selectedSessionId={isSelected ? selectedSessionId : null}
+            refreshToken={refreshToken}
+            onSelect={handleSelectSession}
+            isDark={isDark}
+          />
+        )}
+      </View>
+    );
+  };
+
+  return (
+    <View style={[styles.container, { backgroundColor: colors.background }]}>
+      <View style={styles.top}>
+        <SidebarRow
+          icon={<SquarePen size={15} color={colors.text} strokeWidth={1.8} />}
+          label="新对话"
+          onPress={handleNewSession}
+          disabled={!selectedWorkspaceId}
+          isDark={isDark}
+        />
+        <SidebarRow
+          icon={<PackageOpen size={15} color={colors.textSecondary} strokeWidth={1.8} />}
+          label="插件"
+          isActive={pathname.startsWith("/packages")}
+          onPress={() => router.push("/packages" as any)}
+          isDark={isDark}
+        />
+      </View>
+
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={false}
+      >
+        {pinned.length > 0 && (
+          <>
+            <SectionHeader title="置顶" isDark={isDark} />
+            {pinned.map(renderWorkspace)}
+          </>
+        )}
+
+        <SectionHeader
+          title="项目"
+          isDark={isDark}
+          actions={
+            <>
+              <HeaderAction
+                onPress={handleRefresh}
+                disabled={refreshing}
+                label="刷新项目"
+                isDark={isDark}
+              >
+                {refreshing ? (
+                  <ActivityIndicator size={12} color={colors.textTertiary} />
+                ) : (
+                  <RefreshCw size={12} color={colors.textTertiary} strokeWidth={1.8} />
+                )}
+              </HeaderAction>
+              <HeaderAction
+                onPress={() => setShowNewDialog(true)}
+                label="添加项目"
+                isDark={isDark}
+              >
+                <Plus size={13} color={colors.textTertiary} strokeWidth={2} />
+              </HeaderAction>
+            </>
+          }
+        />
+
+        {rest.length === 0 && pinned.length === 0 ? (
+          <Text style={[styles.empty, { color: colors.textTertiary }]}>
+            暂无项目
+          </Text>
+        ) : (
+          rest.map(renderWorkspace)
+        )}
+      </ScrollView>
+
+      <View
+        style={[styles.footer, { borderTopColor: colors.border }]}
+      >
+        <SidebarRow
+          icon={<Settings size={15} color={colors.textSecondary} strokeWidth={1.8} />}
+          label="设置"
+          isActive={pathname.startsWith("/settings")}
+          onPress={() => router.push("/settings")}
+          isDark={isDark}
+        />
+      </View>
+
+      <NewWorkspaceDialog
+        visible={showNewDialog}
+        onClose={() => setShowNewDialog(false)}
+      />
+      <EditWorkspaceDialog
+        visible={!!editWorkspace}
+        workspace={editWorkspace}
+        onClose={() => setEditWorkspace(null)}
+      />
+      <WorkspaceContextMenu
+        visible={contextMenu.visible}
+        x={contextMenu.x}
+        y={contextMenu.y}
+        pinned={
+          !!contextMenu.workspace && pinnedIds.includes(contextMenu.workspace.id)
+        }
+        onTogglePin={() => {
+          if (contextMenu.workspace) togglePinned(contextMenu.workspace.id);
+        }}
+        onOpen={() => {
+          if (contextMenu.workspace) handleOpenWorkspace(contextMenu.workspace.id);
+        }}
+        onNewSession={() => {
+          if (contextMenu.workspace) handleNewSessionIn(contextMenu.workspace.id);
+        }}
+        onEdit={() => setEditWorkspace(contextMenu.workspace)}
+        onDelete={() => {
+          if (contextMenu.workspace) handleDelete(contextMenu.workspace);
+        }}
+        onClose={() => setContextMenu((prev) => ({ ...prev, visible: false }))}
+      />
+    </View>
+  );
+}
+
+function SectionHeader({
+  title,
+  actions,
+  isDark,
+}: {
+  title: string;
+  actions?: React.ReactNode;
+  isDark: boolean;
+}) {
+  const colors = isDark ? Colors.dark : Colors.light;
+  return (
+    <View style={styles.sectionHeader}>
+      <Text style={[styles.sectionTitle, { color: colors.textTertiary }]}>
+        {title}
+      </Text>
+      {actions}
+    </View>
+  );
+}
+
+function HeaderAction({
+  onPress,
+  label,
+  disabled,
+  children,
+  isDark,
+}: {
+  onPress: () => void;
+  label: string;
+  disabled?: boolean;
+  children: React.ReactNode;
+  isDark: boolean;
+}) {
+  const [hovered, setHovered] = useState(false);
+  const hoverBg = isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)";
+
+  return (
+    <Pressable
+      onPress={onPress}
+      disabled={disabled}
+      accessibilityLabel={label}
+      onHoverIn={() => setHovered(true)}
+      onHoverOut={() => setHovered(false)}
+      style={({ pressed }) => [
+        styles.headerAction,
+        hovered && { backgroundColor: hoverBg },
+        pressed && { opacity: 0.6 },
+      ]}
+    >
+      {children}
+    </Pressable>
+  );
+}
+
+/** A flat icon + label row, used for the actions above and below the list. */
+function SidebarRow({
+  icon,
+  label,
+  onPress,
+  isActive = false,
+  disabled = false,
+  isDark,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  onPress: () => void;
+  isActive?: boolean;
+  disabled?: boolean;
+  isDark: boolean;
+}) {
+  const colors = isDark ? Colors.dark : Colors.light;
+  const [hovered, setHovered] = useState(false);
+  const hoverBg = isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.035)";
+  const activeBg = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)";
+
+  return (
+    <Pressable
+      onPress={onPress}
+      disabled={disabled}
+      onHoverIn={() => setHovered(true)}
+      onHoverOut={() => setHovered(false)}
+      style={({ pressed }) => [
+        styles.row,
+        isActive
+          ? { backgroundColor: activeBg }
+          : hovered && { backgroundColor: hoverBg },
+        disabled && { opacity: 0.4 },
+        pressed && { opacity: 0.7 },
+      ]}
+    >
+      <View style={styles.rowIcon}>{icon}</View>
+      <Text
+        style={[
+          styles.rowLabel,
+          { color: isActive ? colors.text : colors.textSecondary },
+        ]}
+        numberOfLines={1}
+      >
+        {label}
+      </Text>
+    </Pressable>
+  );
+}
+
+/**
+ * The "something is running here" mark: a slow spin, because a project row has
+ * no room for the agent's actual progress and a static icon reads as a status
+ * that has already settled.
+ */
+function ActivityPulse({ color }: { color: string }) {
+  const spin = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const loop = Animated.loop(
+      Animated.timing(spin, {
+        toValue: 1,
+        duration: 1100,
+        easing: Easing.linear,
+        useNativeDriver: true,
+      }),
+    );
+    loop.start();
+    return () => loop.stop();
+  }, [spin]);
+
+  return (
+    <Animated.View
+      style={{
+        transform: [
+          {
+            rotate: spin.interpolate({
+              inputRange: [0, 1],
+              outputRange: ["0deg", "360deg"],
+            }),
+          },
+        ],
+      }}
+    >
+      <Loader2 size={12} color={color} strokeWidth={2} />
+    </Animated.View>
+  );
+}
+
+function WorkspaceRow({
+  workspace,
+  isSelected,
+  isOpen,
+  isPinned,
+  isRunning,
+  hasUnread,
+  onPress,
+  onTogglePin,
+  onMenu,
+  onLongPress,
+  isDark,
+}: {
+  workspace: Workspace;
+  isSelected: boolean;
+  isOpen: boolean;
+  isPinned: boolean;
+  /** At least one session in this project is working right now. */
+  isRunning: boolean;
+  /** A turn finished here and hasn't been looked at. */
+  hasUnread: boolean;
+  /** Left click folds and unfolds; opening a project happens by session. */
+  onPress: () => void;
+  onTogglePin: () => void;
+  /** Viewport coordinates to anchor the actions menu to. */
+  onMenu: (x: number, y: number) => void;
+  onLongPress: (e: any) => void;
+  isDark: boolean;
+}) {
+  const colors = isDark ? Colors.dark : Colors.light;
+  const [hovered, setHovered] = useState(false);
+  const hoverBg = isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.035)";
+  const FolderIcon = isOpen ? FolderOpen : Folder;
+  const Chevron = isOpen ? ChevronDown : ChevronRight;
+  const moreRef = useRef<View>(null);
+  // Hovering swaps the status dot for the actions; both never fit at once.
+  const showActions = hovered;
+
+  const openMenu = useCallback(() => {
+    const node = moreRef.current;
+    if (!node?.measureInWindow) {
+      onMenu(24, 120);
+      return;
+    }
+    // Anchor under the button, right edges aligned.
+    node.measureInWindow((x, y, width, height) => {
+      onMenu(x + width - MENU_WIDTH, y + height + 4);
+    });
+  }, [onMenu]);
+
+  return (
+    /*
+     * Hover lives on a plain View using pointer events, not on the Pressable.
+     * react-native-web's Pressable hover "locks": entering a nested pressable
+     * dispatches an event that ends the parent's hover, so the buttons that only
+     * exist while hovering would vanish the moment the cursor reached them.
+     * `pointerenter`/`pointerleave` don't fire for movement between children.
+     */
+    <View
+      style={[styles.row, hovered && { backgroundColor: hoverBg }]}
+      onPointerEnter={() => setHovered(true)}
+      onPointerLeave={() => setHovered(false)}
+    >
+      <Pressable
+        onPress={onPress}
+        onLongPress={onLongPress}
+        delayLongPress={400}
+        accessibilityLabel={
+          isOpen ? `收起 ${workspace.title}` : `展开 ${workspace.title}`
+        }
+        style={({ pressed }) => [styles.rowMain, pressed && { opacity: 0.7 }]}
+      >
+        {/* The icon slot is the disclosure indicator: on hover the folder
+            becomes a chevron, so folding never costs a second column. */}
+        <View style={styles.rowIcon}>
+          {hovered ? (
+            <Chevron size={14} color={colors.textSecondary} strokeWidth={2} />
+          ) : (
+            <FolderIcon size={15} color={workspace.color} strokeWidth={1.8} />
+          )}
+        </View>
+        <Text
+          style={[
+            styles.rowLabel,
+            {
+              color: isSelected ? colors.text : colors.textSecondary,
+              fontFamily: isSelected ? Fonts.sansMedium : Fonts.sans,
+            },
+          ]}
+          numberOfLines={1}
+        >
+          {workspace.title}
+        </Text>
+      </Pressable>
+
+      {/* Pinning is one click on the row, not two through a menu. Once pinned
+          the icon stays put as the badge for that state. */}
+      <View style={styles.rowActions}>
+        {(showActions || isPinned) && (
+          <RowAction
+            label={
+              isPinned
+                ? `取消置顶 ${workspace.title}`
+                : `置顶 ${workspace.title}`
+            }
+            onPress={onTogglePin}
+            isDark={isDark}
+          >
+            <Pin
+              size={13}
+              color={isPinned ? colors.text : colors.textTertiary}
+              strokeWidth={1.8}
+              fill={isPinned ? colors.text : "transparent"}
+            />
+          </RowAction>
+        )}
+        {showActions && (
+          <View ref={moreRef} collapsable={false}>
+            <RowAction
+              label={`${workspace.title} 的更多操作`}
+              onPress={openMenu}
+              isDark={isDark}
+            >
+              <MoreHorizontal
+                size={14}
+                color={colors.textTertiary}
+                strokeWidth={1.8}
+              />
+            </RowAction>
+          </View>
+        )}
+
+        {/* A working project spins; a finished one waits with a green dot. */}
+        {!showActions && isRunning && (
+          <ActivityPulse color={colors.textSecondary} />
+        )}
+        {!showActions && !isRunning && hasUnread && (
+          <View
+            style={[
+              styles.dot,
+              { backgroundColor: isDark ? "#3FB950" : "#1A7F37" },
+            ]}
+          />
+        )}
+      </View>
+    </View>
+  );
+}
+
+/** A small square button that sits beside a row's main pressable. */function RowAction({
+  label,
+  onPress,
+  children,
+  isDark,
+}: {
+  label: string;
+  onPress: () => void;
+  children: React.ReactNode;
+  isDark: boolean;
+}) {
+  const [hovered, setHovered] = useState(false);
+  const hoverBg = isDark ? "rgba(255,255,255,0.09)" : "rgba(0,0,0,0.07)";
+
+  return (
+    <Pressable
+      onPress={(e) => {
+        e.stopPropagation();
+        onPress();
+      }}
+      accessibilityLabel={label}
+      onHoverIn={() => setHovered(true)}
+      onHoverOut={() => setHovered(false)}
+      style={({ pressed }) => [
+        styles.rowAction,
+        hovered && { backgroundColor: hoverBg },
+        pressed && { opacity: 0.6 },
+      ]}
+    >
+      {children}
+    </Pressable>
+  );
+}
+
+function WorkspaceSessions({
+  workspaceId,
+  selectedSessionId,
+  refreshToken,
+  onSelect,
+  isDark,
+}: {
+  workspaceId: string;
+  selectedSessionId: string | null;
+  refreshToken: number;
+  onSelect: (workspaceId: string, sessionId: string) => void;
+  isDark: boolean;
+}) {
+  const colors = isDark ? Colors.dark : Colors.light;
+  const [showAll, setShowAll] = useState(false);
+  const {
+    sessions,
+    isLoading,
+    isFetchingNextPage,
+    hasNextPage,
+    fetchNextPage,
+    refetch,
+  } = useSessions(workspaceId);
+
+  // Teaches the store which project each session belongs to, so a finished turn
+  // can badge the right project even while it is folded.
+  const registerWorkspaceSessions = useWorkspaceStore(
+    (s) => s.registerWorkspaceSessions,
+  );
+  const sessionNotifications = useWorkspaceStore((s) => s.sessionNotifications);
+  useEffect(() => {
+    if (sessions.length === 0) return;
+    registerWorkspaceSessions(
+      workspaceId,
+      sessions.map((session) => session.id),
+    );
+  }, [workspaceId, sessions, registerWorkspaceSessions]);
+
+  // The sidebar's refresh button covers the whole tree, sessions included.
+  const isFirstRun = refreshToken === 0;
+  useEffect(() => {
+    if (isFirstRun) return;
+    refetch();
+  }, [refreshToken, isFirstRun, refetch]);
+
+  // A folded list must never hide the session being read.
+  const selectedIndex = selectedSessionId
+    ? sessions.findIndex((s) => s.id === selectedSessionId)
+    : -1;
+  const forcedOpen = selectedIndex >= SESSION_PREVIEW_COUNT;
+  useEffect(() => {
+    if (forcedOpen) setShowAll(true);
+  }, [forcedOpen]);
+
+  if (isLoading) {
+    return <ActivityIndicator size="small" style={styles.sessionLoading} />;
+  }
+
+  if (sessions.length === 0) {
+    return (
+      <Text style={[styles.sessionEmpty, { color: colors.textTertiary }]}>
+        暂无对话
+      </Text>
+    );
+  }
+
+  const expanded = showAll || forcedOpen;
+  const visible = expanded ? sessions : sessions.slice(0, SESSION_PREVIEW_COUNT);
+  const foldedCount = sessions.length - visible.length;
+
+  return (
+    <View>
+      {visible.map((session) => (
+        <AnimatedListItem key={session.id}>
+          <SessionRow
+            session={session}
+            isSelected={session.id === selectedSessionId}
+            hasUnread={!!sessionNotifications[session.id]}
+            onPress={() => onSelect(workspaceId, session.id)}
+            isDark={isDark}
+          />
+        </AnimatedListItem>
+      ))}
+
+      {foldedCount > 0 && (
+        <MoreRow label={`展开显示 ${foldedCount} 个`} onPress={() => setShowAll(true)} isDark={isDark} />
+      )}
+      {expanded && !forcedOpen && sessions.length > SESSION_PREVIEW_COUNT && (
+        <MoreRow label="收起" onPress={() => setShowAll(false)} isDark={isDark} />
+      )}
+      {expanded && hasNextPage && (
+        <MoreRow
+          label={isFetchingNextPage ? "加载中…" : "加载更多"}
+          onPress={() => fetchNextPage()}
+          disabled={isFetchingNextPage}
+          isDark={isDark}
+        />
+      )}
+    </View>
+  );
+}
+
+/** The quiet text-only row that folds and unfolds a session list. */
+function MoreRow({
+  label,
+  onPress,
+  disabled,
+  isDark,
+}: {
+  label: string;
+  onPress: () => void;
+  disabled?: boolean;
+  isDark: boolean;
+}) {
+  const colors = isDark ? Colors.dark : Colors.light;
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <Pressable
+      onPress={onPress}
+      disabled={disabled}
+      onHoverIn={() => setHovered(true)}
+      onHoverOut={() => setHovered(false)}
+      style={({ pressed }) => [styles.moreRow, pressed && { opacity: 0.6 }]}
+    >
+      <Text
+        style={[
+          styles.moreText,
+          { color: hovered ? colors.textSecondary : colors.textTertiary },
+        ]}
+      >
+        {label}
+      </Text>
+    </Pressable>
+  );
+}
+
+function SessionRow({
+  session,
+  isSelected,
+  hasUnread,
+  onPress,
+  isDark,
+}: {
+  session: SessionListItem;
+  isSelected: boolean;
+  hasUnread: boolean;
+  onPress: () => void;
+  isDark: boolean;
+}) {
+  const colors = isDark ? Colors.dark : Colors.light;
+  const client = usePiClient();
+  const isActive = useIsSessionActive(session.id);
+  const [hovered, setHovered] = useState(false);
+  const [killing, setKilling] = useState(false);
+  const title = session.display_name ?? session.id;
+  const hoverBg = isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.035)";
+  const selectedBg = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)";
+
+  const handleKill = useCallback(async () => {
+    setKilling(true);
+    try {
+      await client.killSession(session.id);
+    } finally {
+      setKilling(false);
+    }
+  }, [client, session.id]);
+
+  return (
+    // Same reason as the workspace row: hover has to live on a View so reaching
+    // the stop button doesn't end it.
+    <View
+      style={[
+        styles.sessionRow,
+        isSelected
+          ? { backgroundColor: selectedBg }
+          : hovered && { backgroundColor: hoverBg },
+      ]}
+      onPointerEnter={() => setHovered(true)}
+      onPointerLeave={() => setHovered(false)}
+    >
+      <Pressable
+        onPress={onPress}
+        style={({ pressed }) => [styles.sessionMain, pressed && { opacity: 0.7 }]}
+      >
+        <Text
+          style={[
+            styles.sessionLabel,
+            {
+              color: isSelected ? colors.text : colors.textSecondary,
+              fontFamily: isSelected ? Fonts.sansMedium : Fonts.sans,
+            },
+          ]}
+          numberOfLines={1}
+        >
+          {title}
+        </Text>
+      </Pressable>
+      {/* Working: animated dots. Finished but unseen: a green dot until read. */}
+      {isActive && !hovered && (
+        <SessionActivityIndicator
+          sessionId={session.id}
+          color={colors.textSecondary}
+          idlePlaceholder={false}
+        />
+      )}
+      {!isActive && !hovered && hasUnread && (
+        <View
+          style={[styles.dot, { backgroundColor: isDark ? "#3FB950" : "#1A7F37" }]}
+        />
+      )}
+      {hovered && isActive && (
+        <Pressable
+          onPress={(e) => {
+            e.stopPropagation();
+            handleKill();
+          }}
+          disabled={killing}
+          accessibilityLabel="停止该对话"
+          style={({ pressed }) => [
+            styles.killButton,
+            { backgroundColor: isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)" },
+            pressed && { opacity: 0.6 },
+          ]}
+        >
+          {killing ? (
+            <ActivityIndicator size={10} color={colors.textTertiary} />
+          ) : (
+            <Square
+              size={10}
+              color={isDark ? "#ef4444" : "#dc2626"}
+              strokeWidth={2}
+              fill={isDark ? "#ef4444" : "#dc2626"}
+            />
+          )}
+        </Pressable>
+      )}
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    height: "100%",
+  },
+  top: {
+    paddingHorizontal: 8,
+    paddingTop: 8,
+  },
+  scroll: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingHorizontal: 8,
+    paddingBottom: 12,
+  },
+  sectionHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 1,
+    paddingLeft: 8,
+    paddingRight: 1,
+    paddingTop: 16,
+    paddingBottom: 2,
+  },
+  sectionTitle: {
+    flex: 1,
+    fontSize: 11,
+    lineHeight: 16,
+    letterSpacing: 0.4,
+    fontFamily: Fonts.sansMedium,
+  },
+  headerAction: {
+    width: 20,
+    height: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 4,
+  },
+  row: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 7,
+    height: 29,
+    paddingHorizontal: 7,
+    borderRadius: 6,
+  },
+  rowMain: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 7,
+    height: "100%",
+    minWidth: 0,
+  },
+  rowActions: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 1,
+  },
+  rowIcon: {
+    width: 16,
+    height: 20,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  rowLabel: {
+    flex: 1,
+    fontSize: 13.5,
+    lineHeight: 19,
+    fontFamily: Fonts.sans,
+  },
+  pinMark: {
+    width: 3,
+    height: 3,
+    borderRadius: 1.5,
+    opacity: 0.7,
+  },
+  rowAction: {
+    width: 20,
+    height: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 4,
+  },
+  dot: {
+    width: 5,
+    height: 5,
+    borderRadius: 2.5,
+  },
+  sessionRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    height: 26,
+    paddingLeft: SESSION_INDENT,
+    paddingRight: 7,
+    borderRadius: 6,
+  },
+  sessionMain: {
+    flex: 1,
+    flexDirection: "row",
+    alignItems: "center",
+    height: "100%",
+    minWidth: 0,
+  },
+  sessionLabel: {
+    flex: 1,
+    fontSize: 12.5,
+    lineHeight: 18,
+  },
+  sessionLoading: {
+    alignSelf: "flex-start",
+    marginLeft: SESSION_INDENT,
+    marginVertical: 5,
+  },
+  sessionEmpty: {
+    fontSize: 12,
+    lineHeight: 18,
+    fontFamily: Fonts.sans,
+    paddingLeft: SESSION_INDENT,
+    paddingVertical: 5,
+  },
+  moreRow: {
+    height: 24,
+    justifyContent: "center",
+    paddingLeft: SESSION_INDENT,
+  },
+  moreText: {
+    fontSize: 12,
+    lineHeight: 18,
+    fontFamily: Fonts.sans,
+  },
+  killButton: {
+    width: 18,
+    height: 18,
+    borderRadius: 4,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  empty: {
+    fontSize: 12.5,
+    lineHeight: 18,
+    fontFamily: Fonts.sans,
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+  },
+  footer: {
+    borderTopWidth: StyleSheet.hairlineWidth,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+  },
+});
