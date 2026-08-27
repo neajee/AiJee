@@ -1,0 +1,24 @@
+{
+  "name": "pideck-workspace",
+  "private": true,
+  "packageManager": "yarn@4.9.2",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "start": "yarn workspace @pideck/mobile start",
+    "web": "yarn workspace @pideck/web dev",
+    "android": "yarn workspace @pideck/mobile android",
+    "ios": "yarn workspace @pideck/mobile ios",
+    "desktop": "yarn workspace @pideck/desktop dev",
+    "lint": "yarn workspace @pideck/web lint && yarn workspace @pideck/mobile lint",
+    "test": "yarn workspace @pideck/client-sdk test && yarn workspace @pideck/ui test && yarn workspace pideck test",
+    "api:generate": "yarn workspace @pideck/client-sdk api:generate",
+    "web:build": "yarn workspace @pideck/web build",
+    "server:check": "cargo check --manifest-path packages/pideck/server/Cargo.toml",
+    "server:build": "cargo build --manifest-path packages/pideck/server/Cargo.toml --release",
+    "backend:build": "yarn server:build",
+    "build:prod": "yarn web:build && yarn server:build"
+  }
+}

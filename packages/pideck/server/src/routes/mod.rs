@@ -1,0 +1,13 @@
+pub mod agent;
+pub mod auth;
+pub mod chat;
+pub mod custom_models;
+pub mod desktop;
+pub mod fs;
+pub mod git;
+pub mod health;
+pub mod mode;
+pub mod package;
+pub mod setup;
+pub mod task;
+pub mod workspace;

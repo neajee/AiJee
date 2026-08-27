@@ -1,0 +1,12 @@
+{
+  "name": "@pideck/desktop",
+  "version": "0.1.0",
+  "private": true,
+  "main": "src/main.cjs",
+  "scripts": {
+    "dev": "electron ."
+  },
+  "devDependencies": {
+    "electron": "^36.0.0"
+  }
+}
