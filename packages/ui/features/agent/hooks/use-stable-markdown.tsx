@@ -13,7 +13,7 @@ import type { useMarkdownHookOptions } from "react-native-marked";
 import { Renderer } from "react-native-marked";
 import type { ReactNode } from "react";
 import type { TextStyle, ViewStyle } from "react-native";
-import { CodePreview } from "../components/message-list/code-preview";
+import { MarkdownCodeBlock } from "../components/message-list/markdown-code-block";
 
 interface ParserLike {
   parse(tokens?: Token[]): ReactNode[];
@@ -33,7 +33,7 @@ class StableRenderer extends Renderer {
     containerStyle?: ViewStyle,
   ): ReactNode {
     return (
-      <CodePreview
+      <MarkdownCodeBlock
         key={`code-${language ?? "plain"}-${text.length}`}
         code={text}
         language={language}

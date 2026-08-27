@@ -10,6 +10,11 @@ interface CodePreviewProps {
   language?: string;
   diffLanguage?: string;
   showLineNumbers?: boolean;
+  /**
+   * Drop the surface, border and radius so a parent can own the chrome
+   * (used by the markdown code block, which adds its own header row).
+   */
+  bare?: boolean;
 }
 
 type TokenKind =
@@ -321,13 +326,20 @@ export const CodePreview = memo(function CodePreview({
   language,
   diffLanguage,
   showLineNumbers = true,
+  bare = false,
 }: CodePreviewProps) {
   const colors = isDark ? Colors.dark : Colors.light;
   const tokenColors = useMemo(() => createTokenColors(isDark), [isDark]);
   const lines = useMemo(() => code.split("\n"), [code]);
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.surfaceRaised, borderColor: colors.border }]}>
+    <View
+      style={
+        bare
+          ? styles.bareContainer
+          : [styles.container, { backgroundColor: colors.surfaceRaised, borderColor: colors.border }]
+      }
+    >
       <ScrollView
         style={maxHeight ? { maxHeight } : undefined}
         nestedScrollEnabled
@@ -346,7 +358,7 @@ export const CodePreview = memo(function CodePreview({
                       </Text>
                     </View>
                   ) : null}
-                  <Text style={[styles.lineText, !showLineNumbers && styles.lineTextNoGutter, { color: tokenColors.plain }]}>
+                  <Text style={[styles.lineText, !showLineNumbers && styles.lineTextNoGutter, bare && styles.lineTextBare, { color: tokenColors.plain }]}>
                     {segments.length ? segments.map((segment, idx) => (
                       <Text key={`${i}-${idx}`} style={{ color: tokenColors[segment.kind] }}>
                         {segment.text || (idx === 0 ? " " : "")}
@@ -367,6 +379,9 @@ const styles = StyleSheet.create({
   container: {
     borderRadius: 6,
     borderWidth: 0.5,
+    overflow: "hidden",
+  },
+  bareContainer: {
     overflow: "hidden",
   },
   row: {
@@ -394,5 +409,11 @@ const styles = StyleSheet.create({
   },
   lineTextNoGutter: {
     paddingLeft: 10,
+  },
+  lineTextBare: {
+    // paddingLeft must be set explicitly: an edge-specific padding from an
+    // earlier style in the array would otherwise win over paddingHorizontal.
+    paddingHorizontal: 12,
+    paddingLeft: 12,
   },
 });
