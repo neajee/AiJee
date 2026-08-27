@@ -5,14 +5,10 @@ import * as SecureStore from 'expo-secure-store';
 const STORAGE_KEY = 'app_settings';
 
 export type ThemeMode = 'light' | 'dark' | 'system';
-export type DiffViewMode = 'inline' | 'split';
-
 interface AppSettings {
   themeMode: ThemeMode;
   pushNotifications: boolean;
   soundEffects: boolean;
-  diffViewMode: DiffViewMode;
-  diffPanelAutoOpen: boolean;
 }
 
 interface AppSettingsState extends AppSettings {
@@ -25,8 +21,6 @@ const DEFAULTS: AppSettings = {
   themeMode: 'system',
   pushNotifications: true,
   soundEffects: false,
-  diffViewMode: 'inline',
-  diffPanelAutoOpen: true,
 };
 
 async function readFromStore(): Promise<Partial<AppSettings>> {
@@ -70,8 +64,6 @@ export const useAppSettingsStore = create<AppSettingsState>((set, get) => ({
       themeMode: partial.themeMode ?? current.themeMode,
       pushNotifications: partial.pushNotifications ?? current.pushNotifications,
       soundEffects: partial.soundEffects ?? current.soundEffects,
-      diffViewMode: partial.diffViewMode ?? current.diffViewMode,
-      diffPanelAutoOpen: partial.diffPanelAutoOpen ?? current.diffPanelAutoOpen,
     };
     set(next);
     await writeToStore(next);

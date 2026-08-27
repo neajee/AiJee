@@ -39,7 +39,6 @@ export function NavigationRail() {
 
   const isServersActive = pathname.startsWith("/servers");
   const isSettingsActive = pathname.startsWith("/settings");
-  const isProfileActive = pathname.startsWith("/profile");
 
   const getLastSession = useWorkspaceStore((s) => s.getLastSession);
 
@@ -136,12 +135,6 @@ export function NavigationRail() {
           label="Settings"
           isActive={isSettingsActive}
           onPress={() => router.push("/settings")}
-        />
-        <RailItem
-          icon="help-outline"
-          label="Help"
-          isActive={isProfileActive}
-          onPress={() => router.push("/profile")}
         />
       </View>
       <NewWorkspaceDialog

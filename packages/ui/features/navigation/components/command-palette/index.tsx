@@ -14,7 +14,6 @@ import {
   Search,
   FolderOpen,
   Settings,
-  User,
   Plus,
 } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
@@ -121,17 +120,6 @@ export function CommandPalette({ visible, onClose }: CommandPaletteProps) {
       section: 'Navigation',
       onSelect: () => {
         router.push('/settings');
-        handleClose();
-      },
-    },
-    {
-      id: 'profile',
-      label: 'Profile',
-      description: 'View your profile',
-      icon: User,
-      section: 'Navigation',
-      onSelect: () => {
-        router.push('/profile');
         handleClose();
       },
     },

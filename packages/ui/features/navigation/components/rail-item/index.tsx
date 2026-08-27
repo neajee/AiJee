@@ -1,13 +1,12 @@
 import { ComponentProps } from 'react';
 import { Pressable, StyleSheet } from 'react-native';
-import { Settings, CircleHelp, Server } from 'lucide-react-native';
+import { Settings, Server } from 'lucide-react-native';
 
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
 const ICON_MAP = {
   settings: Settings,
-  'help-outline': CircleHelp,
   server: Server,
 } as const;
 

@@ -22,7 +22,6 @@ export function BottomNavigation() {
   const addWorkspace = useWorkspaceStore((s) => s.addWorkspace);
 
   const isSettingsActive = pathname.startsWith('/settings');
-  const isProfileActive = pathname.startsWith('/profile');
 
   const handleWorkspacePress = (id: string) => {
     selectWorkspace(id);
@@ -75,11 +74,6 @@ export function BottomNavigation() {
           icon="settings"
           isActive={isSettingsActive}
           onPress={() => router.push('/settings')}
-        />
-        <BottomBarIcon
-          icon="person-outline"
-          isActive={isProfileActive}
-          onPress={() => router.push('/profile')}
         />
       </View>
     </View>

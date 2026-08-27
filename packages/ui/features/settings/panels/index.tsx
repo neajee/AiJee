@@ -5,10 +5,8 @@ import {
   Bell,
   CheckCircle2,
   ChevronRight,
-  Columns2,
   Download,
   Info,
-  MessageSquare,
   Monitor,
   Moon,
   Palette,
@@ -22,7 +20,6 @@ import { Fonts } from '@/constants/theme';
 import { sdk, unwrapApiData } from '@pideck/client-sdk';
 import type { PackageStatus } from '@pideck/client-sdk';
 
-import { useChatStore } from '../../chat/store';
 import { useAppSettingsStore, type ThemeMode } from '../store';
 import {
   SettingsGroup,
@@ -50,55 +47,6 @@ const {
  * and seeing/applying the agent version are single actions, so making the user
  * open a screen for them is pure friction.
  */
-
-// ─── 聊天 ─────────────────────────────────────────────────────
-
-export function ChatPanel() {
-  const noTools = useChatStore((s) => s.noTools);
-  const setNoTools = useChatStore((s) => s.setNoTools);
-  const chatLoaded = useChatStore((s) => s.loaded);
-  const loadChat = useChatStore((s) => s.load);
-
-  const { diffPanelAutoOpen, loaded, load, update } = useAppSettingsStore();
-
-  useEffect(() => {
-    if (!chatLoaded) loadChat();
-  }, [chatLoaded, loadChat]);
-
-  useEffect(() => {
-    if (!loaded) load();
-  }, [loaded, load]);
-
-  return (
-    <SettingsGroup header="聊天">
-      <SettingsRow
-        icon={MessageSquare}
-        label="启用工具"
-        description="允许模型在会话中使用工具（读写文件、执行命令等）"
-        right={
-          <SettingsSwitch
-            value={!noTools}
-            onValueChange={(v) => setNoTools(!v)}
-            accessibilityLabel="启用工具"
-          />
-        }
-      />
-      <SettingsRow
-        icon={Columns2}
-        label="自动打开差异面板"
-        description="agent 修改或写入文件时，自动在侧边栏展示文件变更"
-        isLast
-        right={
-          <SettingsSwitch
-            value={diffPanelAutoOpen}
-            onValueChange={(v) => update({ diffPanelAutoOpen: v })}
-            accessibilityLabel="自动打开差异面板"
-          />
-        }
-      />
-    </SettingsGroup>
-  );
-}
 
 // ─── 外观 ─────────────────────────────────────────────────────
 

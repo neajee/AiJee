@@ -4,7 +4,6 @@ import {
   Cpu,
   Info,
   Layers,
-  MessageSquare,
   Mic,
   Palette,
   Trash2,
@@ -18,7 +17,6 @@ import {
   AboutRow,
   AppearancePanel,
   AppearanceRow,
-  ChatPanel,
   DataPanel,
   NotificationsPanel,
 } from './panels';
@@ -64,13 +62,6 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
     summary: 'Ollama、LM Studio、vLLM 等兼容提供商',
     icon: Cpu,
     Component: ({ isDark }) => <CustomModelsSection isDark={isDark} />,
-  },
-  {
-    slug: 'chat',
-    title: '聊天',
-    summary: '工具权限与差异面板',
-    icon: MessageSquare,
-    Component: ChatPanel,
   },
   {
     slug: 'speech',
