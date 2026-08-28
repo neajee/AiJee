@@ -18,7 +18,8 @@ import { useQuery } from "@tanstack/react-query";
 
 import { Fonts } from "@/constants/theme";
 import { formatAgentModeLabel } from "@/features/agent/mode";
-import { useAgentSession, useAgentConfig, usePiClient } from "@pideck/client-sdk";
+import { useCachedAgentConfig } from "@/features/agent/hooks/use-cached-agent-config";
+import { useAgentSession, usePiClient } from "@pideck/client-sdk";
 import { useResponsiveLayout } from "@/features/navigation/hooks/use-responsive-layout";
 import { useSpeechRecognition } from "@/features/speech/hooks/use-speech-recognition";
 import { useSpeechSettingsStore } from "@/features/speech/store";
@@ -97,7 +98,9 @@ export function PromptInput({
   const sendDisabled = !!disabled;
   const agentSession = useAgentSession(sessionId ?? null);
   const streamedMode = agentSession.mode;
-  const agentConfig = useAgentConfig(sessionReady ? (sessionId ?? null) : null);
+  const agentConfig = useCachedAgentConfig(sessionId ?? null, {
+    enabled: sessionReady,
+  });
 
   // Context usage: input + output + cacheRead + cacheWrite against context window
   const contextUsage = useMemo(() => {

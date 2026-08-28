@@ -15,6 +15,18 @@ import {
 const MAX_RETRIES = 3;
 const RETRY_DELAY_MS = 1500;
 
+export interface UseAgentConfigOptions {
+  /**
+   * Last known values for this session, used until the live ones arrive.
+   *
+   * Both the model list and the agent state come from the pi process, which
+   * takes seconds to spawn. Seeding lets the composer show the model it had
+   * last time instead of a skeleton for the whole spawn.
+   */
+  seedState?: AgentStateData | null;
+  seedModels?: ModelInfo[] | null;
+}
+
 export interface AgentConfigHandle {
   state: AgentStateData | null;
   models: ModelInfo[] | null;
@@ -44,10 +56,23 @@ export interface AgentConfigHandle {
   retry: () => void;
 }
 
-export function useAgentConfig(sessionId: string | null): AgentConfigHandle {
+export function useAgentConfig(
+  sessionId: string | null,
+  options?: UseAgentConfigOptions,
+): AgentConfigHandle {
   const client = usePiClient();
-  const [state, setState] = useState<AgentStateData | null>(null);
-  const [models, setModels] = useState<ModelInfo[] | null>(null);
+  const [state, setState] = useState<AgentStateData | null>(
+    options?.seedState ?? null,
+  );
+  const [models, setModels] = useState<ModelInfo[] | null>(
+    options?.seedModels ?? null,
+  );
+  // Read through refs so a new seed object every render cannot re-trigger the
+  // seeding effect and undo live data.
+  const seedStateRef = useRef(options?.seedState ?? null);
+  const seedModelsRef = useRef(options?.seedModels ?? null);
+  seedStateRef.current = options?.seedState ?? null;
+  seedModelsRef.current = options?.seedModels ?? null;
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const attemptRef = useRef(0);
@@ -65,12 +90,17 @@ export function useAgentConfig(sessionId: string | null): AgentConfigHandle {
     }
   }, []);
 
+  // The state belongs to one session, so switching sessions drops it and takes
+  // that session's remembered snapshot instead. The model list is the same for
+  // every session on a server, so it is kept.
+  useEffect(() => {
+    setState(seedStateRef.current);
+    setModels((prev) => prev ?? seedModelsRef.current);
+  }, [sessionId]);
+
   // Subscribe to agent_state from SSE
   useEffect(() => {
-    if (!sessionId) {
-      setState(null);
-      return;
-    }
+    if (!sessionId) return;
 
     const sub = client.agentState$(sessionId).subscribe((agentState) => {
       if (agentState && sessionIdRef.current === sessionId) {

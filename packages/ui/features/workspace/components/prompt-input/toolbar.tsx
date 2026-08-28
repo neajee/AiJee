@@ -92,11 +92,10 @@ function ToolbarComponent({
   const agentState = config.state;
   const configError = config.error;
   const configRetry = config.retry;
-  const modelsLoading = config.isLoading;
-  const stateLoading = config.isLoading;
-  const hasCachedModels = models !== undefined;
-  const hasCachedState = agentState !== undefined;
-  const showCachedToolbar = hasCachedModels && hasCachedState;
+  // A remembered snapshot is enough to draw the toolbar: the model name on the
+  // trigger comes from the state, not the list, so the list may still be in
+  // flight. `models === null` means it has never been seen, cached or live.
+  const hasModels = !!models && models.length > 0;
   const toolbarDisabled = !ready;
   // Inline the control shares the action row with 32px round buttons, so its
   // triggers match their height. The standalone strip keeps its own.
@@ -301,7 +300,10 @@ function ToolbarComponent({
     );
   }
 
-  if ((!ready && !showCachedToolbar) || (modelsLoading && !hasCachedModels) || (stateLoading && !hasCachedState) || !agentState) {
+  // Nothing but the agent state is required to render. Waiting on `ready` or on
+  // the model list used to keep the composer a skeleton for the whole several
+  // seconds it takes to spawn the pi process.
+  if (!agentState) {
     return <>{skeleton}</>;
   }
 
@@ -376,7 +378,7 @@ function ToolbarComponent({
               >
                 {providers.length === 0 && (
                   <Text style={[styles.noResults, { color: theme.textMuted }]}>
-                    No models found
+                    {hasModels ? "No models found" : "Loading models…"}
                   </Text>
                 )}
                 {providers.map((provider) => (
