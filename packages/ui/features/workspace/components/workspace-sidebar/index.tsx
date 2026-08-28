@@ -5,6 +5,7 @@ import {
   PanResponder,
   Platform,
   StyleSheet,
+  useWindowDimensions,
   View,
 } from "react-native";
 import * as SecureStore from "expo-secure-store";
@@ -19,7 +20,13 @@ import {
 
 const PANEL_DEFAULT = 280;
 const PANEL_MIN = 180;
-const PANEL_MAX = 480;
+/**
+ * A hard ceiling, and a share of the window that the panel may never exceed.
+ * Reading a file or a wide diff wants room, but the conversation has to keep a
+ * usable column whatever the window size.
+ */
+const PANEL_MAX = 1000;
+const PANEL_MAX_FRACTION = 0.72;
 /**
  * Closed, the panel takes no width at all: a leftover rail showed up as a bare
  * strip of the screen's own background next to the editor. The pill moves
@@ -37,11 +44,43 @@ const SEAM_BAR_WIDTH = 4;
 const COLLAPSE_DURATION = 200;
 const SIDEBAR_WIDTH_KEY = "workspace_sidebar_width";
 const SIDEBAR_COLLAPSED_KEY = "workspace_sidebar_collapsed";
+/**
+ * The default scope keeps the original unsuffixed keys, so an existing
+ * preference is not silently discarded by the introduction of scopes.
+ */
+const DEFAULT_SCOPE = "session";
 
-let sidebarWidthCache = PANEL_DEFAULT;
-let sidebarWidthLoaded = false;
-let sidebarCollapsedCache = false;
-let sidebarCollapsedLoaded = false;
+interface ScopeState {
+  width: number;
+  widthLoaded: boolean;
+  collapsed: boolean;
+  collapsedLoaded: boolean;
+}
+
+/**
+ * Per-scope state, so the start page and an open session remember their panel
+ * independently: the start page wants the composer full width, a session wants
+ * the file tree and preview at hand.
+ */
+const scopes = new Map<string, ScopeState>();
+
+function getScope(scope: string, defaultCollapsed: boolean): ScopeState {
+  let state = scopes.get(scope);
+  if (!state) {
+    state = {
+      width: PANEL_DEFAULT,
+      widthLoaded: false,
+      collapsed: defaultCollapsed,
+      collapsedLoaded: false,
+    };
+    scopes.set(scope, state);
+  }
+  return state;
+}
+
+function scopedKey(base: string, scope: string) {
+  return scope === DEFAULT_SCOPE ? base : `${base}:${scope}`;
+}
 
 function clampWidth(width: number) {
   return Math.max(PANEL_MIN, Math.min(PANEL_MAX, Math.round(width)));
@@ -54,43 +93,44 @@ function parseStoredWidth(value: string | null | undefined) {
   return clampWidth(parsed);
 }
 
-async function loadStoredWidth() {
+async function loadStoredWidth(scope: string) {
+  const key = scopedKey(SIDEBAR_WIDTH_KEY, scope);
   try {
     if (Platform.OS === "web") {
       if (typeof localStorage === "undefined") return null;
-      return parseStoredWidth(localStorage.getItem(SIDEBAR_WIDTH_KEY));
+      return parseStoredWidth(localStorage.getItem(key));
     }
 
-    return parseStoredWidth(
-      await SecureStore.getItemAsync(SIDEBAR_WIDTH_KEY),
-    );
+    return parseStoredWidth(await SecureStore.getItemAsync(key));
   } catch {
     return null;
   }
 }
 
-async function saveStoredWidth(width: number) {
+async function saveStoredWidth(width: number, scope: string) {
+  const key = scopedKey(SIDEBAR_WIDTH_KEY, scope);
   const value = String(clampWidth(width));
 
   try {
     if (Platform.OS === "web") {
       if (typeof localStorage === "undefined") return;
-      localStorage.setItem(SIDEBAR_WIDTH_KEY, value);
+      localStorage.setItem(key, value);
       return;
     }
 
-    await SecureStore.setItemAsync(SIDEBAR_WIDTH_KEY, value);
+    await SecureStore.setItemAsync(key, value);
   } catch {}
 }
 
-async function loadStoredCollapsed(): Promise<boolean | null> {
+async function loadStoredCollapsed(scope: string): Promise<boolean | null> {
+  const key = scopedKey(SIDEBAR_COLLAPSED_KEY, scope);
   try {
     let value: string | null = null;
     if (Platform.OS === "web") {
       if (typeof localStorage === "undefined") return null;
-      value = localStorage.getItem(SIDEBAR_COLLAPSED_KEY);
+      value = localStorage.getItem(key);
     } else {
-      value = await SecureStore.getItemAsync(SIDEBAR_COLLAPSED_KEY);
+      value = await SecureStore.getItemAsync(key);
     }
     if (value === "true") return true;
     if (value === "false") return false;
@@ -100,75 +140,99 @@ async function loadStoredCollapsed(): Promise<boolean | null> {
   }
 }
 
-async function saveStoredCollapsed(collapsed: boolean) {
+async function saveStoredCollapsed(collapsed: boolean, scope: string) {
+  const key = scopedKey(SIDEBAR_COLLAPSED_KEY, scope);
   try {
     if (Platform.OS === "web") {
       if (typeof localStorage === "undefined") return;
-      localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(collapsed));
+      localStorage.setItem(key, String(collapsed));
       return;
     }
-    await SecureStore.setItemAsync(SIDEBAR_COLLAPSED_KEY, String(collapsed));
+    await SecureStore.setItemAsync(key, String(collapsed));
   } catch {}
 }
 
 interface WorkspaceSidebarProps {
   children: ReactNode;
+  /**
+   * Which persisted preference this panel belongs to. Screens that want their
+   * own memory pass their own scope.
+   */
+  storageScope?: string;
+  /** Applied only when the scope has no stored preference yet. */
+  defaultCollapsed?: boolean;
 }
 
-export function WorkspaceSidebar({ children }: WorkspaceSidebarProps) {
+export function WorkspaceSidebar({
+  children,
+  storageScope = DEFAULT_SCOPE,
+  defaultCollapsed = false,
+}: WorkspaceSidebarProps) {
   const colorScheme = useColorScheme() ?? "light";
   const colors = Colors[colorScheme];
   const isDark = colorScheme === "dark";
+
+  const scope = getScope(storageScope, defaultCollapsed);
+
+  const { width: windowWidth } = useWindowDimensions();
+  const maxWidth = Math.max(
+    PANEL_MIN,
+    Math.min(PANEL_MAX, Math.round(windowWidth * PANEL_MAX_FRACTION)),
+  );
+  // The gesture is created once, so it reads the ceiling through a ref rather
+  // than closing over the value it saw on mount.
+  const maxWidthRef = useRef(maxWidth);
+  maxWidthRef.current = maxWidth;
 
   const sidebarBorder = isDark ? "#323131" : "rgba(0,0,0,0.08)";
   // bolt tints the seam with a single translucent grey for hover and drag.
   const seamTint = "rgba(136,136,136,0.16)";
   const seamDragTint = "rgba(136,136,136,0.26)";
 
-  const [isCollapsed, setIsCollapsed] = useState(sidebarCollapsedCache);
+  const [isCollapsed, setIsCollapsed] = useState(scope.collapsed);
   const [isResizing, setIsResizing] = useState(false);
   const [isSeamHovered, setIsSeamHovered] = useState(false);
-  const [panelWidth, setPanelWidth] = useState(sidebarWidthCache);
-  const panelWidthRef = useRef(sidebarWidthCache);
-  const panelStartRef = useRef(sidebarWidthCache);
+  const [panelWidth, setPanelWidth] = useState(scope.width);
+  const panelWidthRef = useRef(scope.width);
+  const panelStartRef = useRef(scope.width);
   const isResizingRef = useRef(false);
   const widthAnim = useRef(
-    new Animated.Value(
-      sidebarCollapsedCache ? COLLAPSED_WIDTH : sidebarWidthCache,
-    ),
+    new Animated.Value(scope.collapsed ? COLLAPSED_WIDTH : scope.width),
   ).current;
-  const [contentMounted, setContentMounted] = useState(!sidebarCollapsedCache);
+  const [contentMounted, setContentMounted] = useState(!scope.collapsed);
 
   useEffect(() => {
     let cancelled = false;
 
     const promises: Promise<void>[] = [];
 
-    if (sidebarWidthLoaded) {
-      const nextWidth = clampWidth(sidebarWidthCache);
+    if (scope.widthLoaded) {
+      const nextWidth = clampWidth(scope.width);
       panelWidthRef.current = nextWidth;
       setPanelWidth(nextWidth);
     } else {
       promises.push(
-        loadStoredWidth().then((storedWidth) => {
+        loadStoredWidth(storageScope).then((storedWidth) => {
           if (cancelled) return;
           const nextWidth = storedWidth ?? PANEL_DEFAULT;
-          sidebarWidthCache = nextWidth;
-          sidebarWidthLoaded = true;
+          scope.width = nextWidth;
+          scope.widthLoaded = true;
           panelWidthRef.current = nextWidth;
           setPanelWidth(nextWidth);
-          if (!sidebarCollapsedCache) widthAnim.setValue(nextWidth);
+          if (!scope.collapsed) widthAnim.setValue(nextWidth);
         }),
       );
     }
 
-    if (!sidebarCollapsedLoaded) {
+    if (scope.collapsedLoaded) {
+      setIsCollapsed(scope.collapsed);
+    } else {
       promises.push(
-        loadStoredCollapsed().then((stored) => {
+        loadStoredCollapsed(storageScope).then((stored) => {
           if (cancelled) return;
-          const collapsed = stored ?? false;
-          sidebarCollapsedCache = collapsed;
-          sidebarCollapsedLoaded = true;
+          const collapsed = stored ?? defaultCollapsed;
+          scope.collapsed = collapsed;
+          scope.collapsedLoaded = true;
           setIsCollapsed(collapsed);
         }),
       );
@@ -181,12 +245,11 @@ export function WorkspaceSidebar({ children }: WorkspaceSidebarProps) {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [defaultCollapsed, scope, storageScope, widthAnim]);
 
   // Width is animated on collapse only; dragging drives it imperatively so the
   // panel tracks the pointer without a queued animation per move.
-  useEffect(() => {
-    if (isResizingRef.current) return;
+  useEffect(() => {    if (isResizingRef.current) return;
 
     if (!isCollapsed) setContentMounted(true);
 
@@ -200,12 +263,22 @@ export function WorkspaceSidebar({ children }: WorkspaceSidebarProps) {
     });
   }, [isCollapsed, panelWidth, widthAnim]);
 
+  // A window that shrank past the ceiling would otherwise leave the panel
+  // covering the conversation; the stored preference is left untouched so the
+  // panel returns to its width once there is room again.
+  useEffect(() => {
+    if (isResizingRef.current || panelWidth <= maxWidth) return;
+    panelWidthRef.current = maxWidth;
+    setPanelWidth(maxWidth);
+    if (!isCollapsed) widthAnim.setValue(maxWidth);
+  }, [isCollapsed, maxWidth, panelWidth, widthAnim]);
+
   const persistWidth = (width: number) => {
     const nextWidth = clampWidth(width);
-    sidebarWidthCache = nextWidth;
-    sidebarWidthLoaded = true;
+    scope.width = nextWidth;
+    scope.widthLoaded = true;
     panelWidthRef.current = nextWidth;
-    void saveStoredWidth(nextWidth);
+    void saveStoredWidth(nextWidth, storageScope);
   };
 
   const panelResizer = useRef(
@@ -224,7 +297,7 @@ export function WorkspaceSidebar({ children }: WorkspaceSidebarProps) {
       onPanResponderMove: (_e, gs) => {
         const newWidth = Math.max(
           PANEL_MIN,
-          Math.min(PANEL_MAX, panelStartRef.current - gs.dx),
+          Math.min(maxWidthRef.current, panelStartRef.current - gs.dx),
         );
         panelWidthRef.current = newWidth;
         widthAnim.setValue(newWidth);
@@ -264,8 +337,9 @@ export function WorkspaceSidebar({ children }: WorkspaceSidebarProps) {
   const toggleCollapsed = () => {
     setIsCollapsed((prev) => {
       const next = !prev;
-      sidebarCollapsedCache = next;
-      void saveStoredCollapsed(next);
+      scope.collapsed = next;
+      scope.collapsedLoaded = true;
+      void saveStoredCollapsed(next, storageScope);
       return next;
     });
   };

@@ -1,4 +1,4 @@
-export type Tab = "changes" | "files" | "history";
+export type Tab = "git" | "files";
 
 /**
  * Colour is spent only where it carries a warning.

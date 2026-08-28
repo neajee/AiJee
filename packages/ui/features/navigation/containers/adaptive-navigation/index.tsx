@@ -148,8 +148,20 @@ export function AdaptiveNavigation({ children }: AdaptiveNavigationProps) {
 
   const pathname = usePathname();
   const settingsMode = pathname.startsWith("/settings");
-  const mobilePreviewSessionMatch = pathname.match(/^\/workspace\/[^/]+\/s\/([^/]+)$/);
-  const mobilePreviewSessionId = mobilePreviewSessionMatch?.[1] ?? null;
+  const sessionRouteMatch = pathname.match(/^\/workspace\/[^/]+\/s\/([^/]+)$/);
+  const openSessionId = sessionRouteMatch?.[1] ?? null;
+  const mobilePreviewSessionId = openSessionId;
+
+  // bolt closes its menu the moment a chat is under way: the conversation is the
+  // point, and the sidebar is one hover at the left edge away. Collapsing is
+  // keyed to the session, so re-opening the sidebar inside a conversation sticks.
+  const autoCollapsedFor = useRef<string | null>(null);
+  useEffect(() => {
+    if (!openSessionId || autoCollapsedFor.current === openSessionId) return;
+    autoCollapsedFor.current = openSessionId;
+    setSidebarMode("hover");
+    setHoverVisible(false);
+  }, [openSessionId]);
 
   if (isWideScreen) {
     const animatedSidebarWidth = Animated.multiply(

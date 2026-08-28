@@ -214,7 +214,9 @@ export default function WorkspaceScreen() {
           </View>
         </View>
         {isWideScreen && (
-          <WorkspaceSidebar>
+          // The start page is a composition surface, so it opens full width and
+          // remembers the panel separately from an open session.
+          <WorkspaceSidebar storageScope="start" defaultCollapsed>
             <View style={{ flex: 1, backgroundColor: editorBg }}>
               <WorkspaceRightPane sessionId={preSessionId} />
             </View>

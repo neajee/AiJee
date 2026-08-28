@@ -11,7 +11,7 @@ import {
 import {
   ChevronRight,
   ChevronDown,
-  ArrowLeft,
+  FolderOpen,
   Search,
   X,
 } from "lucide-react-native";
@@ -19,11 +19,21 @@ import { Colors, Fonts } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useFileList, useFileRead } from "@pideck/client-sdk";
 import type { FsEntry } from "@pideck/client-sdk";
+import { CodePreview } from "@/features/agent/components/message-list/code-preview";
 import { FileTypeBadge } from "../file-type-badge";
 
 /** Tree geometry, bolt's: a small left margin and a narrow step per level. */
 const NODE_INDENT = 6;
 const NODE_STEP = 8;
+
+/**
+ * The tree keeps its place beside the file rather than being swapped out for it,
+ * and it keeps it whether or not a file is open: the reading pane is simply
+ * empty until one is picked. Panels too narrow for two columns fall back to one.
+ */
+const TREE_COLUMN_WIDTH = 250;
+const TREE_COLUMN_NARROW = 150;
+const NARROW_PANEL_WIDTH = 460;
 
 /**
  * Names matching the filter, directories that were opened by hand kept alongside.
@@ -45,6 +55,11 @@ function applyFilter(
       entry.name.toLowerCase().includes(needle) ||
       (entry.is_dir && expandedDirs.has(entry.path)),
   );
+}
+
+function basename(path: string) {
+  const trimmed = path.replace(/\/+$/, "");
+  return trimmed.slice(trimmed.lastIndexOf("/") + 1) || trimmed;
 }
 
 interface FileTreeProps {
@@ -74,22 +89,24 @@ export function FileTree({
   const textMuted = isDark ? "#cdc8c5" : colors.textTertiary;
   const textPrimary = isDark ? "#fefdfd" : colors.text;
   const fieldBg = isDark ? "#1a1a1a" : "#F0F0F0";
-  const fieldBorder = isDark ? "#323131" : "rgba(0,0,0,0.08)";
+  const borderColor = isDark ? "#323131" : "rgba(0,0,0,0.08)";
   const hoverBg = isDark ? "#252525" : "#E8E8E8";
 
   const [query, setQuery] = useState("");
+  const [width, setWidth] = useState(0);
 
-  if (viewingFile) {
-    return <FileViewer filePath={viewingFile} onBack={() => onViewFile(null)} />;
-  }
+  // Width is unknown on the first paint; assume there is room, since the panel
+  // this lives in is usually wide.
+  const isNarrow = width > 0 && width < NARROW_PANEL_WIDTH;
+  const treeWidth = isNarrow ? TREE_COLUMN_NARROW : TREE_COLUMN_WIDTH;
 
-  return (
-    <View style={styles.treeContainer}>
+  const tree = (
+    <>
       <View style={styles.filterRow}>
         <View
           style={[
             styles.filterField,
-            { backgroundColor: fieldBg, borderColor: fieldBorder },
+            { backgroundColor: fieldBg, borderColor },
           ]}
         >
           <Search size={13} color={textMuted} strokeWidth={2} />
@@ -126,7 +143,59 @@ export function FileTree({
         expandedDirs={expandedDirs}
         onToggleDir={onToggleDir}
         query={query.trim()}
+        selectedPath={viewingFile}
       />
+    </>
+  );
+
+  return (
+    <View
+      style={styles.treeContainer}
+      onLayout={(e) => setWidth(e.nativeEvent.layout.width)}
+    >
+      {isNarrow ? (
+        // One column: the file takes the panel while it is open, the tree
+        // returns when it is closed.
+        viewingFile ? (
+          <FileViewer
+            filePath={viewingFile}
+            rootPath={rootPath}
+            onClose={() => onViewFile(null)}
+          />
+        ) : (
+          tree
+        )
+      ) : (
+        <View style={styles.splitRow}>
+          <View style={styles.splitContent}>
+            {viewingFile ? (
+              <FileViewer
+                filePath={viewingFile}
+                rootPath={rootPath}
+                onClose={() => onViewFile(null)}
+              />
+            ) : (
+              <View style={styles.readerEmpty}>
+                <FolderOpen size={26} color={textMuted} strokeWidth={1.5} />
+                <Text style={[styles.readerEmptyTitle, { color: textPrimary }]}>
+                  Open a file
+                </Text>
+                <Text style={[styles.readerEmptyHint, { color: textMuted }]}>
+                  Pick one from the workspace tree
+                </Text>
+              </View>
+            )}
+          </View>
+          <View
+            style={[
+              styles.splitTree,
+              { width: treeWidth, borderLeftColor: borderColor },
+            ]}
+          >
+            {tree}
+          </View>
+        </View>
+      )}
     </View>
   );
 }
@@ -142,6 +211,7 @@ function FileTreeRoot({
   expandedDirs,
   onToggleDir,
   query,
+  selectedPath,
 }: {
   rootPath: string;
   textMuted: string;
@@ -149,6 +219,7 @@ function FileTreeRoot({
   expandedDirs: Set<string>;
   onToggleDir: (path: string) => void;
   query: string;
+  selectedPath: string | null;
 }) {
   const { entries, isLoading, error } = useFileList(rootPath);
 
@@ -198,6 +269,7 @@ function FileTreeRoot({
           expandedDirs={expandedDirs}
           onToggleDir={onToggleDir}
           query={query}
+          selectedPath={selectedPath}
         />
       ))}
     </ScrollView>
@@ -215,6 +287,7 @@ function FileTreeNode({
   expandedDirs,
   onToggleDir,
   query,
+  selectedPath,
 }: {
   entry: FsEntry;
   depth: number;
@@ -222,6 +295,7 @@ function FileTreeNode({
   expandedDirs: Set<string>;
   onToggleDir: (path: string) => void;
   query: string;
+  selectedPath: string | null;
 }) {
   const colorScheme = useColorScheme() ?? "light";
   const colors = Colors[colorScheme];
@@ -230,11 +304,13 @@ function FileTreeNode({
   const textPrimary = isDark ? "#fefdfd" : colors.text;
   const textMuted = isDark ? "#cdc8c5" : colors.textTertiary;
   const hoverBg = isDark ? "#252525" : "#E8E8E8";
+  const selectedBg = isDark ? "#2d2d2d" : "#DEDEDE";
   // Directories are told apart by the caret and the heavier name alone, so no
   // saturated folder icon competes with the name; files show their kind.
   const iconColor = isDark ? "#6f6b69" : "#B0B0B0";
 
   const expanded = entry.is_dir && expandedDirs.has(entry.path);
+  const isSelected = !entry.is_dir && entry.path === selectedPath;
 
   const handlePress = useCallback(() => {
     if (entry.is_dir) {
@@ -252,7 +328,8 @@ function FileTreeNode({
         style={({ pressed, hovered }: any) => [
           styles.row,
           { paddingLeft: NODE_INDENT + depth * NODE_STEP },
-          (pressed || hovered) && { backgroundColor: hoverBg },
+          isSelected && { backgroundColor: selectedBg },
+          !isSelected && (pressed || hovered) && { backgroundColor: hoverBg },
         ]}
       >
         {/* One glyph slot per row, bolt's: a caret for directories, the file's
@@ -287,6 +364,7 @@ function FileTreeNode({
           expandedDirs={expandedDirs}
           onToggleDir={onToggleDir}
           query={query}
+          selectedPath={selectedPath}
         />
       )}
     </View>
@@ -304,6 +382,7 @@ function ExpandedDir({
   expandedDirs,
   onToggleDir,
   query,
+  selectedPath,
 }: {
   dirPath: string;
   depth: number;
@@ -311,6 +390,7 @@ function ExpandedDir({
   expandedDirs: Set<string>;
   onToggleDir: (path: string) => void;
   query: string;
+  selectedPath: string | null;
 }) {
   const colorScheme = useColorScheme() ?? "light";
   const isDark = colorScheme === "dark";
@@ -360,6 +440,7 @@ function ExpandedDir({
           expandedDirs={expandedDirs}
           onToggleDir={onToggleDir}
           query={query}
+          selectedPath={selectedPath}
         />
       ))}
     </View>
@@ -370,12 +451,21 @@ function ExpandedDir({
 // File viewer
 // ---------------------------------------------------------------------------
 
+/** The extension is language enough for the tokenizer to pick a dialect. */
+function languageOf(path: string) {
+  const name = basename(path);
+  const dot = name.lastIndexOf(".");
+  return dot > 0 ? name.slice(dot + 1).toLowerCase() : "";
+}
+
 function FileViewer({
   filePath,
-  onBack,
+  rootPath,
+  onClose,
 }: {
   filePath: string;
-  onBack: () => void;
+  rootPath: string;
+  onClose: () => void;
 }) {
   const colorScheme = useColorScheme() ?? "light";
   const colors = Colors[colorScheme];
@@ -385,11 +475,19 @@ function FileViewer({
   const textMuted = isDark ? "#cdc8c5" : colors.textTertiary;
   const headerBg = isDark ? "#1a1a1a" : "#F0F0F0";
   const headerBorder = isDark ? "#323131" : "rgba(0,0,0,0.08)";
-  const lineBg = isDark ? "#111" : "#F8F8F8";
-  const lineNumColor = isDark ? "#555" : "#AAA";
   const hoverBg = isDark ? "#252525" : "#E8E8E8";
 
-  const fileName = filePath.split("/").pop() ?? filePath;
+  const fileName = basename(filePath);
+  // Where the file sits, from the workspace root down to its directory.
+  const relative = filePath.startsWith(rootPath)
+    ? filePath.slice(rootPath.replace(/\/+$/, "").length + 1)
+    : filePath;
+  const trail = [
+    basename(rootPath),
+    ...relative.split("/").slice(0, -1),
+  ]
+    .filter(Boolean)
+    .join(" › ");
 
   const { data: fileData, isLoading, error: fileError } = useFileRead(filePath);
 
@@ -403,27 +501,27 @@ function FileViewer({
         ]}
       >
         <Pressable
-          onPress={onBack}
-          accessibilityLabel="Back to file tree"
-          {...{ title: "Back" }}
+          onPress={onClose}
+          accessibilityLabel="Close file"
+          {...{ title: "Close file" }}
           style={({ pressed, hovered }: any) => [
-            styles.backButton,
+            styles.closeButton,
             (pressed || hovered) && { backgroundColor: hoverBg },
           ]}
         >
-          <ArrowLeft size={14} color={textMuted} strokeWidth={2} />
+          {/* There is no page to go back to; this clears the open file. */}
+          <X size={13} color={textMuted} strokeWidth={2} />
         </Pressable>
-        <FileTypeBadge path={filePath} fallbackColor={textMuted} />
-        <Text
-          style={[styles.viewerFileName, { color: textPrimary }]}
-          numberOfLines={1}
-        >
+        {/* The trail may lose its middle; the filename never does. */}
+        <Text style={[styles.crumbTrail, { color: textMuted }]} numberOfLines={1}>
+          {trail}
+        </Text>
+        <Text style={[styles.crumbSeparator, { color: textMuted }]}>›</Text>
+        <Text style={[styles.crumbName, { color: textPrimary }]} numberOfLines={1}>
           {fileName}
         </Text>
         {fileData?.truncated && (
-          <Text style={[styles.viewerMeta, { color: textMuted }]}>
-            truncated
-          </Text>
+          <Text style={[styles.viewerMeta, { color: textMuted }]}>truncated</Text>
         )}
       </View>
 
@@ -439,27 +537,13 @@ function FileViewer({
           </Text>
         </View>
       ) : fileData ? (
-        <ScrollView style={{ flex: 1 }} showsVerticalScrollIndicator={false}>
-          {fileData.content.split("\n").map((line, i) => (
-            <View
-              key={i}
-              style={[
-                styles.viewerLine,
-                i % 2 === 0 && { backgroundColor: lineBg },
-              ]}
-            >
-              <Text style={[styles.viewerLineNum, { color: lineNumColor }]}>
-                {i + 1}
-              </Text>
-              <Text
-                style={[styles.viewerLineText, { color: textPrimary }]}
-                numberOfLines={1}
-              >
-                {line || " "}
-              </Text>
-            </View>
-          ))}
-        </ScrollView>
+        <CodePreview
+          code={fileData.content}
+          isDark={isDark}
+          language={languageOf(filePath)}
+          bare
+          fill
+        />
       ) : null}
     </View>
   );
@@ -472,6 +556,32 @@ function FileViewer({
 const styles = StyleSheet.create({
   treeContainer: {
     flex: 1,
+  },
+  splitRow: {
+    flex: 1,
+    flexDirection: "row",
+  },
+  splitContent: {
+    flex: 1,
+  },
+  readerEmpty: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 6,
+    paddingHorizontal: 24,
+  },
+  readerEmptyTitle: {
+    fontSize: 14,
+    fontFamily: Fonts.sansMedium,
+  },
+  readerEmptyHint: {
+    fontSize: 12,
+    fontFamily: Fonts.sans,
+    textAlign: "center",
+  },
+  splitTree: {
+    borderLeftWidth: 0.633,
   },
   content: {
     paddingBottom: 12,
@@ -545,23 +655,35 @@ const styles = StyleSheet.create({
   viewerHeader: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 6,
-    paddingRight: 8,
+    gap: 4,
+    paddingLeft: 4,
+    paddingRight: 10,
     height: 34,
     borderBottomWidth: 0.633,
   },
-  backButton: {
-    width: 32,
-    height: 34,
+  closeButton: {
+    width: 26,
+    height: 26,
+    borderRadius: 5,
     alignItems: "center",
     justifyContent: "center",
   },
-  viewerFileName: {
-    fontSize: 13,
+  crumbTrail: {
+    flexShrink: 1,
+    fontSize: 12,
+    fontFamily: Fonts.sans,
+  },
+  crumbSeparator: {
+    fontSize: 12,
+    fontFamily: Fonts.sans,
+  },
+  crumbName: {
+    flexShrink: 0,
+    fontSize: 12.5,
     fontFamily: Fonts.sansMedium,
-    flex: 1,
   },
   viewerMeta: {
+    marginLeft: 6,
     fontSize: 11,
     fontFamily: Fonts.sans,
   },
@@ -570,24 +692,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 24,
-  },
-  viewerLine: {
-    flexDirection: "row",
-    paddingHorizontal: 8,
-    minHeight: 20,
-  },
-  viewerLineNum: {
-    width: 36,
-    fontSize: 12,
-    fontFamily: Fonts.mono,
-    textAlign: "right",
-    marginRight: 10,
-    lineHeight: 20,
-  },
-  viewerLineText: {
-    fontSize: 12,
-    fontFamily: Fonts.mono,
-    lineHeight: 20,
-    flex: 1,
   },
 });

@@ -1,34 +1,34 @@
+import type { ReactNode } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { Fonts } from "@/constants/theme";
-import type { Tab } from "./constants";
 import { useChangesTheme } from "./use-theme-colors";
 
-const TAB_LABELS: Record<Tab, string> = {
-  changes: "Changes",
-  files: "Files",
-  history: "Log",
-};
+export interface TabItem {
+  key: string;
+  label: string;
+  /** Rendered as a dimmed number after the label. */
+  count?: number;
+}
 
 /**
- * Panel tabs.
+ * The panel's one and only chrome row.
  *
- * A segmented control stretched three equal pills across the panel and spent 48px
- * of height on 22px of content, which read as a form control rather than as
- * navigation. Left-aligned labels with an underline sit on the panel's own
- * hairline, size themselves to their text, and let the change count be a separate
- * dimmed number instead of part of the label.
+ * Everything that used to sit in its own band — the pane switch, the section
+ * switch and the branch — shares this row, which is three rows of vertical space
+ * given back to the content. Labels size to their text and carry an underline;
+ * a segmented control read as a form field and stretched to equal widths.
  */
 export function TabBar({
-  activeTab,
-  onTabChange,
-  totalChanges,
-  tabs,
+  items,
+  activeKey,
+  onSelect,
+  right,
 }: {
-  activeTab: Tab;
-  onTabChange: (tab: Tab) => void;
-  totalChanges: number;
-  tabs: Tab[];
+  items: TabItem[];
+  activeKey: string;
+  onSelect: (key: string) => void;
+  right?: ReactNode;
 }) {
   const { colors, surfaceBg, dividerColor, hoverBg } = useChangesTheme();
 
@@ -39,12 +39,12 @@ export function TabBar({
         { backgroundColor: surfaceBg, borderBottomColor: dividerColor },
       ]}
     >
-      {tabs.map((key) => {
-        const isActive = activeTab === key;
+      {items.map((item) => {
+        const isActive = activeKey === item.key;
         return (
           <Pressable
-            key={key}
-            onPress={() => onTabChange(key)}
+            key={item.key}
+            onPress={() => onSelect(item.key)}
             accessibilityRole="tab"
             accessibilityState={{ selected: isActive }}
             style={({ hovered }: any) => [
@@ -58,9 +58,9 @@ export function TabBar({
                 { color: isActive ? colors.text : colors.textTertiary },
               ]}
             >
-              {TAB_LABELS[key]}
+              {item.label}
             </Text>
-            {key === "changes" && totalChanges > 0 && (
+            {!!item.count && item.count > 0 && (
               <Text
                 style={[
                   styles.tabCount,
@@ -69,7 +69,7 @@ export function TabBar({
                   },
                 ]}
               >
-                {totalChanges}
+                {item.count}
               </Text>
             )}
             {isActive && (
@@ -80,6 +80,12 @@ export function TabBar({
           </Pressable>
         );
       })}
+      {!!right && (
+        <>
+          <View style={styles.filler} />
+          {right}
+        </>
+      )}
     </View>
   );
 }
@@ -88,8 +94,9 @@ const styles = StyleSheet.create({
   tabBar: {
     flexDirection: "row",
     alignItems: "stretch",
-    height: 34,
-    paddingHorizontal: 4,
+    height: 32,
+    paddingLeft: 4,
+    paddingRight: 8,
     borderBottomWidth: 0.633,
   },
   tab: {
@@ -115,5 +122,10 @@ const styles = StyleSheet.create({
     height: 1.5,
     borderTopLeftRadius: 1,
     borderTopRightRadius: 1,
+  },
+  filler: {
+    flexGrow: 1,
+    flexShrink: 0,
+    minWidth: 12,
   },
 });

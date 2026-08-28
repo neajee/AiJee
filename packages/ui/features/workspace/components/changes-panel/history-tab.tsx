@@ -1,6 +1,13 @@
 import { useMemo } from "react";
-import { StyleSheet, Text, View } from "react-native";
-import { History } from "lucide-react-native";
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
+import { ChevronDown, ChevronUp, History } from "lucide-react-native";
 
 import { Fonts } from "@/constants/theme";
 import { timeAgo } from "./constants";
@@ -14,11 +21,17 @@ interface LogEntry {
   message: string;
 }
 
+/**
+ * The log is a footnote to the working tree, so it takes a fixed slice of the
+ * card and scrolls inside it rather than growing with its content.
+ */
+const LOG_MAX_HEIGHT = 190;
+
 /** Where the spine sits, and how far down a row its dot lands. */
-const SPINE_COLUMN = 18;
-const SPINE_X = 7;
-const DOT_SIZE = 5;
-const DOT_TOP = 11;
+const SPINE_COLUMN = 14;
+const SPINE_X = 6;
+const DOT_SIZE = 4;
+const DOT_TOP = 9;
 
 const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const MONTHS = [
@@ -127,7 +140,7 @@ export function HistoryTab({ entries }: { entries: LogEntry[] }) {
                   <View style={[styles.dot, { backgroundColor: hashColor }]} />
                 </View>
 
-                <View style={styles.logBody}>
+                <View style={styles.entryBody}>
                   <Text
                     style={[styles.logMessage, { color: textPrimary }]}
                     numberOfLines={1}
@@ -161,7 +174,87 @@ export function HistoryTab({ entries }: { entries: LogEntry[] }) {
   );
 }
 
+/**
+ * The commit log, docked under the working tree and shut by default.
+ *
+ * What changed now is the reason to open this panel; what changed before is
+ * reference. Keeping history at the foot of the same card means one glance
+ * covers both, and the fetch waits until the section is actually opened.
+ */
+export function LogSection({
+  entries,
+  isLoading,
+  isOpen,
+  onToggle,
+}: {
+  entries: LogEntry[];
+  isLoading: boolean;
+  isOpen: boolean;
+  onToggle: () => void;
+}) {
+  const { textPrimary, textMuted, dividerColor, hoverBg } = useChangesTheme();
+
+  return (
+    <View style={[styles.logSection, { borderTopColor: dividerColor }]}>
+      <Pressable
+        onPress={onToggle}
+        accessibilityRole="button"
+        accessibilityState={{ expanded: isOpen }}
+        style={({ pressed, hovered }: any) => [
+          styles.logHeaderRow,
+          (pressed || hovered) && { backgroundColor: hoverBg },
+        ]}
+      >
+        <History size={12} color={textMuted} strokeWidth={2} />
+        <Text style={[styles.logHeaderText, { color: textPrimary }]}>Log</Text>
+        <View style={{ flex: 1 }} />
+        {isOpen ? (
+          <ChevronDown size={13} color={textMuted} strokeWidth={2} />
+        ) : (
+          <ChevronUp size={13} color={textMuted} strokeWidth={2} />
+        )}
+      </Pressable>
+
+      {isOpen && (
+        <ScrollView
+          style={styles.logBody}
+          contentContainerStyle={styles.logBodyContent}
+          showsVerticalScrollIndicator={false}
+        >
+          {isLoading ? (
+            <ActivityIndicator style={{ marginVertical: 16 }} size="small" />
+          ) : (
+            <HistoryTab entries={entries} />
+          )}
+        </ScrollView>
+      )}
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
+  logSection: {
+    borderTopWidth: 0.633,
+  },
+  logHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+    paddingHorizontal: 10,
+    height: 26,
+  },
+  logHeaderText: {
+    fontSize: 10.5,
+    fontFamily: Fonts.sansSemiBold,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+  logBody: {
+    maxHeight: LOG_MAX_HEIGHT,
+  },
+  logBodyContent: {
+    paddingBottom: 6,
+  },
   cleanState: {
     alignItems: "center",
     justifyContent: "center",
@@ -174,17 +267,17 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   binLabel: {
-    fontSize: 11,
+    fontSize: 10,
     fontFamily: Fonts.sansSemiBold,
     textTransform: "uppercase",
-    letterSpacing: 0.5,
-    paddingHorizontal: 12,
-    paddingTop: 12,
-    paddingBottom: 4,
+    letterSpacing: 0.4,
+    paddingHorizontal: 10,
+    paddingTop: 8,
+    paddingBottom: 2,
   },
   logEntry: {
     flexDirection: "row",
-    paddingRight: 12,
+    paddingRight: 10,
     paddingLeft: 6,
   },
   spine: {
@@ -212,32 +305,32 @@ const styles = StyleSheet.create({
     height: DOT_SIZE,
     borderRadius: DOT_SIZE / 2,
   },
-  logBody: {
+  entryBody: {
     flex: 1,
-    paddingVertical: 5,
+    paddingVertical: 3,
   },
   logMessage: {
-    fontSize: 12.5,
+    fontSize: 11.5,
     fontFamily: Fonts.sans,
-    lineHeight: 18,
+    lineHeight: 15,
   },
   logMeta: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 8,
-    marginTop: 2,
+    gap: 6,
+    marginTop: 1,
   },
   logHash: {
-    fontSize: 11,
+    fontSize: 10,
     fontFamily: Fonts.mono,
   },
   logAuthor: {
-    fontSize: 11,
+    fontSize: 10,
     fontFamily: Fonts.sans,
     flexShrink: 1,
   },
   logDate: {
-    fontSize: 11,
+    fontSize: 10,
     fontFamily: Fonts.sans,
   },
 });

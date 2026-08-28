@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { type ReactNode, useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Platform,
@@ -9,28 +9,42 @@ import {
 } from "react-native";
 
 import { useWorkspaceStore } from "@/features/workspace/store";
-import {
-  useGitStatus,
-  useGitLog,
-  useFileDiff,
-} from "@pideck/client-sdk";
+import { useGitStatus, useGitLog, useFileDiff } from "@pideck/client-sdk";
 import { FileTree } from "../file-tree";
 
 import type { Tab } from "./constants";
 import { useChangesTheme } from "./use-theme-colors";
-import { TabBar } from "./tab-bar";
-import { BranchBar } from "./branch-bar";
+import { TabBar, type TabItem } from "./tab-bar";
+import { BranchLabel } from "./branch-label";
 import { ChangesTab } from "./changes-tab";
-import { HistoryTab } from "./history-tab";
-import { CommitBar, StageAllBar } from "./commit-bar";
+import { LogSection } from "./history-tab";
+import { CommitBar } from "./commit-bar";
 
-export function ChangesPanel() {
+interface ChangesPanelProps {
+  /**
+   * Tabs contributed by the pane around this card, shown after Git and Files.
+   * Their content comes back through `renderExtraTab`, so a parent can add a
+   * view without adding a second row of tabs.
+   */
+  extraTabs?: TabItem[];
+  activeExtraTab?: string | null;
+  onExtraTabChange?: (key: string | null) => void;
+  renderExtraTab?: (key: string) => ReactNode;
+}
+
+export function ChangesPanel({
+  extraTabs,
+  activeExtraTab = null,
+  onExtraTabChange,
+  renderExtraTab,
+}: ChangesPanelProps = {}) {
   const { textMuted, surfaceBg } = useChangesTheme();
 
-  const [activeTab, setActiveTab] = useState<Tab>("changes");
+  const [activeTab, setActiveTab] = useState<Tab>("git");
   const [commitMsg, setCommitMsg] = useState("");
-  const [stagedOpen, setStagedOpen] = useState(true);
-  const [unstagedOpen, setUnstagedOpen] = useState(true);
+  // History is reference material: it waits at the foot of the card until asked
+  // for, and its fetch waits with it.
+  const [logOpen, setLogOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<{
     path: string;
     staged: boolean;
@@ -65,7 +79,7 @@ export function ChangesPanel() {
   } = useGitStatus(cwd);
 
   const { entries: logEntries, isLoading: logLoading } = useGitLog(
-    isGitRepo && activeTab === "history" ? cwd : null,
+    isGitRepo && activeTab === "git" && logOpen ? cwd : null,
   );
 
   const { data: fileDiffData, isLoading: diffLoading } = useFileDiff(
@@ -75,10 +89,9 @@ export function ChangesPanel() {
   );
 
   useEffect(() => {
-    setActiveTab("changes");
+    setActiveTab("git");
     setCommitMsg("");
-    setStagedOpen(true);
-    setUnstagedOpen(true);
+    setLogOpen(false);
     setSelectedFile(null);
     setViewingFile(null);
     setExpandedDirs(new Set());
@@ -105,15 +118,26 @@ export function ChangesPanel() {
   const unstaged = gitData?.unstaged ?? [];
   const untracked = gitData?.untracked ?? [];
   const totalChanges = staged.length + unstaged.length + untracked.length;
-  const tabs: Tab[] = isGitRepo
-    ? ["changes", "files", "history"]
-    : ["files"];
   const currentTab: Tab = isGitRepo ? activeTab : "files";
+  const tabItems: TabItem[] = [
+    ...(isGitRepo
+      ? [{ key: "git", label: "Git", count: totalChanges } as TabItem]
+      : []),
+    { key: "files", label: "Files" },
+    ...(extraTabs ?? []),
+  ];
+  const extraKeys = new Set((extraTabs ?? []).map((tab) => tab.key));
+  const activeKey = activeExtraTab ?? currentTab;
 
-  const handleStageAll = useCallback(() => {
-    const paths = [...unstaged.map((f) => f.path), ...untracked];
-    if (paths.length > 0) stage(paths);
-  }, [unstaged, untracked, stage]);
+  const handleSelectTab = (key: string) => {
+    if (extraKeys.has(key)) {
+      onExtraTabChange?.(key);
+      return;
+    }
+    // Picking Git or Files means leaving whatever the parent had open.
+    onExtraTabChange?.(null);
+    setActiveTab(key as Tab);
+  };
 
   const handleCommit = useCallback(async () => {
     if (!commitMsg.trim() || staged.length === 0 || isCommitting) return;
@@ -124,90 +148,111 @@ export function ChangesPanel() {
   return (
     <View style={[styles.container, { backgroundColor: surfaceBg }]}>
       <TabBar
-        activeTab={currentTab}
-        onTabChange={setActiveTab}
-        totalChanges={totalChanges}
-        tabs={tabs}
+        items={tabItems}
+        activeKey={activeKey}
+        onSelect={handleSelectTab}
+        right={
+          isGitRepo && gitData ? (
+            <BranchLabel
+              branch={gitData.branch}
+              ahead={gitData.ahead}
+              behind={gitData.behind}
+            />
+          ) : null
+        }
       />
 
-      {isGitRepo && gitData && (
-        <BranchBar
-          branch={gitData.branch}
-          ahead={gitData.ahead}
-          behind={gitData.behind}
-        />
-      )}
-
-      <View style={styles.tabPanels}>
-        <View
-          {...(Platform.OS !== "web"
-            ? { pointerEvents: currentTab === "files" ? ("auto" as const) : ("none" as const) }
-            : {})}
-          style={[
-            styles.tabPanel,
-            currentTab !== "files" && styles.tabPanelHidden,
-            Platform.OS === "web" &&
-              ({ pointerEvents: currentTab === "files" ? "auto" : "none" } as any),
-          ]}
-        >
-          {cwd ? (
-            <FileTree
-              rootPath={cwd}
-              viewingFile={viewingFile}
-              onViewFile={setViewingFile}
-              expandedDirs={expandedDirs}
-              onToggleDir={handleToggleDir}
-            />
-          ) : (
-            <Text style={[styles.emptyText, { color: textMuted }]}>
-              No workspace selected
-            </Text>
-          )}
-        </View>
-
-        {isGitRepo && (
-          <ScrollView
+      {activeExtraTab ? (
+        <View style={styles.content}>{renderExtraTab?.(activeExtraTab)}</View>
+      ) : (
+        <View style={styles.tabPanels}>
+          <View
             {...(Platform.OS !== "web"
-              ? { pointerEvents: currentTab !== "files" ? ("auto" as const) : ("none" as const) }
+              ? {
+                  pointerEvents:
+                    currentTab === "files"
+                      ? ("auto" as const)
+                      : ("none" as const),
+                }
               : {})}
             style={[
               styles.tabPanel,
-              currentTab === "files" && styles.tabPanelHidden,
+              currentTab !== "files" && styles.tabPanelHidden,
               Platform.OS === "web" &&
-                ({ pointerEvents: currentTab !== "files" ? "auto" : "none" } as any),
+                ({
+                  pointerEvents: currentTab === "files" ? "auto" : "none",
+                } as any),
             ]}
-            contentContainerStyle={styles.contentInner}
-            showsVerticalScrollIndicator={false}
           >
-            {isLoading ? (
-              <ActivityIndicator style={{ marginTop: 32 }} />
-            ) : currentTab === "changes" ? (
-              <ChangesTab
-                staged={staged}
-                unstaged={unstaged}
-                untracked={untracked}
-                stagedOpen={stagedOpen}
-                unstagedOpen={unstagedOpen}
-                onToggleStaged={() => setStagedOpen((p) => !p)}
-                onToggleUnstaged={() => setUnstagedOpen((p) => !p)}
-                selectedFile={selectedFile}
-                diffContent={fileDiffData?.diff}
-                diffLoading={diffLoading}
-                onFilePress={handleFilePress}
-                onStage={stage}
-                onUnstage={unstage}
-                onDiscard={discard}
+            {cwd ? (
+              <FileTree
+                rootPath={cwd}
+                viewingFile={viewingFile}
+                onViewFile={setViewingFile}
+                expandedDirs={expandedDirs}
+                onToggleDir={handleToggleDir}
               />
-            ) : logLoading ? (
-              <ActivityIndicator style={{ marginTop: 32 }} />
             ) : (
-              <HistoryTab entries={logEntries ?? []} />
+              <Text style={[styles.emptyText, { color: textMuted }]}>
+                No workspace selected
+              </Text>
             )}
-          </ScrollView>
-        )}
-      </View>
+          </View>
 
-      {currentTab === "changes" && staged.length > 0 && (
+          {isGitRepo && (
+            <View
+              {...(Platform.OS !== "web"
+                ? {
+                    pointerEvents:
+                      currentTab === "git"
+                        ? ("auto" as const)
+                        : ("none" as const),
+                  }
+                : {})}
+              style={[
+                styles.tabPanel,
+                currentTab !== "git" && styles.tabPanelHidden,
+                Platform.OS === "web" &&
+                  ({
+                    pointerEvents: currentTab === "git" ? "auto" : "none",
+                  } as any),
+              ]}
+            >
+              <ScrollView
+                style={styles.gitChanges}
+                contentContainerStyle={styles.contentInner}
+                showsVerticalScrollIndicator={false}
+              >
+                {isLoading ? (
+                  <ActivityIndicator style={{ marginTop: 32 }} />
+                ) : (
+                  <ChangesTab
+                    staged={staged}
+                    unstaged={unstaged}
+                    untracked={untracked}
+                    selectedFile={selectedFile}
+                    diffContent={fileDiffData?.diff}
+                    diffLoading={diffLoading}
+                    onFilePress={handleFilePress}
+                    onStage={stage}
+                    onUnstage={unstage}
+                    onDiscard={discard}
+                  />
+                )}
+              </ScrollView>
+
+              <LogSection
+                entries={logEntries ?? []}
+                isLoading={logLoading}
+                isOpen={logOpen}
+                onToggle={() => setLogOpen((open) => !open)}
+              />
+            </View>
+          )}
+        </View>
+      )}
+
+      {!activeExtraTab && currentTab === "git" && staged.length > 0 && (
         <CommitBar
           stagedCount={staged.length}
           commitMsg={commitMsg}
@@ -216,18 +261,15 @@ export function ChangesPanel() {
           isCommitting={isCommitting}
         />
       )}
-
-      {currentTab === "changes" &&
-        staged.length === 0 &&
-        (unstaged.length > 0 || untracked.length > 0) && (
-          <StageAllBar onStageAll={handleStageAll} />
-        )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
+  },
+  content: {
     flex: 1,
   },
   tabPanels: {
@@ -245,6 +287,9 @@ const styles = StyleSheet.create({
   tabPanelHidden: {
     opacity: 0,
     zIndex: 0,
+  },
+  gitChanges: {
+    flex: 1,
   },
   contentInner: {
     paddingBottom: 12,

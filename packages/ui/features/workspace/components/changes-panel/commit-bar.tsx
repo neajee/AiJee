@@ -3,7 +3,6 @@ import {
   ActivityIndicator,
   Pressable,
   StyleSheet,
-  Text,
   TextInput,
   View,
 } from "react-native";
@@ -89,32 +88,6 @@ export function CommitBar({
   );
 }
 
-export function StageAllBar({
-  onStageAll,
-}: {
-  onStageAll: () => void;
-}) {
-  const { textPrimary, dividerColor } = useChangesTheme();
-
-  return (
-    <View style={[styles.commitBar, { borderTopColor: dividerColor }]}>
-      <Pressable
-        onPress={onStageAll}
-        style={({ pressed }) => [
-          styles.stageAllButton,
-          { borderColor: dividerColor },
-          pressed && { opacity: 0.8 },
-        ]}
-        {...{ title: "Stage all files" }}
-      >
-        <Text style={[styles.stageAllButtonText, { color: textPrimary }]}>
-          Stage All
-        </Text>
-      </Pressable>
-    </View>
-  );
-}
-
 const styles = StyleSheet.create({
   commitBar: {
     paddingHorizontal: 10,
@@ -148,16 +121,5 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     alignItems: "center",
     justifyContent: "center",
-  },
-  stageAllButton: {
-    height: 34,
-    borderRadius: 6,
-    borderWidth: 0.633,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  stageAllButtonText: {
-    fontSize: 13,
-    fontFamily: Fonts.sansMedium,
   },
 });
