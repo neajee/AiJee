@@ -1,4 +1,4 @@
-import { ActivityIndicator, Platform, View } from 'react-native';
+import { ActivityIndicator, View } from 'react-native';
 import { Redirect } from 'expo-router';
 
 import { useWorkspaceStore } from '@/features/workspace/store';
@@ -22,9 +22,7 @@ export default function AppIndex() {
 
   const targetId = selectedWorkspaceId ?? workspaces[0]?.id;
   if (targetId) {
-    const lastSession = Platform.OS !== 'web'
-      ? useWorkspaceStore.getState().getLastSession(targetId)
-      : null;
+    const lastSession = useWorkspaceStore.getState().getLastSession(targetId);
     if (lastSession) {
       return <Redirect href={`/workspace/${targetId}/s/${lastSession}`} />;
     }
