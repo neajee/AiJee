@@ -202,20 +202,21 @@ pub fn get_session_messages_paginated(
             continue;
         };
 
-        if val.get("type").and_then(|v| v.as_str()) != Some("message") {
-            continue;
-        }
-
-        let Some(message) = val.get("message") else {
-            continue;
-        };
-
         let entry_id = val
             .get("id")
             .and_then(|v| v.as_str())
             .map(|s| s.to_string());
 
-        let mut msg = message.clone();
+        let mut msg = match val.get("type").and_then(|v| v.as_str()) {
+            Some("message") => val.get("message")?.clone(),
+            Some("compaction") => json!({
+                "role": "compaction",
+                "summary": val.get("summary").and_then(|v| v.as_str()).unwrap_or_default(),
+                "tokensBefore": val.get("tokensBefore").and_then(|v| v.as_u64()),
+                "timestamp": val.get("timestamp").and_then(|v| v.as_str()),
+            }),
+            _ => continue,
+        };
         if let Some(ref eid) = entry_id {
             if let Some(obj) = msg.as_object_mut() {
                 if !obj.contains_key("id") && !obj.contains_key("entryId") {
@@ -942,6 +943,38 @@ mod tests {
         assert!(archive_session(&root, cwd, "session-1").expect("archive"));
         assert!(list_sessions(&root, cwd, 1, 20).items.is_empty());
         assert!(session_dir.join(".archive/session.jsonl").exists());
+
+        std::fs::remove_dir_all(root).expect("remove test dir");
+    }
+
+    #[test]
+    fn paginated_history_keeps_compaction_entries_and_cursors() {
+        let root = std::env::temp_dir().join(format!("pideck-session-{}", Uuid::new_v4()));
+        let session_dir = root.join("--workspace--");
+        std::fs::create_dir_all(&session_dir).expect("create session dir");
+        std::fs::write(
+            session_dir.join("session.jsonl"),
+            concat!(
+                "{\"type\":\"session\",\"id\":\"session-1\"}\n",
+                "{\"type\":\"message\",\"id\":\"entry-1\",\"message\":{\"role\":\"user\",\"content\":\"before\"}}\n",
+                "{\"type\":\"compaction\",\"id\":\"compact-1\",\"timestamp\":\"2026-01-01T00:00:01.000Z\",\"summary\":\"summary\",\"tokensBefore\":123}\n",
+                "{\"type\":\"message\",\"id\":\"entry-2\",\"message\":{\"role\":\"assistant\",\"content\":[],\"stopReason\":\"stop\"}}\n"
+            ),
+        )
+        .expect("write session");
+
+        let newest_page =
+            get_session_messages_paginated(&root, "session-1", 2, None).expect("history page");
+        assert_eq!(newest_page.messages.len(), 2);
+        assert_eq!(newest_page.messages[0]["role"], "compaction");
+        assert_eq!(newest_page.messages[0]["entryId"], "compact-1");
+        assert_eq!(newest_page.oldest_entry_id.as_deref(), Some("compact-1"));
+        assert!(newest_page.has_more);
+
+        let older_page = get_session_messages_paginated(&root, "session-1", 1, Some("compact-1"))
+            .expect("older history page");
+        assert_eq!(older_page.messages[0]["entryId"], "entry-1");
+        assert!(!older_page.has_more);
 
         std::fs::remove_dir_all(root).expect("remove test dir");
     }

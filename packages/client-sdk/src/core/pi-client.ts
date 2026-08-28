@@ -257,8 +257,8 @@ export class PiClient {
 
       const rawMessages = result.messages as Record<string, string>[];
       if (rawMessages.length > 0) {
-        const converted = convertRawMessages(rawMessages);
         const latest = subject.getValue();
+        const converted = convertRawMessages(rawMessages, { tailContext: latest.messages });
         const existingKeys = new Set(latest.messages.map((m) => m.entryId).filter(Boolean));
         const unique = converted.filter((m) => !m.entryId || !existingKeys.has(m.entryId));
         subject.next({

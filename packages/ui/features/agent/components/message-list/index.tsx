@@ -85,7 +85,6 @@ export const MessageList = memo(function MessageList({
     itemsRef.current = next;
     return next;
   }, [messages]);
-  const reversed = useMemo(() => [...items].reverse(), [items]);
 
   // Only the trailing turn can be in flight.
   const activeTurnKey = useMemo(() => {
@@ -100,7 +99,7 @@ export const MessageList = memo(function MessageList({
     prevMessageCountRef.current = messages.length;
     if (countChanged) {
       requestAnimationFrame(() => {
-        listRef.current?.scrollToOffset({ offset: 0, animated: true });
+        listRef.current?.scrollToEnd({ animated: true });
       });
     }
   }, [messages.length, autoFollow]);
@@ -108,7 +107,7 @@ export const MessageList = memo(function MessageList({
   useEffect(() => {
     if (!isStreaming || !autoFollow) return;
     const id = setInterval(() => {
-      listRef.current?.scrollToOffset({ offset: 0, animated: true });
+      listRef.current?.scrollToEnd({ animated: true });
     }, 800);
     return () => clearInterval(id);
   }, [isStreaming, autoFollow]);
@@ -131,18 +130,16 @@ export const MessageList = memo(function MessageList({
   const handleScroll = useCallback(
     (e: NativeSyntheticEvent<NativeScrollEvent>) => {
       const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent;
-      const isAwayFromBottom = contentOffset.y > SCROLL_THRESHOLD;
+      const distanceFromBottom =
+        contentSize.height - layoutMeasurement.height - contentOffset.y;
+      const isAwayFromBottom = distanceFromBottom > SCROLL_THRESHOLD;
       setShowScrollButton(isAwayFromBottom);
       setAutoFollow(!isAwayFromBottom);
 
-      // The list is inverted, so the oldest message is at the *end* of the
-      // scrollable content. FlatList's own onEndReached cannot be trusted here:
-      // it latches per content length, so the fire it spends on mount (when
-      // hasMoreMessages is still false because history is in flight) is never
-      // replayed, leaving the footer button as the only way to page back.
-      // Deriving the distance from each scroll event has no such latch.
-      const distanceFromOldest =
-        contentSize.height - layoutMeasurement.height - contentOffset.y;
+      // Older history is prepended at the top. Derive this from every scroll
+      // event instead of onEndReached, whose initial fire can happen before the
+      // history request reports that another page is available.
+      const distanceFromOldest = contentOffset.y;
       if (
         distanceFromOldest <= HISTORY_PREFETCH_DISTANCE &&
         contentSize.height !== lastPrefetchHeightRef.current
@@ -157,7 +154,7 @@ export const MessageList = memo(function MessageList({
   const scrollToBottom = useCallback(() => {
     setAutoFollow(true);
     setShowScrollButton(false);
-    listRef.current?.scrollToOffset({ offset: 0, animated: true });
+    listRef.current?.scrollToEnd({ animated: true });
   }, []);
 
   const renderItem = useCallback(
@@ -173,7 +170,7 @@ export const MessageList = memo(function MessageList({
 
   const keyExtractor = useCallback((item: ListItem) => item.key, []);
 
-  const listFooter = (
+  const listHeader = (
     <View style={styles.historyLoaderWrap}>
       {session.isLoadingOlderMessages ? (
         <Animated.View
@@ -205,14 +202,11 @@ export const MessageList = memo(function MessageList({
     <View style={styles.root}>
       <FlatList<ListItem>
         ref={listRef}
-        data={reversed}
+        data={items}
         renderItem={renderItem}
         keyExtractor={keyExtractor}
-        inverted
         style={styles.list}
         contentContainerStyle={styles.content}
-        onEndReached={handleLoadMore}
-        onEndReachedThreshold={0.3}
         onScroll={handleScroll}
         // Native only throttles this; a coarser value would let a fast flick
         // reach the oldest message without ever reporting the distance.
@@ -228,7 +222,7 @@ export const MessageList = memo(function MessageList({
         maintainVisibleContentPosition={{
           minIndexForVisible: 0,
         }}
-        ListFooterComponent={listFooter}
+        ListHeaderComponent={listHeader}
       />
       {showScrollButton && (
         <Animated.View

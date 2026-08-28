@@ -1,7 +1,8 @@
-import { memo } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { memo, useState } from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Colors, Fonts } from "@/constants/theme";
 import type { ChatMessage } from "../../types";
+import { AssistantMarkdown } from "./assistant-markdown";
 
 interface SystemMessageProps {
   message: ChatMessage;
@@ -13,6 +14,31 @@ export const SystemMessage = memo(function SystemMessage({
   isDark,
 }: SystemMessageProps) {
   const colors = isDark ? Colors.dark : Colors.light;
+  const [expanded, setExpanded] = useState(false);
+
+  if (message.systemKind === "compaction") {
+    return (
+      <View style={styles.compactionWrap}>
+        <View style={[styles.divider, { backgroundColor: colors.border }]} />
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Toggle compaction summary"
+          onPress={() => setExpanded((value) => !value)}
+          style={styles.compactionTrigger}
+        >
+          <Text style={[styles.compactionLabel, { color: colors.textTertiary }]}>
+            上下文已压缩{message.compactionTokensBefore !== undefined ? ` · ${message.compactionTokensBefore.toLocaleString()} tokens` : ""}
+          </Text>
+        </Pressable>
+        <View style={[styles.divider, { backgroundColor: colors.border }]} />
+        {expanded && message.text ? (
+          <View style={styles.summary}>
+            <AssistantMarkdown text={message.text} />
+          </View>
+        ) : null}
+      </View>
+    );
+  }
 
   const label =
     message.systemKind === "bashExecution"
@@ -45,5 +71,29 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 11,
     fontFamily: Fonts.mono,
+  },
+  compactionWrap: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "center",
+    gap: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  divider: {
+    flex: 1,
+    height: StyleSheet.hairlineWidth,
+  },
+  compactionTrigger: {
+    paddingVertical: 2,
+  },
+  compactionLabel: {
+    fontSize: 11,
+    fontFamily: Fonts.sansMedium,
+  },
+  summary: {
+    width: "100%",
+    paddingHorizontal: 12,
+    paddingTop: 6,
   },
 });

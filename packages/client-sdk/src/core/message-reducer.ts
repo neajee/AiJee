@@ -890,10 +890,61 @@ function convertSingleMessage(msg: Record<string, unknown>, index: number): Chat
     };
   }
 
+  if (role === "compaction") {
+    return {
+      id: stableId(msg, "compaction", index),
+      entryId: extractMessageEntryId(msg),
+      role: "system",
+      systemKind: "compaction",
+      text: typeof msg["summary"] === "string" ? msg["summary"] : "",
+      compactionTokensBefore: typeof msg["tokensBefore"] === "number"
+        ? msg["tokensBefore"]
+        : undefined,
+      timestamp: parseTimestamp(msg["timestamp"]),
+    };
+  }
+
   return null;
 }
 
-export function convertRawMessages(rawMessages: Record<string, string>[]): ChatMessage[] {
+export interface ConvertRawMessagesOptions {
+  /** Newer messages already held by the session store. */
+  tailContext?: ChatMessage[];
+}
+
+function applyToolResult(
+  assistant: ChatMessage,
+  raw: Record<string, unknown>,
+): ChatMessage | null {
+  if (assistant.role !== "assistant" || !assistant.toolCalls) return null;
+  const toolCallIndex = assistant.toolCalls.findIndex(
+    (toolCall) => toolCall.id === raw["toolCallId"] || toolCall.previousId === raw["toolCallId"],
+  );
+  if (toolCallIndex === -1) return null;
+
+  const isError = raw["isError"] === true;
+  const details = raw["details"] as Record<string, unknown> | undefined;
+  const subagentMeta = extractSubagentMeta(details);
+  const previous = assistant.toolCalls[toolCallIndex]!;
+  const toolCall: ToolCallInfo = {
+    ...previous,
+    result: extractTextFromContent(raw["content"] as unknown[] | undefined),
+    resultImages: extractImagesFromContent(raw["content"] as unknown[] | undefined),
+    usage: extractUsage(raw),
+    isError,
+    status: isError ? "error" : "complete",
+    ...(subagentMeta ? { subagentMeta } : {}),
+    ...(typeof details?.["diff"] === "string" ? { diff: details["diff"] } : {}),
+  };
+  const toolCalls = [...assistant.toolCalls];
+  toolCalls[toolCallIndex] = toolCall;
+  return { ...assistant, toolCalls };
+}
+
+export function convertRawMessages(
+  rawMessages: Record<string, string>[],
+  options: ConvertRawMessagesOptions = {},
+): ChatMessage[] {
   const result: ChatMessage[] = [];
 
   for (const [index, msg] of rawMessages.entries()) {
@@ -905,23 +956,24 @@ export function convertRawMessages(rawMessages: Record<string, string>[]): ChatM
     }
 
     if (raw["role"] === "toolResult") {
+      let matched = false;
       for (let i = result.length - 1; i >= 0; i--) {
-        const assistant = result[i];
-        if (assistant?.role !== "assistant" || !assistant.toolCalls) continue;
-        const tc = assistant.toolCalls.find(
-          (toolCall) => toolCall.id === raw["toolCallId"] || toolCall.previousId === raw["toolCallId"],
-        );
-        if (!tc) continue;
-        tc.result = extractTextFromContent(raw["content"] as unknown[] | undefined);
-        tc.resultImages = extractImagesFromContent(raw["content"] as unknown[] | undefined);
-        tc.usage = extractUsage(raw);
-        tc.isError = raw["isError"] as boolean;
-        tc.status = raw["isError"] ? "error" : "complete";
-        const details = raw["details"] as Record<string, unknown> | undefined;
-        const meta = extractSubagentMeta(details);
-        if (meta) tc.subagentMeta = meta;
-        if (typeof details?.["diff"] === "string") tc.diff = details["diff"] as string;
+        const updated = applyToolResult(result[i]!, raw);
+        if (!updated) continue;
+        result[i] = updated;
+        matched = true;
         break;
+      }
+
+      if (!matched) {
+        for (let i = (options.tailContext?.length ?? 0) - 1; i >= 0; i--) {
+          const updated = applyToolResult(options.tailContext![i]!, raw);
+          if (!updated) continue;
+          // Keep the context array but replace the affected message and tool call
+          // immutably. loadOlderMessages spreads it into a new subject value.
+          options.tailContext![i] = updated;
+          break;
+        }
       }
     }
   }

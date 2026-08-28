@@ -94,7 +94,8 @@ export interface ChatMessage {
   stopReason?: StopReason;
   turnDurationMs?: number;
   turnFileStats?: TurnFileStats;
-  systemKind?: "bashExecution" | "event";
+  systemKind?: "bashExecution" | "event" | "compaction";
+  compactionTokensBefore?: number;
   command?: string;
   exitCode?: number;
   cancelled?: boolean;
