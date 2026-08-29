@@ -12,11 +12,11 @@ export function BrowserPreviewDesktop({ serverUrl, accessToken, sessionId, targe
   const socket = useRef<WebSocket>();
   const targetUrl = useMemo(() => buildPreviewUrl({ serverUrl, sessionId, target }), [serverUrl, sessionId, target]);
   const brokerUrl = useMemo(() => {
-    const value = new URL("/api/preview/ws", serverUrl);
+    const value = new URL("/api/preview/ws", window.location.origin);
     value.protocol = value.protocol === "https:" ? "wss:" : "ws:";
     if (accessToken) value.searchParams.set("token", accessToken);
     return value.toString();
-  }, [serverUrl, accessToken]);
+  }, [accessToken]);
 
   useEffect(() => {
     const ws = new WebSocket(brokerUrl);
