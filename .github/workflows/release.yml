@@ -50,15 +50,60 @@ jobs:
       - name: Build web
         run: yarn web:build
 
-      - name: Package desktop runtime
-        run: yarn workspace @aijee/desktop build --dir
-
       - name: Validate SDK runtime
         run: yarn runtime:check && yarn api:check && yarn test
 
-  build-apk:
+  build-desktop:
     needs: release-please
     if: needs.release-please.outputs.release_created == 'true'
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            name: linux
+          - os: windows-latest
+            name: windows
+          - os: macos-latest
+            name: macos
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Enable Corepack
+        run: corepack enable && corepack prepare yarn@4.9.2 --activate
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Build web assets
+        run: |
+          yarn web:build
+          node tools/prepare-web-assets.cjs
+
+      - name: Package Electron app
+        run: yarn workspace @aijee/desktop build --publish never
+
+      - name: Upload Electron artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: aijee-desktop-${{ matrix.name }}
+          path: |
+            apps/desktop/dist/**/*.AppImage
+            apps/desktop/dist/**/*.deb
+            apps/desktop/dist/**/*.dmg
+            apps/desktop/dist/**/*.exe
+            apps/desktop/dist/**/*.zip
+          if-no-files-found: error
+
+  build-apk:
+    needs: release-please
+    if: false
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -99,7 +144,7 @@ jobs:
 
   eas-update:
     needs: release-please
-    if: needs.release-please.outputs.release_created == 'true'
+    if: false
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -164,7 +209,7 @@ jobs:
         run: npm publish npm-packages/aijee --access public --provenance
 
   upload-release-assets:
-    needs: [release-please, build, build-apk]
+    needs: [release-please, build, build-desktop]
     if: needs.release-please.outputs.release_created == 'true'
     runs-on: ubuntu-latest
     permissions:
@@ -179,7 +224,9 @@ jobs:
       - name: Rename artifacts to include platform
         run: |
           mkdir -p release-assets
-          cp artifacts/aijee-android/*.apk release-assets/aijee-android.apk
+          find artifacts/aijee-desktop-linux -type f -exec cp {} release-assets/ \;
+          find artifacts/aijee-desktop-windows -type f -exec cp {} release-assets/ \;
+          find artifacts/aijee-desktop-macos -type f -exec cp {} release-assets/ \;
 
       - name: Upload assets to release
         uses: softprops/action-gh-release@v2

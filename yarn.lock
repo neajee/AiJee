@@ -113,6 +113,7 @@ __metadata:
     aijee: "workspace:*"
     electron: "npm:36.9.5"
     electron-builder: "npm:^26.0.12"
+    ws: "npm:^8.18.0"
   languageName: unknown
   linkType: soft
 

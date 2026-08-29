@@ -7,10 +7,12 @@
   "main": "src/main.cjs",
   "scripts": {
     "dev": "electron .",
-    "build": "electron-builder"
+    "build": "electron-builder",
+    "check": "node --check src/main.cjs"
   },
   "dependencies": {
-    "aijee": "workspace:*"
+    "aijee": "workspace:*",
+    "ws": "^8.18.0"
   },
   "devDependencies": {
     "electron": "36.9.5",

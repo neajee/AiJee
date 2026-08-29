@@ -3,6 +3,7 @@ import { StyleSheet, View } from "react-native";
 
 import type { PreviewTarget } from "@/features/preview/store";
 import { buildPreviewSrc } from "@/features/preview/service-worker";
+import { BrowserPreviewDesktop } from "@/features/preview/components/browser-preview.desktop";
 
 interface BrowserPreviewProps {
   serverUrl: string;
@@ -12,6 +13,9 @@ interface BrowserPreviewProps {
 }
 
 export function BrowserPreview({ serverUrl, sessionId, target }: BrowserPreviewProps) {
+  if (navigator.userAgent.includes("AiJeeDesktop/")) {
+    return <BrowserPreviewDesktop serverUrl={serverUrl} accessToken={accessToken} sessionId={sessionId} target={target} />;
+  }
   const src = useMemo(
     () =>
       buildPreviewSrc({
