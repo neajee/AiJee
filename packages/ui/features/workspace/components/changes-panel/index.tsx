@@ -2,11 +2,13 @@ import { type ReactNode, useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Platform,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
   View,
 } from "react-native";
+import { ChevronDown, ChevronUp, GitCompare } from "lucide-react-native";
 
 import { useWorkspaceStore } from "@/features/workspace/store";
 import { useGitStatus, useGitLog, useFileDiff } from "@pideck/client-sdk";
@@ -14,11 +16,13 @@ import { FileTree } from "../file-tree";
 
 import type { Tab } from "./constants";
 import { useChangesTheme } from "./use-theme-colors";
-import { TabBar, type TabItem } from "./tab-bar";
+import { Fonts } from "@/constants/theme";
+import type { TabItem } from "./tab-bar";
 import { BranchLabel } from "./branch-label";
 import { ChangesTab } from "./changes-tab";
 import { LogSection } from "./history-tab";
 import { CommitBar } from "./commit-bar";
+import { useWorkspacePaneRequest } from "../workspace-sidebar/context";
 
 interface ChangesPanelProps {
   /**
@@ -38,19 +42,23 @@ export function ChangesPanel({
   onExtraTabChange,
   renderExtraTab,
 }: ChangesPanelProps = {}) {
-  const { textMuted, surfaceBg } = useChangesTheme();
+  const { textPrimary, textMuted, surfaceBg, dividerColor, hoverBg } =
+    useChangesTheme();
 
   const [activeTab, setActiveTab] = useState<Tab>("git");
   const [commitMsg, setCommitMsg] = useState("");
   // History is reference material: it waits at the foot of the card until asked
   // for, and its fetch waits with it.
   const [logOpen, setLogOpen] = useState(false);
+  const [changesOpen, setChangesOpen] = useState(true);
   const [selectedFile, setSelectedFile] = useState<{
     path: string;
     staged: boolean;
   } | null>(null);
   const [viewingFile, setViewingFile] = useState<string | null>(null);
   const [expandedDirs, setExpandedDirs] = useState<Set<string>>(new Set());
+  const paneContext = useWorkspacePaneRequest();
+  const paneRequest = paneContext?.request;
 
   const handleToggleDir = useCallback((dirPath: string) => {
     setExpandedDirs((prev) => {
@@ -92,6 +100,7 @@ export function ChangesPanel({
     setActiveTab("git");
     setCommitMsg("");
     setLogOpen(false);
+    setChangesOpen(true);
     setSelectedFile(null);
     setViewingFile(null);
     setExpandedDirs(new Set());
@@ -119,25 +128,23 @@ export function ChangesPanel({
   const untracked = gitData?.untracked ?? [];
   const totalChanges = staged.length + unstaged.length + untracked.length;
   const currentTab: Tab = isGitRepo ? activeTab : "files";
-  const tabItems: TabItem[] = [
-    ...(isGitRepo
-      ? [{ key: "git", label: "Git", count: totalChanges } as TabItem]
-      : []),
-    { key: "files", label: "Files" },
-    ...(extraTabs ?? []),
-  ];
   const extraKeys = new Set((extraTabs ?? []).map((tab) => tab.key));
-  const activeKey = activeExtraTab ?? currentTab;
 
-  const handleSelectTab = (key: string) => {
-    if (extraKeys.has(key)) {
-      onExtraTabChange?.(key);
+  useEffect(() => {
+    if (!paneRequest) return;
+    if (paneRequest.tab === "preview" && extraKeys.has("preview")) {
+      onExtraTabChange?.("preview");
       return;
     }
-    // Picking Git or Files means leaving whatever the parent had open.
     onExtraTabChange?.(null);
-    setActiveTab(key as Tab);
-  };
+    setActiveTab(paneRequest.tab as Tab);
+  }, [paneRequest?.revision]);
+
+  useEffect(() => {
+    paneContext?.setActiveTab(
+      activeExtraTab === "preview" ? "preview" : currentTab,
+    );
+  }, [activeExtraTab, currentTab, paneContext?.setActiveTab]);
 
   const handleCommit = useCallback(async () => {
     if (!commitMsg.trim() || staged.length === 0 || isCommitting) return;
@@ -147,21 +154,6 @@ export function ChangesPanel({
 
   return (
     <View style={[styles.container, { backgroundColor: surfaceBg }]}>
-      <TabBar
-        items={tabItems}
-        activeKey={activeKey}
-        onSelect={handleSelectTab}
-        right={
-          isGitRepo && gitData ? (
-            <BranchLabel
-              branch={gitData.branch}
-              ahead={gitData.ahead}
-              behind={gitData.behind}
-            />
-          ) : null
-        }
-      />
-
       {activeExtraTab ? (
         <View style={styles.content}>{renderExtraTab?.(activeExtraTab)}</View>
       ) : (
@@ -218,28 +210,62 @@ export function ChangesPanel({
                   } as any),
               ]}
             >
-              <ScrollView
-                style={styles.gitChanges}
-                contentContainerStyle={styles.contentInner}
-                showsVerticalScrollIndicator={false}
-              >
-                {isLoading ? (
-                  <ActivityIndicator style={{ marginTop: 32 }} />
-                ) : (
-                  <ChangesTab
-                    staged={staged}
-                    unstaged={unstaged}
-                    untracked={untracked}
-                    selectedFile={selectedFile}
-                    diffContent={fileDiffData?.diff}
-                    diffLoading={diffLoading}
-                    onFilePress={handleFilePress}
-                    onStage={stage}
-                    onUnstage={unstage}
-                    onDiscard={discard}
-                  />
+              <View style={[styles.changesSection, { borderBottomColor: dividerColor }]}>
+                <Pressable
+                  onPress={() => setChangesOpen((open) => !open)}
+                  accessibilityRole="button"
+                  accessibilityState={{ expanded: changesOpen }}
+                  accessibilityLabel="Toggle changes"
+                  style={({ pressed, hovered }: any) => [
+                    styles.sectionHeader,
+                    (pressed || hovered) && { backgroundColor: hoverBg },
+                  ]}
+                >
+                  <GitCompare size={12} color={textMuted} strokeWidth={2} />
+                  <Text style={[styles.sectionHeaderText, { color: textPrimary }]}>Changes</Text>
+                  {totalChanges > 0 && (
+                    <Text style={[styles.sectionCount, { color: textMuted }]}>{totalChanges}</Text>
+                  )}
+                  <View style={{ flex: 1 }} />
+                  {gitData && (
+                    <BranchLabel
+                      branch={gitData.branch}
+                      ahead={gitData.ahead}
+                      behind={gitData.behind}
+                    />
+                  )}
+                  {changesOpen ? (
+                    <ChevronUp size={13} color={textMuted} strokeWidth={2} />
+                  ) : (
+                    <ChevronDown size={13} color={textMuted} strokeWidth={2} />
+                  )}
+                </Pressable>
+
+                {changesOpen && (
+                  <ScrollView
+                    style={styles.gitChanges}
+                    contentContainerStyle={styles.contentInner}
+                    showsVerticalScrollIndicator={false}
+                  >
+                    {isLoading ? (
+                      <ActivityIndicator style={{ marginTop: 32 }} />
+                    ) : (
+                      <ChangesTab
+                        staged={staged}
+                        unstaged={unstaged}
+                        untracked={untracked}
+                        selectedFile={selectedFile}
+                        diffContent={fileDiffData?.diff}
+                        diffLoading={diffLoading}
+                        onFilePress={handleFilePress}
+                        onStage={stage}
+                        onUnstage={unstage}
+                        onDiscard={discard}
+                      />
+                    )}
+                  </ScrollView>
                 )}
-              </ScrollView>
+              </View>
 
               <LogSection
                 entries={logEntries ?? []}
@@ -290,6 +316,27 @@ const styles = StyleSheet.create({
   },
   gitChanges: {
     flex: 1,
+  },
+  changesSection: {
+    flex: 1,
+    borderBottomWidth: 0.633,
+  },
+  sectionHeader: {
+    height: 26,
+    paddingHorizontal: 10,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 5,
+  },
+  sectionHeaderText: {
+    fontSize: 10.5,
+    fontFamily: Fonts.sansSemiBold,
+    textTransform: "uppercase",
+    letterSpacing: 0.5,
+  },
+  sectionCount: {
+    fontSize: 10.5,
+    fontFamily: Fonts.mono,
   },
   contentInner: {
     paddingBottom: 12,

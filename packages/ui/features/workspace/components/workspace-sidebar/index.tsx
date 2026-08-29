@@ -4,11 +4,13 @@ import {
   Easing,
   PanResponder,
   Platform,
+  Pressable,
   StyleSheet,
   useWindowDimensions,
   View,
 } from "react-native";
 import * as SecureStore from "expo-secure-store";
+import { Files, GitBranch, Globe2 } from "lucide-react-native";
 
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -18,6 +20,10 @@ import {
   SEAM_TOGGLE_WIDTH,
 } from "@/components/ui/seam-toggle";
 import { usePanelCoordination } from "@/features/navigation/store/panel-coordination";
+import {
+  WorkspacePaneContext,
+  type WorkspacePaneTab,
+} from "./context";
 
 const PANEL_DEFAULT = 280;
 const PANEL_MIN = 180;
@@ -28,12 +34,7 @@ const PANEL_MIN = 180;
  */
 const PANEL_MAX = 1000;
 const PANEL_MAX_FRACTION = 0.72;
-/**
- * Closed, the panel takes no width at all: a leftover rail showed up as a bare
- * strip of the screen's own background next to the editor. The pill moves
- * inside the content instead, so nothing is left behind.
- */
-const COLLAPSED_WIDTH = 0;
+const COLLAPSED_WIDTH = 38;
 /**
  * Invisible grab strip straddling the panel seam, bolt-style.
  *
@@ -210,12 +211,17 @@ export function WorkspaceSidebar({
   const isResizingRef = useRef(false);
   const widthAnim = useRef(
     new Animated.Value(
-      locked || scope.collapsed ? COLLAPSED_WIDTH : scope.width,
+      locked ? 0 : scope.collapsed ? COLLAPSED_WIDTH : scope.width,
     ),
   ).current;
   const [contentMounted, setContentMounted] = useState(
     locked ? false : !scope.collapsed,
   );
+  const [paneRequest, setPaneRequest] = useState<{
+    tab: WorkspacePaneTab;
+    revision: number;
+  } | null>(null);
+  const [activePaneTab, setActivePaneTab] = useState<WorkspacePaneTab>("git");
   const openedSide = usePanelCoordination((state) => state.openedSide);
   const panelRevision = usePanelCoordination((state) => state.revision);
   const notifyPanelOpened = usePanelCoordination(
@@ -287,7 +293,7 @@ export function WorkspaceSidebar({
     if (!collapsed) setContentMounted(true);
 
     Animated.timing(widthAnim, {
-      toValue: collapsed ? COLLAPSED_WIDTH : panelWidth,
+      toValue: locked ? 0 : collapsed ? COLLAPSED_WIDTH : panelWidth,
       duration: COLLAPSE_DURATION,
       easing: Easing.bezier(0.4, 0, 0.2, 1),
       useNativeDriver: false,
@@ -374,66 +380,145 @@ export function WorkspaceSidebar({
     if (!next) notifyPanelOpened("right");
   };
 
+  const openPane = (tab: WorkspacePaneTab) => {
+    setActivePaneTab(tab);
+    setPaneRequest((current) => ({ tab, revision: (current?.revision ?? 0) + 1 }));
+    updateCollapsed(false);
+    notifyPanelOpened("right");
+  };
+
+  const isDesktopShell =
+    Platform.OS === "web" &&
+    typeof navigator !== "undefined" &&
+    navigator.userAgent.includes("PiDeckDesktop/");
+
   return (
-    <Animated.View
-      style={[
-        styles.container,
-        {
-          width: widthAnim,
-          borderLeftColor: collapsed ? "transparent" : sidebarBorder,
-        },
-      ]}
+    <WorkspacePaneContext.Provider
+      value={{
+        request: paneRequest,
+        activeTab: activePaneTab,
+        setActiveTab: setActivePaneTab,
+      }}
     >
-      <View style={styles.clip}>
-        {contentMounted && (
-          <View style={{ width: panelWidth, flex: 1 }}>{children}</View>
+      <Animated.View
+        style={[
+          styles.container,
+          {
+            width: widthAnim,
+            borderLeftColor: locked ? "transparent" : sidebarBorder,
+          },
+        ]}
+      >
+        {!collapsed && (
+          <View style={styles.clip}>
+            {contentMounted && (
+              <View
+                style={{
+                  width: Math.max(0, panelWidth - COLLAPSED_WIDTH),
+                  flex: 1,
+                }}
+              >
+                {children}
+              </View>
+            )}
+          </View>
         )}
-      </View>
 
-      {/* Same control as the left sidebar's, on this panel's own seam. Closed,
-          it tucks just inside the window edge instead of hanging off it. A
-          locked panel omits the control entirely so it can never be opened. */}
-      {!locked && (
-        <View
-          style={[
-            styles.seamToggleWrap,
-            {
-              left: collapsed
-                ? -(SEAM_TOGGLE_WIDTH + 8)
-                : -SEAM_TOGGLE_WIDTH / 2,
-            },
-          ]}
-          pointerEvents="box-none"
-        >
-          <SeamToggle
-            chevron={collapsed ? "left" : "right"}
-            onPress={toggleCollapsed}
-            label={collapsed ? "Open side panel" : "Close side panel"}
-          />
-        </View>
-      )}
+        {!locked && (
+          <View style={styles.activityBar}>
+            <RailButton
+              label="Open files"
+              active={activePaneTab === "files"}
+              onPress={() => openPane("files")}
+            >
+              <Files size={17} color={colors.textSecondary} strokeWidth={1.8} />
+            </RailButton>
+            <RailButton
+              label="Open Git"
+              active={activePaneTab === "git"}
+              onPress={() => openPane("git")}
+            >
+              <GitBranch size={17} color={colors.textSecondary} strokeWidth={1.8} />
+            </RailButton>
+            {isDesktopShell && (
+              <RailButton
+                label="Open browser"
+                active={activePaneTab === "preview"}
+                onPress={() => openPane("preview")}
+              >
+                <Globe2 size={17} color={colors.textSecondary} strokeWidth={1.8} />
+              </RailButton>
+            )}
+          </View>
+        )}
 
-      {!collapsed && (
-        <View
-          {...panelResizer.panHandlers}
-          {...webSeamHoverProps}
-          style={styles.seam}
-        >
+        {!locked && !collapsed && (
           <View
             style={[
-              styles.seamBar,
+              styles.seamToggleWrap,
               {
-                backgroundColor: seamActive
-                  ? isResizing
-                    ? seamDragTint
-                    : seamTint
-                  : "transparent",
+                left: -SEAM_TOGGLE_WIDTH / 2,
               },
             ]}
-          />
-        </View>
-      )}
-    </Animated.View>
+            pointerEvents="box-none"
+          >
+            <SeamToggle
+              chevron="right"
+              onPress={toggleCollapsed}
+              label="Close side panel"
+            />
+          </View>
+        )}
+
+        {!collapsed && (
+          <View
+            {...panelResizer.panHandlers}
+            {...webSeamHoverProps}
+            style={styles.seam}
+          >
+            <View
+              style={[
+                styles.seamBar,
+                {
+                  backgroundColor: seamActive
+                    ? isResizing
+                      ? seamDragTint
+                      : seamTint
+                    : "transparent",
+                },
+              ]}
+            />
+          </View>
+        )}
+      </Animated.View>
+    </WorkspacePaneContext.Provider>
+  );
+}
+
+function RailButton({
+  label,
+  active,
+  onPress,
+  children,
+}: {
+  label: string;
+  active: boolean;
+  onPress: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      onPress={onPress}
+      style={({ pressed, hovered }: any) => [
+        styles.railButton,
+        active && styles.railButtonActive,
+        (pressed || hovered) && styles.railButtonActive,
+      ]}
+    >
+      {children}
+    </Pressable>
   );
 }
 
@@ -446,6 +531,22 @@ const styles = StyleSheet.create({
   clip: {
     flex: 1,
     overflow: "hidden",
+  },
+  activityBar: {
+    width: COLLAPSED_WIDTH,
+    alignItems: "center",
+    paddingTop: 6,
+    gap: 2,
+  },
+  railButton: {
+    width: 32,
+    height: 32,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 4,
+  },
+  railButtonActive: {
+    backgroundColor: "rgba(136,136,136,0.16)",
   },
   seam: {
     position: "absolute",
