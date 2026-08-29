@@ -11,9 +11,15 @@ export function BrowserPreviewDesktop({ serverUrl, accessToken, sessionId, targe
   const [size, setSize] = useState({ width: 1280, height: 800 });
   const socket = useRef<WebSocket>();
   const targetUrl = useMemo(() => buildPreviewUrl({ serverUrl, sessionId, target }), [serverUrl, sessionId, target]);
+  const brokerUrl = useMemo(() => {
+    const value = new URL("/api/preview/ws", serverUrl);
+    value.protocol = value.protocol === "https:" ? "wss:" : "ws:";
+    if (accessToken) value.searchParams.set("token", accessToken);
+    return value.toString();
+  }, [serverUrl, accessToken]);
 
   useEffect(() => {
-    const ws = new WebSocket("ws://127.0.0.1:5455");
+    const ws = new WebSocket(brokerUrl);
     socket.current = ws;
     ws.onopen = () => ws.send(JSON.stringify({ type: "init", url: targetUrl, token: accessToken }));
     ws.onmessage = (event) => {
@@ -21,7 +27,7 @@ export function BrowserPreviewDesktop({ serverUrl, accessToken, sessionId, targe
       if (message.type === "frame") { setFrame(message.data); setSize({ width: message.width, height: message.height }); }
     };
     return () => { ws.close(); socket.current = undefined; };
-  }, [targetUrl, accessToken]);
+  }, [targetUrl, accessToken, brokerUrl]);
 
   const send = (message: unknown) => socket.current?.send(JSON.stringify(message));
   return <View style={styles.container}>

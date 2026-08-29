@@ -47,7 +47,7 @@ packages/ui                      跨端组件、状态与数据hooks
 首次启动后访问：
 
 ```text
-http://localhost:5454/setup
+http://localhost:10088/setup
 ```
 
 输入终端显示的Setup Code、管理员账号和密码完成初始化。初始化前仅开放静态资源、健康检查和Setup接口；初始化完成后Setup流程关闭。
@@ -68,7 +68,7 @@ aijee auth reset
 
 ```toml
 AIJEE_HOST=0.0.0.0
-AIJEE_PORT=5454
+AIJEE_PORT=10088
 AIJEE_STATE_PATH=~/.aijee/runtime.json
 ```
 

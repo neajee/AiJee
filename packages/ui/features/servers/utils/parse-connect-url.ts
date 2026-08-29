@@ -15,14 +15,14 @@ export function parseConnectUrl(url: string): ConnectParams | null {
 
     const code = parsed.searchParams.get('k');
     if (code) {
-      return { hostname: parsed.hostname, ips: [parsed.hostname], port: parsed.port || '5454', qrId: '', code };
+      return { hostname: parsed.hostname, ips: [parsed.hostname], port: parsed.port || '10088', qrId: '', code };
     }
 
     if (!parsed.pathname.endsWith('/connect')) return null;
 
     const hostname = parsed.searchParams.get('hostname') ?? '';
     const ipsRaw = parsed.searchParams.get('ips') ?? '';
-    const port = parsed.searchParams.get('port') ?? '5454';
+    const port = parsed.searchParams.get('port') ?? '10088';
     const qrId = parsed.searchParams.get('qr_id') ?? '';
     const serverId = parsed.searchParams.get('server_id') ?? '';
 

@@ -1,7 +1,7 @@
 import { spawn, type ChildProcess } from "node:child_process";
 import { fileURLToPath } from "node:url";
 
-export const DEFAULT_SERVER_URL = "http://127.0.0.1:5454";
+export const DEFAULT_SERVER_URL = "http://127.0.0.1:10088";
 
 export function isHealthPayload(value: unknown): boolean {
   if (!value || typeof value !== "object") return false;

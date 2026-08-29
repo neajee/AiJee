@@ -83,7 +83,7 @@ function ServerFormFields({
           ]}
           value={address}
           onChangeText={setAddress}
-          placeholder="http://192.168.1.100:5454"
+          placeholder="http://192.168.1.100:10088"
           placeholderTextColor={isDark ? "#666" : "#bbb"}
           autoCapitalize="none"
           autoCorrect={false}

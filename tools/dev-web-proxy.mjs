@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 
 const listenPort = Number(process.env.AIJEE_WEB_PORT ?? 8081);
 const listenHost = process.env.AIJEE_WEB_HOST ?? process.env.AIJEE_HOST ?? "127.0.0.1";
-const apiPort = Number(process.env.AIJEE_API_PORT ?? 5454);
+const apiPort = Number(process.env.AIJEE_API_PORT ?? 10088);
 const expoPort = Number(process.env.AIJEE_EXPO_PORT ?? 8082);
 
 function targetFor(pathname) {

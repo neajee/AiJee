@@ -14,7 +14,7 @@ Then use these commands in Pi:
 /aijee-stop    stop the runtime owned by this Pi session
 ```
 
-The plugin checks `http://127.0.0.1:5454/api/health`, then starts or reuses the
+The plugin checks `http://127.0.0.1:10088/api/health`, then starts or reuses the
 embedded Pi SDK runtime in this package. Set `AIJEE_SERVER_URL` to connect to
 another AiJee host; only loopback URLs are started automatically.
 

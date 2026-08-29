@@ -17,7 +17,7 @@ export async function runCli(args: string[]): Promise<void> {
     return;
   }
   if (command && !["serve", "desktop"].includes(command)) throw new Error(`Unknown command: ${command}`);
-  const port = Number(valueAfter(args, "--port") ?? process.env.AIJEE_PORT ?? 5454);
+  const port = Number(valueAfter(args, "--port") ?? process.env.AIJEE_PORT ?? 10088);
   const host = valueAfter(args, "--host") ?? process.env.AIJEE_HOST ?? "127.0.0.1";
   if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error("Port must be between 1 and 65535");
 

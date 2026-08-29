@@ -59,7 +59,7 @@ export async function dispatchRoute(ctx: RouteContext, request: IncomingMessage,
   if (request.method === "POST" && url.pathname === "/api/packages/operation") return ctx.error(response, 501, "Marketplace is not available in the embedded runtime");
   if (request.method === "GET" && /^\/api\/packages\/.+/.test(url.pathname)) return ctx.error(response, 404, "Package not found");
   if (["/api/desktop/backends", "/api/desktop/status", "/api/desktop/start", "/api/desktop/stop"].includes(url.pathname)) return ctx.error(response, 501, "Desktop control is owned by the Electron shell");
-  if (url.pathname === "/api/desktop/ws" || url.pathname === "/api/ws/stream" || url.pathname === "/api/ws/stream/") return ctx.error(response, 426, "Upgrade to WebSocket");
+  if (url.pathname === "/api/preview/ws" || url.pathname === "/api/desktop/ws" || url.pathname === "/api/ws/stream" || url.pathname === "/api/ws/stream/") return ctx.error(response, 426, "Upgrade to WebSocket");
   if (request.method === "POST" && url.pathname === "/api/ports/scan") return ctx.error(response, 501, "Port scanning is not implemented");
   if (request.method === "GET" && /^\/api\/tasks\/list\/[^/]+$/.test(url.pathname)) return ctx.listTasks(url, response);
   if (request.method === "GET" && /^\/api\/tasks\/config\/[^/]+$/.test(url.pathname)) return ctx.taskConfig(url, response);

@@ -17,6 +17,7 @@ import { dispatchRoute, type RouteContext } from "./routes/router.ts";
 import { corsHeaders, errorStatus, HttpError, maxJsonBodyBytes, maxPromptBodyBytes } from "./middleware/index.ts";
 import { normalizeImageAttachments } from "./prompt-images.ts";
 import { recordTelemetry } from "../telemetry/index.ts";
+import { PreviewBroker } from "./preview-broker.ts";
 import { WebSocketServer, WebSocket } from "ws";
 import type { Duplex } from "node:stream";
 
@@ -48,6 +49,7 @@ export class AiJeeHttpServer {
   private readonly globalSockets = new Set<WebSocket>();
   private readonly sessionSockets = new Map<string, Set<WebSocket>>();
   private readonly wsServer = new WebSocketServer({ noServer: true });
+  private readonly previewBroker = new PreviewBroker();
   private readonly sessionEventUnsubscribers = new Map<string, () => void>();
   private readonly instanceId = randomUUID();
   private nextEventId = 1;
@@ -71,7 +73,7 @@ export class AiJeeHttpServer {
     this.webRoot = process.env.AIJEE_WEB_ROOT ?? join(fileURLToPath(new URL("../../public", import.meta.url)));
   }
 
-  async listen(port = 5454, host = "127.0.0.1"): Promise<void> {
+  async listen(port = 10088, host = "127.0.0.1"): Promise<void> {
     if (this.server) throw new Error("AiJee runtime server is already running");
     const state = await this.store.load();
     this.localMode = new Set(["127.0.0.1", "localhost", "::1", "[::1]"]).has(host);
@@ -146,6 +148,7 @@ export class AiJeeHttpServer {
     for (const sockets of this.sessionSockets.values()) for (const socket of sockets) socket.close();
     this.globalSockets.clear();
     this.sessionSockets.clear();
+    await this.previewBroker.close();
     if (!this.server) return;
     await new Promise<void>((resolve, reject) => this.server?.close((error) => error ? reject(error) : resolve()));
     this.server = undefined;
@@ -343,7 +346,7 @@ export class AiJeeHttpServer {
 
   private deviceCodeResponse(request: IncomingMessage, response: ServerResponse, code: string): void {
     const protocol = typeof request.headers["x-forwarded-proto"] === "string" ? request.headers["x-forwarded-proto"] : "http";
-    const host = typeof request.headers.host === "string" ? request.headers.host : "127.0.0.1:5454";
+    const host = typeof request.headers.host === "string" ? request.headers.host : "127.0.0.1:10088";
     this.ok(response, { code, url: `${protocol}://${host}/?k=${encodeURIComponent(code)}`, expires_at: null });
   }
 
@@ -787,13 +790,15 @@ export class AiJeeHttpServer {
   private handleUpgrade(request: IncomingMessage, socket: Duplex, head: Buffer): void {
     const url = new URL(request.url ?? "/", "http://localhost");
     const sessionMatch = /^\/api\/ws\/stream\/([^/]+)$/.exec(url.pathname);
+    const isPreview = url.pathname === "/api/preview/ws";
     const isGlobal = url.pathname === "/api/ws/stream" || url.pathname === "/api/desktop/ws";
-    if (!isGlobal && !sessionMatch) { socket.destroy(); return; }
+    if (!isGlobal && !isPreview && !sessionMatch) { socket.destroy(); return; }
     const authorization = request.headers.authorization ?? (url.searchParams.get("token") ? `Bearer ${url.searchParams.get("token")}` : undefined);
     if (!this.auth || (!this.auth.initialized() && !this.localMode) || !(this.localMode && this.isLocalRequest(request)) && !this.auth.validate(authorization, typeof request.headers.cookie === "string" ? request.headers.cookie : undefined)) { socket.destroy(); return; }
     if (sessionMatch && !this.sessions.has(sessionMatch[1])) { socket.destroy(); return; }
     this.wsServer.handleUpgrade(request, socket, head, (client) => {
-      if (sessionMatch) this.attachSessionSocket(sessionMatch[1], client);
+      if (isPreview) this.previewBroker.attach(client);
+      else if (sessionMatch) this.attachSessionSocket(sessionMatch[1], client);
       else this.attachGlobalSocket(client);
     });
   }

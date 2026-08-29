@@ -11,8 +11,7 @@
     "check": "node --check src/main.cjs"
   },
   "dependencies": {
-    "aijee": "workspace:*",
-    "ws": "^8.18.0"
+    "aijee": "workspace:*"
   },
   "devDependencies": {
     "electron": "36.9.5",
@@ -23,7 +22,9 @@
     "productName": "AiJee",
     "executableName": "aijee",
     "linux": {
-      "target": ["AppImage"],
+      "target": [
+        "AppImage"
+      ],
       "category": "Utility"
     },
     "files": [
