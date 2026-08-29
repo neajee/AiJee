@@ -21,6 +21,8 @@ const PREVIEW_TAB = [{ key: "preview", label: "Preview" }];
 function WorkspaceRightPaneComponent({ sessionId }: WorkspaceRightPaneProps) {
   const colorScheme = useColorScheme() ?? "light";
   const isDark = colorScheme === "dark";
+  const isDesktopShell =
+    typeof navigator !== "undefined" && navigator.userAgent.includes("PiDeckDesktop/");
   const previewPaneOpen = usePreviewStore((state) =>
     sessionId ? state.paneOpenBySession[sessionId] ?? false : false,
   );
@@ -39,14 +41,14 @@ function WorkspaceRightPaneComponent({ sessionId }: WorkspaceRightPaneProps) {
       ]}
     >
       <ChangesPanel
-        extraTabs={PREVIEW_TAB}
-        activeExtraTab={previewActive ? "preview" : null}
-        onExtraTabChange={(key) => {
+        extraTabs={isDesktopShell ? PREVIEW_TAB : undefined}
+        activeExtraTab={isDesktopShell && previewActive ? "preview" : null}
+        onExtraTabChange={isDesktopShell ? (key) => {
           const open = key === "preview";
           setPreviewActive(open);
           if (sessionId) setPreviewPaneOpen(sessionId, open);
-        }}
-        renderExtraTab={() => <PreviewPanel sessionId={sessionId} />}
+        } : undefined}
+        renderExtraTab={isDesktopShell ? () => <PreviewPanel sessionId={sessionId} /> : undefined}
       />
     </View>
   );

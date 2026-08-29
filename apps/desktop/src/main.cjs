@@ -12,6 +12,7 @@ function createWindow() {
       sandbox: true,
     },
   });
+  window.webContents.setUserAgent(`${window.webContents.getUserAgent()} PiDeckDesktop/0.1.0`);
   window.loadURL(process.env.PIDECK_CLIENT_URL || "http://127.0.0.1:5454");
 }
 

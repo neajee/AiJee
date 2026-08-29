@@ -39,7 +39,7 @@ function isAbortedMessage(msg: ChatMessage): boolean {
   return !msg.isStreaming && msg.stopReason === "aborted";
 }
 
-function buildTurn(msgs: ChatMessage[]): TurnListItem {
+function buildTurn(msgs: ChatMessage[], requestedAt?: number): TurnListItem {
   // The answer is the last message that produced visible output; everything
   // before it (thinking, narration, tool calls) is work history.
   let finalIdx = -1;
@@ -87,6 +87,17 @@ function buildTurn(msgs: ChatMessage[]): TurnListItem {
     }
   }
 
+  if (!durationMs || durationMs <= 0) {
+    const timestamps = [requestedAt, ...msgs.map((msg) => msg.timestamp)]
+      .filter((value): value is number => typeof value === "number")
+      .map((value) => value < 1e12 ? value * 1000 : value)
+      .filter((value) => Number.isFinite(value) && value > 0);
+    const inferred = timestamps.length > 1
+      ? Math.max(...timestamps) - Math.min(...timestamps)
+      : 0;
+    if (inferred > 0) durationMs = inferred;
+  }
+
   return {
     kind: "turn",
     key: `turn:${msgs[0]!.id}`,
@@ -95,7 +106,7 @@ function buildTurn(msgs: ChatMessage[]): TurnListItem {
     ...(aborted ? { aborted: true } : {}),
     durationMs,
     fileStats,
-    startedAt: msgs[0]!.timestamp,
+    startedAt: requestedAt ?? msgs[0]!.timestamp,
   };
 }
 
@@ -103,11 +114,13 @@ function buildTurn(msgs: ChatMessage[]): TurnListItem {
 export function buildListItems(messages: ChatMessage[]): ListItem[] {
   const items: ListItem[] = [];
   let turn: ChatMessage[] = [];
+  let requestedAt: number | undefined;
 
   const flushTurn = () => {
     if (turn.length === 0) return;
-    items.push(buildTurn(turn));
+    items.push(buildTurn(turn, requestedAt));
     turn = [];
+    requestedAt = undefined;
   };
 
   for (const msg of messages) {
@@ -117,6 +130,7 @@ export function buildListItems(messages: ChatMessage[]): ListItem[] {
     }
     flushTurn();
     items.push({ kind: "message", key: msg.id, message: msg });
+    requestedAt = msg.role === "user" ? msg.timestamp : undefined;
   }
   flushTurn();
 
@@ -193,6 +207,10 @@ export interface TurnAction {
   running: boolean;
 }
 
+export type WorkStepSection =
+  | { kind: "activity"; key: string; steps: WorkStep[] }
+  | { kind: "content"; key: string; step: Extract<WorkStep, { kind: "text" | "error" }> };
+
 const ACTION_OF_TOOL: Record<string, TurnActionKind> = {
   edit: "edit",
   write: "edit",
@@ -255,6 +273,40 @@ export function summarizeTurnActions(steps: WorkStep[]): TurnAction[] {
       running: entry.running,
     };
   });
+}
+
+export function groupWorkSteps(steps: WorkStep[]): WorkStepSection[] {
+  const sections: WorkStepSection[] = [];
+  let activity: WorkStep[] = [];
+  const flush = () => {
+    if (!activity.length) return;
+    sections.push({ kind: "activity", key: `activity:${activity[0]!.key}`, steps: activity });
+    activity = [];
+  };
+
+  for (const step of steps) {
+    if (step.kind === "text" || step.kind === "error") {
+      flush();
+      sections.push({ kind: "content", key: `content:${step.key}`, step });
+    } else {
+      activity.push(step);
+    }
+  }
+  flush();
+  return sections;
+}
+
+export function formatTurnAction(action: TurnAction): string {
+  if (action.count <= 1) return action.label;
+  switch (action.kind) {
+    case "edit": return `${action.running ? "Editing" : "Edited"} ${action.count} files`;
+    case "read": return `${action.running ? "Reading" : "Read"} ${action.count} files`;
+    case "run": return `${action.running ? "Running" : "Ran"} ${action.count} commands`;
+    case "web": return `${action.running ? "Searching" : "Searched"} ${action.count} web tasks`;
+    case "download": return `${action.running ? "Downloading" : "Downloaded"} ${action.count} files`;
+    case "agent": return `${action.running ? "Running" : "Ran"} ${action.count} agents`;
+    case "other": return `${action.running ? "Using" : "Used"} ${action.count} tools`;
+  }
 }
 
 export function formatDuration(ms: number): string {

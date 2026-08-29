@@ -29,6 +29,8 @@ import type { ChatMessage, TurnFileStats } from "../../types";
 import {
   buildListItems,
   formatDuration,
+  formatTurnAction,
+  groupWorkSteps,
   normalizeStart,
   reconcileItems,
   summarizeTurnActions,
@@ -46,7 +48,7 @@ import { AssistantMarkdown } from "./assistant-markdown";
 import { SystemMessage } from "./system-message";
 import { ToolCallGroup } from "./tool-call";
 import { ToolBody, ToolHeader, ToolSurface } from "./tool-call/tool-disclosure";
-import { basename, collectFileChanges, relativePath, type TurnFileChange } from "./utils";
+import { basename, collectFileChanges, isToolActive, relativePath, type TurnFileChange } from "./utils";
 import { ThinkingBlock } from "./thinking-block";
 
 interface MessageListProps {
@@ -648,6 +650,52 @@ const WorkStepView = memo(function WorkStepView({
   }
 });
 
+const WorkActivityGroup = memo(function WorkActivityGroup({
+  steps,
+  isDark,
+}: {
+  steps: WorkStep[];
+  isDark: boolean;
+}) {
+  const colors = isDark ? Colors.dark : Colors.light;
+  const running = steps.some((step) =>
+    step.kind === "thinking"
+      ? step.streaming
+      : step.kind === "tools" && step.toolCalls.some(isToolActive),
+  );
+  const [override, setOverride] = useState<boolean | null>(null);
+  const expanded = override ?? running;
+  const actions = useMemo(() => summarizeTurnActions(steps), [steps]);
+  const label = actions.length
+    ? actions.map(formatTurnAction).join(" · ")
+    : running
+      ? "Thinking"
+      : "Thought";
+
+  return (
+    <View style={styles.activityGroup}>
+      <ToolHeader
+        expanded={expanded}
+        expandable
+        onToggle={() => setOverride(!expanded)}
+        isDark={isDark}
+        accessibilityLabel={`${expanded ? "Collapse" : "Expand"} ${label}`}
+      >
+        <Text style={[styles.activityLabel, { color: colors.textSecondary }]} numberOfLines={1}>
+          {label}
+        </Text>
+      </ToolHeader>
+      <ToolBody expanded={expanded}>
+        <View style={styles.activityBody}>
+          {steps.map((step) => (
+            <WorkStepView key={step.key} step={step} isDark={isDark} />
+          ))}
+        </View>
+      </ToolBody>
+    </View>
+  );
+});
+
 /**
  * A whole assistant turn: the work history behind one "Worked for X" divider,
  * plus the final answer. The divider auto-expands while the turn runs and
@@ -694,17 +742,12 @@ const TurnBlock = memo(function TurnBlock({
 
   const elapsedMs = useTurnElapsed(active, turn.startedAt);
   const settledMs = turn.durationMs && turn.durationMs > 0 ? turn.durationMs : null;
-  // Like actions merged into one line: "Edited files · Read files · Ran
-  // commands" instead of a row per call.
-  const actions = useMemo(() => summarizeTurnActions(turn.steps), [turn.steps]);
-  const label =
-    actions.length > 0
-      ? actions.map((a) => a.label).join(" · ")
-      : active
-        ? "Working"
-        : hasWork
-          ? "Thought"
-          : "Worked";
+  const sections = useMemo(() => groupWorkSteps(turn.steps), [turn.steps]);
+  const label = active
+    ? "Working for"
+    : settledMs
+      ? "Worked for"
+      : "Worked";
   const timeLabel = active
     ? formatDuration(Math.max(1000, elapsedMs))
     : settledMs
@@ -723,7 +766,6 @@ const TurnBlock = memo(function TurnBlock({
         >
           {label}
         </Text>
-        {/* The duration is context, not the headline: it trails the actions. */}
         {timeLabel && (
           <Text style={[styles.dividerTime, { color: colors.textTertiary }]}>
             {timeLabel}
@@ -768,13 +810,13 @@ const TurnBlock = memo(function TurnBlock({
           entering={FadeIn.duration(140)}
           style={[styles.workLog, { borderLeftColor: colors.border }]}
         >
-          {turn.steps.map((step) => (
-            <WorkStepView
-              key={step.key}
-              step={step}
-              isDark={isDark}
-            />
-          ))}
+          {sections.map((section) =>
+            section.kind === "activity" ? (
+              <WorkActivityGroup key={section.key} steps={section.steps} isDark={isDark} />
+            ) : (
+              <WorkStepView key={section.key} step={section.step} isDark={isDark} />
+            ),
+          )}
         </Animated.View>
       )}
 
@@ -952,6 +994,19 @@ const styles = StyleSheet.create({
     paddingBottom: 10,
     borderLeftWidth: StyleSheet.hairlineWidth,
     gap: 12,
+  },
+  activityGroup: {
+    minWidth: 0,
+  },
+  activityLabel: {
+    flex: 1,
+    fontSize: 12,
+    lineHeight: 18,
+    fontFamily: Fonts.sans,
+  },
+  activityBody: {
+    gap: 10,
+    paddingLeft: 10,
   },
   stepText: {
     opacity: 0.75,
