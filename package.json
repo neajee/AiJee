@@ -1,5 +1,5 @@
 {
-  "name": "pideck-workspace",
+  "name": "aijee-workspace",
   "private": true,
   "packageManager": "yarn@4.9.2",
   "workspaces": [
@@ -7,18 +7,18 @@
     "packages/*"
   ],
   "scripts": {
-    "start": "yarn workspace @pideck/client start",
+    "start": "yarn workspace @aijee/client start",
     "web": "node tools/start-web.mjs",
-    "android": "yarn workspace @pideck/client android",
-    "ios": "yarn workspace @pideck/client ios",
-    "desktop": "yarn workspace @pideck/desktop dev",
+    "android": "yarn workspace @aijee/client android",
+    "ios": "yarn workspace @aijee/client ios",
+    "desktop": "yarn workspace @aijee/desktop dev",
     "runtime:start": "node --experimental-strip-types apps/server/src/main.ts serve",
-    "runtime:check": "yarn workspace @pideck/engine check && yarn workspace pideck check",
-    "lint": "yarn workspace @pideck/client lint",
-    "test": "yarn workspace @pideck/client-sdk test && yarn workspace @pideck/ui test && yarn workspace @pideck/engine test && yarn workspace pideck test",
-    "api:generate": "yarn workspace @pideck/api-contract generate && yarn workspace @pideck/client-sdk api:generate",
-    "api:check": "yarn workspace @pideck/api-contract validate",
-    "web:build": "yarn workspace @pideck/client build",
+    "runtime:check": "yarn workspace @aijee/engine check && yarn workspace aijee check",
+    "lint": "yarn workspace @aijee/client lint",
+    "test": "yarn workspace @aijee/client-sdk test && yarn workspace @aijee/ui test && yarn workspace @aijee/engine test && yarn workspace aijee test",
+    "api:generate": "yarn workspace @aijee/api-contract generate && yarn workspace @aijee/client-sdk api:generate",
+    "api:check": "yarn workspace @aijee/api-contract validate",
+    "web:build": "yarn workspace @aijee/client build",
     "build:prod": "yarn web:build && yarn runtime:check"
   }
 }

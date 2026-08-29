@@ -34,8 +34,8 @@ import {
   useWorkspaceSessions as useSessions,
   useIsSessionStreaming,
   useStreamingSessions,
-} from "@pideck/client-sdk";
-import type { SessionListItem } from "@pideck/client-sdk";
+} from "@aijee/client-sdk";
+import type { SessionListItem } from "@aijee/client-sdk";
 import { requestBrowserNotificationPermission } from "@/features/agent/browser-notifications";
 import { SessionActivityIndicator } from "@/features/workspace/components/session-activity-indicator";
 import { AnimatedListItem } from "@/components/ui/animated-list-item";

@@ -1,6 +1,6 @@
 import { create } from 'zustand';
-import { sdk, unwrapApiData, extractApiErrorMessage } from '@pideck/client-sdk';
-import type { TaskDefinition, TaskInfo } from '@pideck/client-sdk';
+import { sdk, unwrapApiData, extractApiErrorMessage } from '@aijee/client-sdk';
+import type { TaskDefinition, TaskInfo } from '@aijee/client-sdk';
 const {
   getConfig,
   listTasks,

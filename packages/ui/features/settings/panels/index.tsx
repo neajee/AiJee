@@ -16,8 +16,8 @@ import {
 } from 'lucide-react-native';
 
 import { Fonts } from '@/constants/theme';
-import { sdk, unwrapApiData } from '@pideck/client-sdk';
-import type { PackageStatus } from '@pideck/client-sdk';
+import { sdk, unwrapApiData } from '@aijee/client-sdk';
+import type { PackageStatus } from '@aijee/client-sdk';
 
 import { useAppSettingsStore, type ThemeMode } from '../store';
 import {
@@ -479,7 +479,7 @@ export function AboutPanel() {
   const banner = agent.success ?? agent.error;
 
   return (
-    <SettingsGroup header="关于" footer={`PiDeck · ${PLATFORM_LABEL}`}>
+    <SettingsGroup header="关于" footer={`AiJee · ${PLATFORM_LABEL}`}>
       <SettingsRow
         icon={Download}
         label="智能体版本"

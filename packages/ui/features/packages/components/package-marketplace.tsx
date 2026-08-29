@@ -14,8 +14,8 @@ import {
 } from 'react-native';
 import { Download, ExternalLink, Search, ShieldAlert, X } from 'lucide-react-native';
 
-import { usePiClient } from '@pideck/client-sdk';
-import type { MarketplacePackage } from '@pideck/client-sdk';
+import { usePiClient } from '@aijee/client-sdk';
+import type { MarketplacePackage } from '@aijee/client-sdk';
 import { Fonts } from '@/constants/theme';
 import {
   useSettingsMetrics,

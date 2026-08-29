@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { client } from '@pideck/client-sdk';
+import { client } from '@aijee/client-sdk';
 
 export interface VncBackend {
   id: string;

@@ -44,28 +44,28 @@ function createStyles(colors: {
       color: colors.text,
     },
     h1: {
-      fontSize: 20,
-      lineHeight: 28,
-      fontFamily: Fonts.sansSemiBold,
-      fontWeight: "600",
-      color: colors.textStrong,
-    },
-    h2: {
       fontSize: 18,
       lineHeight: 26,
       fontFamily: Fonts.sansSemiBold,
       fontWeight: "600",
       color: colors.textStrong,
     },
-    h3: {
+    h2: {
       fontSize: 16,
       lineHeight: 24,
       fontFamily: Fonts.sansSemiBold,
       fontWeight: "600",
       color: colors.textStrong,
     },
-    h4: {
+    h3: {
       fontSize: 15,
+      lineHeight: 23,
+      fontFamily: Fonts.sansSemiBold,
+      fontWeight: "600",
+      color: colors.textStrong,
+    },
+    h4: {
+      fontSize: 14,
       lineHeight: 22,
       fontFamily: Fonts.sansSemiBold,
       fontWeight: "600",
@@ -89,20 +89,28 @@ function createStyles(colors: {
       paddingVertical: 4,
     },
     strong: {
+      fontSize: 14,
+      lineHeight: 22,
       fontFamily: Fonts.sansSemiBold,
       fontWeight: "600",
       color: colors.textStrong,
     },
     em: {
+      fontSize: 14,
+      lineHeight: 22,
       fontFamily: Fonts.sansItalic,
       fontStyle: "italic",
     },
     strikethrough: {
+      fontSize: 14,
+      lineHeight: 22,
       fontFamily: Fonts.sans,
       textDecorationLine: "line-through",
       color: colors.textMuted,
     },
     link: {
+      fontSize: 14,
+      lineHeight: 22,
       fontFamily: Fonts.sans,
       fontStyle: "normal",
       color: colors.link,
@@ -110,7 +118,8 @@ function createStyles(colors: {
     codespan: {
       fontFamily: Fonts.mono,
       fontStyle: "normal",
-      fontSize: 12,
+      fontSize: 13,
+      lineHeight: 20,
       color: colors.codeText,
       backgroundColor: colors.code,
     },

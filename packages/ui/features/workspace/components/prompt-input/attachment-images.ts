@@ -1,4 +1,4 @@
-import type { ImageContent } from "@pideck/client-sdk";
+import type { ImageContent } from "@aijee/client-sdk";
 import type { Attachment } from "./constants";
 
 /**

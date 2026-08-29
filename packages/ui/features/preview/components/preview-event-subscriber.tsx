@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-import { usePiClient } from "@pideck/client-sdk";
+import { usePiClient } from "@aijee/client-sdk";
 import { applyPreviewEvent, parsePreviewEvent } from "@/features/preview/store";
 
 export const GLOBAL_PREVIEW_KEY = "__global__";

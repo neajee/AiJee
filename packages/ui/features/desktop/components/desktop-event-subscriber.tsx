@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { usePiClient } from '@pideck/client-sdk';
+import { usePiClient } from '@aijee/client-sdk';
 import { useDesktopStore } from '../store';
 
 export function DesktopEventSubscriber() {

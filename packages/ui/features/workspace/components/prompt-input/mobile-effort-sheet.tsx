@@ -5,7 +5,7 @@ import { Check } from 'lucide-react-native';
 import { Fonts } from '@/constants/theme';
 import { buildThinkingLevelOptions, ThinkingLevel } from './constants';
 import { usePromptTheme } from './use-theme-colors';
-import type { AgentConfigHandle } from '@pideck/client-sdk';
+import type { AgentConfigHandle } from '@aijee/client-sdk';
 
 interface MobileEffortSheetProps {
   visible: boolean;

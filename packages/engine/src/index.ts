@@ -2,7 +2,7 @@ export { PiSession } from "./adapters/pi/pi-session.ts";
 export { adaptAgentEvent } from "./adapters/pi/event-adapter.ts";
 export { piCapabilities } from "./adapters/pi/index.ts";
 export { createPiEngineAdapter } from "./adapters/pi/index.ts";
-export type { CreateSessionInput, ImageAttachment, PiDeckEvent, PromptInput, SessionDescriptor, SessionEventListener } from "./core/types.ts";
+export type { CreateSessionInput, ImageAttachment, AiJeeEvent, PromptInput, SessionDescriptor, SessionEventListener } from "./core/types.ts";
 export type { EngineCapabilities } from "./core/capabilities.ts";
 export { EngineError } from "./core/errors.ts";
 export { EngineRegistry } from "./registry/index.ts";

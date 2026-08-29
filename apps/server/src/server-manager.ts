@@ -26,7 +26,7 @@ export class ServerManager {
   private starting?: Promise<boolean>;
 
   constructor() {
-    this.url = process.env.PIDECK_SERVER_URL ?? DEFAULT_SERVER_URL;
+    this.url = process.env.AIJEE_SERVER_URL ?? DEFAULT_SERVER_URL;
     this.command = process.execPath;
   }
 

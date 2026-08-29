@@ -22,7 +22,7 @@ function WorkspaceRightPaneComponent({ sessionId }: WorkspaceRightPaneProps) {
   const colorScheme = useColorScheme() ?? "light";
   const isDark = colorScheme === "dark";
   const isDesktopShell =
-    typeof navigator !== "undefined" && navigator.userAgent.includes("PiDeckDesktop/");
+    typeof navigator !== "undefined" && navigator.userAgent.includes("AiJeeDesktop/");
   const previewPaneOpen = usePreviewStore((state) =>
     sessionId ? state.paneOpenBySession[sessionId] ?? false : false,
   );

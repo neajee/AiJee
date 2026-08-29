@@ -264,7 +264,7 @@ export function SettingsGroup({
 
 /**
  * Monochrome icon tile. Deliberately not the colourful iOS-Settings tile —
- * the rest of PiDeck is greyscale + hairline borders, and saturated tiles here
+ * the rest of AiJee is greyscale + hairline borders, and saturated tiles here
  * would read as a different product.
  */
 export const SettingsIconTile = memo(function SettingsIconTile({

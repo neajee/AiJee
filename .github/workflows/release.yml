@@ -51,7 +51,7 @@ jobs:
         run: yarn web:build
 
       - name: Package desktop runtime
-        run: yarn workspace @pideck/desktop build --dir
+        run: yarn workspace @aijee/desktop build --dir
 
       - name: Validate SDK runtime
         run: yarn runtime:check && yarn api:check && yarn test
@@ -94,7 +94,7 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: pideck-android
+          name: aijee-android
           path: '*.apk'
 
   eas-update:
@@ -158,10 +158,10 @@ jobs:
           VERSION="${RELEASE_TAG#v}"
           node tools/prepare-npm-release.mjs npm-packages "$VERSION"
 
-      - name: Publish PiDeck plugin
+      - name: Publish AiJee plugin
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npm publish npm-packages/pideck --access public --provenance
+        run: npm publish npm-packages/aijee --access public --provenance
 
   upload-release-assets:
     needs: [release-please, build, build-apk]
@@ -179,7 +179,7 @@ jobs:
       - name: Rename artifacts to include platform
         run: |
           mkdir -p release-assets
-          cp artifacts/pideck-android/*.apk release-assets/pideck-android.apk
+          cp artifacts/aijee-android/*.apk release-assets/aijee-android.apk
 
       - name: Upload assets to release
         uses: softprops/action-gh-release@v2

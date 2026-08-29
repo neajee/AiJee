@@ -104,8 +104,8 @@ export function QrScanner({ visible, onClose, onNeedNewWorkspace }: QrScannerPro
     if (!params) {
       setError(
         /^exp(s)?:\/\//i.test(data.trim())
-          ? "这是 Expo 开发二维码，请扫描 PiDeck 设备端生成的授权二维码。"
-          : "授权码格式无效，请扫描 PiDeck 设备端生成的授权二维码。",
+          ? "这是 Expo 开发二维码，请扫描 AiJee 设备端生成的授权二维码。"
+          : "授权码格式无效，请扫描 AiJee 设备端生成的授权二维码。",
       );
       setScanned(false);
       return;
@@ -147,7 +147,7 @@ export function QrScanner({ visible, onClose, onNeedNewWorkspace }: QrScannerPro
             <View style={styles.statusCenter}>
               <ActivityIndicator size="large" color={textPrimary} />
               <Text style={[styles.statusTitle, { color: textPrimary }]}>
-                Connecting to PiDeck
+                Connecting to AiJee
               </Text>
               <Text style={[styles.statusDesc, { color: textMuted }]}>
                 Completing secure pairing…

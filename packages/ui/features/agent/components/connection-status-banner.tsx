@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Fonts } from "@/constants/theme";
-import { useConnection } from "@pideck/client-sdk";
+import { useConnection } from "@aijee/client-sdk";
 
 export function ConnectionStatusBanner() {
   const { width } = useWindowDimensions();

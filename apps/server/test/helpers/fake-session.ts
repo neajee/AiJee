@@ -1,4 +1,4 @@
-import type { EngineSession } from "@pideck/engine";
+import type { EngineSession } from "@aijee/engine";
 
 /** Minimal in-memory EngineSession stand-in for HTTP and registry tests. */
 export function fakeSession(sessionId: string, options: { cwd?: string; sessionFile?: string; messages?: unknown[] } = {}): EngineSession {

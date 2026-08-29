@@ -2,13 +2,13 @@
 
 ## Project overview
 
-PiDeck is a cross-platform (iOS, Android, Web) client and single-package runtime for the pi coding agent.
+AiJee is a cross-platform (iOS, Android, Web) client and single-package runtime for the pi coding agent.
 Built with Expo SDK 54, React Native, expo-router, and an embedded Node Pi SDK runtime.
 
 ## Monorepo structure
 
 ```
-PiDeck/
+AiJee/
 ├── apps/
 │   ├── client/             # Expo Web / Android / iOS entry
 │   └── desktop/            # Electron platform entry
@@ -35,7 +35,7 @@ PiDeck/
 └── public/                 # Expo web source assets
 ```
 
-## @pideck/client-sdk package
+## @aijee/client-sdk package
 
 All server communication lives in `packages/client-sdk/`. Apps never
 import from generated SDK files directly.
@@ -86,13 +86,13 @@ Reads the canonical contract from `packages/api-contract/openapi.yaml`; no backe
 | REST endpoint wrappers | `pi-client/core/api-client.ts` | `ApiClient` method |
 | Hooks with state/polling/caching | `pi-client/hooks/` | RxJS `BehaviorSubject` + `useObservable` |
 | Domain types | `pi-client/types/index.ts` | Re-export from `generated/types.gen.ts` |
-| Raw SDK functions (for stores) | `import { sdk } from '@pideck/client-sdk'` | `sdk.functionName()` |
-| hey-api client instance | `import { client } from '@pideck/client-sdk'` | Direct access for interceptors |
-| Unwrap helpers | `import { unwrapApiData } from '@pideck/client-sdk'` | For stores using raw SDK |
+| Raw SDK functions (for stores) | `import { sdk } from '@aijee/client-sdk'` | `sdk.functionName()` |
+| hey-api client instance | `import { client } from '@aijee/client-sdk'` | Direct access for interceptors |
+| Unwrap helpers | `import { unwrapApiData } from '@aijee/client-sdk'` | For stores using raw SDK |
 
 ### Hooks pattern (RxJS, not React Query)
 
-All hooks in `@pideck/client-sdk` follow the same pattern:
+All hooks in `@aijee/client-sdk` follow the same pattern:
 
 ```ts
 const state$ = useRef(new BehaviorSubject<State>(INITIAL));
@@ -110,7 +110,7 @@ Zustand stores live in `features/<name>/store/`. They manage UI state and call
 API functions directly using the `sdk` namespace:
 
 ```ts
-import { sdk, unwrapApiData } from '@pideck/client-sdk';
+import { sdk, unwrapApiData } from '@aijee/client-sdk';
 const { listTasks, startTask } = sdk;
 ```
 
@@ -120,7 +120,7 @@ Stores cannot use React hooks. They use raw SDK functions with the global
 ### Components vs hooks vs stores
 
 - **Components** (`features/<name>/components/`) — React Native views, import hooks
-- **Hooks** — if it's reusable data logic, put it in `@pideck/client-sdk`. App-specific
+- **Hooks** — if it's reusable data logic, put it in `@aijee/client-sdk`. App-specific
   UI hooks (e.g., `use-stable-markdown`) stay in `features/`
 - **Stores** — zustand, for app-level state that persists across screens
 
@@ -135,7 +135,7 @@ Stores cannot use React hooks. They use raw SDK functions with the global
 
 ## Imports
 
-- `@pideck/client-sdk` — all API, types, hooks, utilities
+- `@aijee/client-sdk` — all API, types, hooks, utilities
 - `@/*` — path alias for project root (tsconfig paths)
 - Relative imports within a feature module
 
@@ -147,7 +147,7 @@ yarn web                # Web
 yarn android            # Android
 yarn ios                # iOS
 yarn web:build          # Production web export
-yarn runtime:start      # Embedded PiDeck runtime
+yarn runtime:start      # Embedded AiJee runtime
 yarn build:prod         # Both
 ```
 

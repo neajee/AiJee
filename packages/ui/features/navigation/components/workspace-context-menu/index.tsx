@@ -22,7 +22,7 @@ import {
 
 import { Colors, Fonts } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { useGitStatus, useNestedRepos } from "@pideck/client-sdk";
+import { useGitStatus, useNestedRepos } from "@aijee/client-sdk";
 import { remotesToLinks, type RemoteLink } from "@/features/workspace/utils/git-remote-url";
 
 /** Exported so callers can right-align the menu under an anchor button. */

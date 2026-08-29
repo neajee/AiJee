@@ -1,5 +1,5 @@
 {
-  "name": "@pideck/client",
+  "name": "@aijee/client",
   "main": "expo-router/entry",
   "version": "1.12.0",
   "scripts": {
@@ -9,17 +9,17 @@
     "ios": "expo start --ios",
     "lint": "expo lint",
     "build": "expo export --platform web --clear --output-dir ../../dist",
-    "api:generate": "yarn workspace @pideck/client-sdk api:generate"
+    "api:generate": "yarn workspace @aijee/client-sdk api:generate"
   },
   "dependencies": {
+    "@aijee/client-sdk": "workspace:*",
+    "@aijee/ui": "workspace:*",
     "@expo-google-fonts/dm-sans": "^0.4.2",
     "@expo-google-fonts/jetbrains-mono": "^0.4.1",
     "@expo/vector-icons": "^15.0.3",
     "@hey-api/client-fetch": "^0.13.1",
     "@jsamr/counter-style": "2.0.2",
     "@jsamr/react-native-li": "2.3.1",
-    "@pideck/client-sdk": "workspace:*",
-    "@pideck/ui": "workspace:*",
     "@react-navigation/bottom-tabs": "^7.4.0",
     "@react-navigation/elements": "^2.6.3",
     "@react-navigation/native": "^7.1.8",

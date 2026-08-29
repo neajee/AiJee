@@ -37,9 +37,9 @@ export class RuntimeAuth {
   codeSnapshot(): DeviceCode[] { return [...this.codes.values()]; }
   secret(): string { return this.runtimeSecret; }
 
-  issueDevice(name = "PiDeck device"): Record<string, unknown> {
+  issueDevice(name = "AiJee device"): Record<string, unknown> {
     const now = new Date().toISOString();
-    const device: DeviceRecord = { device_id: randomUUID(), name: name.trim() || "PiDeck device", created_at: now, last_seen: now };
+    const device: DeviceRecord = { device_id: randomUUID(), name: name.trim() || "AiJee device", created_at: now, last_seen: now };
     this.devices.set(device.device_id, device);
     this.schedulePersist();
     return { ...device, token: this.sign({ device_id: device.device_id, iat: Date.now() }) };
@@ -98,7 +98,7 @@ export class RuntimeAuth {
 
 
   private cookieToken(cookie?: string): string | undefined {
-    return cookie?.split(";").map((part) => part.trim()).find((part) => part.startsWith("pideck_token="))?.slice("pideck_token=".length);
+    return cookie?.split(";").map((part) => part.trim()).find((part) => part.startsWith("aijee_token="))?.slice("aijee_token=".length);
   }
 
   private schedulePersist(): void {

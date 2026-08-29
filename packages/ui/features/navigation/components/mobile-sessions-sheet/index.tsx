@@ -14,7 +14,7 @@ import { usePathname, useRouter } from 'expo-router';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useWorkspaceStore } from '@/features/workspace/store';
-import { useWorkspaceSessions as useSessions } from '@pideck/client-sdk';
+import { useWorkspaceSessions as useSessions } from '@aijee/client-sdk';
 import { SessionSheetContent } from '../session-sheet-content';
 
 const SHEET_HEIGHT = 420;

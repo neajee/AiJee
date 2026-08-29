@@ -22,8 +22,8 @@ import { ExtensionUiDialog } from "@/features/agent/components/extension-ui-dial
 import { DiffPanelProvider } from "@/features/agent/components/diff-panel/context";
 import { DiffSidebar } from "@/features/agent/components/diff-panel";
 import { MobileDiffSheetProvider } from "@/features/agent/components/message-list/mobile-diff-sheet";
-import { useAgentSession, useConnection, useWorkspaceSessions as useSessions } from "@pideck/client-sdk";
-import type { ImageContent } from "@pideck/client-sdk";
+import { useAgentSession, useConnection, useWorkspaceSessions as useSessions } from "@aijee/client-sdk";
+import type { ImageContent } from "@aijee/client-sdk";
 import { requestBrowserNotificationPermission } from "@/features/agent/browser-notifications";
 import type { PendingExtensionUiRequest as LegacyPendingUiRequest } from "@/features/agent/extension-ui";
 import type { ChatMessage } from "@/features/agent/types";

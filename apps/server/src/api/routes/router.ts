@@ -16,7 +16,7 @@ export async function dispatchRoute(ctx: RouteContext, request: IncomingMessage,
   if (request.method === "DELETE" && deviceMatch) return ctx.deleteDevice(request, response, deviceMatch[1]);
   if (request.method === "POST" && url.pathname === "/api/auth/logout") return ctx.logout(request, response);
   if (url.pathname === "/api/auth/session") return ctx.authorized(request) ? ctx.ok(response, null) : ctx.error(response, 401, "Unauthorized");
-  if (!ctx.authenticated().initialized() && !ctx.localMode) return ctx.error(response, 503, "PiDeck setup is required");
+  if (!ctx.authenticated().initialized() && !ctx.localMode) return ctx.error(response, 503, "AiJee setup is required");
   if (!ctx.authorized(request)) return ctx.error(response, 401, "Unauthorized");
   if (request.method === "GET" && url.pathname === "/api/agent/runtime-status") return ctx.ok(response, ctx.runtimeStatus());
   if (request.method === "GET" && url.pathname === "/api/custom-models") return ctx.ok(response, ctx.customModels);

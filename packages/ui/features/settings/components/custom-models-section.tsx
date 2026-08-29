@@ -19,7 +19,7 @@ import {
 } from 'lucide-react-native';
 
 import { Fonts } from '@/constants/theme';
-import { PI_MODEL_DEFAULTS } from '@pideck/client-sdk';
+import { PI_MODEL_DEFAULTS } from '@aijee/client-sdk';
 import {
   useCustomModelsStore,
   type CustomProvider,

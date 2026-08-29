@@ -23,8 +23,8 @@ import { usePromptTheme } from "@/features/workspace/components/prompt-input/use
 import { useWorkspaceStore } from "@/features/workspace/store";
 import { useServersStore, type Server } from "@/features/servers/store";
 import { useAuthStore } from "@/features/auth/store";
-import { usePiClient, useGitStatus } from "@pideck/client-sdk";
-import type { GitBranch as GitBranchInfo } from "@pideck/client-sdk";
+import { usePiClient, useGitStatus } from "@aijee/client-sdk";
+import type { GitBranch as GitBranchInfo } from "@aijee/client-sdk";
 
 type DropdownKind = null | "project" | "environment" | "branch";
 

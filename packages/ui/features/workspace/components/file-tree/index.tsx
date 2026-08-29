@@ -17,8 +17,8 @@ import {
 } from "lucide-react-native";
 import { Colors, Fonts } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { useFileList, useFileRead } from "@pideck/client-sdk";
-import type { FsEntry } from "@pideck/client-sdk";
+import { useFileList, useFileRead } from "@aijee/client-sdk";
+import type { FsEntry } from "@aijee/client-sdk";
 import { CodePreview } from "@/features/agent/components/message-list/code-preview";
 import { FileTypeBadge } from "../file-type-badge";
 
@@ -33,7 +33,7 @@ const NODE_STEP = 8;
  */
 const TREE_COLUMN_WIDTH = 250;
 const TREE_COLUMN_NARROW = 150;
-const NARROW_PANEL_WIDTH = 460;
+const NARROW_PANEL_WIDTH = 560;
 
 /**
  * Names matching the filter, directories that were opened by hand kept alongside.

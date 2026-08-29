@@ -6,7 +6,7 @@ import {
   client,
   sdk,
   unwrapApiData,
-} from '@pideck/client-sdk';
+} from '@aijee/client-sdk';
 import { useServersStore, type Server } from '@/features/servers/store';
 
 const {
@@ -401,7 +401,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
 
     authorizeWithCode: async (baseUrl: string, code: string, serverId: string, name?: string) => {
       try {
-        const response = await fetch(`${baseUrl}/api/devices`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code, name: name ?? 'PiDeck device' }) });
+        const response = await fetch(`${baseUrl}/api/devices`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code, name: name ?? 'AiJee device' }) });
         const payload = await response.json();
         const session = toAuthSessionBundle(payload);
         if (!response.ok || !session) return { success: false, error: payload?.error ?? 'Device authorization failed' };
@@ -419,7 +419,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
         });
         const payload = await response.json();
         const session = toAuthSessionBundle(payload);
-        console.info('[pideck/bootstrap] local claim response', { status: response.status, hasSession: !!session });
+        console.info('[aijee/bootstrap] local claim response', { status: response.status, hasSession: !!session });
         if (!response.ok || !session) return { success: false, error: payload?.error ?? 'Local runtime did not issue a session' };
         await applySessionBundle(server.id, session, { activeServerId: server.id, baseUrl: server.address });
         return { success: true };

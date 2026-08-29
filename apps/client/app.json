@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "PiDeck",
-    "slug": "pideck",
+    "name": "AiJee",
+    "slug": "aijee",
     "version": "1.12.0",
     "orientation": "portrait",
     "icon": "../../packages/ui/assets/images/icon.png",
-    "scheme": "pideck",
+    "scheme": "aijee",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -33,7 +33,7 @@
     "web": {
       "output": "static",
       "favicon": "../../packages/ui/assets/images/favicon.png",
-      "name": "PiDeck"
+      "name": "AiJee"
     },
     "plugins": [
       "expo-router",
@@ -52,7 +52,7 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Allow PiDeck to scan computer connection QR codes."
+          "cameraPermission": "Allow AiJee to scan computer connection QR codes."
         }
       ],
       "expo-font",

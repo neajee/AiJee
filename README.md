@@ -1,8 +1,8 @@
-# PiDeck
+# AiJee
 
-PiDeck —— Pi Coding Agent everywhere。
+AiJee —— Pi Coding Agent everywhere。
 
-PiDeck 是面向 [Pi Coding Agent](https://github.com/badlogic/pi-mono/) 的多端控制台：在一台机器安装PiDeck，即可通过Web、手机或桌面端使用同一套Pi Runtime。
+AiJee 是面向 [Pi Coding Agent](https://github.com/badlogic/pi-mono/) 的多端控制台：在一台机器安装AiJee，即可通过Web、手机或桌面端使用同一套Pi Runtime。
 
 [English](README.en.md)
 
@@ -11,37 +11,37 @@ PiDeck 是面向 [Pi Coding Agent](https://github.com/badlogic/pi-mono/) 的多�
 ### 使用 Pi 安装
 
 ```bash
-pi install npm:pideck
+pi install npm:aijee
 ```
 
-插件会启动或复用`pideck`包内的Pi SDK Runtime。
+插件会启动或复用`aijee`包内的Pi SDK Runtime。
 
 ### 独立安装
 
 适用于服务器、NAS或不运行Pi TUI的电脑：
 
 ```bash
-npm install -g pideck
-pideck serve
+npm install -g aijee
+aijee serve
 ```
 
-PiDeck内嵌Pi SDK Runtime、Web资源和远程接口；无需安装Rust、Cargo或全局Pi CLI。
+AiJee内嵌Pi SDK Runtime、Web资源和远程接口；无需安装Rust、Cargo或全局Pi CLI。
 
-首次启动会自动创建 `~/.pideck/`，并在终端输出Setup Code。
+首次启动会自动创建 `~/.aijee/`，并在终端输出Setup Code。
 
 ### 连接客户端
 
-1. 打开 PiDeck Web、移动端或桌面端。
+1. 打开 AiJee Web、移动端或桌面端。
 2. 选择“添加服务器”。
-3. 输入或扫描 PiDeck Runtime终端中的连接信息。
+3. 输入或扫描 AiJee Runtime终端中的连接信息。
 4. 配对完成后即可创建工作区和 Coding Session。
 
 ### Pi 插件
 
-PiDeck可以通过Pi插件自动启动本地SDK Runtime：
+AiJee可以通过Pi插件自动启动本地SDK Runtime：
 
 ```bash
-pi install npm:pideck
+pi install npm:aijee
 ```
 
 架构规范见[架构规范](docs/spec/architecture.md)，SDK适配见[引擎适配约定](docs/spec/engines.md)。
@@ -78,21 +78,21 @@ http://localhost:5454/setup
 重置管理员认证并撤销全部登录Token和已配对设备：
 
 ```bash
-pideck auth reset
+aijee auth reset
 ```
 
 默认运行状态文件：
 
 ```text
-~/.pideck/runtime.json
+~/.aijee/runtime.json
 ```
 
 可用环境变量：
 
 ```toml
-PIDECK_HOST=0.0.0.0
-PIDECK_PORT=5454
-PIDECK_STATE_PATH=~/.pideck/runtime.json
+AIJEE_HOST=0.0.0.0
+AIJEE_PORT=5454
+AIJEE_STATE_PATH=~/.aijee/runtime.json
 ```
 
 ## 开发

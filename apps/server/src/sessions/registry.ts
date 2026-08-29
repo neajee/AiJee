@@ -1,6 +1,6 @@
-import { createPiEngineAdapter } from "@pideck/engine";
-import { EngineRegistry } from "@pideck/engine";
-import type { CreateSessionInput, EngineAdapter, EngineSession, SessionDescriptor } from "@pideck/engine";
+import { createPiEngineAdapter } from "@aijee/engine";
+import { EngineRegistry } from "@aijee/engine";
+import type { CreateSessionInput, EngineAdapter, EngineSession, SessionDescriptor } from "@aijee/engine";
 
 type SessionFactory = (input: CreateSessionInput) => Promise<EngineSession>;
 

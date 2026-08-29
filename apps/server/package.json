@@ -1,12 +1,12 @@
 {
-  "name": "pideck",
+  "name": "aijee",
   "version": "0.1.0",
-  "description": "PiDeck embedded Pi SDK runtime and companion plugin",
+  "description": "AiJee embedded Pi SDK runtime and companion plugin",
   "keywords": [
     "pi-package"
   ],
   "type": "module",
-  "bin": "bin/pideck.cjs",
+  "bin": "bin/aijee.cjs",
   "pi": {
     "extensions": [
       "./src/extension/index.ts"
@@ -26,8 +26,8 @@
     "node": ">=22"
   },
   "dependencies": {
+    "@aijee/engine": "workspace:*",
     "@earendil-works/pi-coding-agent": "0.84.3",
-    "@pideck/engine": "workspace:*",
     "ws": "^8.21.3"
   },
   "devDependencies": {

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 import { isHealthPayload, localServerArgs } from "../src/server-manager.ts";
 
-test("accepts only a PiDeck health payload", () => {
+test("accepts only a AiJee health payload", () => {
   assert.equal(isHealthPayload({ status: "ok" }), true);
   assert.equal(isHealthPayload({ ok: true }), true);
   assert.equal(isHealthPayload("<html>ok</html>"), false);
@@ -16,5 +16,5 @@ test("builds CLI arguments for a local gateway", () => {
 });
 
 test("does not start a remote gateway", () => {
-  assert.equal(localServerArgs("https://pideck.example.com"), undefined);
+  assert.equal(localServerArgs("https://aijee.example.com"), undefined);
 });

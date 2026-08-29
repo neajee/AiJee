@@ -20,7 +20,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Fonts } from "@/constants/theme";
 import { formatAgentModeLabel } from "@/features/agent/mode";
 import { useCachedAgentConfig } from "@/features/agent/hooks/use-cached-agent-config";
-import { useAgentSession, usePiClient } from "@pideck/client-sdk";
+import { useAgentSession, usePiClient } from "@aijee/client-sdk";
 import { useResponsiveLayout } from "@/features/navigation/hooks/use-responsive-layout";
 import { useSpeechRecognition } from "@/features/speech/hooks/use-speech-recognition";
 import { useSpeechSettingsStore } from "@/features/speech/store";
@@ -361,7 +361,7 @@ export function PromptInput({
   }, [attachments, clearDraft, draftKey, hasDraft, onClearError, onSend, setText, setAttachments, trimmedText]);
 
   // Queued messages are display-only: pi 0.84.3 has no `clear_queue` RPC command,
-  // so PiDeck cannot drop them. Stopping only aborts the current run.
+  // so AiJee cannot drop them. Stopping only aborts the current run.
   const requestAbort = useCallback(async () => {
     await onAbort?.();
   }, [onAbort]);

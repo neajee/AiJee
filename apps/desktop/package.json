@@ -1,8 +1,8 @@
 {
-  "name": "@pideck/desktop",
+  "name": "@aijee/desktop",
   "version": "0.1.0",
-  "description": "PiDeck desktop shell",
-  "author": "PiDeck contributors",
+  "description": "AiJee desktop shell",
+  "author": "AiJee contributors",
   "private": true,
   "main": "src/main.cjs",
   "scripts": {
@@ -10,15 +10,15 @@
     "build": "electron-builder"
   },
   "dependencies": {
-    "pideck": "workspace:*"
+    "aijee": "workspace:*"
   },
   "devDependencies": {
     "electron": "36.9.5",
     "electron-builder": "^26.0.12"
   },
   "build": {
-    "appId": "com.anthaathi.pideck",
-    "productName": "PiDeck",
+    "appId": "com.anthaathi.aijee",
+    "productName": "AiJee",
     "files": [
       "src/**/*",
       "package.json",

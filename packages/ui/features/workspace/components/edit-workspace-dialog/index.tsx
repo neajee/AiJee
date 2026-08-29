@@ -19,7 +19,7 @@ import { Colors, Fonts } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useResponsiveLayout } from "@/features/navigation/hooks/use-responsive-layout";
 import { useWorkspaceStore } from "../../store";
-import { sdk } from '@pideck/client-sdk';
+import { sdk } from '@aijee/client-sdk';
 const { update2 } = sdk;
 import type { Workspace } from "../../types";
 

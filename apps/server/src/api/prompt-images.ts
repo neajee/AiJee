@@ -1,4 +1,4 @@
-import type { ImageAttachment } from "@pideck/engine";
+import type { ImageAttachment } from "@aijee/engine";
 
 /** Anything larger is a mistake, not an attachment: 12MB of base64 per image. */
 const MAX_IMAGE_BASE64_BYTES = 12 * 1024 * 1024;

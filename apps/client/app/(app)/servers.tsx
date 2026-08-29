@@ -43,7 +43,7 @@ export default function ServersScreen() {
                 own title instead of relying on a header bar. */}
             <Text style={[styles.title, { color: p.text }]}>连接</Text>
             <Text style={[styles.subtitle, { color: p.textTertiary }]}>
-              选择要连接的 PiDeck 电脑。
+              选择要连接的 AiJee 电脑。
             </Text>
             <ServersSection isDark={isDark} />
           </View>

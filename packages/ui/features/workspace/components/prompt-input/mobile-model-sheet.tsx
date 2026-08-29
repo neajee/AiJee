@@ -6,7 +6,7 @@ import { Fonts } from '@/constants/theme';
 import { matchesModelSearch } from './model-search';
 import { usePromptTheme } from './use-theme-colors';
 import { ProviderIcon } from './provider-icons';
-import type { AgentConfigHandle } from '@pideck/client-sdk';
+import type { AgentConfigHandle } from '@aijee/client-sdk';
 
 interface MobileModelSheetProps {
   visible: boolean;

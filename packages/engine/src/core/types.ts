@@ -7,7 +7,7 @@ export type AgentEvent = {
   data: JsonValue;
   timestamp: number;
 };
-export type PiDeckEvent = AgentEvent;
+export type AiJeeEvent = AgentEvent;
 
 export type SessionDescriptor = {
   sessionId: string;

@@ -2,10 +2,10 @@ import { createServer, request } from "node:http";
 import { createReadStream } from "node:fs";
 import { fileURLToPath } from "node:url";
 
-const listenPort = Number(process.env.PIDECK_WEB_PORT ?? 8081);
-const listenHost = process.env.PIDECK_WEB_HOST ?? process.env.PIDECK_HOST ?? "127.0.0.1";
-const apiPort = Number(process.env.PIDECK_API_PORT ?? 5454);
-const expoPort = Number(process.env.PIDECK_EXPO_PORT ?? 8082);
+const listenPort = Number(process.env.AIJEE_WEB_PORT ?? 8081);
+const listenHost = process.env.AIJEE_WEB_HOST ?? process.env.AIJEE_HOST ?? "127.0.0.1";
+const apiPort = Number(process.env.AIJEE_API_PORT ?? 5454);
+const expoPort = Number(process.env.AIJEE_EXPO_PORT ?? 8082);
 
 function targetFor(pathname) {
   return pathname.startsWith("/api/") || pathname === "/health" || pathname === "/healthz" || pathname === "/version"
@@ -79,5 +79,5 @@ server.on("upgrade", (requestFromClient, clientSocket, head) => {
 });
 
 server.listen(listenPort, listenHost, () => {
-  process.stdout.write(`PiDeck development proxy listening on ${listenHost}:${listenPort}\n`);
+  process.stdout.write(`AiJee development proxy listening on ${listenHost}:${listenPort}\n`);
 });

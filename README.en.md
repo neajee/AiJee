@@ -1,20 +1,20 @@
-# PiDeck
+# AiJee
 
-PiDeck — Pi Coding Agent everywhere.
+AiJee — Pi Coding Agent everywhere.
 
 [中文](README.md)
 
-A multi-platform companion app for [pi-coding-agent](https://github.com/badlogic/pi-mono/). Run PiDeck on your computer, connect from your phone, and control your coding agent remotely.
+A multi-platform companion app for [pi-coding-agent](https://github.com/badlogic/pi-mono/). Run AiJee on your computer, connect from your phone, and control your coding agent remotely.
 
 ## Quick Start
 
 ### 1. Install with Pi
 
 ```bash
-pi install npm:pideck
+pi install npm:aijee
 ```
 
-The plugin starts or reuses the embedded Pi SDK runtime in the same `pideck`
+The plugin starts or reuses the embedded Pi SDK runtime in the same `aijee`
 installation unit.
 
 ### 2. Standalone installation
@@ -22,21 +22,21 @@ installation unit.
 For servers, NAS devices, or computers without a Pi TUI session:
 
 ```bash
-npm install -g pideck
-pideck serve
+npm install -g aijee
+aijee serve
 ```
 
 Rust, Cargo, and a global Pi CLI are not required. The package contains the Pi SDK runtime, hosted API, and web assets.
 
-On first launch PiDeck creates `~/.pideck/` and prints a setup code.
+On first launch AiJee creates `~/.aijee/` and prints a setup code.
 
 ### 3. First launch
 
 ```bash
-pideck serve
+aijee serve
 ```
 
-PiDeck starts on port **5454** and prints a setup code in the terminal:
+AiJee starts on port **5454** and prints a setup code in the terminal:
 
 ```
   Setup code: ...
@@ -44,8 +44,8 @@ PiDeck starts on port **5454** and prints a setup code in the terminal:
 
 ### 4. Connect from the mobile app
 
-1. Install the Pico app on your Android device (APK available in releases)
-2. Open the app and add a PiDeck host
+1. Install the AiJee app on your Android device (APK available in releases)
+2. Open the app and add a AiJee host
 3. Enter the setup code shown in your terminal
 4. Complete setup and sign in
 
@@ -54,7 +54,7 @@ You're connected! You can now create workspaces, start coding sessions, and inte
 ### Pi plugin bootstrap
 
 ```bash
-pi install npm:pideck
+pi install npm:aijee
 ```
 
 ## Architecture
@@ -91,20 +91,20 @@ separately deployed backends. Android and iOS remain connection clients. See
 
 ## Configuration
 
-The runtime state file is `~/.pideck/runtime.json`. Configure the listener with:
+The runtime state file is `~/.aijee/runtime.json`. Configure the listener with:
 
 ```toml
-PIDECK_HOST=0.0.0.0
-PIDECK_PORT=5454
-PIDECK_STATE_PATH=~/.pideck/runtime.json
+AIJEE_HOST=0.0.0.0
+AIJEE_PORT=5454
+AIJEE_STATE_PATH=~/.aijee/runtime.json
 ```
 
 ## Architecture
 
 ```text
-pideck package (Pi SDK + Runtime + HTTP/SSE + Web assets)
+aijee package (Pi SDK + Runtime + HTTP/SSE + Web assets)
         ↑
-PiDeck Client (Web / Mobile / Desktop)
+AiJee Client (Web / Mobile / Desktop)
 ```
 
 ## Development
@@ -117,7 +117,7 @@ PiDeck Client (Web / Mobile / Desktop)
 
 ### Run the mobile app (dev)
 
-On first launch, open `http://localhost:5454/setup` and enter the setup code printed by PiDeck. Reset administrator credentials and revoke all login and paired-device tokens with `pideck auth reset`.
+On first launch, open `http://localhost:5454/setup` and enter the setup code printed by AiJee. Reset administrator credentials and revoke all login and paired-device tokens with `aijee auth reset`.
 
 ```bash
 yarn install

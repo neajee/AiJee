@@ -1,7 +1,7 @@
 import { Platform } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import { create } from "zustand";
-import type { AgentStateData, ModelInfo } from "@pideck/client-sdk";
+import type { AgentStateData, ModelInfo } from "@aijee/client-sdk";
 
 const STORAGE_KEY = "agent_config_cache";
 

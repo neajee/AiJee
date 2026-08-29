@@ -17,7 +17,7 @@ import {
 } from 'lucide-react-native';
 
 import { Fonts } from '@/constants/theme';
-import { useAgentModes, type AgentMode } from '@pideck/client-sdk';
+import { useAgentModes, type AgentMode } from '@aijee/client-sdk';
 import { useSettingsHeadingVisible, useSettingsPalette, useSettingsPhoneLayout } from './settings-list';
 
 /**

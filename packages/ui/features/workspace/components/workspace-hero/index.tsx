@@ -2,7 +2,7 @@ import { useRef, useEffect, useMemo } from "react";
 import { Animated, StyleSheet, Text, View } from "react-native";
 
 import { Colors, Fonts } from "@/constants/theme";
-import { PiDeckLogo } from "@/components/pideck-logo";
+import { AiJeeLogo } from "@/components/aijee-logo";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useResponsiveLayout } from "@/features/navigation/hooks/use-responsive-layout";
 
@@ -135,7 +135,7 @@ export function WorkspaceHero() {
         ]}
       >
         <Animated.View style={{ transform: [{ scale: markScale }] }}>
-          <PiDeckLogo
+          <AiJeeLogo
             size={isWideScreen ? 64 : 52}
             color={textPrimary}
             opacity={isDark ? 0.92 : 0.88}

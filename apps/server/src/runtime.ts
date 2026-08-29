@@ -1,8 +1,8 @@
 import { SessionRegistry } from "./sessions/registry.ts";
-import type { CreateSessionInput, SessionDescriptor } from "@pideck/engine";
+import type { CreateSessionInput, SessionDescriptor } from "@aijee/engine";
 
 /** Product-level Pi SDK runtime. HTTP/desktop launchers use this singleton. */
-export class PiDeckRuntime {
+export class AiJeeRuntime {
   readonly sessions: SessionRegistry;
 
   constructor(sessions: SessionRegistry = new SessionRegistry()) {

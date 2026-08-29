@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import { Animated, StyleSheet, View } from "react-native";
 import { Minus } from "lucide-react-native";
 
-import { useAgentSession } from "@pideck/client-sdk";
+import { useAgentSession } from "@aijee/client-sdk";
 
 const DOT_COUNT = 3;
 const DOT_SIZE = 3.5;

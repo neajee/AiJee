@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { isAbortReason } from "@pideck/client-sdk";
+import { isAbortReason } from "@aijee/client-sdk";
 import type {
   AgentConnectionState,
   ChatMessage,

@@ -1,7 +1,7 @@
 import { Alert, Platform } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import { File as ExpoFile, Paths } from "expo-file-system";
-import type { ApiClient } from "@pideck/client-sdk";
+import type { ApiClient } from "@aijee/client-sdk";
 
 export type UploadItemStatus = "pending" | "uploading" | "success" | "error";
 

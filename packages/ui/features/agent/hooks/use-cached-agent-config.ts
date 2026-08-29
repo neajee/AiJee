@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import {
   useAgentConfig,
   type AgentConfigHandle,
-} from "@pideck/client-sdk";
+} from "@aijee/client-sdk";
 
 import { useAgentConfigCache } from "../store/config-cache";
 

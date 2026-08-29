@@ -1,1 +1,1 @@
-export const PIDECK_STREAM_PATH = "/api/stream";
+export const AIJEE_STREAM_PATH = "/api/stream";

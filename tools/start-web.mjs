@@ -9,7 +9,7 @@ function start(command, args) {
 }
 
 const runtime = start("node", ["--experimental-strip-types", "apps/server/src/main.ts", "serve"]);
-const expo = start("yarn", ["workspace", "@pideck/client", "dev", "--port", "8082"]);
+const expo = start("yarn", ["workspace", "@aijee/client", "dev", "--port", "8082"]);
 const proxy = start("node", ["tools/dev-web-proxy.mjs"]);
 
 function shutdown(code = 0) {

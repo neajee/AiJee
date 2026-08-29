@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Platform } from 'react-native';
 import {
     vnc,
-} from '@pideck/client-sdk';
+} from '@aijee/client-sdk';
 
 type RemoteDisplayRect = vnc.RemoteDisplayRect;
 type RemoteDisplayProtocolEvent = vnc.RemoteDisplayProtocolEvent;

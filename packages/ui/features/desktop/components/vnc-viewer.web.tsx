@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
-import { vnc } from '@pideck/client-sdk';
+import { vnc } from '@aijee/client-sdk';
 import { Colors, Fonts } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import {
@@ -89,7 +89,7 @@ export function VncViewer({
 
     const session = useVncSession({
         wsUrl,
-        websocketProtocols: ['binary', `pideck-auth.${accessToken}`],
+        websocketProtocols: ['binary', `aijee-auth.${accessToken}`],
         password: vncPassword,
         autoConnect: true,
         onFramebufferUpdate: handleFramebufferUpdate,

@@ -12,7 +12,7 @@ const document = JSON.parse(await readFile(contractPath, "utf8")) as {
   paths?: Record<string, Record<string, any>>;
   components?: Record<string, any>;
 };
-if (document.openapi !== "3.1.0" || !document.paths || Object.keys(document.paths).length < 100) throw new Error("openapi.yaml must contain the frozen PiDeck route contract");
+if (document.openapi !== "3.1.0" || !document.paths || Object.keys(document.paths).length < 100) throw new Error("openapi.yaml must contain the frozen AiJee route contract");
 for (const path of ["/healthz", "/version"]) document.paths[path] ??= { get: { operationId: path.slice(1) } };
 
 const schemas = document.components?.schemas ?? {};
@@ -46,7 +46,7 @@ const generatedManifest = generatedOperations.map(({ name, method, url }) => `${
 
 if (process.argv.includes("--check")) {
   const current = JSON.parse(await readFile(contractPath, "utf8"));
-  if (JSON.stringify(current) !== JSON.stringify(document)) throw new Error("openapi.yaml is out of date; run yarn workspace @pideck/api-contract generate");
+  if (JSON.stringify(current) !== JSON.stringify(document)) throw new Error("openapi.yaml is out of date; run yarn workspace @aijee/api-contract generate");
   const manifest = JSON.parse(await readFile(manifestPath, "utf8")) as string[];
   if (JSON.stringify(manifest) !== JSON.stringify(generatedManifest)) throw new Error("client-sdk generated operation diff detected; regenerate the SDK and contract manifest");
 } else {

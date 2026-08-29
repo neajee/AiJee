@@ -21,8 +21,8 @@ import { Colors, Fonts, WorkspaceColors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useResponsiveLayout } from '@/features/navigation/hooks/use-responsive-layout';
 import { useWorkspaceStore } from '../../store';
-import { sdk, unwrapApiData } from '@pideck/client-sdk';
-import type { PathCompletion } from '@pideck/client-sdk';
+import { sdk, unwrapApiData } from '@aijee/client-sdk';
+import type { PathCompletion } from '@aijee/client-sdk';
 const { complete } = sdk;
 
 interface NewWorkspaceDialogProps {

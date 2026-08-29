@@ -19,7 +19,7 @@ import { buildThinkingLevelOptions, thinkingLevelLabel, FlatModel, ThinkingLevel
 import { matchesModelSearch } from './model-search';
 import { usePromptTheme } from './use-theme-colors';
 import { ProviderIcon } from './provider-icons';
-import type { AgentConfigHandle } from '@pideck/client-sdk';
+import type { AgentConfigHandle } from '@aijee/client-sdk';
 import type { AgentMode } from '@/features/agent/mode';
 import { useAppMode } from '@/hooks/use-app-mode';
 import { TaskSelector } from '@/features/tasks/components/task-selector';

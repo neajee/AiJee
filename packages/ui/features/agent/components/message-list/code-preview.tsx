@@ -408,7 +408,7 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.mono,
   },
   lineText: {
-    fontSize: 12,
+    fontSize: 13,
     lineHeight: 20,
     fontFamily: Fonts.mono,
     paddingHorizontal: 8,

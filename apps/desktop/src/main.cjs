@@ -12,15 +12,15 @@ function createWindow() {
       sandbox: true,
     },
   });
-  window.webContents.setUserAgent(`${window.webContents.getUserAgent()} PiDeckDesktop/0.1.0`);
-  window.loadURL(process.env.PIDECK_CLIENT_URL || "http://127.0.0.1:5454");
+  window.webContents.setUserAgent(`${window.webContents.getUserAgent()} AiJeeDesktop/0.1.0`);
+  window.loadURL(process.env.AIJEE_CLIENT_URL || "http://127.0.0.1:5454");
 }
 
 app.whenReady().then(() => {
-  const runtime = require.resolve("pideck/bin/pideck.cjs");
+  const runtime = require.resolve("aijee/bin/aijee.cjs");
   server = spawn(process.execPath, [runtime, "serve"], { detached: true, stdio: "ignore" });
   server.once("error", (error) => {
-    console.error(`Unable to start PiDeck server: ${error.message}`);
+    console.error(`Unable to start AiJee server: ${error.message}`);
   });
   server.unref();
   createWindow();

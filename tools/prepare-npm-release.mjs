@@ -6,12 +6,12 @@ const [outputDir, version] = process.argv.slice(2);
 if (!outputDir || !version) throw new Error("Usage: node tools/prepare-npm-release.mjs <output> <version>");
 
 const root = join(fileURLToPath(new URL("..", import.meta.url)));
-const destination = join(outputDir, "pideck");
+const destination = join(outputDir, "aijee");
 const packageJson = JSON.parse(await readFile(join(root, "apps/server/package.json"), "utf8"));
 packageJson.version = version;
 delete packageJson.devDependencies;
 delete packageJson.scripts;
-delete packageJson.dependencies?.["@pideck/engine"];
+delete packageJson.dependencies?.["@aijee/engine"];
 packageJson.dependencies = { ...(packageJson.dependencies ?? {}), "@earendil-works/pi-coding-agent": "0.84.3" };
 await mkdir(destination, { recursive: true });
 await writeFile(join(destination, "package.json"), `${JSON.stringify(packageJson, null, 2)}\n`);
@@ -22,8 +22,8 @@ await cp(join(root, "packages/engine/src"), join(destination, "src/engine"), { r
 for (const file of ["src/api/http-server.ts", "src/runtime.ts", "src/sessions/registry.ts"]) {
   const target = join(destination, file);
   const source = await readFile(target, "utf8");
-  await writeFile(target, source.replaceAll('"@pideck/engine"', '"../engine/index.ts"'));
+  await writeFile(target, source.replaceAll('"@aijee/engine"', '"../engine/index.ts"'));
 }
 const publicRoot = join(root, "apps/server/public");
 try { await cp(publicRoot, join(destination, "public"), { recursive: true }); } catch { /* web assets may be built by npm prepack */ }
-console.log("Prepared pideck npm package");
+console.log("Prepared aijee npm package");

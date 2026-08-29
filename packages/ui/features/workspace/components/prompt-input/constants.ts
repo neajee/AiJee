@@ -1,5 +1,5 @@
-import type { ModelThinkingLevel } from '@pideck/client-sdk';
-import { ALL_THINKING_LEVELS } from '@pideck/client-sdk';
+import type { ModelThinkingLevel } from '@aijee/client-sdk';
+import { ALL_THINKING_LEVELS } from '@aijee/client-sdk';
 
 export interface SlashCommand {
   name: string;

@@ -11,7 +11,7 @@ import { Star, Layers, Check, CircleOff } from 'lucide-react-native';
 
 import { Fonts } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import type { AgentMode } from '@pideck/client-sdk';
+import type { AgentMode } from '@aijee/client-sdk';
 
 const NO_MODE_ID = '__none__';
 

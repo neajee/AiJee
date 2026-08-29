@@ -25,7 +25,7 @@ import { SquarePen, RefreshCw, Plus } from 'lucide-react-native';
 import { Colors, Fonts } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useWorkspaceStore } from '@/features/workspace/store';
-import { useWorkspaceSessions as useSessions } from '@pideck/client-sdk';
+import { useWorkspaceSessions as useSessions } from '@aijee/client-sdk';
 import { NewWorkspaceDialog } from '@/features/workspace/components/new-workspace-dialog';
 import { SessionActivityIndicator } from '@/features/workspace/components/session-activity-indicator';
 import { AnimatedListItem } from '@/components/ui/animated-list-item';

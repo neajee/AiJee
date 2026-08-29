@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from "react";
 import { Platform } from "react-native";
 import { usePathname } from "expo-router";
-import { usePiClient, useTurnEnd, type TurnEndEvent } from "@pideck/client-sdk";
+import { usePiClient, useTurnEnd, type TurnEndEvent } from "@aijee/client-sdk";
 
 import { useWorkspaceStore } from "@/features/workspace/store";
 import { useAppSettingsStore } from "@/features/settings/store";

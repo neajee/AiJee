@@ -1,10 +1,10 @@
 {
-  "name": "@pideck/ui",
+  "name": "@aijee/ui",
   "version": "0.1.0",
   "private": true,
   "sideEffects": false,
   "dependencies": {
-    "@pideck/client-sdk": "workspace:*",
+    "@aijee/client-sdk": "workspace:*",
     "react": "19.1.0",
     "react-native": "0.81.5"
   },

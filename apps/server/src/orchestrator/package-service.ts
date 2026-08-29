@@ -8,14 +8,14 @@ export class PackageService {
   private readonly operationLogs: Log[] = [];
   private nextId = 1;
 
-  status(): Record<string, unknown> { return { name: "pideck", installed: true, installed_version: "0.1.0", latest_version: null }; }
+  status(): Record<string, unknown> { return { name: "aijee", installed: true, installed_version: "0.1.0", latest_version: null }; }
   logs(limit = 50): Log[] { return this.operationLogs.slice(-Math.max(1, Math.min(limit, 200))); }
 
   async operation(operation: "install" | "update"): Promise<Record<string, unknown>> {
     const started = new Date().toISOString();
     try {
       const result = await exec("npm", ["--version"], { maxBuffer: 1024 * 1024 });
-      const output = `npm ${result.stdout.trim()} available; ${operation} is managed by the installed PiDeck package`;
+      const output = `npm ${result.stdout.trim()} available; ${operation} is managed by the installed AiJee package`;
       this.operationLogs.push({ id: this.nextId++, operation, status: "success", output, created_at: started });
       return { operation, output, success: true };
     } catch (error) {

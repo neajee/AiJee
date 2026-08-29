@@ -20,7 +20,7 @@ import { PiLogo } from "@/components/pi-logo";
 import { useServersStore, type Server } from "@/features/servers/store";
 import { useAuthStore } from "@/features/auth/store";
 import { useWorkspaceStore } from "@/features/workspace/store";
-import { useOptionalPiClient } from "@pideck/client-sdk";
+import { useOptionalPiClient } from "@aijee/client-sdk";
 import { QrScanner } from "@/features/servers/components/qr-scanner";
 import { NewWorkspaceDialog } from "@/features/workspace/components/new-workspace-dialog";
 import {
@@ -259,10 +259,10 @@ export function ServersSection({
           <Text
             style={[styles.welcomeTitle, { color: p.text }]}
           >
-            欢迎使用 PiDeck
+            欢迎使用 AiJee
           </Text>
           <Text style={[styles.welcomeDesc, { color: p.textTertiary }]}>
-            连接到运行 PiDeck 的设备，{"\n"}
+            连接到运行 AiJee 的设备，{"\n"}
             使用设备授权后即可打开工作区。
           </Text>
           <View style={styles.welcomeButtons}>
@@ -350,7 +350,7 @@ export function ServersSection({
         <SettingsRow
           icon={QrCode}
           label="扫描授权码"
-          description="扫描 PiDeck 设备端生成的授权二维码"
+          description="扫描 AiJee 设备端生成的授权二维码"
           onPress={() => setQrVisible(true)}
           isLast
         />

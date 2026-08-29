@@ -4,12 +4,12 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
 import { WebSocket } from "ws";
-import { PiDeckHttpServer } from "../src/api/http-server.ts";
-import { PiDeckRuntime } from "../src/runtime.ts";
+import { AiJeeHttpServer } from "../src/api/http-server.ts";
+import { AiJeeRuntime } from "../src/runtime.ts";
 import { SessionRegistry } from "../src/sessions/registry.ts";
 import { fakeSession } from "./helpers/fake-session.ts";
 
-async function authorize(server: PiDeckHttpServer): Promise<string> {
+async function authorize(server: AiJeeHttpServer): Promise<string> {
   const link = await server.bootstrapLink(server.url());
   const code = new URL(link).searchParams.get("k")!;
   const response = await fetch(`${server.url()}/api/devices`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ code, name: "Test owner" }) });
@@ -17,8 +17,8 @@ async function authorize(server: PiDeckHttpServer): Promise<string> {
 }
 
 test("serves the SDK runtime health and workspace contract", async () => {
-  const directory = await mkdtemp(join(tmpdir(), "pideck-runtime-"));
-  const server = new PiDeckHttpServer(undefined, join(directory, "runtime.json"));
+  const directory = await mkdtemp(join(tmpdir(), "aijee-runtime-"));
+  const server = new AiJeeHttpServer(undefined, join(directory, "runtime.json"));
   await server.listen(0, "0.0.0.0");
   try {
     const health = await fetch(`${server.url()}/api/health`);
@@ -30,7 +30,7 @@ test("serves the SDK runtime health and workspace contract", async () => {
     const created = await fetch(`${server.url()}/api/workspaces`, {
       method: "POST",
       headers,
-      body: JSON.stringify({ name: "Pico", path: directory }),
+      body: JSON.stringify({ name: "AiJee", path: directory }),
     });
     const createdBody = await created.json() as { success: boolean; data: { id: string } };
     assert.equal(created.status, 201);
@@ -65,7 +65,7 @@ test("serves the SDK runtime health and workspace contract", async () => {
 });
 
 test("reuses a hidden draft session and publishes it only after the first prompt", async () => {
-  const directory = await mkdtemp(join(tmpdir(), "pideck-draft-"));
+  const directory = await mkdtemp(join(tmpdir(), "aijee-draft-"));
   const messages: unknown[] = [];
   let creates = 0;
   const registry = new SessionRegistry(async (input) => {
@@ -74,12 +74,12 @@ test("reuses a hidden draft session and publishes it only after the first prompt
     session.prompt = async (text: string) => { messages.push({ role: "user", content: text }); };
     return session;
   });
-  const server = new PiDeckHttpServer(new PiDeckRuntime(registry), join(directory, "runtime.json"));
+  const server = new AiJeeHttpServer(new AiJeeRuntime(registry), join(directory, "runtime.json"));
   await server.listen(0, "0.0.0.0");
   try {
     const token = await authorize(server);
     const headers = { "Content-Type": "application/json", Authorization: `Bearer ${token}` };
-    const created = await fetch(`${server.url()}/api/workspaces`, { method: "POST", headers, body: JSON.stringify({ name: "Pico", path: directory }) });
+    const created = await fetch(`${server.url()}/api/workspaces`, { method: "POST", headers, body: JSON.stringify({ name: "AiJee", path: directory }) });
     const workspaceId = (await created.json() as { data: { id: string } }).data.id;
     const body = JSON.stringify({ workspace_id: workspaceId, draft: true });
 
@@ -105,7 +105,7 @@ test("reuses a hidden draft session and publishes it only after the first prompt
 });
 
 test("forwards image attachments and the queue behaviour to the engine", async () => {
-  const directory = await mkdtemp(join(tmpdir(), "pideck-images-"));
+  const directory = await mkdtemp(join(tmpdir(), "aijee-images-"));
   const sent: Array<{ text: string; options?: { images?: unknown; streamingBehavior?: string } }> = [];
   const registry = new SessionRegistry(async (input) => {
     const session = fakeSession("image-session", { cwd: input.cwd });
@@ -114,12 +114,12 @@ test("forwards image attachments and the queue behaviour to the engine", async (
     };
     return session;
   });
-  const server = new PiDeckHttpServer(new PiDeckRuntime(registry), join(directory, "runtime.json"));
+  const server = new AiJeeHttpServer(new AiJeeRuntime(registry), join(directory, "runtime.json"));
   await server.listen(0, "0.0.0.0");
   try {
     const token = await authorize(server);
     const headers = { "Content-Type": "application/json", Authorization: `Bearer ${token}` };
-    const created = await fetch(`${server.url()}/api/workspaces`, { method: "POST", headers, body: JSON.stringify({ name: "Pico", path: directory }) });
+    const created = await fetch(`${server.url()}/api/workspaces`, { method: "POST", headers, body: JSON.stringify({ name: "AiJee", path: directory }) });
     const workspaceId = (await created.json() as { data: { id: string } }).data.id;
     const session = await fetch(`${server.url()}/api/agent/sessions`, { method: "POST", headers, body: JSON.stringify({ workspace_id: workspaceId }) });
     const sessionId = (await session.json() as { data: { session_id: string } }).data.session_id;
@@ -146,8 +146,8 @@ test("forwards image attachments and the queue behaviour to the engine", async (
 });
 
 test("legacy authentication endpoints are not routed", async () => {
-  const directory = await mkdtemp(join(tmpdir(), "pideck-pair-"));
-  const server = new PiDeckHttpServer(undefined, join(directory, "runtime.json"));
+  const directory = await mkdtemp(join(tmpdir(), "aijee-pair-"));
+  const server = new AiJeeHttpServer(undefined, join(directory, "runtime.json"));
   await server.listen(0);
   try {
     const removed = await fetch(`${server.url()}/api/auth/login`, { method: "POST" });
@@ -159,8 +159,8 @@ test("legacy authentication endpoints are not routed", async () => {
 });
 
 test("claims a local-only session without exposing setup", async () => {
-  const directory = await mkdtemp(join(tmpdir(), "pideck-local-"));
-  const server = new PiDeckHttpServer(undefined, join(directory, "runtime.json"));
+  const directory = await mkdtemp(join(tmpdir(), "aijee-local-"));
+  const server = new AiJeeHttpServer(undefined, join(directory, "runtime.json"));
   await server.listen(0);
   try {
     const origin = server.url();
@@ -176,8 +176,8 @@ test("claims a local-only session without exposing setup", async () => {
 });
 
 test("authorizes, lists, and revokes device tokens", async () => {
-  const directory = await mkdtemp(join(tmpdir(), "pideck-devices-"));
-  const server = new PiDeckHttpServer(undefined, join(directory, "runtime.json"));
+  const directory = await mkdtemp(join(tmpdir(), "aijee-devices-"));
+  const server = new AiJeeHttpServer(undefined, join(directory, "runtime.json"));
   await server.listen(0, "0.0.0.0");
   try {
     const ownerToken = await authorize(server);
@@ -199,9 +199,9 @@ test("authorizes, lists, and revokes device tokens", async () => {
 });
 
 test("keeps one reusable device code until it is manually rotated", async () => {
-  const directory = await mkdtemp(join(tmpdir(), "pideck-device-code-"));
+  const directory = await mkdtemp(join(tmpdir(), "aijee-device-code-"));
   const statePath = join(directory, "runtime.json");
-  let server = new PiDeckHttpServer(undefined, statePath);
+  let server = new AiJeeHttpServer(undefined, statePath);
   await server.listen(0, "0.0.0.0");
   try {
     const ownerToken = await authorize(server);
@@ -214,7 +214,7 @@ test("keeps one reusable device code until it is manually rotated", async () => 
     }
 
     await server.close();
-    server = new PiDeckHttpServer(undefined, statePath);
+    server = new AiJeeHttpServer(undefined, statePath);
     await server.listen(0, "0.0.0.0");
     const persisted = await fetch(`${server.url()}/api/devices/code`, { headers });
     assert.equal((await persisted.json() as { data: { code: string } }).data.code, firstCode);
@@ -233,8 +233,8 @@ test("keeps one reusable device code until it is manually rotated", async () => 
 });
 
 test("serves the global SSE handshake expected by client-sdk", async () => {
-  const directory = await mkdtemp(join(tmpdir(), "pideck-stream-"));
-  const server = new PiDeckHttpServer(undefined, join(directory, "runtime.json"));
+  const directory = await mkdtemp(join(tmpdir(), "aijee-stream-"));
+  const server = new AiJeeHttpServer(undefined, join(directory, "runtime.json"));
   await server.listen(0, "0.0.0.0");
   const controller = new AbortController();
   try {
@@ -253,8 +253,8 @@ test("serves the global SSE handshake expected by client-sdk", async () => {
 });
 
 test("serves the authenticated WebSocket stream handshake", async () => {
-  const directory = await mkdtemp(join(tmpdir(), "pideck-ws-"));
-  const server = new PiDeckHttpServer(undefined, join(directory, "runtime.json"));
+  const directory = await mkdtemp(join(tmpdir(), "aijee-ws-"));
+  const server = new AiJeeHttpServer(undefined, join(directory, "runtime.json"));
   await server.listen(0, "0.0.0.0");
   let socket: WebSocket | undefined;
   try {
@@ -273,10 +273,10 @@ test("serves the authenticated WebSocket stream handshake", async () => {
 });
 
 test("device authorization preserves persisted models and modes", async () => {
-  const directory = await mkdtemp(join(tmpdir(), "pideck-state-"));
+  const directory = await mkdtemp(join(tmpdir(), "aijee-state-"));
   const statePath = join(directory, "runtime.json");
   await writeFile(statePath, JSON.stringify({ workspaces: [], custom_models: { providers: { local: { models: [] } } }, modes: [{ id: "safe", name: "Safe" }] }));
-  const server = new PiDeckHttpServer(undefined, statePath);
+  const server = new AiJeeHttpServer(undefined, statePath);
   await server.listen(0, "0.0.0.0");
   try {
     await authorize(server);
@@ -290,12 +290,12 @@ test("device authorization preserves persisted models and modes", async () => {
 });
 
 test("restores persisted sessions on demand for model and history reads", async () => {
-  const directory = await mkdtemp(join(tmpdir(), "pideck-restore-"));
+  const directory = await mkdtemp(join(tmpdir(), "aijee-restore-"));
   const statePath = join(directory, "runtime.json");
   const sessionFile = join(directory, "session.jsonl");
   await writeFile(sessionFile, `${JSON.stringify({ type: "session", version: 3, id: "seeded", timestamp: new Date().toISOString(), cwd: directory })}\n`);
   await writeFile(statePath, JSON.stringify({
-    workspaces: [{ id: "workspace-1", path: directory, name: "Pico" }],
+    workspaces: [{ id: "workspace-1", path: directory, name: "AiJee" }],
     sessions: [{ session_id: "seeded", session_file: sessionFile, workspace_id: "workspace-1", cwd: directory, created_at: new Date().toISOString(), last_active: Date.now() }],
   }));
 
@@ -316,7 +316,7 @@ test("restores persisted sessions on demand for model and history reads", async 
       return Reflect.get(target, property, receiver);
     },
   });
-  const server = new PiDeckHttpServer(new PiDeckRuntime(countingRegistry as SessionRegistry), statePath);
+  const server = new AiJeeHttpServer(new AiJeeRuntime(countingRegistry as SessionRegistry), statePath);
   await server.listen(0, "0.0.0.0");
   try {
     const token = await authorize(server);

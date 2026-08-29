@@ -1,10 +1,10 @@
 import { create } from 'zustand';
-import { sdk, unwrapApiData, extractApiErrorMessage } from '@pideck/client-sdk';
+import { sdk, unwrapApiData, extractApiErrorMessage } from '@aijee/client-sdk';
 import type {
   CustomProvider,
   CustomModelEntry,
   CustomModelsConfigResult,
-} from '@pideck/client-sdk';
+} from '@aijee/client-sdk';
 const { getCustomModels, saveCustomModels } = sdk;
 
 export type { CustomProvider, CustomModelEntry };

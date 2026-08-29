@@ -21,7 +21,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { ArrowDown, ChevronRight } from "lucide-react-native";
-import { useAgentSession } from "@pideck/client-sdk";
+import { useAgentSession } from "@aijee/client-sdk";
 import { useWorkspaceStore } from "@/features/workspace/store";
 import { Colors, Fonts } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";

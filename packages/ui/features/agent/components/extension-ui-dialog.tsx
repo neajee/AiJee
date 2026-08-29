@@ -13,7 +13,7 @@ import { Check, Circle, CircleDot, X } from "lucide-react-native";
 import { Fonts } from "@/constants/theme";
 import { usePromptTheme } from "@/features/workspace/components/prompt-input/use-theme-colors";
 import type { PendingExtensionUiRequest } from "../extension-ui";
-import { usePiClient } from "@pideck/client-sdk";
+import { usePiClient } from "@aijee/client-sdk";
 import { useAgentStore } from "../store";
 
 function useSendExtensionUiResponse() {

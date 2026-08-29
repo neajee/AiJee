@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { usePiClient } from '@pideck/client-sdk';
+import { usePiClient } from '@aijee/client-sdk';
 import { useTasksStore } from '../store';
 import { handleTaskStreamEvent } from '../hooks/use-task-events';
 

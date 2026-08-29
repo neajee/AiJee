@@ -8,7 +8,7 @@ const CANVAS_TO_MARK = 1 / 0.61;
 
 const MARK = require("../assets/images/android-icon-monochrome.png");
 
-interface PiDeckLogoProps {
+interface AiJeeLogoProps {
   /** Optical size of the mark itself, not the padded asset canvas. */
   size?: number;
   /** Tint applied to the monochrome mark. Omit to keep the asset as-is. */
@@ -17,12 +17,12 @@ interface PiDeckLogoProps {
   style?: StyleProp<ImageStyle>;
 }
 
-export function PiDeckLogo({
+export function AiJeeLogo({
   size = 56,
   color,
   opacity = 1,
   style,
-}: PiDeckLogoProps) {
+}: AiJeeLogoProps) {
   const box = Math.round(size * CANVAS_TO_MARK);
 
   return (

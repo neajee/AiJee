@@ -381,6 +381,10 @@ export function WorkspaceSidebar({
   };
 
   const openPane = (tab: WorkspacePaneTab) => {
+    if (!collapsed && activePaneTab === tab) {
+      updateCollapsed(true);
+      return;
+    }
     setActivePaneTab(tab);
     setPaneRequest((current) => ({ tab, revision: (current?.revision ?? 0) + 1 }));
     updateCollapsed(false);
@@ -390,7 +394,7 @@ export function WorkspaceSidebar({
   const isDesktopShell =
     Platform.OS === "web" &&
     typeof navigator !== "undefined" &&
-    navigator.userAgent.includes("PiDeckDesktop/");
+    navigator.userAgent.includes("AiJeeDesktop/");
 
   return (
     <WorkspacePaneContext.Provider

@@ -8,7 +8,7 @@ import { BrowserPreview } from "@/features/preview/components/browser-preview";
 import { usePreviewStore, type PreviewTarget } from "@/features/preview/store";
 import { GLOBAL_PREVIEW_KEY } from "@/features/preview/components/preview-event-subscriber";
 import { useAuthStore } from "@/features/auth/store";
-import { usePiClient } from "@pideck/client-sdk";
+import { usePiClient } from "@aijee/client-sdk";
 
 const EMPTY_TARGETS: PreviewTarget[] = [];
 

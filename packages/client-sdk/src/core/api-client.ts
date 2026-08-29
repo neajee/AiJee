@@ -1,4 +1,4 @@
-import { PIDECK_STREAM_PATH } from "./constants";
+import { AIJEE_STREAM_PATH } from "./constants";
 import * as sdk from "../generated/sdk.gen";
 import type {
   AgentSessionInfo,
@@ -1338,7 +1338,7 @@ export class ApiClient {
   // ---------------------------------------------------------------------------
 
   getStreamUrl(from?: number): string {
-    const url = new URL(`${this._serverUrl}${PIDECK_STREAM_PATH}`);
+    const url = new URL(`${this._serverUrl}${AIJEE_STREAM_PATH}`);
     if (from !== undefined) url.searchParams.set("from", String(from));
     return url.toString();
   }

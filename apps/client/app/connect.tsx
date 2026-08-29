@@ -93,7 +93,7 @@ export default function DirectConnectScreen() {
         setError("This authorization link is no longer supported. Generate a new device link.");
         return;
       }
-      const result = await authorizeWithCode(baseUrl, connectParams.code, serverId, connectParams.hostname || 'PiDeck device');
+      const result = await authorizeWithCode(baseUrl, connectParams.code, serverId, connectParams.hostname || 'AiJee device');
       if (cancelled) return;
 
       if (!result.success) {
@@ -104,7 +104,7 @@ export default function DirectConnectScreen() {
 
       await addServer({
         id: serverId,
-        name: existingServer?.name || connectParams.hostname || "PiDeck",
+        name: existingServer?.name || connectParams.hostname || "AiJee",
         address: baseUrl,
       });
 
@@ -140,7 +140,7 @@ export default function DirectConnectScreen() {
 
   const titleByStatus: Record<ConnectStatus, string> = {
     loading: "Preparing direct login",
-    pairing: "Connecting to PiDeck",
+    pairing: "Connecting to AiJee",
     done: "Connected",
     error: "Direct login failed",
   };

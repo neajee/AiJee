@@ -3,33 +3,33 @@ import { ServerManager } from "../server-manager.ts";
 
 const server = new ServerManager();
 
-export default function pideck(pi: ExtensionAPI) {
-  pi.registerCommand("pideck", {
-    description: "Start or connect to PiDeck",
+export default function aijee(pi: ExtensionAPI) {
+  pi.registerCommand("aijee", {
+    description: "Start or connect to AiJee",
     handler: async (_args, ctx) => {
       const healthy = await server.ensureStarted();
       ctx.ui.notify(
         healthy
-          ? `PiDeck is ready at ${server.url}`
-          : `PiDeck failed to start with ${server.command}`,
+          ? `AiJee is ready at ${server.url}`
+          : `AiJee failed to start with ${server.command}`,
         healthy ? "info" : "error",
       );
     },
   });
 
-  pi.registerCommand("pideck-status", {
-    description: "Check PiDeck status",
+  pi.registerCommand("aijee-status", {
+    description: "Check AiJee status",
     handler: async (_args, ctx) => {
       const healthy = await server.isHealthy();
-      ctx.ui.notify(healthy ? `PiDeck is running at ${server.url}` : "PiDeck is not running", "info");
+      ctx.ui.notify(healthy ? `AiJee is running at ${server.url}` : "AiJee is not running", "info");
     },
   });
 
-  pi.registerCommand("pideck-stop", {
-    description: "Stop PiDeck started by this Pi session",
+  pi.registerCommand("aijee-stop", {
+    description: "Stop AiJee started by this Pi session",
     handler: async (_args, ctx) => {
       ctx.ui.notify(
-        server.stop() ? "PiDeck stopped" : "This Pi session does not own PiDeck",
+        server.stop() ? "AiJee stopped" : "This Pi session does not own AiJee",
         "info",
       );
     },

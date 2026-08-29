@@ -11,7 +11,7 @@ import {
 import { ChevronDown, ChevronUp, GitCompare } from "lucide-react-native";
 
 import { useWorkspaceStore } from "@/features/workspace/store";
-import { useGitStatus, useGitLog, useFileDiff } from "@pideck/client-sdk";
+import { useGitStatus, useGitLog, useFileDiff } from "@aijee/client-sdk";
 import { FileTree } from "../file-tree";
 
 import type { Tab } from "./constants";

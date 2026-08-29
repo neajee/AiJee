@@ -90,16 +90,16 @@ export default function RootLayout() {
         window.history.replaceState({}, '', window.location.pathname || '/');
         const server = await ensureLocalServer(address);
         const result = await authorizeWithCode(address, code, server.id, server.name);
-        console.info('[pideck/bootstrap] device code', { success: result.success, error: result.error ?? null });
+        console.info('[aijee/bootstrap] device code', { success: result.success, error: result.error ?? null });
         setBootstrapReady(true);
         return;
       }
       const target = await getBootstrapTarget();
-      console.info('[pideck/bootstrap] target', target.kind);
+      console.info('[aijee/bootstrap] target', target.kind);
       if (target.kind === 'local') {
         const server = await ensureLocalServer(target.server.address);
         const claim = await claimLocalServer(server);
-        console.info('[pideck/bootstrap] local claim', { success: claim.success, error: claim.error ?? null });
+        console.info('[aijee/bootstrap] local claim', { success: claim.success, error: claim.error ?? null });
       }
       setBootstrapReady(true);
     })();
@@ -119,7 +119,7 @@ export default function RootLayout() {
     if (fontsLoaded) {
       SplashScreen.hideAsync();
       if (typeof document === 'undefined') return;
-      const startup = document.getElementById('pideck-web-startup');
+      const startup = document.getElementById('aijee-web-startup');
       startup?.classList.add('is-ready');
       const timeout = setTimeout(() => startup?.remove(), 200);
       return () => clearTimeout(timeout);
@@ -137,7 +137,7 @@ export default function RootLayout() {
           value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
         >
           <Head>
-            <title>PiDeck</title>
+            <title>AiJee</title>
           </Head>
           <Stack>
             <Stack.Screen

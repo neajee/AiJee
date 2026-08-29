@@ -1,4 +1,10 @@
-import { memo, type ReactNode } from "react";
+import {
+  cloneElement,
+  isValidElement,
+  memo,
+  type ReactElement,
+  type ReactNode,
+} from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { Colors } from "@/constants/theme";
@@ -21,6 +27,26 @@ interface MarkdownTableProps {
   header: ReactNode[][];
   rows: ReactNode[][][];
   isDark: boolean;
+}
+
+function normalizeCellTypography(node: ReactNode): ReactNode {
+  if (Array.isArray(node)) return node.map(normalizeCellTypography);
+  if (!isValidElement(node)) return node;
+
+  const element = node as ReactElement<{
+    children?: ReactNode;
+    style?: unknown;
+  }>;
+  const children = element.props.children;
+
+  return cloneElement(element, {
+    ...(element.type === Text
+      ? { style: [element.props.style, styles.cellText] }
+      : {}),
+    ...(children === undefined
+      ? {}
+      : { children: normalizeCellTypography(children) }),
+  });
 }
 
 export const MarkdownTable = memo(function MarkdownTable({
@@ -64,7 +90,9 @@ export const MarkdownTable = memo(function MarkdownTable({
             >
               {/* Header cells arrive as inline nodes; wrapping in Text keeps the
                   emphasis without a second block-level box. */}
-              <Text style={styles.headerText}>{cell}</Text>
+              <Text style={[styles.cellText, styles.headerText]}>
+                {normalizeCellTypography(cell)}
+              </Text>
             </View>
           ))}
         </View>
@@ -90,7 +118,7 @@ export const MarkdownTable = memo(function MarkdownTable({
                 },
               ]}
             >
-              {cell}
+              {normalizeCellTypography(cell)}
             </View>
           ))}
         </View>
@@ -136,5 +164,11 @@ const styles = StyleSheet.create({
   },
   headerText: {
     fontWeight: "600",
+  },
+  cellText: {
+    fontSize: 13,
+    lineHeight: 19,
+    maxWidth: "100%",
+    alignSelf: "flex-start",
   },
 });

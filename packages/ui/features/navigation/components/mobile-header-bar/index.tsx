@@ -16,7 +16,7 @@ import { Colors, Fonts } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useAppMode } from '@/hooks/use-app-mode';
 import { useWorkspaceStore } from '@/features/workspace/store';
-import { useGitStatus, useNestedRepos } from '@pideck/client-sdk';
+import { useGitStatus, useNestedRepos } from '@aijee/client-sdk';
 import { remotesToLinks, type RemoteLink } from '@/features/workspace/utils/git-remote-url';
 import { usePreviewStore } from '@/features/preview/store';
 import { useTasksStore } from '@/features/tasks/store';

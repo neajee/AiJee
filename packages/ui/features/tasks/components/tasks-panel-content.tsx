@@ -20,7 +20,7 @@ import { Colors, Fonts } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useTasksStore } from '../store';
 import { useWorkspaceStore } from '@/features/workspace/store';
-import type { TaskDefinition, TaskInfo } from '@pideck/client-sdk';
+import type { TaskDefinition, TaskInfo } from '@aijee/client-sdk';
 
 const SOURCE_COLORS: Record<string, string> = {
   npm: '#CB3837',

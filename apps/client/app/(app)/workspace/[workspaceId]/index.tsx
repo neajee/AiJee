@@ -23,8 +23,8 @@ import { WorkspaceRightPane } from "@/features/preview/components/workspace-righ
 import { ModePickerDialog } from "@/features/workspace/components/mode-picker-dialog";
 import { useWorkspaceStore } from "@/features/workspace/store";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { usePiClient, useAgentModes } from "@pideck/client-sdk";
-import type { AgentMode } from "@pideck/client-sdk";
+import { usePiClient, useAgentModes } from "@aijee/client-sdk";
+import type { AgentMode } from "@aijee/client-sdk";
 import { requestBrowserNotificationPermission } from "@/features/agent/browser-notifications";
 
 export default function WorkspaceScreen() {

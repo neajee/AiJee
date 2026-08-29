@@ -1,13 +1,13 @@
-# PiDeck Source-Available Non-Commercial License
+# AiJee Source-Available Non-Commercial License
 
 Version 1.0
 
-Copyright © 2026 PiDeck Authors.
+Copyright © 2026 AiJee Authors.
 All Rights Reserved.
 
 ## 1. Grant of License
 
-Subject to the terms of this License, the copyright holder grants you a limited, non-exclusive, non-transferable, revocable license to access, use, copy, modify, and distribute the PiDeck source code solely for non-commercial purposes.
+Subject to the terms of this License, the copyright holder grants you a limited, non-exclusive, non-transferable, revocable license to access, use, copy, modify, and distribute the AiJee source code solely for non-commercial purposes.
 
 Permitted non-commercial purposes include:
 
@@ -17,22 +17,22 @@ Permitted non-commercial purposes include:
 * Security research;
 * Evaluation and testing;
 * Development of non-commercial modifications or extensions;
-* Contributions made back to the PiDeck project.
+* Contributions made back to the AiJee project.
 
 ## 2. Commercial Use Prohibited
 
-Unless you have obtained prior written authorization or a separate commercial license from the copyright holder, you may not use PiDeck, in whole or in substantial part, for any commercial purpose.
+Unless you have obtained prior written authorization or a separate commercial license from the copyright holder, you may not use AiJee, in whole or in substantial part, for any commercial purpose.
 
 Commercial use includes, but is not limited to:
 
-1. Selling PiDeck or modified versions of PiDeck;
-2. Charging users for access to PiDeck;
-3. Offering PiDeck as a paid SaaS, hosted service, cloud service, managed service, or subscription service;
-4. Integrating PiDeck into a commercial software product or commercial platform;
-5. Using PiDeck as a substantial component of a product or service offered for commercial advantage;
-6. Redistributing, sublicensing, leasing, renting, or reselling PiDeck for commercial purposes;
-7. Providing paid deployment, hosting, customization, or managed PiDeck services where PiDeck itself forms a substantial part of the commercial offering;
-8. Removing PiDeck branding and redistributing substantially the same software under another name for commercial purposes.
+1. Selling AiJee or modified versions of AiJee;
+2. Charging users for access to AiJee;
+3. Offering AiJee as a paid SaaS, hosted service, cloud service, managed service, or subscription service;
+4. Integrating AiJee into a commercial software product or commercial platform;
+5. Using AiJee as a substantial component of a product or service offered for commercial advantage;
+6. Redistributing, sublicensing, leasing, renting, or reselling AiJee for commercial purposes;
+7. Providing paid deployment, hosting, customization, or managed AiJee services where AiJee itself forms a substantial part of the commercial offering;
+8. Removing AiJee branding and redistributing substantially the same software under another name for commercial purposes.
 
 Internal use by a commercial organization is also considered commercial use unless separately authorized by the copyright holder.
 
@@ -45,9 +45,9 @@ If you distribute a modified version, you must:
 * Clearly state that the software has been modified;
 * Preserve existing copyright and attribution notices;
 * Include a copy of this License;
-* Clearly identify the project as being derived from PiDeck where applicable.
+* Clearly identify the project as being derived from AiJee where applicable.
 
-You may not represent a modified version as an official PiDeck release without written authorization.
+You may not represent a modified version as an official AiJee release without written authorization.
 
 ## 4. Redistribution
 
@@ -56,20 +56,20 @@ Non-commercial redistribution is permitted provided that:
 * This License is included;
 * Copyright notices are preserved;
 * Attribution notices are preserved;
-* The source of the original PiDeck project is identified where reasonably practical;
-* No additional terms are imposed that reduce the protections granted to the PiDeck copyright holder.
+* The source of the original AiJee project is identified where reasonably practical;
+* No additional terms are imposed that reduce the protections granted to the AiJee copyright holder.
 
 ## 5. Trademark and Branding
 
-This License does not grant permission to use the PiDeck name, logo, trademarks, service marks, visual identity, or other branding except as reasonably necessary to describe the origin of the software.
+This License does not grant permission to use the AiJee name, logo, trademarks, service marks, visual identity, or other branding except as reasonably necessary to describe the origin of the software.
 
-You may not use PiDeck branding in a way that implies sponsorship, endorsement, partnership, or official affiliation without written permission.
+You may not use AiJee branding in a way that implies sponsorship, endorsement, partnership, or official affiliation without written permission.
 
 Modified or redistributed versions should use a distinct product name unless otherwise authorized.
 
 ## 6. Commercial Licensing
 
-Commercial use requires a separate commercial license issued by the PiDeck copyright holder.
+Commercial use requires a separate commercial license issued by the AiJee copyright holder.
 
 Commercial licenses may permit, depending on the agreement:
 
@@ -86,9 +86,9 @@ Commercial licensing terms are negotiated separately and are not granted by this
 
 ## 7. Third-Party Components
 
-PiDeck may include or be derived from third-party software distributed under separate licenses, including software licensed under the Apache License 2.0.
+AiJee may include or be derived from third-party software distributed under separate licenses, including software licensed under the Apache License 2.0.
 
-This License applies only to portions of the software for which the PiDeck copyright holder owns or controls the applicable copyright.
+This License applies only to portions of the software for which the AiJee copyright holder owns or controls the applicable copyright.
 
 Third-party components remain subject to their respective licenses.
 
@@ -96,24 +96,24 @@ Nothing in this License limits, replaces, or removes rights independently grante
 
 ## 8. Apache License 2.0 Components
 
-Certain portions of PiDeck may contain code originally licensed under the Apache License 2.0.
+Certain portions of AiJee may contain code originally licensed under the Apache License 2.0.
 
 Those portions remain available under the Apache License 2.0 and are not relicensed or restricted by this License beyond what is permitted by applicable law and the original license.
 
-PiDeck-specific modifications, additions, modules, interfaces, services, applications, workflows, and other independently copyrightable contributions may be licensed separately under this License.
+AiJee-specific modifications, additions, modules, interfaces, services, applications, workflows, and other independently copyrightable contributions may be licensed separately under this License.
 
 ## 9. No Circumvention
 
 You may not intentionally circumvent the commercial-use restrictions of this License by:
 
-* Separating PiDeck into multiple components;
-* Using modified builds that are substantially equivalent to PiDeck;
-* Redistributing PiDeck through an intermediary;
+* Separating AiJee into multiple components;
+* Using modified builds that are substantially equivalent to AiJee;
+* Redistributing AiJee through an intermediary;
 * Using affiliates, subsidiaries, contractors, or related entities to perform activities that would otherwise violate this License.
 
 ## 10. Contributions
 
-Unless otherwise agreed in writing, contributions submitted to the official PiDeck repository may be incorporated into PiDeck and distributed under this License and/or other licenses selected by the PiDeck maintainers.
+Unless otherwise agreed in writing, contributions submitted to the official AiJee repository may be incorporated into AiJee and distributed under this License and/or other licenses selected by the AiJee maintainers.
 
 By submitting a contribution, you represent that you have the legal right to submit that contribution.
 
@@ -121,19 +121,19 @@ By submitting a contribution, you represent that you have the legal right to sub
 
 Your rights under this License automatically terminate if you violate its terms.
 
-Upon termination, you must cease all unauthorized use, distribution, hosting, and commercial exploitation of PiDeck.
+Upon termination, you must cease all unauthorized use, distribution, hosting, and commercial exploitation of AiJee.
 
 The copyright holder may separately grant reinstatement in writing.
 
 ## 12. Disclaimer of Warranty
 
-PiDeck is provided "AS IS", without warranties or conditions of any kind, express or implied.
+AiJee is provided "AS IS", without warranties or conditions of any kind, express or implied.
 
 To the maximum extent permitted by law, the copyright holder and contributors disclaim all warranties, including warranties of merchantability, fitness for a particular purpose, title, and non-infringement.
 
 ## 13. Limitation of Liability
 
-To the maximum extent permitted by applicable law, the copyright holder and contributors shall not be liable for any direct, indirect, incidental, special, consequential, exemplary, or other damages arising from the use or inability to use PiDeck.
+To the maximum extent permitted by applicable law, the copyright holder and contributors shall not be liable for any direct, indirect, incidental, special, consequential, exemplary, or other damages arising from the use or inability to use AiJee.
 
 ## 14. Reservation of Rights
 
@@ -141,9 +141,9 @@ All rights not expressly granted under this License are reserved by the copyrigh
 
 ## 15. Contact
 
-For commercial licensing, partnership, OEM licensing, or other permissions, contact the PiDeck copyright holder through the official PiDeck repository or designated business contact.
+For commercial licensing, partnership, OEM licensing, or other permissions, contact the AiJee copyright holder through the official AiJee repository or designated business contact.
 
 ---
 
-PiDeck Source-Available Non-Commercial License
+AiJee Source-Available Non-Commercial License
 Version 1.0

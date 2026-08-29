@@ -12,7 +12,7 @@ import { Redirect, Slot, usePathname, useRouter } from 'expo-router';
 import { Colors, Fonts } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 
-import { PiClientProvider, type PiClientConfig } from '@pideck/client-sdk';
+import { PiClientProvider, type PiClientConfig } from '@aijee/client-sdk';
 import { AdaptiveNavigation } from '@/features/navigation/containers/adaptive-navigation';
 import { TaskEventSubscriber } from '@/features/tasks/components/task-event-subscriber';
 import { TurnEndNotifier } from '@/features/agent/components/turn-end-notifier';
@@ -159,7 +159,7 @@ function UnconnectedNotice({ onAddDevice }: { onAddDevice: () => void }) {
     <View style={{ flex: 1, padding: 16, backgroundColor: isDark ? '#121212' : Colors[colorScheme].background }}>
       <View style={{ alignSelf: 'center', width: '100%', maxWidth: 760, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 16, paddingHorizontal: 18, paddingVertical: 14, borderRadius: 12, backgroundColor: isDark ? '#252321' : '#f4f2ef' }}>
         <Text style={{ flex: 1, fontFamily: Fonts.sans, fontSize: 14, color: isDark ? '#fefdfd' : Colors[colorScheme].text }}>
-          未连接 PiDeck 设备。连接后即可同步工作区与会话。
+          未连接 AiJee 设备。连接后即可同步工作区与会话。
         </Text>
         <Pressable onPress={onAddDevice} style={({ pressed }) => ({ borderRadius: 8, paddingHorizontal: 14, paddingVertical: 9, backgroundColor: isDark ? '#fefdfd' : '#1a1a1a', opacity: pressed ? 0.7 : 1 })}>
           <Text style={{ fontFamily: Fonts.sansSemiBold, fontSize: 14, color: isDark ? '#1a1a1a' : '#fff' }}>添加设备</Text>
@@ -357,7 +357,7 @@ export default function AppLayout() {
     return (
       <StartupScreen
         title="Can’t reach server"
-        description="The selected PiDeck computer appears to be offline or unreachable. Check that PiDeck is running, then retry, or open the Servers screen to switch to another computer."
+        description="The selected AiJee computer appears to be offline or unreachable. Check that AiJee is running, then retry, or open the Servers screen to switch to another computer."
         primaryLabel="Retry"
         onPrimaryPress={() => setRetryNonce((value) => value + 1)}
         secondaryLabel="Open Servers"

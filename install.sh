@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # ──────────────────────────────────────────────────────────────────────────────
-#  PiDeck Installer
+#  AiJee Installer
 #
-#  Install:   curl -fsSL https://raw.githubusercontent.com/anthaathi/Pico/main/install.sh | bash
+#  Install:   curl -fsSL https://raw.githubusercontent.com/anthaathi/AiJee/main/install.sh | bash
 #  Uninstall: curl -fsSL ... | bash -s -- --uninstall
 #
 #  Options:
 #    --yes          Skip confirmation prompts (auto-accept)
 #    --no-service   Skip service installation
-#    --uninstall    Remove PiDeck and its service
+#    --uninstall    Remove AiJee and its service
 #    --help         Show this help
 # ──────────────────────────────────────────────────────────────────────────────
 
@@ -16,19 +16,19 @@ set -euo pipefail
 
 # ── Constants ────────────────────────────────────────────────────────────────
 
-REPO="anthaathi/Pico"
+REPO="anthaathi/AiJee"
 GITHUB_API="https://api.github.com/repos/${REPO}"
 GITHUB_RELEASES="https://github.com/${REPO}/releases"
 
 INSTALL_DIR="${HOME}/.pi/ui"
-BINARY="pideck"
-WRAPPER="pideck-wrapper.sh"
+BINARY="aijee"
+WRAPPER="aijee-wrapper.sh"
 
 SYSTEMD_UNIT_DIR="${HOME}/.config/systemd/user"
-SYSTEMD_SERVICE="pideck.service"
+SYSTEMD_SERVICE="aijee.service"
 
 LAUNCHD_AGENTS_DIR="${HOME}/Library/LaunchAgents"
-LAUNCHD_LABEL="com.pideck.companion"
+LAUNCHD_LABEL="com.aijee.companion"
 LAUNCHD_PLIST="${LAUNCHD_LABEL}.plist"
 
 # ── Options ──────────────────────────────────────────────────────────────────
@@ -147,7 +147,7 @@ detect_arch() {
 
 fetch_latest_tag() {
   local os="$1" arch="$2"
-  local artifact="pideck-${os}-${arch}"
+  local artifact="aijee-${os}-${arch}"
 
   local response
   response="$(curl -fsSL -H "Accept: application/vnd.github.v3+json" \
@@ -176,7 +176,7 @@ fetch_latest_tag() {
 
 get_download_url() {
   local tag="$1" os="$2" arch="$3"
-  local artifact="pideck-${os}-${arch}"
+  local artifact="aijee-${os}-${arch}"
   echo "${GITHUB_RELEASES}/download/${tag}/${artifact}"
 }
 
@@ -196,7 +196,7 @@ installed_version() {
 download_binary() {
   local url="$1" dest="$2"
 
-  TMPFILE="$(mktemp "${TMPDIR:-/tmp}/pideck-XXXXXX")"
+  TMPFILE="$(mktemp "${TMPDIR:-/tmp}/aijee-XXXXXX")"
 
   info "Downloading from ${DIM}${url}${RESET}"
 
@@ -233,7 +233,7 @@ install_systemd() {
   mkdir -p "$SYSTEMD_UNIT_DIR"
   cat > "${SYSTEMD_UNIT_DIR}/${SYSTEMD_SERVICE}" <<EOF
 [Unit]
-Description=PiDeck – companion for pi-coding-agent
+Description=AiJee – companion for pi-coding-agent
 After=network-online.target
 Wants=network-online.target
 
@@ -247,7 +247,7 @@ RestartSec=5
 # Logging
 StandardOutput=journal
 StandardError=journal
-SyslogIdentifier=pideck
+SyslogIdentifier=aijee
 
 [Install]
 WantedBy=default.target
@@ -289,7 +289,7 @@ is_launchd_installed() {
 
 install_launchd() {
   local bin="${INSTALL_DIR}/${BINARY}"
-  local log="${INSTALL_DIR}/pideck.log"
+  local log="${INSTALL_DIR}/aijee.log"
   local uid
   uid="$(id -u)"
 
@@ -378,7 +378,7 @@ service_install() {
         install_systemd
       else
         warn "systemd user session not available."
-        warn "You can run pideck manually instead."
+        warn "You can run aijee manually instead."
       fi
       ;;
     macos)
@@ -457,7 +457,7 @@ add_to_path() {
     shell_name="$(basename "${SHELL:-/bin/bash}")"
 
     echo "" >> "$profile"
-    echo "# PiDeck" >> "$profile"
+    echo "# AiJee" >> "$profile"
 
     if [ "$shell_name" = "fish" ]; then
       echo "set -gx PATH \"${INSTALL_DIR}\" \$PATH" >> "$profile"
@@ -466,7 +466,7 @@ add_to_path() {
     fi
 
     info "Added to ${profile}"
-    dim "  Run 'source ${profile}' or open a new terminal to use 'pideck' directly."
+    dim "  Run 'source ${profile}' or open a new terminal to use 'aijee' directly."
   else
     dim "  You can add it manually:"
     dim "    export PATH=\"${INSTALL_DIR}:\$PATH\""
@@ -504,14 +504,14 @@ do_uninstall() {
   local os
   os="$(detect_os)"
 
-  header "Uninstalling PiDeck"
+  header "Uninstalling AiJee"
 
   if [ ! -d "$INSTALL_DIR" ] && ! service_is_installed "$os"; then
-    info "Nothing to uninstall – PiDeck is not installed."
+    info "Nothing to uninstall – AiJee is not installed."
     exit 0
   fi
 
-  if ! confirm "This will remove PiDeck and its service. Continue?" "y"; then
+  if ! confirm "This will remove AiJee and its service. Continue?" "y"; then
     info "Cancelled."
     exit 0
   fi
@@ -531,12 +531,12 @@ do_uninstall() {
     # Remove the PATH line and the comment above it
     local tmp
     tmp="$(mktemp)"
-    grep -v "# PiDeck" "$profile" | grep -v "${INSTALL_DIR}" > "$tmp" || true
+    grep -v "# AiJee" "$profile" | grep -v "${INSTALL_DIR}" > "$tmp" || true
     mv "$tmp" "$profile"
     info "Removed PATH entry from ${profile}"
   fi
 
-  success "PiDeck has been uninstalled"
+  success "AiJee has been uninstalled"
 }
 
 # ── Runtime dependency detection ─────────────────────────────────────────────
@@ -642,7 +642,7 @@ do_install() {
   require_cmd sed
   require_cmd mktemp
 
-  header "PiDeck Installer"
+  header "AiJee Installer"
 
   info "Platform: ${os}/${arch}"
 
@@ -684,7 +684,7 @@ do_install() {
     local tty
     tty="$(tty_fd)"
     if can_read_from "$tty"; then
-      info "Setting up PiDeck for the first time..."
+      info "Setting up AiJee for the first time..."
       echo ""
       (cd "$INSTALL_DIR" && "./${BINARY}" init < "$tty")
       echo ""
@@ -706,7 +706,7 @@ do_install() {
       service_restart "$os"
     else
       echo ""
-      if confirm "Install PiDeck as a background service (starts on login)?" "y"; then
+      if confirm "Install AiJee as a background service (starts on login)?" "y"; then
         echo ""
         service_install "$os"
       else
@@ -723,7 +723,7 @@ do_install() {
 
   echo ""
   success "All done!"
-  dim "  Scan the QR code from the PiDeck app to connect."
+  dim "  Scan the QR code from the AiJee app to connect."
   echo ""
 }
 
@@ -740,7 +740,7 @@ main() {
         printf "Options:\n"
         printf "  --yes, -y      Skip confirmation prompts\n"
         printf "  --no-service   Skip service installation\n"
-        printf "  --uninstall    Remove PiDeck and its service\n"
+        printf "  --uninstall    Remove AiJee and its service\n"
         printf "  --help, -h     Show this help\n"
         exit 0
         ;;

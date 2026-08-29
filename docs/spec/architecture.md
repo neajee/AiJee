@@ -1,15 +1,15 @@
-# Pico 架构定稿
+# AiJee 架构定稿
 
 ## 目录结构
 
 ```text
-Pico/
+AiJee/
 ├── apps/
 │   ├── server/                    # 唯一后端（含CLI与可执行入口）
 │   │   ├── src/
 │   │   │   ├── main.ts            # 启动、配置装载、优雅退出
 │   │   │   ├── bin/               # 仅命令入口
-│   │   │   │   ├── pideck.ts
+│   │   │   │   ├── aijee.ts
 │   │   │   │   ├── start.ts
 │   │   │   │   └── auth-reset.ts
 │   │   │   ├── api/               # REST + SSE + WS对外边界
@@ -71,9 +71,9 @@ api-contract/openapi.yaml
 
 `src/bin/*`只做参数解析、配置装载、调用`src/`函数和设置退出码。单文件超过百余行即说明业务逻辑漏入入口。
 
-`packages/pideck`与手写客户端`protocol`目录已删除；发布入口统一为`apps/server`的`pideck`包。
+`packages/aijee`与手写客户端`protocol`目录已删除；发布入口统一为`apps/server`的`aijee`包。
 
-运行时状态保存在`~/.pideck/`：工作区、模式、会话索引和任务日志均可在重启后恢复；会话激活时才由`SessionRegistry`按其磁盘session file重建。文件、Git和任务cwd必须位于已配置工作区内。
+运行时状态保存在`~/.aijee/`：工作区、模式、会话索引和任务日志均可在重启后恢复；会话激活时才由`SessionRegistry`按其磁盘session file重建。文件、Git和任务cwd必须位于已配置工作区内。
 
 ## Rust后端处置
 

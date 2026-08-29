@@ -1,5 +1,5 @@
 import { Subject, BehaviorSubject, Observable } from "rxjs";
-import { PIDECK_STREAM_PATH } from "./constants";
+import { AIJEE_STREAM_PATH } from "./constants";
 import type { ConnectionState } from "../types";
 import type { StreamEventEnvelope } from "../types/stream-events";
 import { XhrEventSource } from "./event-source";
@@ -275,7 +275,7 @@ export class StreamConnection {
   }
 
   private _buildStreamUrl(): string {
-    const url = new URL(`${this._config.serverUrl}${PIDECK_STREAM_PATH}`);
+    const url = new URL(`${this._config.serverUrl}${AIJEE_STREAM_PATH}`);
     if (this._lastEventId !== null) {
       url.searchParams.set("from", String(this._lastEventId));
     }

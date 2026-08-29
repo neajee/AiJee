@@ -6,8 +6,8 @@ import { mkdir, readdir, readFile, rename, rm, stat, writeFile } from "node:fs/p
 import { homedir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { PiDeckRuntime } from "../runtime.ts";
-import type { EngineSession } from "@pideck/engine";
+import { AiJeeRuntime } from "../runtime.ts";
+import type { EngineSession } from "@aijee/engine";
 import { RuntimeStateStore, type PersistedSession } from "../storage/state-store.ts";
 import { reconcileSessionRecords, listNativeSessionItems } from "../storage/session-migrator.ts";
 import { RuntimeAuth, type DeviceCode, type DeviceRecord } from "../auth/runtime-auth.ts";
@@ -35,9 +35,9 @@ type Workspace = {
 type ManagedSession = { key: string; workspaceId: string; session: EngineSession; createdAt: string; lastActive: number; modeId?: string; draft?: boolean };
 type Mode = { id: string; name: string; description?: string; model?: string; thinking_level?: string; extensions?: string[]; skills?: string[]; extra_args?: string[]; is_default?: boolean; sort_order?: number };
 
-export class PiDeckHttpServer {
+export class AiJeeHttpServer {
   private server?: Server;
-  private readonly runtime: PiDeckRuntime;
+  private readonly runtime: AiJeeRuntime;
   private readonly workspaces = new Map<string, Workspace>();
   private readonly sessions = new Map<string, ManagedSession>();
   private readonly restoring = new Map<string, Promise<ManagedSession>>();
@@ -63,15 +63,15 @@ export class PiDeckHttpServer {
   private localWorkspaceSeeded = false;
   private runtimeSecret = "";
 
-  constructor(runtime = new PiDeckRuntime(), statePath = join(homedir(), ".pideck", "runtime.json")) {
+  constructor(runtime = new AiJeeRuntime(), statePath = join(homedir(), ".aijee", "runtime.json")) {
     this.runtime = runtime;
     this.store = new RuntimeStateStore(statePath);
     this.tasks = new TaskService(join(dirname(statePath), "tasks.json"));
-    this.webRoot = process.env.PIDECK_WEB_ROOT ?? join(fileURLToPath(new URL("../../public", import.meta.url)));
+    this.webRoot = process.env.AIJEE_WEB_ROOT ?? join(fileURLToPath(new URL("../../public", import.meta.url)));
   }
 
   async listen(port = 5454, host = "127.0.0.1"): Promise<void> {
-    if (this.server) throw new Error("PiDeck runtime server is already running");
+    if (this.server) throw new Error("AiJee runtime server is already running");
     const state = await this.store.load();
     this.localMode = new Set(["127.0.0.1", "localhost", "::1", "[::1]"]).has(host);
     this.localWorkspaceSeeded = state.local_workspace_seeded === true;
@@ -115,7 +115,7 @@ export class PiDeckHttpServer {
 
   url(): string {
     const address = this.server?.address();
-    if (!address || typeof address === "string") throw new Error("PiDeck runtime server is not listening");
+    if (!address || typeof address === "string") throw new Error("AiJee runtime server is not listening");
     const { port } = address as AddressInfo;
     return `http://127.0.0.1:${port}`;
   }
@@ -303,7 +303,7 @@ export class PiDeckHttpServer {
     try {
       const device = body.code ? this.authenticated().issueWithCode(body.code, body.name) : local ? this.authenticated().issueDevice(body.name) : (() => { throw new HttpError(403, "A device code is required"); })();
       const token = String(device.token);
-      response.setHeader("Set-Cookie", `pideck_token=${token}; HttpOnly; SameSite=Strict; Path=/`);
+      response.setHeader("Set-Cookie", `aijee_token=${token}; HttpOnly; SameSite=Strict; Path=/`);
       this.ok(response, { device_id: device.device_id, token, name: device.name, created_at: device.created_at }, 201);
     } catch (error) { this.error(response, error instanceof HttpError ? error.status : 422, error instanceof Error ? error.message : "Device authorization failed"); }
   }
@@ -322,7 +322,7 @@ export class PiDeckHttpServer {
     const device = this.authenticated().authenticate(request.headers.authorization, typeof request.headers.cookie === "string" ? request.headers.cookie : undefined);
     if (!device) return this.error(response, 401, "Unauthorized");
     this.authenticated().revoke(device.device_id);
-    response.setHeader("Set-Cookie", "pideck_token=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0");
+    response.setHeader("Set-Cookie", "aijee_token=; HttpOnly; SameSite=Strict; Path=/; Max-Age=0");
     this.ok(response, null);
   }
 
@@ -346,7 +346,7 @@ export class PiDeckHttpServer {
     this.ok(response, { code, url: `${protocol}://${host}/?k=${encodeURIComponent(code)}`, expires_at: null });
   }
 
-  private version(response: ServerResponse): void { this.json(response, 200, { name: "pideck", version: "0.1.0", server_id: this.localMode ? "local" : "runtime", remote: !this.localMode, auth_model: "device-token" }); }
+  private version(response: ServerResponse): void { this.json(response, 200, { name: "aijee", version: "0.1.0", server_id: this.localMode ? "local" : "runtime", remote: !this.localMode, auth_model: "device-token" }); }
 
   private authorized(request: IncomingMessage): boolean { return this.isLocalRequest(request) || this.authenticated().validate(request.headers.authorization, typeof request.headers.cookie === "string" ? request.headers.cookie : undefined); }
   private isLocalRequest(request: IncomingMessage): boolean {
@@ -502,13 +502,13 @@ export class PiDeckHttpServer {
   }
 
   private async createChatSession(_request: IncomingMessage, response: ServerResponse): Promise<void> {
-    await this.createManagedSession(response, process.env.PIDECK_CHAT_CWD ?? process.cwd(), undefined, "__chat__");
+    await this.createManagedSession(response, process.env.AIJEE_CHAT_CWD ?? process.cwd(), undefined, "__chat__");
   }
 
   private async listChatSessions(url: URL, response: ServerResponse): Promise<void> {
     const page = Math.max(1, Number(url.searchParams.get("page") ?? 1));
     const limit = Math.min(100, Math.max(1, Number(url.searchParams.get("limit") ?? 20)));
-    const items = await this.mergedSessionItems(process.env.PIDECK_CHAT_CWD ?? process.cwd(), "__chat__");
+    const items = await this.mergedSessionItems(process.env.AIJEE_CHAT_CWD ?? process.cwd(), "__chat__");
     const offset = (page - 1) * limit;
     this.ok(response, { items: items.slice(offset, offset + limit), page, limit, total: items.length, has_more: offset + limit < items.length });
   }
@@ -562,7 +562,7 @@ export class PiDeckHttpServer {
     const existing = await this.restoreSession(sessionId);
     if (existing) return this.ok(response, this.sessionInfo(sessionId));
     const body = await this.body<{ session_file?: string }>(request);
-    await this.createManagedSession(response, process.env.PIDECK_CHAT_CWD ?? process.cwd(), body.session_file, "__chat__");
+    await this.createManagedSession(response, process.env.AIJEE_CHAT_CWD ?? process.cwd(), body.session_file, "__chat__");
   }
 
   private async createManagedSession(response: ServerResponse, cwd: string, sessionFile?: string, workspaceId = "__chat__", modeId?: string): Promise<void> {
@@ -885,7 +885,7 @@ export class PiDeckHttpServer {
   private runtimeStatus(): Record<string, unknown> {
     return { ready: true, can_install_pi: false, node: { command: process.execPath, installed: true, version: process.version, path: process.execPath, details: null }, pi: { command: "embedded-sdk", installed: true, version: null, path: null, details: { engines: this.runtime.sessions.enginesList() } } };
   }
-  private authenticated(): RuntimeAuth { if (!this.auth) throw new Error("PiDeck runtime is not initialized"); return this.auth; }
+  private authenticated(): RuntimeAuth { if (!this.auth) throw new Error("AiJee runtime is not initialized"); return this.auth; }
   private persist(): Promise<void> { return this.store.save({ workspaces: [...this.workspaces.values()], identity: undefined, runtime_secret: this.runtimeSecret, devices: this.auth?.snapshot(), device_codes: this.auth?.codeSnapshot(), local_signing_secret: this.localSigningSecret, local_workspace_seeded: this.localWorkspaceSeeded, custom_models: this.customModels, modes: [...this.modes.values()], sessions: [...this.sessionRecords.values()], archived_session_ids: [...this.archivedSessionIds] }); }
 
   /**
