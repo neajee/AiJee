@@ -20,5 +20,6 @@
     "api:check": "yarn workspace @aijee/api-contract validate",
     "web:build": "yarn workspace @aijee/client build",
     "build:prod": "yarn web:build && yarn runtime:check"
-  }
+  },
+  "version": "1.13.0"
 }
