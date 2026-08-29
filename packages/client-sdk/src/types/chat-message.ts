@@ -86,6 +86,7 @@ export interface ChatMessage {
   toolCalls?: ToolCallInfo[];
   timestamp: number;
   isStreaming?: boolean;
+  pending?: boolean;
   model?: string;
   provider?: string;
   api?: string;

@@ -4,7 +4,7 @@ import type { StreamEventEnvelope, ImageContent, AgentStateData } from "../types
 import type { ChatMessage, AgentMode, PendingExtensionUiRequest } from "../types/chat-message";
 import { ApiClient } from "./api-client";
 import { StreamConnection } from "./stream-connection";
-import { reduceStreamEvent, createEmptySessionState, convertRawMessages, type SessionState } from "./message-reducer";
+import { reduceStreamEvent, createEmptySessionState, convertRawMessages, isModeSlashCommand, type SessionState } from "./message-reducer";
 
 export interface SessionListState {
   items: SessionListItem[];
@@ -366,14 +366,29 @@ export class PiClient {
     workspaceId?: string;
     sessionFile?: string;
   }): Promise<void> {
-    return this.api.prompt({
-      sessionId,
-      message,
-      images: options?.images,
-      streamingBehavior: options?.streamingBehavior,
-      workspaceId: options?.workspaceId,
-      sessionFile: options?.sessionFile,
-    });
+    const subject = this._getOrCreateSessionSubject(sessionId);
+    const pendingId = `pending-user-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    if (message.trim() && !isModeSlashCommand(message)) {
+      const current = subject.getValue();
+      subject.next({
+        ...current,
+        messages: [...current.messages, {
+          id: pendingId,
+          role: "user",
+          text: message,
+          timestamp: Date.now(),
+          pending: true,
+          ...(options?.images?.length ? { attachments: options.images.map((image, index) => ({ id: `pending-img-${index}`, type: "image" as const, mimeType: image.mimeType, data: image.data })) } : {}),
+        }],
+      });
+    }
+    try {
+      await this.api.prompt({ sessionId, message, images: options?.images, streamingBehavior: options?.streamingBehavior, workspaceId: options?.workspaceId, sessionFile: options?.sessionFile });
+    } catch (error) {
+      const current = subject.getValue();
+      subject.next({ ...current, messages: current.messages.filter((item) => item.id !== pendingId) });
+      throw error;
+    }
   }
 
   async steer(sessionId: string, message: string, options?: {

@@ -172,7 +172,7 @@ function extractMessageEntryId(msg: Record<string, unknown>): string | undefined
   return undefined;
 }
 
-function isModeSlashCommand(message: string): boolean {
+export function isModeSlashCommand(message: string): boolean {
   const first = message.trim().split(/\s+/)[0];
   return first === "/chat" || first === "/plan";
 }
@@ -427,6 +427,37 @@ export function reduceStreamEvent(state: SessionState, envelope: StreamEventEnve
     case "message_start": {
       if (event.type !== "message_start") break;
       const msg = event.message;
+      const raw = msg as unknown as Record<string, unknown>;
+      if (raw["role"] === "user") {
+        const text = extractTextFromContent(raw["content"] as unknown[] | undefined);
+        if (!text || isModeSlashCommand(text)) break;
+        const entryId = extractMessageEntryId(raw);
+        const attachments = extractImagesFromContent(raw["content"] as unknown[] | undefined)?.map((image, index) => ({
+          id: `img-${envelope.id}-${index}`,
+          type: "image" as const,
+          mimeType: image.mimeType,
+          data: image.data,
+        }));
+        const existingIdx = messages.findIndex((item) =>
+          item.role === "user" && ((entryId && item.entryId === entryId) || item.id === `user-${envelope.id}` || (item.pending && item.text === text)),
+        );
+        const userMessage: ChatMessage = {
+          id: `user-${envelope.id}`,
+          entryId,
+          role: "user",
+          text,
+          timestamp: envelope.timestamp,
+          ...(attachments?.length ? { attachments } : {}),
+        };
+        if (existingIdx >= 0) {
+          const next = [...messages];
+          next[existingIdx] = { ...next[existingIdx]!, ...userMessage, pending: undefined };
+          messages = next;
+        } else {
+          messages = [...messages, userMessage];
+        }
+        break;
+      }
       if (msg?.role === "assistant") {
         const newId = `assistant-${envelope.id}`;
         const existingIdx = messages.findIndex((m) => m.id === newId);
@@ -590,6 +621,17 @@ export function reduceStreamEvent(state: SessionState, envelope: StreamEventEnve
     case "message_end": {
       if (event.type !== "message_end") break;
       const endMsg = event.message as unknown as Record<string, unknown> | undefined;
+      if (endMsg?.["role"] === "user") {
+        const text = extractTextFromContent(endMsg["content"] as unknown[] | undefined);
+        const entryId = extractMessageEntryId(endMsg);
+        const idx = messages.findIndex((item) => item.role === "user" && ((entryId && item.entryId === entryId) || (text && item.text === text)));
+        if (idx !== -1) {
+          const next = [...messages];
+          next[idx] = { ...next[idx]!, ...(entryId ? { entryId } : {}), pending: undefined };
+          messages = next;
+        }
+        break;
+      }
       if (endMsg?.["role"] !== "assistant") {
         break;
       }
