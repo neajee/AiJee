@@ -4,30 +4,7 @@ AiJee —— Pi Coding Agent everywhere。
 
 AiJee 是面向 [Pi Coding Agent](https://github.com/badlogic/pi-mono/) 的多端控制台：在一台机器安装AiJee，即可通过Web、手机或桌面端使用同一套Pi Runtime。
 
-[English](README.en.md)
-
 ## 快速开始
-
-### 使用 Pi 安装
-
-```bash
-pi install npm:aijee
-```
-
-插件会启动或复用`aijee`包内的Pi SDK Runtime。
-
-### 独立安装
-
-适用于服务器、NAS或不运行Pi TUI的电脑：
-
-```bash
-npm install -g aijee
-aijee serve
-```
-
-AiJee内嵌Pi SDK Runtime、Web资源和远程接口；无需安装Rust、Cargo或全局Pi CLI。
-
-首次启动会自动创建 `~/.aijee/`，并在终端输出Setup Code。
 
 ### 连接客户端
 
@@ -50,7 +27,7 @@ pi install npm:aijee
 
 ```text
 apps/client + apps/desktop → packages/ui → packages/client-sdk
-apps/server → packages/engine → Pi / Codex / OpenCode SDK
+apps/server → packages/engine → Pi SDK
 ```
 
 目录职责：
@@ -97,7 +74,7 @@ AIJEE_STATE_PATH=~/.aijee/runtime.json
 
 ## 开发
 
-环境要求：Node.js 22+、Yarn 4，以及 Android 开发所需的 Java 17。
+环境要求：Node.js 22+、Yarn 4。
 
 ```bash
 yarn install
