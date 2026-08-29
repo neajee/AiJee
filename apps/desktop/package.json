@@ -21,6 +21,11 @@
   "build": {
     "appId": "com.anthaathi.aijee",
     "productName": "AiJee",
+    "executableName": "aijee",
+    "linux": {
+      "target": ["AppImage"],
+      "category": "Utility"
+    },
     "files": [
       "src/**/*",
       "package.json",
