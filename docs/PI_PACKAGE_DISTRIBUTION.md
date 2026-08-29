@@ -1,234 +1,224 @@
-# PiDeck 一体化安装与发布架构
+# PiDeck 运行与发布架构
+
+> 当前目录与运行边界以[`docs/spec/architecture.md`](spec/architecture.md)为准；本文保留`pideck`发布包的兼容与迁移记录。
+
+## 架构状态
+
+目标架构已定稿：`pideck`发布包由`apps/server`构建，Node Runtime通过`packages/engine`适配Pi SDK；REST/SSE与产品服务集中在唯一Server。
 
 ## 目标
 
-PiDeck 对用户只暴露一个安装入口：
+PiDeck对用户只暴露一个安装单元和一个命令：
 
 ```bash
-pi install npm:pideck
+npm install -g pideck
+pideck
 ```
 
-安装完成后，Pi Package 自动选择当前平台的 PiDeck Server，并负责检测、启动和展示连接状态。用户不需要单独下载 Server、配置路径或手动启动后台进程。
+`pideck`安装包包含`apps/server`构建产物及其运行时依赖；用户不需要分别安装Gateway或第二个后端服务。
 
-## 设计原则
+安装在不同机器上的仍是同一个PiDeck：
 
-- 一个 Monorepo：Client、Server、协议、插件和发布脚本统一维护。
-- 一个产品版本：插件、启动器和平台二进制使用相同版本发布。
-- 一个安装命令：用户只安装 `pideck`。
-- 分层运行：Pi 插件负责生命周期，Rust Server 独立提供服务。
-- Server 可独立使用：服务器、NAS 和无 Pi TUI 场景仍可直接运行二进制。
-- 平台包按需安装：不把全部平台二进制放入同一个 npm 包。
+- 个人电脑：打开Desktop，并同时提供本机Web界面。
+- 服务器或NAS：无界面运行，通过浏览器和移动端远程访问。
+- 局域网设备：按配置暴露受保护的远程接口。
+- Android和iOS：作为客户端连接PiDeck主机，不承担常驻Agent Runtime。
 
-## 仓库结构
+## 核心原则
+
+- 一个产品包：Pi SDK和服务能力随`pideck`安装。
+- 一个Agent Runtime：同一机器内只维护一套会话、模型和事件状态。
+- 多种启动模式：Desktop、Web和Remote Server不是三套后端。
+- 一个协议入口：Web、Desktop和Mobile都使用同一REST/SSE/WebSocket契约。
+- SDK直连：Runtime通过`createAgentSessionRuntime()`使用Pi SDK，不启动`pi --mode rpc`子进程。
+- 本地优先：数据、会话和工具默认运行在安装PiDeck的机器上。
+
+## 目标运行结构
+
+```text
+pideck
+├── Pi Runtime
+│   ├── AgentSessionRuntime
+│   ├── Session Registry
+│   ├── ModelRuntime
+│   ├── ResourceLoader
+│   └── Tools / Extensions
+├── Product Services
+│   ├── Auth / Pairing
+│   ├── Workspace / Files / Terminal
+│   ├── REST / SSE / WebSocket
+│   └── Persistence / Logs
+├── Web Assets
+└── Launchers
+    ├── Desktop Window
+    └── Headless Process
+```
+
+这里的HTTP服务是PiDeck进程内部的产品接口，不是需要用户单独部署的后端。
+
+## 启动模式
+
+```bash
+pideck                 # 启动本机Runtime并提供Web与远程连接
+pideck serve           # 无界面运行（与默认命令相同）
+pideck auth reset      # 重置管理员认证和设备授权
+```
+
+所有模式共享相同配置目录和单实例锁。Desktop只负责创建窗口并加载本机Web地址，不复制Agent逻辑。
+
+## 仓库职责
 
 ```text
 PiDeck/
 ├── apps/
-│   ├── web/                    # Web 平台入口
-│   ├── mobile/                 # Android / iOS 平台入口
-│   └── desktop/                # Desktop 平台入口
+│   ├── server/                 # 唯一后端、CLI与Pi SDK Runtime
+│   ├── client/                 # Expo Web/Android/iOS客户端
+│   └── desktop/                # Desktop壳，不持有Agent业务
 ├── packages/
-│   ├── client/                 # 三端共享前端与 Client SDK
-│   └── pideck/                 # Pi Package、CLI、Rust Server
-├── tools/                      # 发布准备脚本
-└── .github/workflows/          # 构建与统一发布
+│   ├── engine/                 # 引擎核心与Pi适配器
+│   ├── api-contract/           # OpenAPI唯一源头
+│   ├── client-sdk/             # 外部API、SSE和WebSocket客户端
+│   └── ui/                     # 多端共享界面与feature
+└── docs/
 ```
 
-`packages/pideck/server`是Rust源码，Pi入口为`src/extension/index.ts`，CLI与二进制解析属于同一个`pideck`包。平台包由发布脚本临时生成。
+`apps/server`是唯一可独立运行的核心包。Web构建产物在发布时复制进该包；Desktop发布物复用同一Runtime，不另建服务实现。
 
-## npm 产物
+## 进程与状态边界
 
-| 包名 | 职责 |
-| --- | --- |
-| `pideck` | Pi Package、命令注册、Server 生命周期入口 |
-| `@pideck/server-linux-x64` | Linux x64 Server |
-| `@pideck/server-linux-arm64` | Linux ARM64 Server |
-| `@pideck/server-darwin-x64` | macOS Intel Server |
-| `@pideck/server-darwin-arm64` | macOS Apple Silicon Server |
-| `@pideck/server-win32-x64` | Windows x64 Server |
+单台机器默认只有一个PiDeck Runtime进程：
 
-`pideck`通过`optionalDependencies`声明平台包。npm只安装当前平台产物，内置CLI和Pi扩展共同解析该二进制。
+- Runtime拥有所有`AgentSessionRuntime`实例。
+- 每个工作会话对应一个Session Registry记录。
+- `newSession()`、`switchSession()`和`fork()`替换活动Session后，Runtime必须重新绑定事件订阅与扩展。
+- 浏览器刷新、Desktop窗口关闭或客户端断线不能销毁仍在运行的Agent Session。
+- 最后一个界面关闭后是否退出由运行模式决定：Desktop可配置退出，`serve`必须继续运行。
 
-## Pi Package Manifest
+## 接口边界
 
-`pideck` 必须符合 Pi Package 规范：
-
-```json
-{
-  "name": "pideck",
-  "version": "0.1.0",
-  "keywords": ["pi-package"],
-  "pi": {
-    "extensions": ["./src/extension/index.ts"]
-  },
-  "bin": { "pideck": "./bin/pideck.cjs" },
-  "peerDependencies": {
-    "@earendil-works/pi-coding-agent": "*"
-  }
-}
-```
-
-## 安装与启动流程
+客户端继续只依赖`@pideck/client-sdk`：
 
 ```text
-pi install npm:pideck
+Web / Desktop / Mobile
         ↓
-npm 安装 Pi Package 与当前平台 Server
+@pideck/client-sdk
         ↓
-Pi 加载 src/extension/index.ts
+REST + SSE + WebSocket
         ↓
-请求 http://127.0.0.1:5454/api/health
+pideck Runtime
         ↓
-┌───────────────────┬────────────────────┐
-│ Server 已运行      │ Server 未运行       │
-│ 校验版本与协议      │ 定位平台二进制       │
-│ 复用现有实例        │ 获取进程锁并启动      │
-└───────────────────┴────────────────────┘
-        ↓
-显示状态、连接地址和配对入口
+Pi SDK
 ```
 
-## Server 必备契约
+OpenAPI仍是客户端协议源。Pi SDK事件在Runtime内转换成现有PiDeck事件，不把Pi SDK对象直接暴露给客户端。
 
-插件依赖以下稳定接口：
+## 安装与发布
 
-```text
-GET /api/health          进程是否可用
-GET /api/version         产品版本和协议版本
-GET /api/runtime/status  Pi、Node、工作目录和运行状态
-POST /api/auth/pair      一次性二维码配对
+### npm安装
+
+```bash
+npm install -g pideck
+pideck serve
 ```
 
-建议统一响应：
+顶层包必须包含：
 
-```json
-{
-  "ok": true,
-  "data": {
-    "version": "0.1.0",
-    "protocolVersion": 1
-  }
-}
-```
+- Pi SDK运行依赖。
+- PiDeck Runtime和CLI。
+- 已构建Web静态资源。
+- 数据库迁移和默认配置。
+- 当前平台确实需要的可选原生模块。
 
-Server 还必须支持：
+不再发布仅用于启动Rust Gateway的`@pideck/server-*`平台包。若VNC、PTY等能力必须保留原生实现，应作为同一产品包的内部原生模块，而不是第二个用户可见服务。
 
-- 零配置启动并自动创建 `~/.pideck/`。
-- 自动发现 Node 和 Pi。
-- 端口冲突时返回明确错误。
-- 使用 PID 文件或进程锁避免重复实例。
-- 支持结构化日志和优雅退出。
-- 重启后保留设备授权和 Agent Session。
-
-## 插件职责
-
-插件负责：
-
-- 检测 Server 健康状态和协议兼容性。
-- 定位 npm 安装的平台二进制。
-- 启动单一 Server 实例。
-- 注册 `/pideck`、`/pideck-status`、`/pideck-stop` 和 `/pideck-pair`。
-- 通过 `ctx.ui.notify()` 返回真实结果。
-- 捕获启动错误并展示日志路径。
-- Pi 退出时不误杀由系统服务或其他客户端启动的 Server。
-
-插件不负责：
-
-- 实现 Agent、Session、配对和数据库业务。
-- 直接读取或修改 Server 数据库。
-- 将 Server 逻辑复制到 TypeScript Extension。
-
-## 生命周期策略
-
-启动前依次检查：
-
-1. 请求健康接口。
-2. 校验协议版本。
-3. 检查 PID 文件和进程是否存在。
-4. 获取跨进程启动锁。
-5. 再次检查健康接口，防止并发重复启动。
-6. 启动二进制并等待健康接口就绪。
-7. 超时后终止本次子进程并返回日志位置。
-
-Server 默认独立于当前 Pi Session 存活，使手机和其他客户端在 Pi TUI 关闭后仍可连接。`/pideck-stop` 只能停止由当前用户管理的 PiDeck 实例。
-
-## 版本策略
-
-- 产品包统一使用同一版本，例如 `0.1.0`。
-- 插件声明支持的 `protocolVersion` 范围。
-- Server 返回产品版本和协议版本。
-- 协议不兼容时禁止复用旧 Server，并提示升级。
-- CI 必须先发布平台包，再发布`pideck`。
-
-## 发布流程
-
-```text
-Git tag v0.1.0
-    ↓
-构建并测试 Rust Server
-    ↓
-生成 Linux / macOS / Windows 二进制
-    ↓
-组装并发布平台 npm 包
-    ↓
-执行 Pi Package 本地安装测试
-    ↓
-发布 pideck
-    ↓
-验证 pi install npm:pideck
-```
-
-每个平台包发布前必须验证 SHA-256、执行权限和 `pideck --version`。任何平台构建失败时，不发布顶层 `pideck`。
-
-## 安全边界
-
-- 健康检查默认只访问 `127.0.0.1`。
-- 二进制必须来自同版本 npm 平台包，禁止执行未校验下载文件。
-- 二维码使用一次性随机凭据，并具备过期和重放保护。
-- Server 暴露局域网时必须保留设备授权与撤销能力。
-- 插件不得记录 token、二维码密钥或用户凭据。
-
-## 实施顺序
-
-### P0：完成 Server
-
-- 固定 health、version、runtime 和 pairing 契约。
-- 完成零配置启动、进程锁、日志和优雅退出。
-- 完成重启恢复、端口冲突和无 Pi 场景测试。
-
-### P1：完成启动器与平台包
-
-- 在`pideck`内完成CLI和平台解析。
-- 生成各平台二进制npm包。
-- 验证平台解析、权限和版本一致性。
-
-### P2：完成 Pi Package
-
-- 修正 Pi manifest。
-- 实现健康检查和 Server 生命周期命令。
-- 增加错误反馈、状态和配对入口。
-
-### P3：统一发布
-
-- 建立跨平台 CI。
-- 完成 npm provenance、版本编排和发布回滚。
-- 使用干净环境验收一条命令安装。
-
-## 最终验收
-
-在未安装 PiDeck 的干净机器上：
+### Pi Package安装
 
 ```bash
 pi install npm:pideck
-pi
+```
+
+Pi扩展只复用或启动本机PiDeck实例，并展示状态与连接入口；它不再查找Pi二进制，也不管理RPC子进程。
+
+### Desktop发布
+
+Desktop安装器打包同版本Web资源和PiDeck Runtime。Electron主进程启动或复用本机实例，窗口加载受保护的本机地址。Desktop与npm安装版必须使用同一配置、协议版本和数据格式。
+
+## 安全边界
+
+- 首次启动创建`~/.pideck/`并生成一次性Setup Code。
+- Setup Code只用于初始化；设备配对使用独立的五分钟轮换码，且由已认证设备获取。
+- 初始化前只开放静态资源、`/health`和`/setup`。
+- 默认本机地址可直接用于Desktop；绑定局域网地址时必须启用认证和设备授权。
+- Token、Setup Code、二维码内容和模型密钥不得写入日志。
+- Agent工具权限按工作区隔离，远程客户端不能绕过Runtime权限策略。
+
+## 迁移计划
+
+### P0：冻结外部契约
+
+- 为现有会话、消息、模型、队列、终止和事件顺序补充契约测试。
+- 标记哪些接口是Pi RPC形状，定义稳定的PiDeck领域事件。
+- 保持`@pideck/client-sdk`调用方式不变。
+
+### P1：建立SDK Runtime
+
+- 将`@earendil-works/pi-coding-agent`从peer/dev依赖改为`pideck`的固定生产依赖。
+- 在`apps/server`增加Runtime入口、Session Registry和生命周期管理；由`packages/engine/adapters/pi`封装Pi SDK。
+- 使用`createAgentSessionRuntime()`创建、恢复、切换和释放会话。
+- 将Pi SDK事件转换为现有SSE/WebSocket事件。
+- 实现异常退出恢复、并发创建去重、空闲释放和优雅关闭。
+
+### P2：迁移产品服务
+
+- 将Rust中的鉴权、配对、配置、工作区和持久化逐项迁入Runtime。
+- 文件、终端和VNC按能力迁移；确需原生实现的部分改为内部模块。
+- 让Web构建产物由Runtime直接托管。
+
+### P3：切换启动与发布
+
+- 将`pideck`CLI改为启动同包Runtime。
+- Desktop改为复用本机Runtime；Pi扩展删除平台二进制解析。
+- 发布单包安装产物并完成Linux、macOS和Windows干净环境测试。
+
+### P4：删除RPC与Rust Gateway
+
+- 删除`PiAgentProvider`、JSONL命令映射和`pi --mode rpc`进程管理。
+- 删除`@pideck/server-*`发布流程和遗留配置。
+- 契约fixture、SDK Runtime集成测试和打包检查均已纳入验证。
+
+## 代码落点
+
+Runtime代码落点：
+
+```text
+apps/server/src/
+├── main.ts                    # Runtime启动与优雅退出
+├── api/                       # REST/SSE/WS边界
+├── auth/                      # 认证与配对
+├── sessions/                  # Session Registry与生命周期
+├── orchestrator/              # 任务与产品服务
+└── storage/                   # 状态持久化
+packages/engine/src/
+├── core/                      # 引擎无关接口与事件
+└── adapters/pi/               # Pi SDK会话包装与事件适配
+```
+
+验收标准：可直接通过SDK创建会话、发送消息、接收流事件、终止任务并释放会话；HTTP层保持既有REST/SSE路径与响应包络。
+
+## 最终验收
+
+在未安装PiDeck和Pi CLI的干净机器上：
+
+```bash
+npm install -g pideck
+pideck serve
 ```
 
 必须满足：
 
-- Pi 正确加载 PiDeck Extension。
-- 当前平台 Server 自动安装并只启动一个实例。
-- `/pideck-status` 返回健康状态、版本和地址。
-- 手机扫码后自动完成配对。
-- 关闭 Pi 后 Server 继续运行。
-- 再次启动 Pi 时复用已有 Server。
-- `pi update npm:pideck` 能完成兼容升级。
+- 一个安装包即可创建Pi会话并调用模型。
+- 浏览器可直接打开本机Web界面。
+- Desktop复用同一Runtime和会话。
+- 手机可通过授权连接该机器。
+- 客户端断线后任务继续执行，重连后恢复状态。
+- 全程不启动`pi --mode rpc`，也不要求用户部署第二个服务。

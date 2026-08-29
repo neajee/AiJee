@@ -1,4 +1,4 @@
-export { PiClientProvider, usePiClient, type PiClientProviderProps } from "./context";
+export { PiClientProvider, usePiClient, useOptionalPiClient, type PiClientProviderProps } from "./context";
 export { useConnection } from "./use-connection";
 export { useAgentSession, type AgentSessionHandle } from "./use-agent-session";
 export {

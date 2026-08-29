@@ -13,7 +13,10 @@ export interface Server {
 interface ServersState {
   servers: Server[];
   loaded: boolean;
+  bootstrapReady: boolean;
   load: () => Promise<void>;
+  setBootstrapReady: (ready: boolean) => void;
+  ensureLocalServer: (address: string) => Promise<Server>;
   addServer: (server: Omit<Server, 'id'> & { id?: string }) => Promise<void>;
   updateServer: (id: string, updates: Partial<Omit<Server, 'id'>>) => Promise<void>;
   removeServer: (id: string) => Promise<void>;
@@ -56,14 +59,25 @@ function stripTrailingSlashes(url: string): string {
 export const useServersStore = create<ServersState>((set, get) => ({
   servers: [],
   loaded: false,
+  bootstrapReady: false,
 
   load: async () => {
     const raw = await readFromStore();
-    const servers = raw.map(({ username, password, ...s }: any) => ({ ...s, address: stripTrailingSlashes(s.address) }));
+    const servers = raw.map((s: any) => ({ ...s, address: stripTrailingSlashes(s.address) }));
     set({ servers, loaded: true });
     if (raw.some((s: any) => s.username || s.password)) {
       await writeToStore(servers);
     }
+  },
+
+  setBootstrapReady: (bootstrapReady) => set({ bootstrapReady }),
+
+  ensureLocalServer: async (address) => {
+    const local: Server = { id: 'local', name: '这台电脑', address: stripTrailingSlashes(address) };
+    const servers = [local, ...get().servers.filter((server) => server.id !== local.id)];
+    set({ servers });
+    await writeToStore(servers);
+    return local;
   },
 
   addServer: async (server) => {

@@ -1,4 +1,4 @@
-import { PIDECK_STREAM_PATH } from "../protocol";
+import { PIDECK_STREAM_PATH } from "./constants";
 import * as sdk from "../generated/sdk.gen";
 import type {
   AgentSessionInfo,
@@ -10,7 +10,6 @@ import type {
   SessionEntry,
   SessionTreeNode,
   Workspace,
-  AuthTokensResponse,
   GitStatusResponse,
   GitBranch,
   GitLogEntry,
@@ -39,6 +38,7 @@ import type {
   SessionHistoryResponse,
 } from "../generated/types.gen";
 import type {
+  AgentStateData,
   CompactionResult,
   ImageContent,
   ModelInfo,
@@ -141,27 +141,29 @@ export class ApiClient {
   // Auth
   // ---------------------------------------------------------------------------
 
-  async login(
-    username: string,
-    password: string,
-    baseUrl?: string,
-  ): Promise<AuthTokensResponse> {
-    const result = await sdk.login({
-      body: { username, password },
-      ...(baseUrl && { baseUrl }),
-    });
-    return unwrapResult<AuthTokensResponse>(result);
+  async createDevice(code?: string, name?: string): Promise<{ device_id: string; token: string; name: string; created_at: string }> {
+    const response = await this.authFetch(this.buildApiUrl('/api/devices'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code, name }) });
+    return unwrapResult(await response.json());
   }
 
-  async refresh(
-    refreshToken: string,
-    baseUrl?: string,
-  ): Promise<AuthTokensResponse> {
-    const result = await sdk.refresh({
-      body: { refresh_token: refreshToken },
-      ...(baseUrl && { baseUrl }),
-    });
-    return unwrapResult<AuthTokensResponse>(result);
+  async listDevices(): Promise<Array<{ device_id: string; name: string; created_at: string; last_seen: string }>> {
+    const response = await this.authFetch(this.buildApiUrl('/api/devices'));
+    return unwrapResult(await response.json());
+  }
+
+  async revokeDevice(deviceId: string): Promise<void> {
+    const response = await this.authFetch(this.buildApiUrl(`/api/devices/${encodeURIComponent(deviceId)}`), { method: 'DELETE' });
+    unwrapResult(await response.json());
+  }
+
+  async createDeviceCode(): Promise<{ code: string; url: string; expires_at: null }> {
+    const response = await this.authFetch(this.buildApiUrl('/api/devices/code'), { method: 'POST' });
+    return unwrapResult(await response.json());
+  }
+
+  async getDeviceCode(): Promise<{ code: string; url: string; expires_at: null }> {
+    const response = await this.authFetch(this.buildApiUrl('/api/devices/code'));
+    return unwrapResult(await response.json());
   }
 
   async logout(refreshToken?: string, baseUrl?: string): Promise<void> {
@@ -170,17 +172,6 @@ export class ApiClient {
       ...(baseUrl && { baseUrl }),
     });
     unwrapResult(result);
-  }
-
-  async pair(
-    qrId: string,
-    baseUrl?: string,
-  ): Promise<AuthTokensResponse> {
-    const result = await sdk.pair({
-      body: { qr_id: qrId },
-      ...(baseUrl && { baseUrl }),
-    });
-    return unwrapResult<AuthTokensResponse>(result);
   }
 
   async checkSession(): Promise<void> {
@@ -205,13 +196,16 @@ export class ApiClient {
     workspaceId: string;
     sessionPath?: string;
     modeId?: string;
+    draft?: boolean;
   }): Promise<AgentSessionInfo> {
+    const body = {
+      workspace_id: params.workspaceId,
+      session_path: params.sessionPath,
+      mode_id: params.modeId,
+      draft: params.draft,
+    };
     const result = await sdk.createSession({
-      body: {
-        workspace_id: params.workspaceId,
-        session_path: params.sessionPath,
-        mode_id: params.modeId,
-      },
+      body,
     });
     return unwrapResult<AgentSessionInfo>(result);
   }
@@ -240,6 +234,11 @@ export class ApiClient {
   async listActiveSessions(): Promise<ActiveSessionSummary[]> {
     const result = await sdk.listSessions({});
     return unwrapResult<ActiveSessionSummary[]>(result);
+  }
+
+  async getAgentState(sessionId: string): Promise<AgentStateData> {
+    const result = await sdk.getState({ body: { session_id: sessionId } });
+    return unwrapResult<AgentStateData>(result);
   }
 
   // ---------------------------------------------------------------------------

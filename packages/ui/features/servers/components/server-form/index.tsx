@@ -21,7 +21,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import { Eye, EyeOff, X } from "lucide-react-native";
+import { X } from "lucide-react-native";
 
 import { Colors, Fonts } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -43,12 +43,6 @@ function ServerFormFields({
   setName,
   address,
   setAddress,
-  username,
-  setUsername,
-  password,
-  setPassword,
-  showPassword,
-  setShowPassword,
   isDark,
   autoFocus,
 }: {
@@ -56,12 +50,6 @@ function ServerFormFields({
   setName: (v: string) => void;
   address: string;
   setAddress: (v: string) => void;
-  username: string;
-  setUsername: (v: string) => void;
-  password: string;
-  setPassword: (v: string) => void;
-  showPassword: boolean;
-  setShowPassword: (v: boolean) => void;
   isDark: boolean;
   autoFocus?: boolean;
 }) {
@@ -102,55 +90,11 @@ function ServerFormFields({
           keyboardType="url"
         />
       </View>
-      <View style={formStyles.field}>
-        <Text style={[formStyles.label, { color: textMuted }]}>Username</Text>
-        <TextInput
-          style={[
-            formStyles.input,
-            { backgroundColor: inputBg, color: textPrimary, borderColor },
-          ]}
-          value={username}
-          onChangeText={setUsername}
-          placeholder="admin"
-          placeholderTextColor={isDark ? "#666" : "#bbb"}
-          autoCapitalize="none"
-          autoCorrect={false}
-        />
-      </View>
-      <View style={formStyles.field}>
-        <Text style={[formStyles.label, { color: textMuted }]}>Password</Text>
-        <View style={formStyles.passwordRow}>
-          <TextInput
-            style={[
-              formStyles.input,
-              formStyles.passwordInput,
-              { backgroundColor: inputBg, color: textPrimary, borderColor },
-            ]}
-            value={password}
-            onChangeText={setPassword}
-            placeholder="••••••••"
-            placeholderTextColor={isDark ? "#666" : "#bbb"}
-            secureTextEntry={!showPassword}
-            autoCapitalize="none"
-            autoCorrect={false}
-          />
-          <Pressable
-            onPress={() => setShowPassword(!showPassword)}
-            style={formStyles.eyeBtn}
-          >
-            {showPassword ? (
-              <EyeOff size={16} color={textMuted} strokeWidth={1.8} />
-            ) : (
-              <Eye size={16} color={textMuted} strokeWidth={1.8} />
-            )}
-          </Pressable>
-        </View>
-      </View>
     </View>
   );
 }
 
-export type ServerFormData = Omit<Server, "id"> & { username: string; password: string };
+export type ServerFormData = Omit<Server, "id">;
 
 function ServerFormDesktopModal({
   visible,
@@ -171,17 +115,11 @@ function ServerFormDesktopModal({
 }) {
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     if (visible) {
       setName(initial?.name ?? "");
       setAddress(initial?.address ?? "");
-      setUsername("");
-      setPassword("");
-      setShowPassword(false);
     }
   }, [visible, initial]);
 
@@ -197,8 +135,6 @@ function ServerFormDesktopModal({
     onSave({
       name: name.trim(),
       address: address.trim(),
-      username: username.trim(),
-      password,
     });
   };
 
@@ -231,12 +167,6 @@ function ServerFormDesktopModal({
               setName,
               address,
               setAddress,
-              username,
-              setUsername,
-              password,
-              setPassword,
-              showPassword,
-              setShowPassword,
               isDark,
             }}
             autoFocus
@@ -304,9 +234,6 @@ function ServerFormSheet({
 
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
 
   const translateY = useSharedValue(SHEET_HEIGHT);
   const overlayOpacity = useSharedValue(0);
@@ -326,9 +253,6 @@ function ServerFormSheet({
     if (visible) {
       setName(initial?.name ?? "");
       setAddress(initial?.address ?? "");
-      setUsername("");
-      setPassword("");
-      setShowPassword(false);
       translateY.value = withTiming(0, TIMING_CONFIG);
       overlayOpacity.value = withTiming(1, TIMING_CONFIG);
     } else {
@@ -399,8 +323,6 @@ function ServerFormSheet({
     onSave({
       name: name.trim(),
       address: address.trim(),
-      username: username.trim(),
-      password,
     });
   };
 
@@ -471,12 +393,6 @@ function ServerFormSheet({
                     setName,
                     address,
                     setAddress,
-                    username,
-                    setUsername,
-                    password,
-                    setPassword,
-                    showPassword,
-                    setShowPassword,
                     isDark,
                   }}
                 />

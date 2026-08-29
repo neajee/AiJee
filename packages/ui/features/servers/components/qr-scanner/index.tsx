@@ -74,7 +74,13 @@ export function QrScanner({ visible, onClose, onNeedNewWorkspace }: QrScannerPro
     setStep("pairing");
     setError(null);
 
-    const result = await useAuthStore.getState().pairWithServer(address, params.qrId, serverId);
+    const auth = useAuthStore.getState();
+    if (!params.code) {
+      setStep("error");
+      setError("授权码无效，请在设备端刷新后重试。");
+      return;
+    }
+    const result = await auth.authorizeWithCode(address, params.code, serverId, params.hostname || ip);
 
     if (result.success) {
       setStep("done");
@@ -96,7 +102,11 @@ export function QrScanner({ visible, onClose, onNeedNewWorkspace }: QrScannerPro
   const handleScanned = (data: string) => {
     const params = parseConnectUrl(data);
     if (!params) {
-      setError("Invalid QR code. Expected a pi://connect URL.");
+      setError(
+        /^exp(s)?:\/\//i.test(data.trim())
+          ? "这是 Expo 开发二维码，请扫描 PiDeck 设备端生成的授权二维码。"
+          : "授权码格式无效，请扫描 PiDeck 设备端生成的授权二维码。",
+      );
       setScanned(false);
       return;
     }
@@ -132,8 +142,8 @@ export function QrScanner({ visible, onClose, onNeedNewWorkspace }: QrScannerPro
   if (step === "pairing") {
     return (
       <Modal visible={visible} transparent animationType="fade" onRequestClose={handleClose}>
-        <View style={[styles.overlay, { backgroundColor: isDark ? "rgba(0,0,0,0.6)" : "rgba(0,0,0,0.3)" }]}>
-          <View style={[styles.card, { backgroundColor: cardBg, borderColor }]}>
+        <Pressable style={[styles.overlay, { backgroundColor: isDark ? "rgba(0,0,0,0.6)" : "rgba(0,0,0,0.3)" }]} onPress={handleClose} accessibilityLabel="关闭配对弹窗">
+          <Pressable style={[styles.card, { backgroundColor: cardBg, borderColor }]} onPress={(e) => e.stopPropagation()}>
             <View style={styles.statusCenter}>
               <ActivityIndicator size="large" color={textPrimary} />
               <Text style={[styles.statusTitle, { color: textPrimary }]}>
@@ -148,8 +158,8 @@ export function QrScanner({ visible, onClose, onNeedNewWorkspace }: QrScannerPro
                 Cancel
               </Text>
             </Pressable>
-          </View>
-        </View>
+          </Pressable>
+        </Pressable>
       </Modal>
     );
   }
@@ -157,9 +167,9 @@ export function QrScanner({ visible, onClose, onNeedNewWorkspace }: QrScannerPro
   // Pairing success
   if (step === "done") {
     return (
-      <Modal visible={visible} transparent animationType="fade" onRequestClose={() => {}}>
-        <View style={[styles.overlay, { backgroundColor: isDark ? "rgba(0,0,0,0.6)" : "rgba(0,0,0,0.3)" }]}>
-          <View style={[styles.card, { backgroundColor: cardBg, borderColor }]}>
+      <Modal visible={visible} transparent animationType="fade" onRequestClose={handleClose}>
+        <Pressable style={[styles.overlay, { backgroundColor: isDark ? "rgba(0,0,0,0.6)" : "rgba(0,0,0,0.3)" }]} onPress={handleClose} accessibilityLabel="关闭配对成功弹窗">
+          <Pressable style={[styles.card, { backgroundColor: cardBg, borderColor }]} onPress={(e) => e.stopPropagation()}>
             <View style={styles.statusCenter}>
               <View style={[styles.successCircle, { backgroundColor: isDark ? "#30D158" : "#34C759" }]}>
                 <Check size={28} color="#fff" strokeWidth={2.5} />
@@ -168,8 +178,8 @@ export function QrScanner({ visible, onClose, onNeedNewWorkspace }: QrScannerPro
                 Connected
               </Text>
             </View>
-          </View>
-        </View>
+          </Pressable>
+        </Pressable>
       </Modal>
     );
   }
@@ -178,8 +188,8 @@ export function QrScanner({ visible, onClose, onNeedNewWorkspace }: QrScannerPro
   if (step === "error") {
     return (
       <Modal visible={visible} transparent animationType="fade" onRequestClose={handleClose}>
-        <View style={[styles.overlay, { backgroundColor: isDark ? "rgba(0,0,0,0.6)" : "rgba(0,0,0,0.3)" }]}>
-          <View style={[styles.card, { backgroundColor: cardBg, borderColor }]}>
+        <Pressable style={[styles.overlay, { backgroundColor: isDark ? "rgba(0,0,0,0.6)" : "rgba(0,0,0,0.3)" }]} onPress={handleClose} accessibilityLabel="关闭配对失败弹窗">
+          <Pressable style={[styles.card, { backgroundColor: cardBg, borderColor }]} onPress={(e) => e.stopPropagation()}>
             <View style={styles.statusCenter}>
               <View style={[styles.errorCircle, { backgroundColor: isDark ? "#FF453A" : "#FF3B30" }]}>
                 <AlertCircle size={28} color="#fff" strokeWidth={2} />
@@ -203,8 +213,8 @@ export function QrScanner({ visible, onClose, onNeedNewWorkspace }: QrScannerPro
                 </Text>
               </Pressable>
             </View>
-          </View>
-        </View>
+          </Pressable>
+        </Pressable>
       </Modal>
     );
   }
@@ -213,8 +223,8 @@ export function QrScanner({ visible, onClose, onNeedNewWorkspace }: QrScannerPro
   if (step === "pick-ip" && connectParams) {
     return (
       <Modal visible={visible} transparent animationType="fade" onRequestClose={handleClose}>
-        <View style={[styles.overlay, { backgroundColor: isDark ? "rgba(0,0,0,0.6)" : "rgba(0,0,0,0.3)" }]}>
-          <View style={[styles.card, { backgroundColor: cardBg, borderColor }]}>
+        <Pressable style={[styles.overlay, { backgroundColor: isDark ? "rgba(0,0,0,0.6)" : "rgba(0,0,0,0.3)" }]} onPress={handleClose} accessibilityLabel="关闭网络选择弹窗">
+          <Pressable style={[styles.card, { backgroundColor: cardBg, borderColor }]} onPress={(e) => e.stopPropagation()}>
             <View style={styles.cardHeader}>
               <Text style={[styles.cardTitle, { color: textPrimary }]}>
                 Select Network
@@ -248,8 +258,8 @@ export function QrScanner({ visible, onClose, onNeedNewWorkspace }: QrScannerPro
                 </Pressable>
               ))}
             </View>
-          </View>
-        </View>
+          </Pressable>
+        </Pressable>
       </Modal>
     );
   }
@@ -257,8 +267,8 @@ export function QrScanner({ visible, onClose, onNeedNewWorkspace }: QrScannerPro
   // Scan screen
   return (
     <Modal visible={visible} transparent animationType="fade" onRequestClose={handleClose}>
-      <View style={[styles.overlay, { backgroundColor: isDark ? "rgba(0,0,0,0.6)" : "rgba(0,0,0,0.3)" }]}>
-        <View style={[styles.card, styles.scannerCard, { backgroundColor: cardBg, borderColor }]}>
+      <Pressable style={[styles.overlay, { backgroundColor: isDark ? "rgba(0,0,0,0.6)" : "rgba(0,0,0,0.3)" }]} onPress={handleClose} accessibilityLabel="关闭扫码弹窗">
+        <Pressable style={[styles.card, styles.scannerCard, { backgroundColor: cardBg, borderColor }]} onPress={(e) => e.stopPropagation()}>
           <View style={styles.cardHeader}>
             <Text style={[styles.cardTitle, { color: textPrimary }]}>
               Scan QR Code
@@ -286,7 +296,7 @@ export function QrScanner({ visible, onClose, onNeedNewWorkspace }: QrScannerPro
                 style={[styles.manualInput, { backgroundColor: inputBg, color: textPrimary, borderColor }]}
                 value={manualUrl}
                 onChangeText={(t) => { setManualUrl(t); setError(null); }}
-                placeholder="pi://connect?..."
+                placeholder="http://设备地址/?k=授权码"
                 placeholderTextColor={isDark ? "#666" : "#bbb"}
                 autoCapitalize="none"
                 autoCorrect={false}
@@ -308,8 +318,8 @@ export function QrScanner({ visible, onClose, onNeedNewWorkspace }: QrScannerPro
               {error}
             </Text>
           )}
-        </View>
-      </View>
+        </Pressable>
+      </Pressable>
     </Modal>
   );
 }

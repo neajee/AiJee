@@ -7,7 +7,7 @@
   "scripts": {
     "typecheck": "tsc --noEmit",
     "test": "node --experimental-strip-types --test test/*.test.ts",
-    "api:generate": "openapi-ts -i http://127.0.0.1:5454/api-docs/openapi.json -o ./src/generated -c @hey-api/client-fetch",
+    "api:generate": "openapi-ts -i ../api-contract/openapi.yaml -o ./src/generated -c @hey-api/client-fetch",
     "build:wasm": "tsx scripts/build-wasm-decoder.ts"
   },
   "dependencies": {

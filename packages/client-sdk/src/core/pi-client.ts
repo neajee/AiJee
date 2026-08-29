@@ -30,6 +30,12 @@ export class PiClient {
   private _streamingSessionIds = new Set<string>();
   private _viewedSessionId: string | null = null;
   private _pendingActiveSession: string | null | undefined = undefined;
+  /**
+   * Monotonic per-session history request counter. Session open and stream
+   * (re)connect both fetch history, so responses can interleave; without this
+   * guard a stale or empty response would overwrite freshly rendered messages.
+   */
+  private readonly _historyRequestIds = new Map<string, number>();
   private readonly _highWaterMarks = new Map<string, number>();
   private readonly _deltaHighWaterMarks = new Map<string, number>();
 
@@ -43,6 +49,7 @@ export class PiClient {
       serverUrl: config.serverUrl,
       getAccessToken: () => this._config.accessToken,
       onAuthError: config.onAuthError,
+      transport: config.transport,
       reconnectBaseMs: config.reconnectBaseMs,
       reconnectMaxMs: config.reconnectMaxMs,
     });
@@ -175,6 +182,7 @@ export class PiClient {
       }
     };
 
+    if (__DEV__) console.log("[pi:open]", sessionId, { ready: current.isReady, workspace: params.workspaceId });
     if (current.isReady) {
       touch().catch(() => {});
       await this._fetchAndApplyHistory(sessionId);
@@ -184,7 +192,8 @@ export class PiClient {
 
     subject.next({ ...current, isLoading: true });
 
-    try { await touch(); } catch {
+    try { await touch(); } catch (error) {
+      if (__DEV__) console.warn("[pi:open] touch failed", sessionId, error);
       await this._fetchAndApplyHistory(sessionId);
       this._setActiveSessionOnBackend(sessionId);
       return;
@@ -426,7 +435,7 @@ export class PiClient {
     await this.api.killSession(sessionId);
   }
 
-  async createAgentSession(params: { workspaceId: string; sessionPath?: string; modeId?: string }) {
+  async createAgentSession(params: { workspaceId: string; sessionPath?: string; modeId?: string; draft?: boolean }) {
     const info = await this.api.createAgentSession(params);
     const subject = this._getOrCreateSessionSubject(info.session_id);
     subject.next({ ...createEmptySessionState(), isReady: true });
@@ -541,12 +550,26 @@ export class PiClient {
 
   private async _fetchAndApplyHistory(sessionId: string): Promise<void> {
     const subject = this._getOrCreateSessionSubject(sessionId);
+    const requestId = (this._historyRequestIds.get(sessionId) ?? 0) + 1;
+    this._historyRequestIds.set(sessionId, requestId);
+    const isStale = () => this._historyRequestIds.get(sessionId) !== requestId;
 
     try {
-      const result = await this.api.getSessionHistory(sessionId, { limit: 50 });
+      const result = await Promise.race([
+        this.api.getSessionHistory(sessionId, { limit: 50 }),
+        new Promise<never>((_, reject) => setTimeout(() => reject(new Error("Session history timed out")), 8_000)),
+      ]);
+      if (isStale()) return;
       const rawMessages = result.messages as Record<string, string>[];
       const converted = convertRawMessages(rawMessages);
       const current = subject.getValue();
+
+      // A newer fetch already rendered messages: never replace them with an
+      // empty history (a session whose file is not written yet reads as empty).
+      if (converted.length === 0 && current.messages.length > 0) {
+        subject.next({ ...current, isReady: true, isLoading: false, isLoadingOlderMessages: false });
+        return;
+      }
 
       subject.next({
         ...current,
@@ -562,9 +585,12 @@ export class PiClient {
         sessionId,
         this._activeSessionIds.has(sessionId) ? true : current.isStreaming,
       );
-    } catch {
+      if (__DEV__) console.log("[pi:history] ready", sessionId, { messages: converted.length });
+    } catch (error) {
+      if (isStale()) return;
       const current = subject.getValue();
       subject.next({ ...current, isReady: true, isLoading: false, isLoadingOlderMessages: false });
+      if (__DEV__) console.warn("[pi:history] failed", sessionId, error);
     }
   }
 

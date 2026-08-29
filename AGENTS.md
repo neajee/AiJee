@@ -2,18 +2,17 @@
 
 ## Project overview
 
-PiDeck is a cross-platform (iOS, Android, Web) client for the pi coding agent.
-Built with Expo SDK 54, React Native, and expo-router for file-based routing.
+PiDeck is a cross-platform (iOS, Android, Web) client and single-package runtime for the pi coding agent.
+Built with Expo SDK 54, React Native, expo-router, and an embedded Node Pi SDK runtime.
 
 ## Monorepo structure
 
 ```
 PiDeck/
 ├── apps/
-│   ├── web/                # Web platform entry
-│   ├── mobile/             # Android / iOS platform entry
+│   ├── client/             # Expo Web / Android / iOS entry
 │   └── desktop/            # Electron platform entry
-├── apps/web, apps/mobile/
+├── apps/client/
 │   ├── app/                # Platform-owned Expo Router screens
 │       ├── _layout.tsx     # PiClientProvider, AdaptiveNavigation
 │       ├── settings.tsx
@@ -32,8 +31,8 @@ PiDeck/
 │   │   ├── tasks/           # Task runner store + components
 │   │   └── workspace/       # Workspace store, components, types
 ├── packages/client-sdk/    # Headless API, streaming and protocol SDK
-├── packages/pideck/        # Pi extension, CLI and Rust gateway
-└── public/                 # Assets embedded by the server
+├── apps/server/            # Pi SDK runtime, CLI, HTTP/SSE and product services
+└── public/                 # Expo web source assets
 ```
 
 ## @pideck/client-sdk package
@@ -76,7 +75,7 @@ yarn api:generate          # runs from root, delegates to pi-client
 cd packages/client-sdk && yarn api:generate
 ```
 
-Requires the backend running at `http://127.0.0.1:5454`.
+Reads the canonical contract from `packages/api-contract/openapi.yaml`; no backend process is required for generation.
 
 ## Key conventions
 
@@ -148,7 +147,7 @@ yarn web                # Web
 yarn android            # Android
 yarn ios                # iOS
 yarn web:build          # Production web export
-yarn server:build       # Rust PiDeck server
+yarn runtime:start      # Embedded PiDeck runtime
 yarn build:prod         # Both
 ```
 
@@ -161,5 +160,5 @@ yarn build:prod         # Both
 - **Icons:** lucide-react-native
 - **Fonts:** DM Sans, JetBrains Mono (via expo-google-fonts)
 - **API client:** @hey-api/client-fetch (auto-generated)
-- **Backend:** Rust (in `packages/pideck/server/`)
+- **Runtime:** Node.js (in `apps/server/src/`)
 - **Package manager:** Yarn 4 (Berry) with workspaces

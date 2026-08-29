@@ -1,6 +1,5 @@
 const { app, BrowserWindow } = require("electron");
 const { spawn } = require("node:child_process");
-const { resolveServerBinary } = require("../../../packages/pideck/src/runtime/server-binary.cjs");
 
 let server;
 
@@ -13,11 +12,12 @@ function createWindow() {
       sandbox: true,
     },
   });
-  window.loadURL(process.env.PIDECK_CLIENT_URL || "http://localhost:8081");
+  window.loadURL(process.env.PIDECK_CLIENT_URL || "http://127.0.0.1:5454");
 }
 
 app.whenReady().then(() => {
-  server = spawn(resolveServerBinary(), ["--headless"], { detached: true, stdio: "ignore" });
+  const runtime = require.resolve("pideck/bin/pideck.cjs");
+  server = spawn(process.execPath, [runtime, "serve"], { detached: true, stdio: "ignore" });
   server.once("error", (error) => {
     console.error(`Unable to start PiDeck server: ${error.message}`);
   });

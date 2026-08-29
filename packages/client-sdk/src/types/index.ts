@@ -7,7 +7,6 @@ export type {
   ActiveSessionSummary,
   AgentRuntimeStatus,
   AgentSessionCommandResponse,
-  AuthTokensResponse,
   CustomModelEntry,
   CustomModelsConfig,
   CustomProvider,

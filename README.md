@@ -2,7 +2,7 @@
 
 PiDeck —— Pi Coding Agent everywhere。
 
-PiDeck 是面向 [Pi Coding Agent](https://github.com/badlogic/pi-mono/) 的多端控制台：在电脑运行 PiDeck Server，通过 Web、手机或桌面端连接并控制 Pi。
+PiDeck 是面向 [Pi Coding Agent](https://github.com/badlogic/pi-mono/) 的多端控制台：在一台机器安装PiDeck，即可通过Web、手机或桌面端使用同一套Pi Runtime。
 
 [English](README.en.md)
 
@@ -14,7 +14,7 @@ PiDeck 是面向 [Pi Coding Agent](https://github.com/badlogic/pi-mono/) 的多�
 pi install npm:pideck
 ```
 
-插件会安装当前平台的Rust Server，并在需要时自动启动。
+插件会启动或复用`pideck`包内的Pi SDK Runtime。
 
 ### 独立安装
 
@@ -22,70 +22,47 @@ pi install npm:pideck
 
 ```bash
 npm install -g pideck
-pideck --headless
+pideck serve
 ```
 
-用户不需要安装Rust或Cargo。npm只下载当前平台的预编译二进制：
+PiDeck内嵌Pi SDK Runtime、Web资源和远程接口；无需安装Rust、Cargo或全局Pi CLI。
 
-| 平台 | 文件 |
-| --- | --- |
-| Linux x86_64 | `pideck-linux-x86_64` |
-| Linux ARM64 | `pideck-linux-aarch64` |
-| macOS Apple Silicon | `pideck-macos-aarch64` |
-| macOS Intel | `pideck-macos-x86_64` |
-| Windows | `pideck-windows-x86_64.exe` |
-
-首次启动会自动创建 `~/.pideck/`，并在终端输出二维码。
-
-PiDeck 默认使用二维码自动完成配对，不需要再去终端输入确认命令。
-
-### 安装 Pi Coding Agent
-
-```bash
-npm install -g @earendil-works/pi-coding-agent
-```
+首次启动会自动创建 `~/.pideck/`，并在终端输出Setup Code。
 
 ### 连接客户端
 
 1. 打开 PiDeck Web、移动端或桌面端。
-2. 选择“添加服务器”或扫描二维码。
-3. 扫描 PiDeck Server 终端中的二维码。
+2. 选择“添加服务器”。
+3. 输入或扫描 PiDeck Runtime终端中的连接信息。
 4. 配对完成后即可创建工作区和 Coding Session。
 
 ### Pi 插件
 
-PiDeck 可以通过 Pi 插件自动启动本地 Server：
+PiDeck可以通过Pi插件自动启动本地SDK Runtime：
 
 ```bash
 pi install npm:pideck
 ```
 
-完整的一体化安装、平台二进制和发布方案见 [PiDeck 一体化安装与发布架构](docs/PI_PACKAGE_DISTRIBUTION.md)。
+架构规范见[架构规范](docs/spec/architecture.md)，SDK适配见[引擎适配约定](docs/spec/engines.md)。
 
 ## 架构
 
 ```text
-PiDeck Client
-├── Web
-├── Mobile
-└── Desktop
-        ↓
-PiDeck Protocol / Client SDK
-        ↓
-PiDeck Server
-        ↓
-Pi Coding Agent
+apps/client + apps/desktop → packages/ui → packages/client-sdk
+apps/server → packages/engine → Pi / Codex / OpenCode SDK
 ```
 
 目录职责：
 
 ```text
-apps/web                         独立 Web 应用、路由与功能
-apps/mobile                      独立 Android / iOS 应用、路由与功能
-apps/desktop                     Electron 外壳，承载 Web 应用并扩展桌面能力
-packages/client-sdk              无界面 API、SSE、WebSocket 与协议类型
-packages/ui                      Web / Mobile 复用的组件、feature、主题与图标
-packages/pideck                  Pi 插件、CLI 与 Rust Gateway
+apps/server                      唯一后端、CLI、REST/SSE/WS与运行时
+apps/client                      Expo Web / iOS / Android客户端
+apps/desktop                     Electron 外壳与Server发现
+packages/engine                  统一引擎抽象与适配器
+packages/api-contract            OpenAPI协议唯一源头
+packages/client-sdk              生成客户端与薄封装
+packages/ui                      跨端组件、状态与数据hooks
 ```
 
 ## 配置
@@ -96,7 +73,7 @@ packages/pideck                  Pi 插件、CLI 与 Rust Gateway
 http://localhost:5454/setup
 ```
 
-输入终端显示的Setup Code、管理员账号和密码完成初始化。初始化前仅开放静态资源、健康检查和Setup接口；初始化完成后`/setup`永久关闭。
+输入终端显示的Setup Code、管理员账号和密码完成初始化。初始化前仅开放静态资源、健康检查和Setup接口；初始化完成后Setup流程关闭。
 
 重置管理员认证并撤销全部登录Token和已配对设备：
 
@@ -104,46 +81,31 @@ http://localhost:5454/setup
 pideck auth reset
 ```
 
-默认配置文件：
+默认运行状态文件：
 
 ```text
-~/.pideck/config.toml
+~/.pideck/runtime.json
 ```
 
-示例：
+可用环境变量：
 
 ```toml
-[server]
-port = 5454
-host = "0.0.0.0"
-
-[auth]
-username = "admin"
-password_hash = "..."
-access_token_ttl_minutes = 15
-refresh_token_ttl_days = 30
-
-[package]
-name = "@earendil-works/pi-coding-agent"
-
-[agent]
-pi_binary = "/usr/local/bin/pi"
-
-[sessions]
-base_path = "~/.pi/agent/sessions"
+PIDECK_HOST=0.0.0.0
+PIDECK_PORT=5454
+PIDECK_STATE_PATH=~/.pideck/runtime.json
 ```
 
 ## 开发
 
-环境要求：Node.js 22+、Yarn 4、Rust，以及 Android 开发所需的 Java 17。
+环境要求：Node.js 22+、Yarn 4，以及 Android 开发所需的 Java 17。
 
 ```bash
 yarn install
 yarn web                  # 启动 Web 开发端
 yarn android              # 启动 Android
 yarn ios                  # 启动 iOS
-yarn server:check        # 检查 Rust Server
-yarn server:build        # 构建 Rust Server
+yarn runtime:check       # 检查 Pi SDK Runtime
+yarn runtime:start       # 启动 Runtime Web 服务
 yarn desktop             # 启动 Desktop Shell
 ```
 
@@ -156,7 +118,7 @@ yarn build:prod
 构建 Android APK：
 
 ```bash
-cd apps/mobile
+cd apps/client
 eas build --platform android --profile preview --local
 ```
 

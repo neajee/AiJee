@@ -48,8 +48,11 @@ export function ServerSwitcher() {
         setPopoverVisible(false);
       }
     };
-    setTimeout(() => document.addEventListener("click", handler), 0);
-    return () => document.removeEventListener("click", handler);
+    const id = setTimeout(() => document.addEventListener("click", handler), 0);
+    return () => {
+      clearTimeout(id);
+      document.removeEventListener("click", handler);
+    };
   }, [popoverVisible]);
 
   const handleSwitchServer = useCallback(

@@ -3,6 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "sideEffects": false,
+  "dependencies": {
+    "@pideck/client-sdk": "workspace:*",
+    "react": "19.1.0",
+    "react-native": "0.81.5"
+  },
   "scripts": {
     "test": "node --experimental-strip-types --test test/*.test.ts"
   }

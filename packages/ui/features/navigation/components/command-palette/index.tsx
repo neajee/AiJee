@@ -21,8 +21,6 @@ import { useRouter } from 'expo-router';
 import { Colors, Fonts } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useWorkspaceStore } from '@/features/workspace/store';
-import { usePiClient } from '@pideck/client-sdk';
-import { requestBrowserNotificationPermission } from '@/features/agent/browser-notifications';
 
 interface CommandPaletteProps {
   visible: boolean;
@@ -56,8 +54,6 @@ export function CommandPalette({ visible, onClose }: CommandPaletteProps) {
   const workspaces = useWorkspaceStore((s) => s.workspaces);
   const selectWorkspace = useWorkspaceStore((s) => s.selectWorkspace);
   const selectedWorkspaceId = useWorkspaceStore((s) => s.selectedWorkspaceId);
-  const piClient = usePiClient();
-  const createSessionPending = useRef(false);
 
   const bg = isDark ? '#1e1e1e' : '#FFFFFF';
   const borderColor = isDark ? '#3b3a39' : 'rgba(0,0,0,0.12)';
@@ -88,19 +84,10 @@ export function CommandPalette({ visible, onClose }: CommandPaletteProps) {
       description: 'Start a new chat session',
       icon: Plus,
       section: 'Actions',
-      onSelect: async () => {
-        if (!selectedWorkspaceId || createSessionPending.current) return;
-        createSessionPending.current = true;
-        requestBrowserNotificationPermission();
+      onSelect: () => {
+        if (!selectedWorkspaceId) return;
         handleClose();
-        try {
-          const info = await piClient.createAgentSession({
-            workspaceId: selectedWorkspaceId,
-          });
-          router.navigate(
-            `/workspace/${selectedWorkspaceId}/s/${info.session_id}`,
-          );
-        } catch {} finally { createSessionPending.current = false; }
+        router.navigate(`/workspace/${selectedWorkspaceId}`);
       },
     },
     {

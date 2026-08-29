@@ -1,5 +1,5 @@
 import { Subject, BehaviorSubject, Observable } from "rxjs";
-import { PIDECK_STREAM_PATH } from "../protocol";
+import { PIDECK_STREAM_PATH } from "./constants";
 import type { ConnectionState } from "../types";
 import type { StreamEventEnvelope } from "../types/stream-events";
 import { XhrEventSource } from "./event-source";
@@ -40,6 +40,7 @@ function parseStreamEvents(raw: string): StreamEventEnvelope[] {
 export interface StreamConnectionConfig {
   serverUrl: string;
   getAccessToken: () => string;
+  transport?: "sse" | "ws";
   onAuthError?: () => void;
   reconnectBaseMs?: number;
   reconnectMaxMs?: number;
@@ -63,6 +64,7 @@ export class StreamConnection {
   private _lastEventId: number | null = null;
   private _retryCount = 0;
   private _es: XhrEventSource | null = null;
+  private _ws: WebSocket | null = null;
   private _reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private _destroyed = false;
 
@@ -107,7 +109,7 @@ export class StreamConnection {
     this._close();
     this._clearReconnectTimer();
     this._retryCount = 0;
-    this._openSse();
+    this._openTransport();
   }
 
   disconnect(): void {
@@ -127,7 +129,12 @@ export class StreamConnection {
     this._close();
     this._clearReconnectTimer();
     this._retryCount = 0;
-    this._openSse();
+    this._openTransport();
+  }
+
+  private _openTransport(): void {
+    if (this._config.transport === "ws") this._openWebSocket();
+    else this._openSse();
   }
 
   private _openSse(): void {
@@ -154,32 +161,7 @@ export class StreamConnection {
       this._setConnection({ status: "connected" });
     });
 
-    es.addEventListener("message", (event) => {
-      if (this._destroyed || !event.data) return;
-      try {
-        const raw = JSON.parse(event.data) as Record<string, unknown>;
-        if (raw["type"] === "server_hello" && typeof raw["instance_id"] === "string") {
-          if (typeof raw["connection_id"] === "string") {
-            this._connectionId = raw["connection_id"] as string;
-            this._connectionId$.next(this._connectionId);
-          }
-          this._instanceId$.next(raw["instance_id"] as string);
-          return;
-        }
-        const activeSessionIds = extractActiveSessionIds(raw);
-        if (activeSessionIds) {
-          this._activeSessions$.next(activeSessionIds);
-          return;
-        }
-      } catch { /* not a control event, continue */ }
-      const events = parseStreamEvents(event.data);
-      for (const evt of events) {
-        if (evt.id > 0) {
-          this._lastEventId = evt.id;
-        }
-        this._events$.next(evt);
-      }
-    });
+    es.addEventListener("message", (event) => this._handleMessage(event.data ?? ""));
 
     es.addEventListener("error", (event) => {
       if (this._destroyed) { es.close(); return; }
@@ -207,6 +189,35 @@ export class StreamConnection {
     });
   }
 
+  private _openWebSocket(): void {
+    if (this._destroyed) return;
+    const httpUrl = new URL(this._buildStreamUrl());
+    httpUrl.protocol = httpUrl.protocol === "https:" ? "wss:" : "ws:";
+    httpUrl.searchParams.set("token", this._config.getAccessToken());
+    this._setConnection({ status: this._retryCount > 0 ? "reconnecting" : "connecting", retryAttempt: this._retryCount });
+    const socket = new WebSocket(httpUrl.toString());
+    this._ws = socket;
+    socket.onopen = () => { if (this._destroyed) socket.close(); else { this._retryCount = 0; this._setConnection({ status: "connected" }); } };
+    socket.onmessage = (event) => this._handleMessage(typeof event.data === "string" ? event.data : "");
+    socket.onerror = () => { if (!this._destroyed) { this._close(); this._scheduleReconnect("WebSocket connection failed"); } };
+    socket.onclose = () => { if (!this._destroyed) { this._close(); this._scheduleReconnect("WebSocket connection closed"); } };
+  }
+
+  private _handleMessage(data: string): void {
+    if (this._destroyed || !data) return;
+    try {
+      const raw = JSON.parse(data) as Record<string, unknown>;
+      if (raw["type"] === "server_hello" && typeof raw["instance_id"] === "string") {
+        if (typeof raw["connection_id"] === "string") { this._connectionId = raw["connection_id"] as string; this._connectionId$.next(this._connectionId); }
+        this._instanceId$.next(raw["instance_id"] as string);
+        return;
+      }
+      const activeSessionIds = extractActiveSessionIds(raw);
+      if (activeSessionIds) { this._activeSessions$.next(activeSessionIds); return; }
+    } catch { /* Continue with stream event parsing. */ }
+    for (const evt of parseStreamEvents(data)) { if (evt.id > 0) this._lastEventId = evt.id; this._events$.next(evt); }
+  }
+
   private _scheduleReconnect(reason: string): void {
     if (this._destroyed) return;
 
@@ -225,7 +236,7 @@ export class StreamConnection {
 
     this._reconnectTimer = setTimeout(() => {
       this._reconnectTimer = null;
-      this._openSse();
+      this._openTransport();
     }, delay);
   }
 
@@ -234,6 +245,14 @@ export class StreamConnection {
       this._es.removeAllEventListeners();
       this._es.close();
       this._es = null;
+    }
+    if (this._ws) {
+      this._ws.onopen = null;
+      this._ws.onmessage = null;
+      this._ws.onerror = null;
+      this._ws.onclose = null;
+      this._ws.close();
+      this._ws = null;
     }
   }
 

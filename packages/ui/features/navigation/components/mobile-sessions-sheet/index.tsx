@@ -13,10 +13,8 @@ import { usePathname, useRouter } from 'expo-router';
 
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { usePiClient } from '@pideck/client-sdk';
 import { useWorkspaceStore } from '@/features/workspace/store';
 import { useWorkspaceSessions as useSessions } from '@pideck/client-sdk';
-import { requestBrowserNotificationPermission } from '@/features/agent/browser-notifications';
 import { SessionSheetContent } from '../session-sheet-content';
 
 const SHEET_HEIGHT = 420;
@@ -38,7 +36,6 @@ export function MobileSessionsSheet({ visible, onClose }: MobileSessionsSheetPro
   const overlayOpacity = useSharedValue(0);
 
   const router = useRouter();
-  const piClient = usePiClient();
   const [createPending, setCreatePending] = useState(false);
   const selectedWorkspaceId = useWorkspaceStore((s) => s.selectedWorkspaceId);
   const workspace = useWorkspaceStore((s) =>
@@ -74,19 +71,13 @@ export function MobileSessionsSheet({ visible, onClose }: MobileSessionsSheetPro
     });
   }, [translateY, overlayOpacity, onClose]);
 
-  const handleNewSession = useCallback(async () => {
+  const handleNewSession = useCallback(() => {
     if (!selectedWorkspaceId || createPending) return;
     setCreatePending(true);
-    requestBrowserNotificationPermission();
-    try {
-      const info = await piClient.createAgentSession({ workspaceId: selectedWorkspaceId });
-      router.navigate(`/workspace/${selectedWorkspaceId}/s/${info.session_id}`);
-      dismiss();
-    } catch {
-    } finally {
-      setCreatePending(false);
-    }
-  }, [selectedWorkspaceId, createPending, piClient, router, dismiss]);
+    router.navigate(`/workspace/${selectedWorkspaceId}`);
+    dismiss();
+    setCreatePending(false);
+  }, [selectedWorkspaceId, createPending, router, dismiss]);
 
   const panGesture = Gesture.Pan()
     .onUpdate((e) => {

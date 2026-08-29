@@ -101,7 +101,7 @@ function ToolbarComponent({
   // triggers match their height. The standalone strip keeps its own.
   const controlHeight = inline ? 32 : TOOLBAR_CONTROL_HEIGHT;
 
-  const currentModel = agentState?.model;
+  const currentModel = agentState?.model ?? models?.[0] ?? null;
   const currentThinking = agentState?.thinkingLevel ?? 'medium';
   const currentMode: AgentMode =
     agentState?.mode ?? (modeLabel?.trim().toLowerCase() === 'plan' ? 'plan' : 'chat');
@@ -303,7 +303,7 @@ function ToolbarComponent({
   // Nothing but the agent state is required to render. Waiting on `ready` or on
   // the model list used to keep the composer a skeleton for the whole several
   // seconds it takes to spawn the pi process.
-  if (!agentState) {
+  if (!agentState && !currentModel) {
     return <>{skeleton}</>;
   }
 

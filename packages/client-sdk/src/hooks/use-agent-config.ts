@@ -119,12 +119,29 @@ export function useAgentConfig(
       setError(null);
 
       try {
-        const modelsResult = await client.api.getAvailableModels(sessionId);
+        const [modelsResult, agentState] = await Promise.all([
+          client.api.getAvailableModels(sessionId),
+          client.api.getAgentState(sessionId),
+        ]);
         if (sessionIdRef.current !== sessionId) return;
-        setModels(modelsResult.models ?? []);
+        setState(agentState);
+        const availableModels = modelsResult.models ?? [];
+        if (__DEV__) console.log("[pi:config]", sessionId, { attempt, models: availableModels.length, hasState: Boolean(agentState) });
+        if (availableModels.length === 0 && attempt + 1 < MAX_RETRIES) {
+          const nextAttempt = attempt + 1;
+          attemptRef.current = nextAttempt;
+          retryTimerRef.current = setTimeout(() => {
+            if (sessionIdRef.current === sessionId) {
+              loadModels(nextAttempt);
+            }
+          }, RETRY_DELAY_MS);
+          return;
+        }
+        setModels(availableModels);
         attemptRef.current = 0;
         setIsLoading(false);
       } catch (err) {
+        if (__DEV__) console.warn("[pi:config] failed", sessionId, err);
         if (sessionIdRef.current !== sessionId) return;
 
         const nextAttempt = attempt + 1;

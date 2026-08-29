@@ -53,8 +53,6 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
   },
   bubble: {
-    borderRadius: 16,
-    borderBottomRightRadius: 4,
     paddingHorizontal: 14,
     paddingVertical: 10,
     maxWidth: "85%",

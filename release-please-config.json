@@ -5,13 +5,8 @@
       "include-component-in-tag": false,
       "extra-files": [
         {
-          "type": "toml",
-          "path": "packages/pideck/server/Cargo.toml",
-          "jsonpath": "$.package.version"
-        },
-        {
           "type": "json",
-          "path": "app.json",
+          "path": "apps/client/app.json",
           "jsonpath": "$.expo.version"
         }
       ]

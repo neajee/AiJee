@@ -1,4 +1,5 @@
 export { PiClient, type SessionListState } from "./pi-client";
+export { PIDECK_STREAM_PATH } from "./constants";
 export { ApiClient } from "./api-client";
 export { StreamConnection, type StreamConnectionConfig } from "./stream-connection";
 export { XhrEventSource, type EventSourceEvent } from "./event-source";

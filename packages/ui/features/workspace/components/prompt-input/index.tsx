@@ -14,6 +14,7 @@ import {
 } from "react-native";
 import { Plus, ArrowUp, Mic, Square } from "lucide-react-native";
 import * as DocumentPicker from "expo-document-picker";
+import { File as ExpoFile } from "expo-file-system";
 import { useQuery } from "@tanstack/react-query";
 
 import { Fonts } from "@/constants/theme";
@@ -56,6 +57,21 @@ type QueueBehavior = "steer" | "followUp";
 
 function formatQueueBehaviorLabel(behavior: QueueBehavior): string {
   return behavior === "followUp" ? "Follow up" : "Steer";
+}
+
+/**
+ * Reads a picked native image into a data URL.
+ *
+ * Returns undefined when the file cannot be read, so the attachment still
+ * appears as a chip (without a thumbnail) instead of the pick failing.
+ */
+async function readImageDataUrl(uri: string, mimeType?: string | null): Promise<string | undefined> {
+  try {
+    const base64 = await new ExpoFile(uri).base64();
+    return `data:${mimeType || "image/png"};base64,${base64}`;
+  } catch {
+    return undefined;
+  }
 }
 
 interface PromptInputProps {
@@ -430,6 +446,9 @@ export function PromptInput({
           type: isImage ? "image" : "file",
           uri: asset.uri,
           size: asset.size ?? undefined,
+          // The prompt travels as base64, so a native pick has to be read here:
+          // a bare file:// uri means the image is silently dropped on send.
+          preview: isImage ? await readImageDataUrl(asset.uri, asset.mimeType) : undefined,
         });
       }
     }

@@ -2,8 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
-  Animated,
-  Easing,
   Platform,
   Pressable,
   ScrollView,
@@ -20,11 +18,9 @@ import {
   ChevronRight,
   Folder,
   FolderOpen,
-  Loader2,
   MoreHorizontal,
   Pin,
   Plus,
-  RefreshCw,
   Settings,
   PackageOpen,
   Pencil,
@@ -76,7 +72,6 @@ export function ProjectSidebar() {
   const selectWorkspace = useWorkspaceStore((s) => s.selectWorkspace);
   const togglePinned = useWorkspaceStore((s) => s.togglePinnedWorkspace);
   const removeWorkspace = useWorkspaceStore((s) => s.removeWorkspace);
-  const fetchWorkspaces = useWorkspaceStore((s) => s.fetchWorkspaces);
   const getLastSession = useWorkspaceStore((s) => s.getLastSession);
   const clearLastSession = useWorkspaceStore((s) => s.clearLastSession);
   const clearSessionNotification = useWorkspaceStore(
@@ -110,8 +105,6 @@ export function ProjectSidebar() {
 
   const [showNewDialog, setShowNewDialog] = useState(false);
   const [editWorkspace, setEditWorkspace] = useState<Workspace | null>(null);
-  const [refreshToken, setRefreshToken] = useState(0);
-  const [refreshing, setRefreshing] = useState(false);
   // Only holds projects whose state differs from the default (selected = open).
   const [overrides, setOverrides] = useState<Record<string, boolean>>({});
   const [contextMenu, setContextMenu] = useState<{
@@ -183,16 +176,6 @@ export function ProjectSidebar() {
     requestBrowserNotificationPermission();
     router.navigate(`/workspace/${selectedWorkspaceId}`);
   }, [selectedWorkspaceId, router]);
-
-  const handleRefresh = useCallback(async () => {
-    setRefreshing(true);
-    try {
-      await fetchWorkspaces();
-      setRefreshToken((n) => n + 1);
-    } finally {
-      setRefreshing(false);
-    }
-  }, [fetchWorkspaces]);
 
   const handleContextMenu = useCallback((ws: Workspace, e: any) => {
     if (Platform.OS !== "web") return;
@@ -280,7 +263,6 @@ export function ProjectSidebar() {
           <WorkspaceSessions
             workspaceId={ws.id}
             selectedSessionId={isSelected ? selectedSessionId : null}
-            refreshToken={refreshToken}
             onSelect={handleSelectSession}
             onArchived={handleArchivedSession}
             isDark={isDark}
@@ -331,18 +313,6 @@ export function ProjectSidebar() {
           isDark={isDark}
           actions={
             <>
-              <HeaderAction
-                onPress={handleRefresh}
-                disabled={refreshing}
-                label="刷新项目"
-                isDark={isDark}
-              >
-                {refreshing ? (
-                  <ActivityIndicator size={12} color={colors.textTertiary} />
-                ) : (
-                  <RefreshCw size={12} color={colors.textTertiary} strokeWidth={1.8} />
-                )}
-              </HeaderAction>
               <HeaderAction
                 onPress={() => setShowNewDialog(true)}
                 label="添加项目"
@@ -577,44 +547,6 @@ function SidebarRow({
   );
 }
 
-/**
- * The "something is running here" mark: a slow spin, because a project row has
- * no room for the agent's actual progress and a static icon reads as a status
- * that has already settled.
- */
-function ActivityPulse({ color }: { color: string }) {
-  const spin = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    const loop = Animated.loop(
-      Animated.timing(spin, {
-        toValue: 1,
-        duration: 1100,
-        easing: Easing.linear,
-        useNativeDriver: true,
-      }),
-    );
-    loop.start();
-    return () => loop.stop();
-  }, [spin]);
-
-  return (
-    <Animated.View
-      style={{
-        transform: [
-          {
-            rotate: spin.interpolate({
-              inputRange: [0, 1],
-              outputRange: ["0deg", "360deg"],
-            }),
-          },
-        ],
-      }}
-    >
-      <Loader2 size={12} color={color} strokeWidth={2} />
-    </Animated.View>
-  );
-}
 
 function WorkspaceRow({
   workspace,
@@ -748,10 +680,6 @@ function WorkspaceRow({
           </View>
         )}
 
-        {/* A working project spins; a finished one waits with a green dot. */}
-        {!showActions && isRunning && (
-          <ActivityPulse color={colors.textSecondary} />
-        )}
         {!showActions && !isRunning && hasUnread && (
           <View
             style={[
@@ -802,14 +730,12 @@ function WorkspaceRow({
 function WorkspaceSessions({
   workspaceId,
   selectedSessionId,
-  refreshToken,
   onSelect,
   onArchived,
   isDark,
 }: {
   workspaceId: string;
   selectedSessionId: string | null;
-  refreshToken: number;
   onSelect: (workspaceId: string, sessionId: string) => void;
   onArchived: (workspaceId: string, sessionId: string) => void;
   isDark: boolean;
@@ -822,7 +748,6 @@ function WorkspaceSessions({
     isFetchingNextPage,
     hasNextPage,
     fetchNextPage,
-    refetch,
     renameSession,
     archiveSession,
   } = useSessions(workspaceId);
@@ -840,13 +765,6 @@ function WorkspaceSessions({
       sessions.map((session) => session.id),
     );
   }, [workspaceId, sessions, registerWorkspaceSessions]);
-
-  // The sidebar's refresh button covers the whole tree, sessions included.
-  const isFirstRun = refreshToken === 0;
-  useEffect(() => {
-    if (isFirstRun) return;
-    refetch();
-  }, [refreshToken, isFirstRun, refetch]);
 
   // A folded list must never hide the session being read.
   const selectedIndex = selectedSessionId

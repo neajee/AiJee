@@ -4,6 +4,7 @@ export interface ConnectParams {
   port: string;
   qrId: string;
   serverId?: string;
+  code?: string;
 }
 
 export function parseConnectUrl(url: string): ConnectParams | null {
@@ -11,6 +12,11 @@ export function parseConnectUrl(url: string): ConnectParams | null {
     // Handle pi://connect?... format and browser-safe /connect URLs.
     const normalized = url.replace(/^pi:\/\//, 'https://pi.local/');
     const parsed = new URL(normalized);
+
+    const code = parsed.searchParams.get('k');
+    if (code) {
+      return { hostname: parsed.hostname, ips: [parsed.hostname], port: parsed.port || '5454', qrId: '', code };
+    }
 
     if (!parsed.pathname.endsWith('/connect')) return null;
 

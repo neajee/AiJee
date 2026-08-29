@@ -1,201 +1,149 @@
-                                 Apache License
-                           Version 2.0, January 2004
-                        http://www.apache.org/licenses/
+# PiDeck Source-Available Non-Commercial License
 
-   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+Version 1.0
 
-   1. Definitions.
+Copyright © 2026 PiDeck Authors.
+All Rights Reserved.
 
-      "License" shall mean the terms and conditions for use, reproduction,
-      and distribution as defined by Sections 1 through 9 of this document.
+## 1. Grant of License
 
-      "Licensor" shall mean the copyright owner or entity authorized by
-      the copyright owner that is granting the License.
+Subject to the terms of this License, the copyright holder grants you a limited, non-exclusive, non-transferable, revocable license to access, use, copy, modify, and distribute the PiDeck source code solely for non-commercial purposes.
 
-      "Legal Entity" shall mean the union of the acting entity and all
-      other entities that control, are controlled by, or are under common
-      control with that entity. For the purposes of this definition,
-      "control" means (i) the power, direct or indirect, to cause the
-      direction or management of such entity, whether by contract or
-      otherwise, or (ii) ownership of fifty percent (50%) or more of the
-      outstanding shares, or (iii) beneficial ownership of such entity.
+Permitted non-commercial purposes include:
 
-      "You" (or "Your") shall mean an individual or Legal Entity
-      exercising permissions granted by this License.
+* Personal use;
+* Educational use;
+* Academic research;
+* Security research;
+* Evaluation and testing;
+* Development of non-commercial modifications or extensions;
+* Contributions made back to the PiDeck project.
 
-      "Source" form shall mean the preferred form for making modifications,
-      including but not limited to software source code, documentation
-      source, and configuration files.
+## 2. Commercial Use Prohibited
 
-      "Object" form shall mean any form resulting from mechanical
-      transformation or translation of a Source form, including but
-      not limited to compiled object code, generated documentation,
-      and conversions to other media types.
+Unless you have obtained prior written authorization or a separate commercial license from the copyright holder, you may not use PiDeck, in whole or in substantial part, for any commercial purpose.
 
-      "Work" shall mean the work of authorship, whether in Source or
-      Object form, made available under the License, as indicated by a
-      copyright notice that is included in or attached to the work
-      (an example is provided in the Appendix below).
+Commercial use includes, but is not limited to:
 
-      "Derivative Works" shall mean any work, whether in Source or Object
-      form, that is based on (or derived from) the Work and for which the
-      editorial revisions, annotations, elaborations, or other modifications
-      represent, as a whole, an original work of authorship. For the purposes
-      of this License, Derivative Works shall not include works that remain
-      separable from, or merely link (or bind by name) to the interfaces of,
-      the Work and Derivative Works thereof.
+1. Selling PiDeck or modified versions of PiDeck;
+2. Charging users for access to PiDeck;
+3. Offering PiDeck as a paid SaaS, hosted service, cloud service, managed service, or subscription service;
+4. Integrating PiDeck into a commercial software product or commercial platform;
+5. Using PiDeck as a substantial component of a product or service offered for commercial advantage;
+6. Redistributing, sublicensing, leasing, renting, or reselling PiDeck for commercial purposes;
+7. Providing paid deployment, hosting, customization, or managed PiDeck services where PiDeck itself forms a substantial part of the commercial offering;
+8. Removing PiDeck branding and redistributing substantially the same software under another name for commercial purposes.
 
-      "Contribution" shall mean any work of authorship, including
-      the original version of the Work and any modifications or additions
-      to that Work or Derivative Works thereof, that is intentionally
-      submitted to Licensor for inclusion in the Work by the copyright owner
-      or by an individual or Legal Entity authorized to submit on behalf of
-      the copyright owner. For the purposes of this definition, "submitted"
-      means any form of electronic, verbal, or written communication sent
-      to the Licensor or its representatives, including but not limited to
-      communication on electronic mailing lists, source code control systems,
-      and issue tracking systems that are managed by, or on behalf of, the
-      Licensor for the purpose of discussing and improving the Work, but
-      excluding communication that is conspicuously marked or otherwise
-      designated in writing by the copyright owner as "Not a Contribution."
+Internal use by a commercial organization is also considered commercial use unless separately authorized by the copyright holder.
 
-      "Contributor" shall mean Licensor and any individual or Legal Entity
-      on behalf of whom a Contribution has been received by Licensor and
-      subsequently incorporated within the Work.
+## 3. Modification
 
-   2. Grant of Copyright License. Subject to the terms and conditions of
-      this License, each Contributor hereby grants to You a perpetual,
-      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
-      copyright license to reproduce, prepare Derivative Works of,
-      publicly display, publicly perform, sublicense, and distribute the
-      Work and such Derivative Works in Source or Object form.
+You may modify the source code for permitted non-commercial purposes.
 
-   3. Grant of Patent License. Subject to the terms and conditions of
-      this License, each Contributor hereby grants to You a perpetual,
-      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
-      (except as stated in this section) patent license to make, have made,
-      use, offer to sell, sell, import, and otherwise transfer the Work,
-      where such license applies only to those patent claims licensable
-      by such Contributor that are necessarily infringed by their
-      Contribution(s) alone or by combination of their Contribution(s)
-      with the Work to which such Contribution(s) was submitted. If You
-      institute patent litigation against any entity (including a
-      cross-claim or counterclaim in a lawsuit) alleging that the Work
-      or a Contribution incorporated within the Work constitutes direct
-      or contributory patent infringement, then any patent licenses
-      granted to You under this License for that Work shall terminate
-      as of the date such litigation is filed.
+If you distribute a modified version, you must:
 
-   4. Redistribution. You may reproduce and distribute copies of the
-      Work or Derivative Works thereof in any medium, with or without
-      modifications, and in Source or Object form, provided that You
-      meet the following conditions:
+* Clearly state that the software has been modified;
+* Preserve existing copyright and attribution notices;
+* Include a copy of this License;
+* Clearly identify the project as being derived from PiDeck where applicable.
 
-      (a) You must give any other recipients of the Work or
-          Derivative Works a copy of this License; and
+You may not represent a modified version as an official PiDeck release without written authorization.
 
-      (b) You must cause any modified files to carry prominent notices
-          stating that You changed the files; and
+## 4. Redistribution
 
-      (c) You must retain, in the Source form of any Derivative Works
-          that You distribute, all copyright, patent, trademark, and
-          attribution notices from the Source form of the Work,
-          excluding those notices that do not pertain to any part of
-          the Derivative Works; and
+Non-commercial redistribution is permitted provided that:
 
-      (d) If the Work includes a "NOTICE" text file as part of its
-          distribution, then any Derivative Works that You distribute must
-          include a readable copy of the attribution notices contained
-          within such NOTICE file, excluding those notices that do not
-          pertain to any part of the Derivative Works, in at least one
-          of the following places: within a NOTICE text file distributed
-          as part of the Derivative Works; within the Source form or
-          documentation, if provided along with the Derivative Works; or,
-          within a display generated by the Derivative Works, if and
-          wherever such third-party notices normally appear. The contents
-          of the NOTICE file are for informational purposes only and
-          do not modify the License. You may add Your own attribution
-          notices within Derivative Works that You distribute, alongside
-          or as an addendum to the NOTICE text from the Work, provided
-          that such additional attribution notices cannot be construed
-          as modifying the License.
+* This License is included;
+* Copyright notices are preserved;
+* Attribution notices are preserved;
+* The source of the original PiDeck project is identified where reasonably practical;
+* No additional terms are imposed that reduce the protections granted to the PiDeck copyright holder.
 
-      You may add Your own copyright statement to Your modifications and
-      may provide additional or different license terms and conditions
-      for use, reproduction, or distribution of Your modifications, or
-      for any such Derivative Works as a whole, provided Your use,
-      reproduction, and distribution of the Work otherwise complies with
-      the conditions stated in this License.
+## 5. Trademark and Branding
 
-   5. Submission of Contributions. Unless You explicitly state otherwise,
-      any Contribution intentionally submitted for inclusion in the Work
-      by You to the Licensor shall be under the terms and conditions of
-      this License, without any additional terms or conditions.
-      Notwithstanding the above, nothing herein shall supersede or modify
-      the terms of any separate license agreement you may have executed
-      with Licensor regarding such Contributions.
+This License does not grant permission to use the PiDeck name, logo, trademarks, service marks, visual identity, or other branding except as reasonably necessary to describe the origin of the software.
 
-   6. Trademarks. This License does not grant permission to use the trade
-      names, trademarks, service marks, or product names of the Licensor,
-      except as required for reasonable and customary use in describing the
-      origin of the Work and reproducing the content of the NOTICE file.
+You may not use PiDeck branding in a way that implies sponsorship, endorsement, partnership, or official affiliation without written permission.
 
-   7. Disclaimer of Warranty. Unless required by applicable law or
-      agreed to in writing, Licensor provides the Work (and each
-      Contributor provides its Contributions) on an "AS IS" BASIS,
-      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
-      implied, including, without limitation, any warranties or conditions
-      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
-      PARTICULAR PURPOSE. You are solely responsible for determining the
-      appropriateness of using or redistributing the Work and assume any
-      risks associated with Your exercise of permissions under this License.
+Modified or redistributed versions should use a distinct product name unless otherwise authorized.
 
-   8. Limitation of Liability. In no event and under no legal theory,
-      whether in tort (including negligence), contract, or otherwise,
-      unless required by applicable law (such as deliberate and grossly
-      negligent acts) or agreed to in writing, shall any Contributor be
-      liable to You for damages, including any direct, indirect, special,
-      incidental, or consequential damages of any character arising as a
-      result of this License or out of the use or inability to use the
-      Work (including but not limited to damages for loss of goodwill,
-      work stoppage, computer failure or malfunction, or any and all
-      other commercial damages or losses), even if such Contributor
-      has been advised of the possibility of such damages.
+## 6. Commercial Licensing
 
-   9. Accepting Warranty or Additional Liability. While redistributing
-      the Work or Derivative Works thereof, You may choose to offer,
-      and charge a fee for, acceptance of support, warranty, indemnity,
-      or other liability obligations and/or rights consistent with this
-      License. However, in accepting such obligations, You may act only
-      on Your own behalf and on Your sole responsibility, not on behalf
-      of any other Contributor, and only if You agree to indemnify,
-      defend, and hold each Contributor harmless for any liability
-      incurred by, or claims asserted against, such Contributor by reason
-      of your accepting any such warranty or additional liability.
+Commercial use requires a separate commercial license issued by the PiDeck copyright holder.
 
-   END OF TERMS AND CONDITIONS
+Commercial licenses may permit, depending on the agreement:
 
-   APPENDIX: How to apply the Apache License to your work.
+* Internal enterprise use;
+* Commercial distribution;
+* Commercial integration;
+* SaaS deployment;
+* OEM distribution;
+* White-label distribution;
+* Paid hosting or managed services;
+* Other commercial activities.
 
-      To apply the Apache License to your work, attach the following
-      boilerplate notice, with the fields enclosed by brackets "[]"
-      replaced with your own identifying information. (Don't include
-      the brackets!)  The text should be enclosed in the appropriate
-      comment syntax for the file format. We also recommend that a
-      file or class name and description of purpose be included on the
-      same "printed page" as the copyright notice for easier
-      identification within third-party archives.
+Commercial licensing terms are negotiated separately and are not granted by this License.
 
-   Copyright [yyyy] [name of copyright owner]
+## 7. Third-Party Components
 
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+PiDeck may include or be derived from third-party software distributed under separate licenses, including software licensed under the Apache License 2.0.
 
-       http://www.apache.org/licenses/LICENSE-2.0
+This License applies only to portions of the software for which the PiDeck copyright holder owns or controls the applicable copyright.
 
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+Third-party components remain subject to their respective licenses.
+
+Nothing in this License limits, replaces, or removes rights independently granted under third-party licenses.
+
+## 8. Apache License 2.0 Components
+
+Certain portions of PiDeck may contain code originally licensed under the Apache License 2.0.
+
+Those portions remain available under the Apache License 2.0 and are not relicensed or restricted by this License beyond what is permitted by applicable law and the original license.
+
+PiDeck-specific modifications, additions, modules, interfaces, services, applications, workflows, and other independently copyrightable contributions may be licensed separately under this License.
+
+## 9. No Circumvention
+
+You may not intentionally circumvent the commercial-use restrictions of this License by:
+
+* Separating PiDeck into multiple components;
+* Using modified builds that are substantially equivalent to PiDeck;
+* Redistributing PiDeck through an intermediary;
+* Using affiliates, subsidiaries, contractors, or related entities to perform activities that would otherwise violate this License.
+
+## 10. Contributions
+
+Unless otherwise agreed in writing, contributions submitted to the official PiDeck repository may be incorporated into PiDeck and distributed under this License and/or other licenses selected by the PiDeck maintainers.
+
+By submitting a contribution, you represent that you have the legal right to submit that contribution.
+
+## 11. Termination
+
+Your rights under this License automatically terminate if you violate its terms.
+
+Upon termination, you must cease all unauthorized use, distribution, hosting, and commercial exploitation of PiDeck.
+
+The copyright holder may separately grant reinstatement in writing.
+
+## 12. Disclaimer of Warranty
+
+PiDeck is provided "AS IS", without warranties or conditions of any kind, express or implied.
+
+To the maximum extent permitted by law, the copyright holder and contributors disclaim all warranties, including warranties of merchantability, fitness for a particular purpose, title, and non-infringement.
+
+## 13. Limitation of Liability
+
+To the maximum extent permitted by applicable law, the copyright holder and contributors shall not be liable for any direct, indirect, incidental, special, consequential, exemplary, or other damages arising from the use or inability to use PiDeck.
+
+## 14. Reservation of Rights
+
+All rights not expressly granted under this License are reserved by the copyright holder.
+
+## 15. Contact
+
+For commercial licensing, partnership, OEM licensing, or other permissions, contact the PiDeck copyright holder through the official PiDeck repository or designated business contact.
+
+---
+
+PiDeck Source-Available Non-Commercial License
+Version 1.0

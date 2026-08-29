@@ -167,6 +167,96 @@ export function reconcileItems(prev: ListItem[], next: ListItem[]): ListItem[] {
   return changed ? result : prev;
 }
 
+/** Mirrors `isToolActive`; kept local so this module stays type-only. */
+const RUNNING_STATUSES: ReadonlySet<ToolCallInfo["status"]> = new Set([
+  "streaming",
+  "pending",
+  "running",
+]);
+
+/** The kinds of work a turn can report, merged across its tool calls. */
+export type TurnActionKind =
+  | "edit"
+  | "read"
+  | "run"
+  | "web"
+  | "download"
+  | "agent"
+  | "other";
+
+export interface TurnAction {
+  kind: TurnActionKind;
+  /** Past tense once the work is done, present participle while it runs. */
+  label: string;
+  /** How many calls of this kind the turn made. */
+  count: number;
+  running: boolean;
+}
+
+const ACTION_OF_TOOL: Record<string, TurnActionKind> = {
+  edit: "edit",
+  write: "edit",
+  read: "read",
+  bash: "run",
+  search: "web",
+  scrape: "web",
+  crawl: "web",
+  download: "download",
+  subagent: "agent",
+};
+
+const ACTION_LABELS: Record<TurnActionKind, { done: string; running: string }> = {
+  edit: { done: "Edited files", running: "Editing files" },
+  read: { done: "Read files", running: "Reading files" },
+  run: { done: "Ran commands", running: "Running commands" },
+  web: { done: "Searched the web", running: "Searching the web" },
+  download: { done: "Downloaded files", running: "Downloading files" },
+  agent: { done: "Ran agents", running: "Running agents" },
+  other: { done: "Used tools", running: "Using tools" },
+};
+
+/** Reads as a sentence regardless of the order the calls actually came in. */
+const ACTION_ORDER: TurnActionKind[] = [
+  "edit",
+  "read",
+  "run",
+  "web",
+  "download",
+  "agent",
+  "other",
+];
+
+/**
+ * What a turn did, as one deduplicated line: every `edit` and `write` in the
+ * turn becomes a single "Edited files", every `read` a single "Read files", and
+ * so on. This is the collapsed header for the whole work log, so a turn that
+ * touched thirty files still reads as one row instead of thirty.
+ */
+export function summarizeTurnActions(steps: WorkStep[]): TurnAction[] {
+  const seen = new Map<TurnActionKind, { count: number; running: boolean }>();
+
+  for (const step of steps) {
+    if (step.kind !== "tools") continue;
+    for (const tc of step.toolCalls) {
+      const kind = ACTION_OF_TOOL[tc.name] ?? "other";
+      const entry = seen.get(kind) ?? { count: 0, running: false };
+      entry.count += 1;
+      if (RUNNING_STATUSES.has(tc.status)) entry.running = true;
+      seen.set(kind, entry);
+    }
+  }
+
+  return ACTION_ORDER.filter((kind) => seen.has(kind)).map((kind) => {
+    const entry = seen.get(kind)!;
+    return {
+      kind,
+      label: ACTION_LABELS[kind][entry.running ? "running" : "done"],
+      count: entry.count,
+      running: entry.running,
+    };
+  });
+}
+
 export function formatDuration(ms: number): string {
   if (ms < 1000) return "<1s";
   const totalSeconds = Math.round(ms / 1000);

@@ -26,8 +26,6 @@ import { Colors, Fonts } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useWorkspaceStore } from '@/features/workspace/store';
 import { useWorkspaceSessions as useSessions } from '@pideck/client-sdk';
-import { usePiClient } from '@pideck/client-sdk';
-import { requestBrowserNotificationPermission } from '@/features/agent/browser-notifications';
 import { NewWorkspaceDialog } from '@/features/workspace/components/new-workspace-dialog';
 import { SessionActivityIndicator } from '@/features/workspace/components/session-activity-indicator';
 import { AnimatedListItem } from '@/components/ui/animated-list-item';
@@ -374,19 +372,15 @@ function SessionPage({ workspaceId, onSessionPress, onDismiss }: SessionPageProp
     isRefetching,
   } = useSessions(workspaceId);
 
-  const piClient = usePiClient();
   const [createPending, setCreatePending] = useState(false);
 
-  const handleNewSession = useCallback(async () => {
+  const handleNewSession = useCallback(() => {
     if (createPending) return;
     setCreatePending(true);
-    requestBrowserNotificationPermission();
-    try {
-      const info = await piClient.createAgentSession({ workspaceId });
-      router.navigate(`/workspace/${workspaceId}/s/${info.session_id}`);
-      onDismiss();
-    } catch {} finally { setCreatePending(false); }
-  }, [workspaceId, createPending, piClient, router, onDismiss]);
+    router.navigate(`/workspace/${workspaceId}`);
+    onDismiss();
+    setCreatePending(false);
+  }, [workspaceId, createPending, router, onDismiss]);
 
   return (
     <View style={styles.pageContent}>

@@ -161,12 +161,20 @@ interface WorkspaceSidebarProps {
   storageScope?: string;
   /** Applied only when the scope has no stored preference yet. */
   defaultCollapsed?: boolean;
+  /**
+   * When true the panel stays collapsed and cannot be expanded, resized or
+   * restored from storage: it effectively hides itself and keeps out of the
+   * way (used on the new-session start page, where the composer should get
+   * the whole width while a session is still being prepared).
+   */
+  locked?: boolean;
 }
 
 export function WorkspaceSidebar({
   children,
   storageScope = DEFAULT_SCOPE,
   defaultCollapsed = false,
+  locked = false,
 }: WorkspaceSidebarProps) {
   const colorScheme = useColorScheme() ?? "light";
   const colors = Colors[colorScheme];
@@ -190,6 +198,9 @@ export function WorkspaceSidebar({
   const seamDragTint = "rgba(136,136,136,0.26)";
 
   const [isCollapsed, setIsCollapsed] = useState(scope.collapsed);
+  // A locked panel is always treated as collapsed, regardless of what the
+  // store remembered, so it can never be shown on the new-session page.
+  const collapsed = locked ? true : isCollapsed;
   const [isResizing, setIsResizing] = useState(false);
   const [isSeamHovered, setIsSeamHovered] = useState(false);
   const [panelWidth, setPanelWidth] = useState(scope.width);
@@ -197,9 +208,13 @@ export function WorkspaceSidebar({
   const panelStartRef = useRef(scope.width);
   const isResizingRef = useRef(false);
   const widthAnim = useRef(
-    new Animated.Value(scope.collapsed ? COLLAPSED_WIDTH : scope.width),
+    new Animated.Value(
+      locked || scope.collapsed ? COLLAPSED_WIDTH : scope.width,
+    ),
   ).current;
-  const [contentMounted, setContentMounted] = useState(!scope.collapsed);
+  const [contentMounted, setContentMounted] = useState(
+    locked ? false : !scope.collapsed,
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -219,7 +234,7 @@ export function WorkspaceSidebar({
           scope.widthLoaded = true;
           panelWidthRef.current = nextWidth;
           setPanelWidth(nextWidth);
-          if (!scope.collapsed) widthAnim.setValue(nextWidth);
+          if (!scope.collapsed && !locked) widthAnim.setValue(nextWidth);
         }),
       );
     }
@@ -251,17 +266,17 @@ export function WorkspaceSidebar({
   // panel tracks the pointer without a queued animation per move.
   useEffect(() => {    if (isResizingRef.current) return;
 
-    if (!isCollapsed) setContentMounted(true);
+    if (!collapsed) setContentMounted(true);
 
     Animated.timing(widthAnim, {
-      toValue: isCollapsed ? COLLAPSED_WIDTH : panelWidth,
+      toValue: collapsed ? COLLAPSED_WIDTH : panelWidth,
       duration: COLLAPSE_DURATION,
       easing: Easing.bezier(0.4, 0, 0.2, 1),
       useNativeDriver: false,
     }).start(({ finished }) => {
-      if (finished && isCollapsed) setContentMounted(false);
+      if (finished && collapsed) setContentMounted(false);
     });
-  }, [isCollapsed, panelWidth, widthAnim]);
+  }, [collapsed, panelWidth, widthAnim]);
 
   // A window that shrank past the ceiling would otherwise leave the panel
   // covering the conversation; the stored preference is left untouched so the
@@ -270,8 +285,8 @@ export function WorkspaceSidebar({
     if (isResizingRef.current || panelWidth <= maxWidth) return;
     panelWidthRef.current = maxWidth;
     setPanelWidth(maxWidth);
-    if (!isCollapsed) widthAnim.setValue(maxWidth);
-  }, [isCollapsed, maxWidth, panelWidth, widthAnim]);
+    if (!collapsed) widthAnim.setValue(maxWidth);
+  }, [collapsed, maxWidth, panelWidth, widthAnim]);
 
   const persistWidth = (width: number) => {
     const nextWidth = clampWidth(width);
@@ -283,8 +298,8 @@ export function WorkspaceSidebar({
 
   const panelResizer = useRef(
     PanResponder.create({
-      onStartShouldSetPanResponder: () => !isCollapsed,
-      onMoveShouldSetPanResponder: () => !isCollapsed,
+      onStartShouldSetPanResponder: () => !collapsed && !locked,
+      onMoveShouldSetPanResponder: () => !collapsed && !locked,
       onPanResponderGrant: () => {
         panelStartRef.current = panelWidthRef.current;
         isResizingRef.current = true;
@@ -335,6 +350,7 @@ export function WorkspaceSidebar({
       : {};
 
   const toggleCollapsed = () => {
+    if (locked) return;
     setIsCollapsed((prev) => {
       const next = !prev;
       scope.collapsed = next;
@@ -350,7 +366,7 @@ export function WorkspaceSidebar({
         styles.container,
         {
           width: widthAnim,
-          borderLeftColor: isCollapsed ? "transparent" : sidebarBorder,
+          borderLeftColor: collapsed ? "transparent" : sidebarBorder,
         },
       ]}
     >
@@ -361,26 +377,29 @@ export function WorkspaceSidebar({
       </View>
 
       {/* Same control as the left sidebar's, on this panel's own seam. Closed,
-          it tucks just inside the window edge instead of hanging off it. */}
-      <View
-        style={[
-          styles.seamToggleWrap,
-          {
-            left: isCollapsed
-              ? -(SEAM_TOGGLE_WIDTH + 8)
-              : -SEAM_TOGGLE_WIDTH / 2,
-          },
-        ]}
-        pointerEvents="box-none"
-      >
-        <SeamToggle
-          chevron={isCollapsed ? "left" : "right"}
-          onPress={toggleCollapsed}
-          label={isCollapsed ? "Open side panel" : "Close side panel"}
-        />
-      </View>
+          it tucks just inside the window edge instead of hanging off it. A
+          locked panel omits the control entirely so it can never be opened. */}
+      {!locked && (
+        <View
+          style={[
+            styles.seamToggleWrap,
+            {
+              left: collapsed
+                ? -(SEAM_TOGGLE_WIDTH + 8)
+                : -SEAM_TOGGLE_WIDTH / 2,
+            },
+          ]}
+          pointerEvents="box-none"
+        >
+          <SeamToggle
+            chevron={collapsed ? "left" : "right"}
+            onPress={toggleCollapsed}
+            label={collapsed ? "Open side panel" : "Close side panel"}
+          />
+        </View>
+      )}
 
-      {!isCollapsed && (
+      {!collapsed && (
         <View
           {...panelResizer.panHandlers}
           {...webSeamHoverProps}

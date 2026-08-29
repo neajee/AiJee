@@ -50,7 +50,7 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
   {
     slug: 'servers',
     title: '连接',
-    summary: '服务器地址与登录凭据',
+    summary: '设备地址与授权连接',
     icon: Wifi,
     Component: ({ isDark }) => <ServersSection isDark={isDark} />,
   },

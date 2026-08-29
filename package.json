@@ -7,18 +7,18 @@
     "packages/*"
   ],
   "scripts": {
-    "start": "yarn workspace @pideck/mobile start",
-    "web": "yarn workspace @pideck/web dev",
-    "android": "yarn workspace @pideck/mobile android",
-    "ios": "yarn workspace @pideck/mobile ios",
+    "start": "yarn workspace @pideck/client start",
+    "web": "node tools/start-web.mjs",
+    "android": "yarn workspace @pideck/client android",
+    "ios": "yarn workspace @pideck/client ios",
     "desktop": "yarn workspace @pideck/desktop dev",
-    "lint": "yarn workspace @pideck/web lint && yarn workspace @pideck/mobile lint",
-    "test": "yarn workspace @pideck/client-sdk test && yarn workspace @pideck/ui test && yarn workspace pideck test",
-    "api:generate": "yarn workspace @pideck/client-sdk api:generate",
-    "web:build": "yarn workspace @pideck/web build",
-    "server:check": "cargo check --manifest-path packages/pideck/server/Cargo.toml",
-    "server:build": "cargo build --manifest-path packages/pideck/server/Cargo.toml --release",
-    "backend:build": "yarn server:build",
-    "build:prod": "yarn web:build && yarn server:build"
+    "runtime:start": "node --experimental-strip-types apps/server/src/main.ts serve",
+    "runtime:check": "yarn workspace @pideck/engine check && yarn workspace pideck check",
+    "lint": "yarn workspace @pideck/client lint",
+    "test": "yarn workspace @pideck/client-sdk test && yarn workspace @pideck/ui test && yarn workspace @pideck/engine test && yarn workspace pideck test",
+    "api:generate": "yarn workspace @pideck/api-contract generate && yarn workspace @pideck/client-sdk api:generate",
+    "api:check": "yarn workspace @pideck/api-contract validate",
+    "web:build": "yarn workspace @pideck/client build",
+    "build:prod": "yarn web:build && yarn runtime:check"
   }
 }

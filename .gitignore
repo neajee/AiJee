@@ -7,6 +7,7 @@ node_modules/
 # Expo
 .expo/
 dist/
+apps/server/public/
 web-build/
 expo-env.d.ts
 
@@ -39,11 +40,8 @@ yarn-error.*
 
 app-example
 
-# server config (generated via `pideck init`)
-packages/pideck/server/config.toml
-packages/pideck/server/*.db
-/pideck.db
-packages/pideck/server/target/
+# runtime state
+apps/server/runtime.json
 unsloth_compiled_cache/
 
 # generated native folders

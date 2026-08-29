@@ -60,9 +60,9 @@ export function ModePickerDialog({
   const isNoneSelected = selectedId === NO_MODE_ID;
 
   return (
-    <Modal visible={visible} transparent animationType="fade">
-      <View style={[styles.overlay, { backgroundColor: overlayBg }]}>
-        <View style={[styles.dialog, { backgroundColor: bg, borderColor }]}>
+    <Modal visible={visible} transparent animationType="fade" onRequestClose={onSkip}>
+      <Pressable style={[styles.overlay, { backgroundColor: overlayBg }]} onPress={onSkip}>
+        <Pressable style={[styles.dialog, { backgroundColor: bg, borderColor }]} onPress={(e) => e.stopPropagation()}>
           <View style={styles.header}>
             <Layers size={18} color={textPrimary} strokeWidth={1.8} />
             <Text style={[styles.title, { color: textPrimary }]}>Select Mode</Text>
@@ -177,8 +177,8 @@ export function ModePickerDialog({
               </Text>
             </Pressable>
           </View>
-        </View>
-      </View>
+        </Pressable>
+      </Pressable>
     </Modal>
   );
 }

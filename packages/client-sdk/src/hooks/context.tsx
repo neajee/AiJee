@@ -5,7 +5,7 @@ import type { PiClientConfig } from "../types";
 const PiClientContext = createContext<PiClient | null>(null);
 
 export interface PiClientProviderProps {
-  config: PiClientConfig;
+  config?: PiClientConfig;
   children: ReactNode;
 }
 
@@ -13,17 +13,19 @@ export function PiClientProvider({ config, children }: PiClientProviderProps) {
   const clientRef = useRef<PiClient | null>(null);
 
   if (!clientRef.current) {
-    clientRef.current = new PiClient(config);
+    clientRef.current = new PiClient(config ?? { serverUrl: "", accessToken: "" });
   }
 
   const client = clientRef.current;
 
   useEffect(() => {
+    if (!config?.serverUrl || !config.accessToken) return;
     client.connect();
     return () => client.disconnect();
-  }, [client]);
+  }, [client, config?.accessToken, config?.serverUrl]);
 
   useEffect(() => {
+    if (!config) return;
     const tokenChanged = client.api.accessToken !== config.accessToken;
     client.updateToken(config.accessToken);
     // If the token changed while disconnected (e.g. after a refresh),
@@ -34,7 +36,7 @@ export function PiClientProvider({ config, children }: PiClientProviderProps) {
         client.reconnect();
       }
     }
-  }, [client, config.accessToken]);
+  }, [client, config]);
 
   return (
     <PiClientContext.Provider value={client}>
@@ -49,4 +51,8 @@ export function usePiClient(): PiClient {
     throw new Error("usePiClient must be used within a <PiClientProvider>");
   }
   return client;
+}
+
+export function useOptionalPiClient(): PiClient | null {
+  return useContext(PiClientContext);
 }

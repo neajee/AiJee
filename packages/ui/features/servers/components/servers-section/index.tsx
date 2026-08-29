@@ -2,6 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Image,
+  Modal,
   Platform,
   Pressable,
   StyleSheet,
@@ -9,13 +11,16 @@ import {
   View,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { Pencil, Plus, QrCode, Trash2 } from "lucide-react-native";
+import { Copy, Pencil, Plus, QrCode, RefreshCw, Trash2, X } from "lucide-react-native";
+import * as Clipboard from "expo-clipboard";
+import QRCode from "qrcode";
 
 import { Fonts } from "@/constants/theme";
 import { PiLogo } from "@/components/pi-logo";
 import { useServersStore, type Server } from "@/features/servers/store";
 import { useAuthStore } from "@/features/auth/store";
 import { useWorkspaceStore } from "@/features/workspace/store";
+import { useOptionalPiClient } from "@pideck/client-sdk";
 import { QrScanner } from "@/features/servers/components/qr-scanner";
 import { NewWorkspaceDialog } from "@/features/workspace/components/new-workspace-dialog";
 import {
@@ -47,10 +52,10 @@ export function ServersSection({
   const m = useSettingsMetrics();
   const p = useSettingsPalette();
   const router = useRouter();
+  const client = useOptionalPiClient();
 
   const { servers, loaded, load, addServer, updateServer, removeServer } =
     useServersStore();
-  const loginToServer = useAuthStore((s) => s.loginToServer);
   const logoutFromServer = useAuthStore((s) => s.logoutFromServer);
   const activeServerId = useAuthStore((s) => s.activeServerId);
 
@@ -61,6 +66,8 @@ export function ServersSection({
   const [qrVisible, setQrVisible] = useState(false);
   const [newWsVisible, setNewWsVisible] = useState(false);
   const [connecting, setConnecting] = useState<string | null>(null);
+  const [refreshingCode, setRefreshingCode] = useState(false);
+  const [codeDialog, setCodeDialog] = useState<{ code: string; url: string; image: string } | null>(null);
 
   useEffect(() => {
     if (!loaded) load();
@@ -96,6 +103,43 @@ export function ServersSection({
     [removeServer, logoutFromServer],
   );
 
+  const handleShowCode = useCallback(async () => {
+    if (!client) {
+      setLoginError("当前页面尚未连接设备，无法生成授权码。");
+      return;
+    }
+    try {
+      const result = await client.api.getDeviceCode();
+      const image = await QRCode.toDataURL(result.url, { width: 240, margin: 1 });
+      setCodeDialog({ code: result.code, url: result.url, image });
+    } catch (error) {
+      Alert.alert("获取授权码失败", error instanceof Error ? error.message : "请稍后重试");
+    }
+  }, [client]);
+
+  const handleRefreshCode = useCallback(async () => {
+    if (!client || refreshingCode || !activeServerId) return;
+    const server = servers.find((entry) => entry.id === activeServerId);
+    if (!server) return;
+    setRefreshingCode(true);
+    try {
+      const result = await client.api.createDeviceCode();
+      const authorized = await useAuthStore.getState().authorizeWithCode(
+        server.address,
+        result.code,
+        server.id,
+        server.name,
+      );
+      if (!authorized.success) throw new Error(authorized.error ?? "更新设备令牌失败");
+      const image = await QRCode.toDataURL(result.url, { width: 240, margin: 1 });
+      setCodeDialog({ code: result.code, url: result.url, image });
+    } catch (error) {
+      Alert.alert("刷新授权码失败", error instanceof Error ? error.message : "请稍后重试");
+    } finally {
+      setRefreshingCode(false);
+    }
+  }, [activeServerId, client, refreshingCode, servers]);
+
   /**
    * A fresh connection may land on a server with no projects yet, in which case
    * creating one is the only useful next step.
@@ -116,10 +160,14 @@ export function ServersSection({
 
   const handleConnect = useCallback(
     async (server: Server) => {
-      if (server.id === activeServerId) return;
       try {
         const auth = useAuthStore.getState();
         setConnecting(server.id);
+
+        if (server.id === activeServerId) {
+          await navigateAfterConnect();
+          return;
+        }
 
         const connected = auth.hasToken(server.id)
           ? await auth.activateServer(server)
@@ -131,7 +179,7 @@ export function ServersSection({
           // A stored token that no longer works is indistinguishable from none:
           // ask for credentials rather than failing silently.
           setEditingServer(server);
-          setLoginError("登录已过期，请重新输入凭据。");
+          setLoginError("设备授权已失效，请重新扫描授权码。");
           setFormVisible(true);
         }
       } catch (e) {
@@ -149,7 +197,7 @@ export function ServersSection({
       setLoginLoading(true);
       setLoginError(null);
 
-      const { username, password, ...serverData } = data;
+      const serverData = data;
       let server: Server;
       if (editingServer) {
         await updateServer(editingServer.id, serverData);
@@ -160,17 +208,11 @@ export function ServersSection({
         server = current[current.length - 1];
       }
 
-      const result = await loginToServer(server, { username, password });
       setLoginLoading(false);
-
-      if (result.success) {
-        setFormVisible(false);
-        await navigateAfterConnect();
-      } else {
-        setLoginError(result.error ?? "连接失败");
-      }
+      setFormVisible(false);
+      setLoginError("请扫描设备端生成的一次性授权码完成连接。");
     },
-    [editingServer, addServer, updateServer, loginToServer, navigateAfterConnect],
+    [editingServer, addServer, updateServer],
   );
 
   const handleNewWsClose = useCallback(() => {
@@ -220,8 +262,8 @@ export function ServersSection({
             欢迎使用 PiDeck
           </Text>
           <Text style={[styles.welcomeDesc, { color: p.textTertiary }]}>
-            连接一台运行 PiDeck 的电脑，{"\n"}
-            就能打开它上面的项目。
+            连接到运行 PiDeck 的设备，{"\n"}
+            使用设备授权后即可打开工作区。
           </Text>
           <View style={styles.welcomeButtons}>
             <Pressable
@@ -234,7 +276,7 @@ export function ServersSection({
             >
               <QrCode size={16} color={p.text} strokeWidth={2} />
               <Text style={[styles.welcomeButtonText, { color: p.text }]}>
-                扫码添加
+                扫描授权码
               </Text>
             </Pressable>
             <Pressable
@@ -266,7 +308,7 @@ export function ServersSection({
     <View style={{ gap: m.groupGap }}>
       <SettingsGroup
         header="服务器"
-        footer="点击一台服务器即可连接。凭据保存在本机，不会同步。"
+        footer="点击设备即可连接。设备令牌仅保存在本机，不会同步。"
       >
         {servers.length === 0 ? (
           <View
@@ -296,6 +338,7 @@ export function ServersSection({
               onPress={() => handleConnect(server)}
               onEdit={() => handleEdit(server)}
               onDelete={() => handleDelete(server)}
+              onShowCode={handleShowCode}
               isDark={isDark}
             />
           ))
@@ -306,8 +349,8 @@ export function ServersSection({
         <SettingsRow icon={Plus} label="添加服务器" onPress={handleAdd} />
         <SettingsRow
           icon={QrCode}
-          label="扫码添加"
-          description="扫描 PiDeck 终端里显示的二维码"
+          label="扫描授权码"
+          description="扫描 PiDeck 设备端生成的授权二维码"
           onPress={() => setQrVisible(true)}
           isLast
         />
@@ -330,6 +373,52 @@ export function ServersSection({
         onNeedNewWorkspace={() => setNewWsVisible(true)}
       />
       <NewWorkspaceDialog visible={newWsVisible} onClose={handleNewWsClose} />
+      <Modal visible={!!codeDialog} transparent animationType="fade" onRequestClose={() => setCodeDialog(null)}>
+        <Pressable style={styles.codeBackdrop} onPress={() => setCodeDialog(null)} accessibilityLabel="关闭授权对话框">
+          <Pressable
+            style={[styles.codeDialog, { backgroundColor: p.card }]}
+            onPress={(e) => e.stopPropagation()}
+          >
+            <View style={styles.codeHeader}>
+              <Text style={[styles.codeTitle, { color: p.text }]}>设备授权二维码</Text>
+              <Pressable
+                onPress={() => setCodeDialog(null)}
+                accessibilityLabel="关闭授权二维码"
+                hitSlop={8}
+                style={styles.closeCodeButton}
+              >
+                <X size={18} color={p.textTertiary} />
+              </Pressable>
+            </View>
+            {codeDialog && <Image source={{ uri: codeDialog.image }} style={styles.codeImage} />}
+            <View style={styles.codeRow}>
+              <Text style={[styles.codeLabel, { color: p.textTertiary }]}>授权码</Text>
+              <Text selectable style={[styles.codeValue, { color: p.text }]}>{codeDialog?.code}</Text>
+              <Pressable
+                onPress={() => codeDialog && Clipboard.setStringAsync(codeDialog.url)}
+                accessibilityLabel="复制完整地址"
+                accessibilityHint="复制设备连接地址"
+                style={styles.copyUrlButton}
+              >
+                <Copy size={18} color={p.text} />
+              </Pressable>
+              <Pressable
+                onPress={handleRefreshCode}
+                disabled={refreshingCode}
+                accessibilityLabel="刷新授权码"
+                accessibilityHint="生成新授权码并更新当前设备令牌"
+                style={styles.copyUrlButton}
+              >
+                {refreshingCode ? (
+                  <ActivityIndicator size="small" color={p.text} />
+                ) : (
+                  <RefreshCw size={18} color={p.text} />
+                )}
+              </Pressable>
+            </View>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </View>
   );
 }
@@ -342,6 +431,7 @@ function ServerRow({
   onPress,
   onEdit,
   onDelete,
+  onShowCode,
   isDark,
 }: {
   server: Server;
@@ -351,6 +441,7 @@ function ServerRow({
   onPress: () => void;
   onEdit: () => void;
   onDelete: () => void;
+  onShowCode: () => void;
   isDark: boolean;
 }) {
   const m = useSettingsMetrics();
@@ -433,6 +524,16 @@ function ServerRow({
         </Text>
       </View>
 
+      <Pressable
+        onPress={(e) => {
+          e.stopPropagation();
+          onShowCode();
+        }}
+        accessibilityLabel={`显示 ${server.name} 授权二维码`}
+        style={({ pressed }) => [styles.action, pressed && { opacity: 0.5 }]}
+      >
+        <QrCode size={15} color={p.textTertiary} strokeWidth={1.8} />
+      </Pressable>
       <Pressable
         onPress={(e) => {
           e.stopPropagation();
@@ -520,5 +621,57 @@ const styles = StyleSheet.create({
     height: 28,
     alignItems: "center",
     justifyContent: "center",
+  },
+  codeBackdrop: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "rgba(0,0,0,0.58)",
+    padding: 24,
+  },
+  codeDialog: {
+    width: "100%",
+    maxWidth: 360,
+    alignItems: "center",
+    borderRadius: 14,
+    padding: 24,
+    gap: 10,
+  },
+  codeTitle: {
+    fontSize: 17,
+    fontFamily: Fonts.sansMedium,
+  },
+  codeHeader: {
+    width: "100%",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  codeImage: {
+    width: 240,
+    height: 240,
+    marginVertical: 6,
+  },
+  codeLabel: {
+    fontSize: 12,
+    fontFamily: Fonts.sans,
+  },
+  codeValue: {
+    fontSize: 18,
+    fontFamily: Fonts.mono,
+    letterSpacing: 1,
+  },
+  codeRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 10,
+  },
+  copyUrlButton: {
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 4,
+  },
+  closeCodeButton: {
+    paddingVertical: 4,
   },
 });

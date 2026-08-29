@@ -831,11 +831,19 @@ function convertSingleMessage(msg: Record<string, unknown>, index: number): Chat
   if (role === "user") {
     const content = msg["content"];
     const text = typeof content === "string" ? content : extractTextFromContent(content as unknown[] | undefined);
+    const baseId = stableId(msg, "user", index);
+    const attachments = (extractImagesFromContent(content as unknown[] | undefined) ?? []).map((image, imageIndex) => ({
+      id: `${baseId}:image:${imageIndex}`,
+      type: "image" as const,
+      mimeType: image.mimeType,
+      data: image.data,
+    }));
     return {
-      id: stableId(msg, "user", index),
+      id: baseId,
       entryId: extractMessageEntryId(msg),
       role: "user",
       text,
+      ...(attachments.length > 0 ? { attachments } : {}),
       timestamp: parseTimestamp(msg["timestamp"]),
     };
   }

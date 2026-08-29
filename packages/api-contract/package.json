@@ -1,0 +1,10 @@
+{
+  "name": "@pideck/api-contract",
+  "version": "0.1.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "generate": "node --experimental-strip-types scripts/generate.ts",
+    "validate": "node --experimental-strip-types scripts/generate.ts --check"
+  }
+}

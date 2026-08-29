@@ -31,6 +31,7 @@ import {
   formatDuration,
   normalizeStart,
   reconcileItems,
+  summarizeTurnActions,
   type ListItem,
   type TurnListItem,
   type WorkStep,
@@ -59,6 +60,29 @@ const SCROLL_THRESHOLD = 200;
  * place by the time the reader arrives, so history feels continuous.
  */
 const HISTORY_PREFETCH_DISTANCE = 400;
+/**
+ * Rows measure asynchronously, so the content keeps growing for a while after
+ * the first page renders. The opening bottom-align therefore re-runs on every
+ * content-size change and only settles once the height has been quiet for
+ * this long.
+ */
+const ALIGN_SETTLE_MS = 220;
+/**
+ * Upper bound on that align phase. Without it a session that never stops
+ * growing (a live stream, an image that decodes late) would keep the reader's
+ * own scrolling suppressed indefinitely.
+ */
+const ALIGN_TIMEOUT_MS = 4000;
+/**
+ * A programmatic pin lands within a frame or two. Scroll events inside this
+ * window are ours, not the reader's, so they must not flip follow state — that
+ * feedback loop is what made a streaming turn fight the auto-scroll.
+ */
+const PIN_SUPPRESS_MS = 160;
+/** Cover for the one place an animated scroll is still right: the button. */
+const ANIMATED_SCROLL_MS = 420;
+/** Ignore sub-pixel offset noise when deciding the reader scrolled up. */
+const SCROLL_UP_EPSILON = 4;
 const INITIAL_RENDER_COUNT = 12;
 const RENDER_BATCH_COUNT = 6;
 const WINDOW_SIZE = 7;
@@ -71,13 +95,47 @@ export const MessageList = memo(function MessageList({
   const colors = Colors[colorScheme];
   const listRef = useRef<FlatList<ListItem>>(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
-  const [autoFollow, setAutoFollow] = useState(true);
+  /**
+   * Follow state is a ref, not state: it changes on scroll events at 60fps and
+   * nothing renders from it. Re-rendering the whole list on every frame of a
+   * stream was half of the jitter.
+   */
+  const autoFollowRef = useRef(true);
 
   const session = useAgentSession(sessionId);
   const messages = session.messages as ChatMessage[];
   const isStreaming = session.isStreaming;
+  /**
+   * Prepended pages are the only thing that needs an anchor, and they can only
+   * arrive while history remains. Once it is exhausted the prop goes away so it
+   * can never contend with the follow-the-bottom pin.
+   */
+  // Keep the native anchor only during an actual prepend. Leaving it enabled
+  // for the whole session makes it compete with bottom-follow during streaming.
+  const historyAnchor = session.isLoadingOlderMessages;
 
   const prevMessageCountRef = useRef(messages.length);
+  /**
+   * True until the list has been dragged to the newest message and the content
+   * height has settled. While it is set, scroll offsets belong to us rather
+   * than to the reader: nothing derives follow state or history prefetching
+   * from them, which is what used to strand a long session at its top — the
+   * offset-0 scroll event fired first, pulled in another page of history and
+   * cancelled the align that was supposed to run next.
+   */
+  const aligningRef = useRef(true);
+  const alignSettleRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const alignDeadlineRef = useRef<number | null>(null);
+  // Each auto-load has to be re-armed by the content actually growing, so a
+  // page shorter than the prefetch distance cannot spin the handler into
+  // firing on every scroll frame.
+  const lastPrefetchHeightRef = useRef(0);
+  /** Coalesces every pin request in a frame into one non-animated scroll. */
+  const pinFrameRef = useRef<number | null>(null);
+  const pinUntilRef = useRef(0);
+  const lastOffsetRef = useRef(0);
+  /** A pin issued mid-drag fights the finger; touch always wins. */
+  const draggingRef = useRef(false);
 
   const itemsRef = useRef<ListItem[]>([]);
   const items = useMemo(() => {
@@ -93,32 +151,113 @@ export const MessageList = memo(function MessageList({
     return last && last.kind === "turn" ? last.key : null;
   }, [items, isStreaming]);
 
-  useEffect(() => {
-    if (!autoFollow) return;
-    const countChanged = messages.length !== prevMessageCountRef.current;
-    prevMessageCountRef.current = messages.length;
-    if (countChanged) {
-      requestAnimationFrame(() => {
-        listRef.current?.scrollToEnd({ animated: true });
-      });
+  /**
+   * Hold the viewport at the newest content without animating.
+   *
+   * An animated scrollToEnd takes ~300ms, and a stream appends rows faster than
+   * that: each new chunk restarted the animation from a stale target while the
+   * content kept growing underneath it, which reads as the list bouncing. A
+   * single unanimated jump per frame is invisible when the delta is one line and
+   * correct when it is twenty.
+   */
+  const pinToBottom = useCallback(() => {
+    if (pinFrameRef.current !== null || draggingRef.current) return;
+    pinFrameRef.current = requestAnimationFrame(() => {
+      pinFrameRef.current = null;
+      pinUntilRef.current = Date.now() + PIN_SUPPRESS_MS;
+      listRef.current?.scrollToEnd({ animated: false });
+    });
+  }, []);
+
+  const cancelPin = useCallback(() => {
+    if (pinFrameRef.current !== null) {
+      cancelAnimationFrame(pinFrameRef.current);
+      pinFrameRef.current = null;
     }
-  }, [messages.length, autoFollow]);
+  }, []);
 
   useEffect(() => {
-    if (!isStreaming || !autoFollow) return;
-    const id = setInterval(() => {
-      listRef.current?.scrollToEnd({ animated: true });
-    }, 800);
-    return () => clearInterval(id);
-  }, [isStreaming, autoFollow]);
+    // The opening align owns the offset until it settles.
+    if (!autoFollowRef.current || aligningRef.current) return;
+    const countChanged = messages.length !== prevMessageCountRef.current;
+    prevMessageCountRef.current = messages.length;
+    if (countChanged) pinToBottom();
+  }, [messages.length, pinToBottom]);
+
+  const clearAlignTimer = useCallback(() => {
+    if (alignSettleRef.current) {
+      clearTimeout(alignSettleRef.current);
+      alignSettleRef.current = null;
+    }
+  }, []);
+
+  const finishAlign = useCallback(() => {
+    clearAlignTimer();
+    aligningRef.current = false;
+    alignDeadlineRef.current = null;
+    // The reader starts at the newest message, so they start following it.
+    autoFollowRef.current = true;
+    setShowScrollButton(false);
+  }, [clearAlignTimer]);
+
+  /** Pull the viewport to the newest message, and keep doing it until the
+   * content height stops moving. */
+  const alignToLatest = useCallback(() => {
+    if (!aligningRef.current || !session.isReady || items.length === 0) return;
+
+    if (alignDeadlineRef.current === null) {
+      alignDeadlineRef.current = Date.now() + ALIGN_TIMEOUT_MS;
+    }
+
+    listRef.current?.scrollToEnd({ animated: false });
+    // A second pass after layout catches the rows this frame just measured.
+    requestAnimationFrame(() => {
+      if (aligningRef.current) listRef.current?.scrollToEnd({ animated: false });
+    });
+
+    clearAlignTimer();
+    if (Date.now() > alignDeadlineRef.current) {
+      finishAlign();
+      return;
+    }
+    alignSettleRef.current = setTimeout(() => {
+      listRef.current?.scrollToEnd({ animated: false });
+      finishAlign();
+    }, ALIGN_SETTLE_MS);
+  }, [clearAlignTimer, finishAlign, items.length, session.isReady]);
+
+  useEffect(() => {
+    alignToLatest();
+  }, [alignToLatest]);
+
+  // A new session re-opens at its own newest message.
+  useEffect(() => {
+    aligningRef.current = true;
+    alignDeadlineRef.current = null;
+    prevMessageCountRef.current = 0;
+    lastPrefetchHeightRef.current = 0;
+    lastOffsetRef.current = 0;
+    autoFollowRef.current = true;
+    setShowScrollButton(false);
+    return () => {
+      clearAlignTimer();
+      cancelPin();
+    };
+  }, [sessionId, clearAlignTimer, cancelPin]);
+
+  // Growth is what the stream produces, so growth is what drives the follow —
+  // no timer. onContentSizeChange fires once per committed layout, which is
+  // exactly the moment a new bottom exists to scroll to.
+  const handleContentSizeChange = useCallback(() => {
+    if (aligningRef.current) {
+      alignToLatest();
+      return;
+    }
+    if (autoFollowRef.current) pinToBottom();
+  }, [alignToLatest, pinToBottom]);
 
   const sessionRef = useRef(session);
   sessionRef.current = session;
-
-  // Each auto-load has to be re-armed by the content actually growing, so a
-  // page shorter than the prefetch distance cannot spin the handler into
-  // firing on every scroll frame.
-  const lastPrefetchHeightRef = useRef(0);
 
   const handleLoadMore = useCallback(() => {
     const s = sessionRef.current;
@@ -132,15 +271,37 @@ export const MessageList = memo(function MessageList({
       const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent;
       const distanceFromBottom =
         contentSize.height - layoutMeasurement.height - contentOffset.y;
+      const offset = contentOffset.y;
+      const scrolledUp = offset < lastOffsetRef.current - SCROLL_UP_EPSILON;
+      lastOffsetRef.current = offset;
+
+      if (aligningRef.current) {
+        // Our own offset. Record the height so the first reader-driven scroll
+        // after the align cannot immediately read as "new content at the top".
+        lastPrefetchHeightRef.current = contentSize.height;
+        return;
+      }
+
+      // A pin only ever moves the offset toward the bottom, so an upward move is
+      // the reader even inside the suppression window; anything else in that
+      // window is the echo of our own scroll and must be ignored.
+      if (!scrolledUp && Date.now() < pinUntilRef.current) return;
+
       const isAwayFromBottom = distanceFromBottom > SCROLL_THRESHOLD;
-      setShowScrollButton(isAwayFromBottom);
-      setAutoFollow(!isAwayFromBottom);
+      if (autoFollowRef.current === isAwayFromBottom) {
+        autoFollowRef.current = !isAwayFromBottom;
+        // Leaving the bottom cancels the pin already queued for this frame,
+        // otherwise the reader's scroll-up is undone before they see it.
+        if (isAwayFromBottom) cancelPin();
+      }
+      setShowScrollButton((prev) => (prev === isAwayFromBottom ? prev : isAwayFromBottom));
 
       // Older history is prepended at the top. Derive this from every scroll
       // event instead of onEndReached, whose initial fire can happen before the
       // history request reports that another page is available.
-      const distanceFromOldest = contentOffset.y;
+      const distanceFromOldest = offset;
       if (
+        !autoFollowRef.current &&
         distanceFromOldest <= HISTORY_PREFETCH_DISTANCE &&
         contentSize.height !== lastPrefetchHeightRef.current
       ) {
@@ -148,13 +309,27 @@ export const MessageList = memo(function MessageList({
         handleLoadMore();
       }
     },
-    [handleLoadMore],
+    [handleLoadMore, cancelPin],
   );
 
   const scrollToBottom = useCallback(() => {
-    setAutoFollow(true);
-    setShowScrollButton(false);
+    finishAlign();
+    // Reader-initiated, so animation is a cue rather than a competitor.
     listRef.current?.scrollToEnd({ animated: true });
+    pinUntilRef.current = Date.now() + ANIMATED_SCROLL_MS;
+  }, [finishAlign]);
+
+  const handleScrollBeginDrag = useCallback(() => {
+    draggingRef.current = true;
+    cancelPin();
+    // Only meaningful during the opening align — afterwards a drag must not
+    // reset follow state, or grabbing the list would re-arm the auto-scroll it
+    // was meant to break out of.
+    if (aligningRef.current) finishAlign();
+  }, [finishAlign, cancelPin]);
+
+  const handleScrollEndDrag = useCallback(() => {
+    draggingRef.current = false;
   }, []);
 
   const renderItem = useCallback(
@@ -208,6 +383,12 @@ export const MessageList = memo(function MessageList({
         style={styles.list}
         contentContainerStyle={styles.content}
         onScroll={handleScroll}
+        onLayout={alignToLatest}
+        onContentSizeChange={handleContentSizeChange}
+        // A reader who grabs the list mid-align owns the offset from then on.
+        onScrollBeginDrag={handleScrollBeginDrag}
+        onScrollEndDrag={handleScrollEndDrag}
+        onMomentumScrollEnd={handleScrollEndDrag}
         // Native only throttles this; a coarser value would let a fast flick
         // reach the oldest message without ever reporting the distance.
         scrollEventThrottle={16}
@@ -219,9 +400,12 @@ export const MessageList = memo(function MessageList({
         keyboardShouldPersistTaps="handled"
         keyboardDismissMode="interactive"
         showsVerticalScrollIndicator={false}
-        maintainVisibleContentPosition={{
-          minIndexForVisible: 0,
-        }}
+        // Anchors prepended history only. While following the newest message we
+        // own the offset outright, and two mechanisms adjusting it in the same
+        // frame is a fight neither wins.
+        maintainVisibleContentPosition={
+          historyAnchor ? { minIndexForVisible: 0 } : undefined
+        }
         ListHeaderComponent={listHeader}
       />
       {showScrollButton && (
@@ -510,11 +694,22 @@ const TurnBlock = memo(function TurnBlock({
 
   const elapsedMs = useTurnElapsed(active, turn.startedAt);
   const settledMs = turn.durationMs && turn.durationMs > 0 ? turn.durationMs : null;
-  const label = active
-    ? `Working for ${formatDuration(Math.max(1000, elapsedMs))}`
+  // Like actions merged into one line: "Edited files · Read files · Ran
+  // commands" instead of a row per call.
+  const actions = useMemo(() => summarizeTurnActions(turn.steps), [turn.steps]);
+  const label =
+    actions.length > 0
+      ? actions.map((a) => a.label).join(" · ")
+      : active
+        ? "Working"
+        : hasWork
+          ? "Thought"
+          : "Worked";
+  const timeLabel = active
+    ? formatDuration(Math.max(1000, elapsedMs))
     : settledMs
-      ? `Worked for ${formatDuration(settledMs)}`
-      : "Worked";
+      ? formatDuration(settledMs)
+      : null;
 
   const showDivider = hasWork || active || !!settledMs;
 
@@ -522,9 +717,18 @@ const TurnBlock = memo(function TurnBlock({
     <View style={styles.dividerWrap}>
       <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
       <View style={styles.dividerCenter}>
-        <Text style={[styles.dividerText, { color: colors.textTertiary }]}>
+        <Text
+          style={[styles.dividerText, { color: colors.textTertiary }]}
+          numberOfLines={1}
+        >
           {label}
         </Text>
+        {/* The duration is context, not the headline: it trails the actions. */}
+        {timeLabel && (
+          <Text style={[styles.dividerTime, { color: colors.textTertiary }]}>
+            {timeLabel}
+          </Text>
+        )}
         {hasWork && (
           <Animated.View style={[styles.dividerChevron, chevronStyle]}>
             <ChevronRight size={12} color={colors.textTertiary} strokeWidth={2} />
@@ -718,6 +922,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 4,
     paddingHorizontal: 8,
+    flexShrink: 1,
   },
   dividerLine: {
     flex: 1,
@@ -727,6 +932,12 @@ const styles = StyleSheet.create({
   dividerText: {
     fontSize: 12,
     fontFamily: Fonts.sans,
+    flexShrink: 1,
+  },
+  dividerTime: {
+    fontSize: 11,
+    fontFamily: Fonts.mono,
+    opacity: 0.7,
   },
   dividerChevron: {
     width: 14,

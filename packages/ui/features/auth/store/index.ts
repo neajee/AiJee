@@ -6,31 +6,22 @@ import {
   client,
   sdk,
   unwrapApiData,
-  type AuthTokensResponse,
 } from '@pideck/client-sdk';
 import { useServersStore, type Server } from '@/features/servers/store';
 
 const {
   checkSession,
-  login: apiLogin,
   logout: apiLogout,
-  pair: apiPair,
-  refresh: apiRefresh,
 } = sdk;
 
 const TOKENS_KEY = 'auth_tokens';
 const ACTIVE_SERVER_KEY = 'auth_active_server';
 const DEBUG_ROUTES = [
-  '/api/auth/pair',
-  '/api/auth/refresh',
   '/api/auth/session',
   '/api/workspaces',
 ];
 const RETRY_EXCLUDED_ROUTES = [
-  '/api/auth/login',
   '/api/auth/logout',
-  '/api/auth/pair',
-  '/api/auth/refresh',
 ];
 const REFRESH_SKEW_MS = 15_000;
 const REFRESH_RETRY_DELAY_MS = 5_000;
@@ -62,12 +53,8 @@ interface AuthState {
   remote: boolean;
 
   load: () => Promise<void>;
-  loginToServer: (server: Server, credentials: { username: string; password: string }) => Promise<{ success: boolean; error?: string }>;
-  pairWithServer: (
-    baseUrl: string,
-    qrId: string,
-    serverId: string,
-  ) => Promise<{ success: boolean; error?: string }>;
+  authorizeWithCode: (baseUrl: string, code: string, serverId: string, name?: string) => Promise<{ success: boolean; error?: string }>;
+  claimLocalServer: (server: Server) => Promise<{ success: boolean; error?: string }>;
   logoutFromServer: (serverId: string) => Promise<void>;
   activateServer: (server: Server) => Promise<boolean>;
   hasToken: (serverId: string) => boolean;
@@ -124,24 +111,12 @@ function normalizeStoredSessions(raw: unknown): {
 }
 
 function toAuthSessionBundle(value: unknown): AuthSessionBundle | null {
-  const data = unwrapApiData<AuthTokensResponse>(
-    value as AuthTokensResponse | null | undefined,
-  );
-  if (
-    !data?.access_token ||
-    !data.refresh_token ||
-    !data.access_expires_at ||
-    !data.refresh_expires_at
-  ) {
-    return null;
+  const raw = unwrapApiData<Record<string, unknown>>(value as Record<string, unknown>);
+  if (typeof raw?.token === 'string') {
+    const neverExpires = new Date('2099-12-31T23:59:59.000Z').toISOString();
+    return { accessToken: raw.token, refreshToken: raw.token, accessExpiresAt: neverExpires, refreshExpiresAt: neverExpires };
   }
-
-  return {
-    accessToken: data.access_token,
-    refreshToken: data.refresh_token,
-    accessExpiresAt: data.access_expires_at,
-    refreshExpiresAt: data.refresh_expires_at,
-  };
+  return null;
 }
 
 function parseExpiresAt(value: string) {
@@ -424,61 +399,33 @@ export const useAuthStore = create<AuthState>((set, get) => {
       }
     },
 
-    loginToServer: async (server: Server, credentials: { username: string; password: string }) => {
-      const result = await apiLogin({
-        baseUrl: server.address,
-        body: {
-          username: credentials.username,
-          password: credentials.password,
-        },
-      });
-
-      if (result.error) {
-        return {
-          success: false,
-          error: extractErrorMessage(result.error, 'Login failed'),
-        };
-      }
-
-      const session = toAuthSessionBundle(result.data);
-      console.log(`[loginToServer] response session=${formatSessionDebug(session)}`);
-      if (!session) {
-        return { success: false, error: 'Login tokens missing from response' };
-      }
-
-      await applySessionBundle(server.id, session, {
-        activeServerId: server.id,
-        baseUrl: server.address,
-      });
-
-      return { success: true };
+    authorizeWithCode: async (baseUrl: string, code: string, serverId: string, name?: string) => {
+      try {
+        const response = await fetch(`${baseUrl}/api/devices`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code, name: name ?? 'PiDeck device' }) });
+        const payload = await response.json();
+        const session = toAuthSessionBundle(payload);
+        if (!response.ok || !session) return { success: false, error: payload?.error ?? 'Device authorization failed' };
+        await applySessionBundle(serverId, session, { activeServerId: serverId, baseUrl });
+        return { success: true };
+      } catch (error) { return { success: false, error: error instanceof Error ? error.message : 'Device authorization failed' }; }
     },
 
-    pairWithServer: async (baseUrl: string, qrId: string, serverId: string) => {
-      const result = await apiPair({
-        baseUrl,
-        body: { qr_id: qrId },
-      });
-
-      if (result.error) {
-        return {
-          success: false,
-          error: extractErrorMessage(result.error, 'Pairing failed'),
-        };
+    claimLocalServer: async (server: Server) => {
+      try {
+        const response = await fetch(`${server.address}/api/devices`, {
+          method: 'POST',
+          headers: { Origin: server.address, 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name: server.name }),
+        });
+        const payload = await response.json();
+        const session = toAuthSessionBundle(payload);
+        console.info('[pideck/bootstrap] local claim response', { status: response.status, hasSession: !!session });
+        if (!response.ok || !session) return { success: false, error: payload?.error ?? 'Local runtime did not issue a session' };
+        await applySessionBundle(server.id, session, { activeServerId: server.id, baseUrl: server.address });
+        return { success: true };
+      } catch (error) {
+        return { success: false, error: error instanceof Error ? error.message : 'Local runtime is unavailable' };
       }
-
-      const session = toAuthSessionBundle(result.data);
-      console.log(`[pairWithServer] response session=${formatSessionDebug(session)}`);
-      if (!session) {
-        return { success: false, error: 'Pairing tokens missing from response' };
-      }
-
-      await applySessionBundle(serverId, session, {
-        activeServerId: serverId,
-        baseUrl,
-      });
-
-      return { success: true };
     },
 
     logoutFromServer: async (serverId: string) => {
@@ -489,7 +436,6 @@ export const useAuthStore = create<AuthState>((set, get) => {
         try {
           await apiLogout({
             baseUrl: server.address,
-            body: { refresh_token: session.refreshToken },
             headers: session.accessToken
               ? { Authorization: `Bearer ${session.accessToken}` }
               : undefined,
@@ -500,6 +446,11 @@ export const useAuthStore = create<AuthState>((set, get) => {
       }
 
       await removeServerSession(serverId);
+      if (get().activeServerId === serverId) {
+        clearScheduledRefresh();
+        set({ activeServerId: null, remote: false });
+        await writeActiveServerId(null);
+      }
     },
 
     activateServer: async (server: Server) => {
@@ -570,49 +521,8 @@ export const useAuthStore = create<AuthState>((set, get) => {
         if (!session) {
           return null;
         }
-
-        if (isRefreshTokenExpired(session)) {
-          await removeServerSession(serverId);
-          return null;
-        }
-
-        const server = findServer(serverId);
-        if (!server) {
-          if (useServersStore.getState().loaded) {
-            await removeServerSession(serverId);
-          }
-          return null;
-        }
-
-        console.log(
-          `[auth] refreshServerSession serverId=${serverId} session=${formatSessionDebug(
-            session,
-          )}`,
-        );
-
-        const result = await apiRefresh({
-          baseUrl: server.address,
-          body: { refresh_token: session.refreshToken },
-        });
-
-        if (result.error) {
-          const status = result.response?.status ?? 0;
-          if (status === 401 || status === 403) {
-            await removeServerSession(serverId);
-          }
-          return null;
-        }
-
-        const nextSession = toAuthSessionBundle(result.data);
-        if (!nextSession) {
-          return null;
-        }
-
-        await applySessionBundle(serverId, nextSession, {
-          baseUrl: configuredServerId === serverId ? server.address : undefined,
-        });
-
-        return nextSession;
+        // Device tokens are self-contained and are never refreshed.
+        return session;
       })();
 
       refreshInFlight.set(serverId, task);
