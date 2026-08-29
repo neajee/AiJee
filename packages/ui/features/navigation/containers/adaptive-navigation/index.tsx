@@ -37,6 +37,7 @@ import {
   SEAM_TOGGLE_HEIGHT,
   SEAM_TOGGLE_WIDTH,
 } from "@/components/ui/seam-toggle";
+import { usePanelCoordination } from "../../store/panel-coordination";
 
 const SIDEBAR_DEFAULT = 280;
 /** Width of the invisible left-edge strip that reveals a hidden sidebar. */
@@ -72,6 +73,11 @@ export function AdaptiveNavigation({ children }: AdaptiveNavigationProps) {
   const [hoverVisible, setHoverVisible] = useState(false);
   const [showPersistentSidebar, setShowPersistentSidebar] = useState(true);
   const [sidebarWidth] = useState(SIDEBAR_DEFAULT);
+  const openedSide = usePanelCoordination((state) => state.openedSide);
+  const panelRevision = usePanelCoordination((state) => state.revision);
+  const notifyPanelOpened = usePanelCoordination(
+    (state) => state.notifyOpened,
+  );
 
   const isDark = colorScheme === "dark";
   const contentBorder = isDark ? "#3b3a39" : "rgba(0,0,0,0.12)";
@@ -126,9 +132,18 @@ export function AdaptiveNavigation({ children }: AdaptiveNavigationProps) {
   }, [hoverAnim, hoverVisible, isPersistent]);
 
   const handleToggleSidebar = useCallback(() => {
-    setSidebarMode((prev) => (prev === "persistent" ? "hover" : "persistent"));
+    setSidebarMode((prev) => {
+      if (prev === "hover") notifyPanelOpened("left");
+      return prev === "persistent" ? "hover" : "persistent";
+    });
     setHoverVisible(false);
-  }, []);
+  }, [notifyPanelOpened]);
+
+  useEffect(() => {
+    if (panelRevision === 0 || openedSide !== "right") return;
+    setSidebarMode("hover");
+    setHoverVisible(false);
+  }, [openedSide, panelRevision]);
 
   const handleHoverZoneIn = useCallback(() => {
     if (!isPersistent) setHoverVisible(true);
@@ -168,14 +183,6 @@ export function AdaptiveNavigation({ children }: AdaptiveNavigationProps) {
       inputRange: [0, 1],
       outputRange: [0, 0.633],
     });
-
-    const contentBorderRadius = Animated.multiply(
-      persistentAnim.interpolate({
-        inputRange: [0, 1],
-        outputRange: [12, 10],
-      }),
-      codeModeAnim,
-    );
 
     const hoverTranslateX = hoverAnim.interpolate({
       inputRange: [0, 1],
@@ -228,8 +235,6 @@ export function AdaptiveNavigation({ children }: AdaptiveNavigationProps) {
                     borderLeftColor: contentBorder,
                     borderTopColor: contentBorder,
                     borderRightColor: contentBorder,
-                    borderTopLeftRadius: contentBorderRadius,
-                    borderTopRightRadius: contentBorderRadius,
                   }
                 : {},
             ]}

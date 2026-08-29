@@ -17,6 +17,7 @@ import {
   SEAM_TOGGLE_HEIGHT,
   SEAM_TOGGLE_WIDTH,
 } from "@/components/ui/seam-toggle";
+import { usePanelCoordination } from "@/features/navigation/store/panel-coordination";
 
 const PANEL_DEFAULT = 280;
 const PANEL_MIN = 180;
@@ -215,6 +216,23 @@ export function WorkspaceSidebar({
   const [contentMounted, setContentMounted] = useState(
     locked ? false : !scope.collapsed,
   );
+  const openedSide = usePanelCoordination((state) => state.openedSide);
+  const panelRevision = usePanelCoordination((state) => state.revision);
+  const notifyPanelOpened = usePanelCoordination(
+    (state) => state.notifyOpened,
+  );
+
+  const updateCollapsed = (next: boolean) => {
+    scope.collapsed = next;
+    scope.collapsedLoaded = true;
+    setIsCollapsed(next);
+    void saveStoredCollapsed(next, storageScope);
+  };
+
+  useEffect(() => {
+    if (locked || panelRevision === 0 || openedSide !== "left") return;
+    updateCollapsed(true);
+  }, [locked, openedSide, panelRevision]);
 
   useEffect(() => {
     let cancelled = false;
@@ -351,13 +369,9 @@ export function WorkspaceSidebar({
 
   const toggleCollapsed = () => {
     if (locked) return;
-    setIsCollapsed((prev) => {
-      const next = !prev;
-      scope.collapsed = next;
-      scope.collapsedLoaded = true;
-      void saveStoredCollapsed(next, storageScope);
-      return next;
-    });
+    const next = !isCollapsed;
+    updateCollapsed(next);
+    if (!next) notifyPanelOpened("right");
   };
 
   return (
