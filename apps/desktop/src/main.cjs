@@ -1,6 +1,7 @@
 const { app, BrowserWindow, dialog } = require("electron");
 const { spawn } = require("node:child_process");
 const { request } = require("node:http");
+const { existsSync } = require("node:fs");
 const { join } = require("node:path");
 const WebSocket = require("ws");
 
@@ -12,7 +13,18 @@ const url = process.env.AIJEE_CLIENT_URL || `http://127.0.0.1:${port}`;
 const brokerPort = Number(process.env.AIJEE_CDP_PORT || 5455);
 
 function chromePath() {
-  return process.env.AIJEE_CHROME_PATH || (process.platform === "linux" ? "/usr/bin/google-chrome" : "chrome");
+  if (process.env.AIJEE_CHROME_PATH) return process.env.AIJEE_CHROME_PATH;
+  const candidates = process.platform === "win32"
+    ? [
+        join(process.env.PROGRAMFILES || "C:\\Program Files", "Google\\Chrome\\Application\\chrome.exe"),
+        join(process.env["PROGRAMFILES(X86)"] || "C:\\Program Files (x86)", "Google\\Chrome\\Application\\chrome.exe"),
+        join(process.env.LOCALAPPDATA || "", "Google\\Chrome\\Application\\chrome.exe"),
+        join(process.env.PROGRAMFILES || "C:\\Program Files", "Microsoft\\Edge\\Application\\msedge.exe"),
+      ]
+    : process.platform === "darwin"
+      ? ["/Applications/Google Chrome.app/Contents/MacOS/Google Chrome", "/Applications/Microsoft Edge.app/Contents/MacOS/Microsoft Edge"]
+      : ["/usr/bin/google-chrome", "/usr/bin/chromium", "/usr/bin/chromium-browser"];
+  return candidates.find((candidate) => existsSync(candidate)) || null;
 }
 
 function jsonRequest(path) {
@@ -29,11 +41,17 @@ function jsonRequest(path) {
 }
 
 function startPreviewBroker() {
-  chrome = spawn(chromePath(), [
+  const executable = chromePath();
+  if (!executable) {
+    console.error("No Chrome or Edge executable found; browser preview is unavailable");
+    return;
+  }
+  chrome = spawn(executable, [
     "--headless=new", "--remote-debugging-port=9222", "--disable-gpu",
     "--no-first-run", "--no-default-browser-check", `--user-data-dir=${join(app.getPath("userData"), "preview-browser")}`,
     "about:blank",
   ], { stdio: "ignore" });
+  chrome.once("error", (error) => console.error(`Unable to start preview browser: ${error.message}`));
   broker = new WebSocket.Server({ host: "127.0.0.1", port: brokerPort });
   broker.on("connection", async (socket) => {
     let cdp;
