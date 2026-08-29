@@ -52,6 +52,7 @@ export class AiJeeHttpServer {
   private readonly instanceId = randomUUID();
   private nextEventId = 1;
   private readonly eventHistory: Array<Record<string, unknown>> = [];
+  private readonly sessionStreamingStates = new Map<string, boolean>();
   private readonly tasks: TaskService;
   private readonly modes = new Map<string, Mode>();
   private customModels: Record<string, unknown> = { providers: {} };
@@ -741,7 +742,7 @@ export class AiJeeHttpServer {
     if (!managed) return this.error(response, 404, "Session not found");
     openSse(response);
     response.write(sseFrame({ type: "session_stream_hello", session_id: sessionId }));
-    this.replayEvents(response, request.headers["last-event-id"], sessionId);
+    this.replayEvents(response, request.headers["last-event-id"], sessionId, new URL(request.url ?? "/", "http://localhost").searchParams.get("from"));
     const streams = this.sessionStreams.get(sessionId) ?? new Set<ServerResponse>();
     streams.add(response);
     this.sessionStreams.set(sessionId, streams);
@@ -753,7 +754,7 @@ export class AiJeeHttpServer {
     openSse(response);
     response.write(sseFrame({ type: "server_hello", instance_id: this.instanceId, connection_id: randomUUID() }));
     response.write(sseFrame({ type: "active_sessions", data: { session_ids: this.activeStreamingSessionIds() } }));
-    this.replayEvents(response, request.headers["last-event-id"]);
+    this.replayEvents(response, request.headers["last-event-id"], undefined, new URL(request.url ?? "/", "http://localhost").searchParams.get("from"));
     this.globalStreams.add(response);
     const keepalive = setInterval(() => response.write(keepAliveFrame()), 15_000);
     response.once("close", () => { clearInterval(keepalive); this.globalStreams.delete(response); });
@@ -767,6 +768,12 @@ export class AiJeeHttpServer {
       const record = this.sessionRecords.get(sessionId);
       if (record) record.last_active = Date.now();
       this.publishEvent({ id: this.nextEventId++, session_id: sessionId, workspace_id: workspaceId, type: event.type, data: event.data, timestamp: event.timestamp });
+      const streaming = session.describe().streaming;
+      if (this.sessionStreamingStates.get(sessionId) !== streaming) {
+        this.sessionStreamingStates.set(sessionId, streaming);
+        this.publishEvent({ id: this.nextEventId++, session_id: sessionId, workspace_id: workspaceId, type: "session_state", data: { isStreaming: streaming }, timestamp: Date.now() });
+        this.publishEvent({ id: this.nextEventId++, type: "active_sessions", data: { session_ids: this.activeStreamingSessionIds() }, timestamp: Date.now() });
+      }
     });
     this.sessionEventUnsubscribers.set(sessionId, unsubscribe);
   }
@@ -774,6 +781,7 @@ export class AiJeeHttpServer {
   private unbindSessionEvents(sessionId: string): void {
     this.sessionEventUnsubscribers.get(sessionId)?.();
     this.sessionEventUnsubscribers.delete(sessionId);
+    this.sessionStreamingStates.delete(sessionId);
   }
 
   private handleUpgrade(request: IncomingMessage, socket: Duplex, head: Buffer): void {
@@ -820,7 +828,7 @@ export class AiJeeHttpServer {
 
   private publishEvent(payload: Record<string, unknown>): void {
     this.eventHistory.push(payload);
-    if (this.eventHistory.length > 500) this.eventHistory.splice(0, this.eventHistory.length - 500);
+    if (this.eventHistory.length > 5000) this.eventHistory.splice(0, this.eventHistory.length - 5000);
     const frame = sseFrame(payload);
     for (const stream of this.globalStreams) try { stream.write(frame); } catch { this.globalStreams.delete(stream); }
     const sessionId = typeof payload.session_id === "string" ? payload.session_id : "";
@@ -829,8 +837,9 @@ export class AiJeeHttpServer {
     for (const socket of this.sessionSockets.get(sessionId) ?? []) this.sendSocket(socket, payload);
   }
 
-  private replayEvents(response: ServerResponse, lastEventId: string | string[] | undefined, sessionId?: string): void {
-    const last = Number(Array.isArray(lastEventId) ? lastEventId[0] : lastEventId ?? 0);
+  private replayEvents(response: ServerResponse, lastEventId: string | string[] | undefined, sessionId?: string, queryFrom?: string | null): void {
+    const raw = Array.isArray(lastEventId) ? lastEventId[0] : lastEventId ?? queryFrom ?? "0";
+    const last = Number(raw);
     for (const event of this.eventHistory) if (typeof event.id === "number" && event.id > last && (!sessionId || event.session_id === sessionId)) response.write(sseFrame(event));
   }
 

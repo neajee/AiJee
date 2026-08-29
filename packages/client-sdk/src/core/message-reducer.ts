@@ -173,8 +173,7 @@ function extractMessageEntryId(msg: Record<string, unknown>): string | undefined
 }
 
 export function isModeSlashCommand(message: string): boolean {
-  const first = message.trim().split(/\s+/)[0];
-  return first === "/chat" || first === "/plan";
+  return message.trim().startsWith("/");
 }
 
 const CLEAR_PENDING_EVENTS = new Set([
@@ -430,9 +429,11 @@ export function reduceStreamEvent(state: SessionState, envelope: StreamEventEnve
       const raw = msg as unknown as Record<string, unknown>;
       if (raw["role"] === "user") {
         const text = extractTextFromContent(raw["content"] as unknown[] | undefined);
-        if (!text || isModeSlashCommand(text)) break;
+        const content = raw["content"] as unknown[] | undefined;
+        const images = extractImagesFromContent(content);
+        if ((!text && !images?.length) || isModeSlashCommand(text)) break;
         const entryId = extractMessageEntryId(raw);
-        const attachments = extractImagesFromContent(raw["content"] as unknown[] | undefined)?.map((image, index) => ({
+        const attachments = images?.map((image, index) => ({
           id: `img-${envelope.id}-${index}`,
           type: "image" as const,
           mimeType: image.mimeType,

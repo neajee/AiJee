@@ -64,16 +64,7 @@ export class PiClient {
     });
 
     this._stream.connectionId$.subscribe(() => {
-      const sessionId = this._pendingActiveSession !== undefined
-        ? this._pendingActiveSession
-        : this._viewedSessionId;
       this._pendingActiveSession = undefined;
-
-      if (sessionId) {
-        this._fetchAndApplyHistory(sessionId).then(() => {
-          this._sendActiveSession(sessionId);
-        });
-      }
     });
 
     this._stream.activeSessions$.subscribe((sessionIds) => {
@@ -368,7 +359,7 @@ export class PiClient {
   }): Promise<void> {
     const subject = this._getOrCreateSessionSubject(sessionId);
     const pendingId = `pending-user-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    if (message.trim() && !isModeSlashCommand(message)) {
+    if ((message.trim() || options?.images?.length) && !isModeSlashCommand(message)) {
       const current = subject.getValue();
       subject.next({
         ...current,
@@ -396,13 +387,7 @@ export class PiClient {
     workspaceId?: string;
     sessionFile?: string;
   }): Promise<void> {
-    return this.api.steer({
-      sessionId,
-      message,
-      images: options?.images,
-      workspaceId: options?.workspaceId,
-      sessionFile: options?.sessionFile,
-    });
+    return this.prompt(sessionId, message, { ...options, streamingBehavior: "steer" });
   }
 
   async followUp(sessionId: string, message: string, options?: {
@@ -410,13 +395,7 @@ export class PiClient {
     workspaceId?: string;
     sessionFile?: string;
   }): Promise<void> {
-    return this.api.followUp({
-      sessionId,
-      message,
-      images: options?.images,
-      workspaceId: options?.workspaceId,
-      sessionFile: options?.sessionFile,
-    });
+    return this.prompt(sessionId, message, { ...options, streamingBehavior: "followUp" });
   }
 
   async abort(sessionId: string): Promise<void> {
@@ -594,11 +573,11 @@ export class PiClient {
         isReady: true,
         isLoading: false,
         isLoadingOlderMessages: false,
-        isStreaming: this._activeSessionIds.has(sessionId) ? true : current.isStreaming,
+        isStreaming: current.isStreaming,
       });
       this._trackStreamingSession(
         sessionId,
-        this._activeSessionIds.has(sessionId) ? true : current.isStreaming,
+        current.isStreaming,
       );
       if (__DEV__) console.log("[pi:history] ready", sessionId, { messages: converted.length });
     } catch (error) {
