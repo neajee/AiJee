@@ -42,6 +42,7 @@ app-example
 
 # runtime state
 apps/server/runtime.json
+apps/desktop/dist-runtime/
 unsloth_compiled_cache/
 
 # generated native folders

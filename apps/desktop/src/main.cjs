@@ -69,10 +69,16 @@ else {
     if (!url) {
       const port = await findAvailablePort(preferredPort);
       url = `http://127.0.0.1:${port}`;
-      const runtime = require.resolve("aijee/bin/aijee.cjs");
+      const runtimePackage = require.resolve("aijee/bin/aijee.cjs");
+      const runtime = app.isPackaged ? join(__dirname, "../dist-runtime/aijee.mjs") : runtimePackage;
       server = spawn(process.execPath, [runtime, "serve", "--host", "127.0.0.1", "--port", String(port)], {
         stdio: "inherit",
-        env: { ...process.env, AIJEE_CHROME_PATH: chromePath() },
+        env: {
+          ...process.env,
+          ELECTRON_RUN_AS_NODE: "1",
+          AIJEE_CHROME_PATH: chromePath(),
+          AIJEE_WEB_ROOT: join(runtimePackage, "../../public"),
+        },
       });
       server.once("error", (error) => console.error(`Unable to start AiJee server: ${error.message}`));
     }
