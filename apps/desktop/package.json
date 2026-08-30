@@ -23,6 +23,7 @@
     "appId": "com.anthaathi.aijee",
     "productName": "AiJee",
     "executableName": "aijee",
+    "icon": "assets/icon.ico",
     "linux": {
       "target": [
         "AppImage"
@@ -30,6 +31,7 @@
       "category": "Utility"
     },
     "files": [
+      "assets/**/*",
       "src/**/*",
       "dist-runtime/**/*",
       "package.json",
