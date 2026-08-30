@@ -1,10 +1,10 @@
 import { createServer, request as proxyRequest, type IncomingMessage, type Server, type ServerResponse } from "node:http";
 import type { AddressInfo } from "node:net";
 import { randomBytes, randomUUID } from "node:crypto";
-import { existsSync } from "node:fs";
+import { createReadStream, existsSync } from "node:fs";
 import { mkdir, readdir, readFile, rename, rm, stat, writeFile } from "node:fs/promises";
 import { homedir } from "node:os";
-import { basename, dirname, join, resolve } from "node:path";
+import { basename, dirname, isAbsolute, join, relative as relativePath, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { AiJeeRuntime } from "../runtime.ts";
 import type { EngineSession } from "@aijee/engine";
@@ -20,6 +20,8 @@ import { recordTelemetry } from "../telemetry/index.ts";
 import { PreviewBroker } from "./preview-broker.ts";
 import { WebSocketServer, WebSocket } from "ws";
 import type { Duplex } from "node:stream";
+import { pipeline } from "node:stream/promises";
+import { constants as zlibConstants, createBrotliCompress, createGzip } from "node:zlib";
 
 type Workspace = {
   id: string;
@@ -201,19 +203,60 @@ export class AiJeeHttpServer {
     response.end(content);
   }
 
-  private async web(_request: IncomingMessage, response: ServerResponse, url: URL): Promise<void> {
+  private async web(request: IncomingMessage, response: ServerResponse, url: URL): Promise<void> {
     const relative = decodeURIComponent(url.pathname).replace(/^\/+/, "");
     const candidate = resolve(this.webRoot, relative || "index.html");
     const root = resolve(this.webRoot);
-    const file = candidate.startsWith(`${root}/`) ? candidate : join(root, "index.html");
+    const fromRoot = relativePath(root, candidate);
+    const file = !fromRoot.startsWith("..") && !isAbsolute(fromRoot) ? candidate : join(root, "index.html");
     let target = file;
     try { if (!(await stat(target)).isFile()) target = join(root, "index.html"); } catch { target = join(root, "index.html"); }
     try {
-      const content = await readFile(target);
+      const metadata = await stat(target);
       const extension = target.split(".").pop() ?? "html";
-      const types: Record<string, string> = { html: "text/html; charset=utf-8", js: "text/javascript", css: "text/css", json: "application/json", svg: "image/svg+xml", png: "image/png", ico: "image/x-icon" };
-      response.writeHead(200, { "Content-Type": types[extension] ?? "application/octet-stream" }); response.end(content);
-    } catch { this.error(response, 404, "Web assets not found; run yarn web:build"); }
+      const types: Record<string, string> = { html: "text/html; charset=utf-8", js: "text/javascript; charset=utf-8", css: "text/css; charset=utf-8", json: "application/json; charset=utf-8", svg: "image/svg+xml", png: "image/png", jpg: "image/jpeg", jpeg: "image/jpeg", webp: "image/webp", ico: "image/x-icon", ttf: "font/ttf", woff: "font/woff", woff2: "font/woff2" };
+      const etag = `W/\"${metadata.size.toString(16)}-${Math.trunc(metadata.mtimeMs).toString(16)}\"`;
+      const isHtml = extension === "html";
+      const isHashed = /[.-][a-f0-9]{8,}\./i.test(target);
+      const headers: Record<string, string> = {
+        "Content-Type": types[extension] ?? "application/octet-stream",
+        "Cache-Control": isHtml ? "no-cache" : isHashed ? "public, max-age=31536000, immutable" : "public, max-age=86400",
+        "ETag": etag,
+        "Last-Modified": metadata.mtime.toUTCString(),
+      };
+      if (request.headers["if-none-match"] === etag) {
+        response.writeHead(304, headers);
+        response.end();
+        return;
+      }
+
+      const compressible = new Set(["html", "js", "css", "json", "svg"]);
+      const accepted = request.headers["accept-encoding"] ?? "";
+      const encoding = compressible.has(extension) && metadata.size > 1024
+        ? accepted.includes("br") ? "br" : accepted.includes("gzip") ? "gzip" : ""
+        : "";
+      if (encoding) {
+        headers["Content-Encoding"] = encoding;
+        headers["Vary"] = "Accept-Encoding";
+      } else {
+        headers["Content-Length"] = String(metadata.size);
+      }
+      response.writeHead(200, headers);
+      const source = createReadStream(target);
+      if (encoding === "br") {
+        await pipeline(source, createBrotliCompress({ params: { [zlibConstants.BROTLI_PARAM_QUALITY]: 5 } }), response);
+      } else if (encoding === "gzip") {
+        await pipeline(source, createGzip({ level: 6 }), response);
+      } else {
+        await pipeline(source, response);
+      }
+    } catch (error) {
+      if (!response.headersSent) this.error(response, 404, "Web assets not found; run yarn web:build");
+      else if (!response.destroyed) {
+        const code = error && typeof error === "object" && "code" in error ? error.code : undefined;
+        if (code !== "ERR_STREAM_PREMATURE_CLOSE" && code !== "ECONNRESET" && code !== "EPIPE") response.destroy();
+      }
+    }
   }
 
   private async fsRead(url: URL, response: ServerResponse): Promise<void> {

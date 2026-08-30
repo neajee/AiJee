@@ -29,3 +29,12 @@ jobs:
 
       - name: Lint
         run: yarn lint
+
+      - name: Build web assets
+        run: |
+          yarn web:build
+          node tools/prepare-web-assets.cjs
+
+      - name: Verify desktop web assets
+        shell: bash
+        run: test -f apps/server/public/index.html

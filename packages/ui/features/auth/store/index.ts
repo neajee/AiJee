@@ -490,17 +490,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
         return false;
       }
 
-      // Fetch server capabilities (remote flag) from /version
-      let remote = false;
-      try {
-        const versionRes = await sdk.version();
-        const versionData = versionRes.data as any;
-        remote = !!versionData?.remote;
-      } catch {
-        // Non-fatal — default to false
-      }
-
-      set({ activeServerId: server.id, remote });
+      set({ activeServerId: server.id, remote: false });
       await writeActiveServerId(server.id);
       syncRefreshSchedule(server.id);
       return true;

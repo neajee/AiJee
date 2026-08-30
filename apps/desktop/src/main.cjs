@@ -8,6 +8,7 @@ let server;
 let mainWindow;
 let url = process.env.AIJEE_CLIENT_URL || "";
 const preferredPort = Number(process.env.AIJEE_PORT || 10088);
+const devWebRoot = join(__dirname, "../../server/public");
 
 function chromePath() {
   if (process.env.AIJEE_CHROME_PATH) return process.env.AIJEE_CHROME_PATH;
@@ -33,6 +34,31 @@ function findAvailablePort(start) {
     });
     probe.listen(start, "127.0.0.1", () => probe.close(() => resolve(start)));
   });
+}
+
+async function isAiJeeRuntime(port) {
+  try {
+    const signal = AbortSignal.timeout(1000);
+    const [health, version] = await Promise.all([
+      fetch(`http://127.0.0.1:${port}/api/health`, { signal }),
+      fetch(`http://127.0.0.1:${port}/api/version`, { signal }),
+    ]);
+    return health.ok && version.ok;
+  } catch {
+    return false;
+  }
+}
+
+async function resolveRuntimePort(start) {
+  for (let port = start; port < start + 100; port += 1) {
+    if (await isAiJeeRuntime(port)) return { port, reused: true };
+    try {
+      return { port: await findAvailablePort(port), reused: false };
+    } catch (error) {
+      if (error?.code !== "EADDRINUSE") throw error;
+    }
+  }
+  throw new Error(`No available AiJee port near ${start}`);
 }
 
 function waitForRuntime() {
@@ -67,20 +93,23 @@ else {
   });
   app.whenReady().then(async () => {
     if (!url) {
-      const port = await findAvailablePort(preferredPort);
+      const runtimePort = await resolveRuntimePort(preferredPort);
+      const port = runtimePort.port;
       url = `http://127.0.0.1:${port}`;
-      const runtimePackage = require.resolve("aijee/bin/aijee.cjs");
-      const runtime = app.isPackaged ? join(__dirname, "../dist-runtime/aijee.mjs") : runtimePackage;
-      server = spawn(process.execPath, [runtime, "serve", "--host", "127.0.0.1", "--port", String(port)], {
-        stdio: "inherit",
-        env: {
-          ...process.env,
-          ELECTRON_RUN_AS_NODE: "1",
-          AIJEE_CHROME_PATH: chromePath(),
-          AIJEE_WEB_ROOT: join(runtimePackage, "../../public"),
-        },
-      });
-      server.once("error", (error) => console.error(`Unable to start AiJee server: ${error.message}`));
+      if (!runtimePort.reused) {
+        const runtimePackage = require.resolve("aijee/bin/aijee.cjs");
+        const runtime = app.isPackaged ? join(__dirname, "../dist-runtime/aijee.mjs") : runtimePackage;
+        server = spawn(process.execPath, [runtime, "serve", "--host", "127.0.0.1", "--port", String(port)], {
+          stdio: "inherit",
+          env: {
+            ...process.env,
+            ELECTRON_RUN_AS_NODE: "1",
+            AIJEE_CHROME_PATH: chromePath(),
+            AIJEE_WEB_ROOT: app.isPackaged ? join(process.resourcesPath, "public") : devWebRoot,
+          },
+        });
+        server.once("error", (error) => console.error(`Unable to start AiJee server: ${error.message}`));
+      }
     }
     try { await waitForRuntime(); createWindow(); }
     catch (error) { dialog.showErrorBox("AiJee startup failed", error.message); app.quit(); }

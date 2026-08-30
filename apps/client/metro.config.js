@@ -5,6 +5,7 @@ const config = getDefaultConfig(__dirname);
 
 const WEB_STUBS = {
   'react-native-pager-view': path.resolve(__dirname, 'web-stubs/react-native-pager-view.js'),
+  'lucide-react-native': path.resolve(__dirname, 'web-stubs/lucide-react-native.js'),
 };
 
 const defaultResolveRequest = config.resolver.resolveRequest;

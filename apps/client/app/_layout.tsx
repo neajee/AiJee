@@ -13,13 +13,9 @@ import * as SplashScreen from "expo-splash-screen";
 import { useFonts } from "expo-font";
 import {
   DMSans_400Regular,
-  DMSans_400Regular_Italic,
   DMSans_500Medium,
-  DMSans_500Medium_Italic,
-  DMSans_600SemiBold,
   DMSans_700Bold,
 } from "@expo-google-fonts/dm-sans";
-import { JetBrainsMono_400Regular } from "@expo-google-fonts/jetbrains-mono";
 import "react-native-reanimated";
 
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -64,8 +60,10 @@ export default function RootLayout() {
 
   useEffect(() => {
     if (Platform.OS !== 'web' || typeof window === 'undefined') return;
-    if (!['127.0.0.1', 'localhost'].includes(window.location.hostname) || window.location.port !== '8082') return;
-    window.location.replace(`http://127.0.0.1:8081${window.location.pathname}${window.location.search}${window.location.hash}`);
+    const expoPort = process.env.EXPO_PUBLIC_AIJEE_EXPO_PORT ?? '8082';
+    const webPort = process.env.EXPO_PUBLIC_AIJEE_WEB_PORT ?? '8081';
+    if (!['127.0.0.1', 'localhost'].includes(window.location.hostname) || window.location.port !== expoPort) return;
+    window.location.replace(`http://127.0.0.1:${webPort}${window.location.pathname}${window.location.search}${window.location.hash}`);
   }, []);
 
   useEffect(() => {
@@ -107,12 +105,8 @@ export default function RootLayout() {
 
   const [fontsLoaded] = useFonts({
     "DMSans-Regular": DMSans_400Regular,
-    "DMSans-Italic": DMSans_400Regular_Italic,
     "DMSans-Medium": DMSans_500Medium,
-    "DMSans-MediumItalic": DMSans_500Medium_Italic,
-    "DMSans-SemiBold": DMSans_600SemiBold,
     "DMSans-Bold": DMSans_700Bold,
-    "JetBrainsMono-Regular": JetBrainsMono_400Regular,
   });
 
   useEffect(() => {

@@ -27,6 +27,11 @@ function upstreamHeaders(requestFromClient, targetPort) {
 }
 
 function proxy(requestFromClient, responseToClient) {
+  if ((requestFromClient.url ?? "").split("?", 1)[0] === "/_aijee/dev-health") {
+    responseToClient.writeHead(200, { "content-type": "text/plain; charset=utf-8", "cache-control": "no-store" });
+    responseToClient.end("ok");
+    return;
+  }
   if ((requestFromClient.url ?? "").split("?", 1)[0] === "/preview-sw.js") {
     responseToClient.writeHead(200, {
       "content-type": "application/javascript; charset=utf-8",

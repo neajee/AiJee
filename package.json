@@ -11,7 +11,7 @@
     "web": "node tools/start-web.mjs",
     "android": "yarn workspace @aijee/client android",
     "ios": "yarn workspace @aijee/client ios",
-    "desktop": "yarn workspace @aijee/desktop dev",
+    "desktop": "yarn web:build && node tools/prepare-web-assets.cjs && yarn workspace @aijee/desktop dev",
     "runtime:start": "node --experimental-strip-types apps/server/src/main.ts serve",
     "runtime:check": "yarn workspace @aijee/engine check && yarn workspace aijee check",
     "lint": "yarn workspace @aijee/client lint",

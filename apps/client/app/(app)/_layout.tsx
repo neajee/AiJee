@@ -302,14 +302,9 @@ export default function AppLayout() {
             return;
           }
 
-          await fetchWorkspaces(candidate.id);
-          if (cancelled) return;
-
-          const workspaceError = useWorkspaceStore.getState().error;
-          if (!workspaceError) {
-            setStatus('ready');
-            return;
-          }
+          setStatus('ready');
+          void fetchWorkspaces(candidate.id);
+          return;
         } catch (error) {
           console.warn('[startup] failed to connect to server', error);
         }
