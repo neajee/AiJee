@@ -13,11 +13,8 @@ import {
 import { useRouter, usePathname } from "expo-router";
 import {
   Archive as ArchiveIcon,
-  ChevronDown,
   ChevronLeft,
-  ChevronRight,
   Folder,
-  FolderOpen,
   MoreHorizontal,
   Pin,
   Plus,
@@ -578,8 +575,6 @@ function WorkspaceRow({
   const colors = isDark ? Colors.dark : Colors.light;
   const [hovered, setHovered] = useState(false);
   const hoverBg = isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.035)";
-  const FolderIcon = isOpen ? FolderOpen : Folder;
-  const Chevron = isOpen ? ChevronDown : ChevronRight;
   const moreRef = useRef<View>(null);
   // Hovering swaps the status dot for the actions; both never fit at once.
   const showActions = hovered;
@@ -618,14 +613,8 @@ function WorkspaceRow({
         }
         style={({ pressed }) => [styles.rowMain, pressed && { opacity: 0.7 }]}
       >
-        {/* The icon slot is the disclosure indicator: on hover the folder
-            becomes a chevron, so folding never costs a second column. */}
         <View style={styles.rowIcon}>
-          {hovered ? (
-            <Chevron size={14} color={colors.textSecondary} strokeWidth={2} />
-          ) : (
-            <FolderIcon size={15} color={workspace.color} strokeWidth={1.8} />
-          )}
+          <Folder size={15} color={colors.text} strokeWidth={1.8} />
         </View>
         <Text
           style={[
