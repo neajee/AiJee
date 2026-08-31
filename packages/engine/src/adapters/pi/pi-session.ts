@@ -98,6 +98,9 @@ export class PiSession implements EngineSession {
   lastAssistantText(): string | null { return this.session.getLastAssistantText() ?? null; }
   async exportHtml(outputPath?: string): Promise<string> { return this.session.exportToHtml(outputPath); }
   commands(): JsonValue[] { return this.session.extensionRunner.getRegisteredCommands() as unknown as JsonValue[]; }
+  async reloadResources(): Promise<void> {
+    await this.session.reload();
+  }
 
   async newSession(): Promise<SessionDescriptor> {
     await this.runtime.newSession();

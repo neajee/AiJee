@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Linking,
@@ -42,10 +42,9 @@ const CATEGORIES: { value: string; label: string }[] = [
 ];
 
 const SEARCH_DEBOUNCE_MS = 350;
-const CARD_MIN_WIDTH = 260;
+const CARD_MIN_WIDTH = 340;
 
 type Tab = 'discover' | 'installed';
-type Scope = 'global' | 'project';
 
 export function PackageMarketplace() {
   const client = usePiClient();
@@ -115,21 +114,7 @@ export function PackageMarketplace() {
     if (tab === 'installed' && installedOutput === null) void loadInstalled();
   }, [tab, installedOutput, loadInstalled]);
 
-  const openDetail = useCallback(
-    async (pkg: MarketplacePackage) => {
-      setSelected(pkg);
-      if (pkg.readme !== undefined && pkg.readme !== null) return;
-      // The list response omits the readme; fetch it once the panel is open so
-      // the grid stays cheap.
-      try {
-        const detail = await client.api.marketplaceDetail(pkg.name);
-        setSelected((current) => (current?.name === pkg.name ? detail : current));
-      } catch {
-        // Keep the list data on screen; the readme is optional.
-      }
-    },
-    [client],
-  );
+  const openDetail = useCallback((pkg: MarketplacePackage) => setSelected(pkg), []);
 
   const handleInstalled = useCallback(
     (output: string) => {
@@ -445,6 +430,7 @@ function InstalledView({
   onRefresh: () => void;
   gutter: number;
 }) {
+  const client = usePiClient();
   const m = useSettingsMetrics();
   const p = useSettingsPalette();
 
@@ -458,7 +444,7 @@ function InstalledView({
         <Text style={{ fontSize: m.headerSize, fontFamily: Fonts.sansMedium, color: p.textSecondary }}>
           服务器上已安装的插件
         </Text>
-        <SecondaryButton label="刷新" onPress={onRefresh} />
+        <View style={styles.installedActions}><SecondaryButton label="全部更新" onPress={() => void client.api.marketplaceOperation({ operation: 'update', name: '*', scope: 'user' })} /><SecondaryButton label="刷新" onPress={onRefresh} /></View>
       </View>
 
       {error ? <Notice text={error} tone="error" /> : null}
@@ -474,9 +460,11 @@ function InstalledView({
         {loading ? (
           <ActivityIndicator size="small" color={p.textTertiary} />
         ) : (
-          <Text style={[styles.outputText, { color: p.textSecondary }]} selectable>
-            {output ?? ''}
-          </Text>
+          <>{(output ?? '').split('\n').map((line) => {
+            const source = line.split(' [')[0] ?? '';
+            if (!source || source === '暂无已安装插件') return <Text key={line} style={[styles.outputText, { color: p.textSecondary }]}>{line}</Text>;
+            return <View key={line} style={styles.installedRow}><Text style={[styles.outputText, { color: p.textSecondary, flex: 1 }]} selectable>{line}</Text><SecondaryButton label="更新" onPress={() => void client.api.marketplaceOperation({ operation: 'update', name: source, scope: 'user' })} /><SecondaryButton label="卸载" onPress={() => void client.api.marketplaceOperation({ operation: 'remove', name: source, scope: 'user' })} /></View>;
+          })}</>
         )}
       </View>
     </ScrollView>
@@ -500,9 +488,6 @@ function PackageDetail({
   const phone = useSettingsPhoneLayout();
   const { height: screenHeight } = useWindowDimensions();
 
-  const [scope, setScope] = useState<Scope>('global');
-  const [version, setVersion] = useState('');
-  const [confirming, setConfirming] = useState(false);
   const [installing, setInstalling] = useState(false);
   const [failure, setFailure] = useState<string | null>(null);
   const nameRef = useRef<string | null>(null);
@@ -511,18 +496,11 @@ function PackageDetail({
   useEffect(() => {
     if (!pkg || nameRef.current === pkg.name) return;
     nameRef.current = pkg.name;
-    setScope('global');
-    setVersion(pkg.version);
-    setConfirming(false);
     setInstalling(false);
     setFailure(null);
   }, [pkg]);
 
-  const target = version.trim() || pkg?.version || 'latest';
-  const command = useMemo(() => {
-    if (!pkg) return '';
-    return `pi install npm:${pkg.name}@${target}${scope === 'project' ? ' --local' : ''}`;
-  }, [pkg, target, scope]);
+  const target = pkg?.version || 'latest';
 
   const install = useCallback(async () => {
     if (!pkg) return;
@@ -533,18 +511,17 @@ function PackageDetail({
         operation: 'install',
         name: pkg.name,
         version: target,
-        scope,
+        scope: 'global',
         lock_version: true,
         workspace_id: null,
       });
       onInstalled(result.output || '安装完成');
     } catch (e) {
       setFailure(e instanceof Error ? e.message : '安装失败');
-      setConfirming(false);
     } finally {
       setInstalling(false);
     }
-  }, [client, pkg, target, scope, onInstalled]);
+  }, [client, pkg, target, onInstalled]);
 
   if (!pkg) return null;
 
@@ -608,68 +585,8 @@ function PackageDetail({
               {pkg.description || '作者未提供介绍'}
             </Text>
 
-            <View style={{ gap: 6 }}>
-              <FieldLabel text="安装范围" />
-              <Segmented
-                options={[
-                  { value: 'global', label: '全局' },
-                  { value: 'project', label: '当前项目' },
-                ]}
-                value={scope}
-                onChange={(value) => setScope(value as Scope)}
-              />
-            </View>
-
-            <View style={{ gap: 6 }}>
-              <FieldLabel text="版本" />
-              <TextInput
-                value={version}
-                onChangeText={setVersion}
-                placeholder={pkg.version}
-                placeholderTextColor={p.textTertiary}
-                autoCapitalize="none"
-                autoCorrect={false}
-                accessibilityLabel="安装版本"
-                style={[
-                  styles.input,
-                  {
-                    color: p.text,
-                    backgroundColor: p.tile,
-                    borderColor: p.separator,
-                    borderRadius: m.tileRadius,
-                  },
-                ]}
-              />
-            </View>
-
-            <Notice
-              text="插件以完整系统权限运行。安装前请确认来源可信。"
-              tone="warning"
-            />
-
             {failure ? <Notice text={failure} tone="error" /> : null}
 
-            <View style={[styles.commandBlock, { backgroundColor: p.tile, borderColor: p.separator, borderRadius: m.tileRadius }]}>
-              <Text style={[styles.commandText, { color: p.textSecondary }]} selectable>
-                {command}
-              </Text>
-            </View>
-
-            {pkg.readme ? (
-              <View style={{ gap: 6 }}>
-                <FieldLabel text="README" />
-                <View
-                  style={[
-                    styles.readme,
-                    { backgroundColor: p.tile, borderColor: p.separator, borderRadius: m.tileRadius },
-                  ]}
-                >
-                  <Text style={[styles.readmeText, { color: p.textSecondary }]} selectable>
-                    {pkg.readme.trim()}
-                  </Text>
-                </View>
-              </View>
-            ) : null}
           </ScrollView>
 
           <View style={[styles.dialogFooter, { borderTopColor: p.separator, padding: m.gutter }]}>
@@ -696,41 +613,9 @@ function PackageDetail({
               label="安装"
               icon={Download}
               busy={installing}
-              onPress={() => setConfirming(true)}
+              onPress={() => void install()}
             />
           </View>
-
-          {/* An inline confirm layer rather than a second Modal: stacked modals
-              misbehave on native, and the risk being confirmed is about the very
-              package described behind this layer. */}
-          {confirming ? (
-            <View style={[styles.confirmLayer, { backgroundColor: p.isDark ? 'rgba(0,0,0,0.65)' : 'rgba(255,255,255,0.8)' }]}>
-              <View
-                style={[
-                  styles.confirmCard,
-                  { backgroundColor: p.card, borderColor: p.border, borderRadius: m.cardRadius },
-                ]}
-              >
-                <View style={styles.confirmHead}>
-                  <ShieldAlert size={16} color={p.destructive} strokeWidth={2} />
-                  <Text style={{ fontSize: m.labelSize, fontFamily: Fonts.sansMedium, color: p.text }}>
-                    确认安装
-                  </Text>
-                </View>
-                <Text style={{ fontSize: m.descSize, color: p.textSecondary, lineHeight: m.descSize * 1.5 }}>
-                  {`将执行 ${command}\n来源：${pkg.repository ?? pkg.npm_url}\n插件拥有完整系统权限。`}
-                </Text>
-                <View style={styles.confirmActions}>
-                  <SecondaryButton label="取消" onPress={() => setConfirming(false)} />
-                  <PrimaryButton
-                    label="继续安装"
-                    busy={installing}
-                    onPress={() => void install()}
-                  />
-                </View>
-              </View>
-            </View>
-          ) : null}
         </View>
       </View>
     </Modal>
@@ -910,13 +795,15 @@ const styles = StyleSheet.create({
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 10,
+    gap: 12,
+    alignItems: 'stretch',
   },
   card: {
     flexGrow: 1,
     minWidth: CARD_MIN_WIDTH,
-    maxWidth: 420,
-    gap: 8,
+    maxWidth: 560,
+    minHeight: 132,
+    gap: 10,
     borderWidth: StyleSheet.hairlineWidth,
   },
   cardTop: {
@@ -952,6 +839,8 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: 12,
   },
+  installedActions: { flexDirection: 'row', gap: 8 },
+  installedRow: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 6 },
   outputBlock: {
     padding: 12,
     borderWidth: StyleSheet.hairlineWidth,
@@ -1023,6 +912,8 @@ const styles = StyleSheet.create({
   readme: {
     padding: 10,
     maxHeight: 220,
+    maxWidth: '100%',
+    overflow: 'hidden',
     borderWidth: StyleSheet.hairlineWidth,
   },
   readmeText: {

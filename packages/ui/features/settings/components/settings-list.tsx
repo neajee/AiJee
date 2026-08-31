@@ -169,6 +169,7 @@ export interface SettingsPalette {
   accent: string;
   onAccent: string;
   success: string;
+  notification: string;
   destructive: string;
 }
 
@@ -195,6 +196,7 @@ export function useSettingsPalette(): SettingsPalette {
       accent: c.text,
       onAccent: c.background,
       success: c.success,
+      notification: c.notificationDot,
       destructive: c.destructive,
     }),
     [c, isDark],

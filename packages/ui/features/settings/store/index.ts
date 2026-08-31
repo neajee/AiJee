@@ -9,6 +9,8 @@ interface AppSettings {
   themeMode: ThemeMode;
   pushNotifications: boolean;
   soundEffects: boolean;
+  /** Allow outbound update checks against GitHub Releases. */
+  checkUpdates: boolean;
 }
 
 interface AppSettingsState extends AppSettings {
@@ -21,6 +23,7 @@ const DEFAULTS: AppSettings = {
   themeMode: 'system',
   pushNotifications: true,
   soundEffects: false,
+  checkUpdates: true,
 };
 
 async function readFromStore(): Promise<Partial<AppSettings>> {
@@ -64,6 +67,7 @@ export const useAppSettingsStore = create<AppSettingsState>((set, get) => ({
       themeMode: partial.themeMode ?? current.themeMode,
       pushNotifications: partial.pushNotifications ?? current.pushNotifications,
       soundEffects: partial.soundEffects ?? current.soundEffects,
+      checkUpdates: partial.checkUpdates ?? current.checkUpdates,
     };
     set(next);
     await writeToStore(next);

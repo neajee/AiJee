@@ -96,4 +96,6 @@ export interface BuiltinProvider {
   supports_oauth: boolean;
   supports_api_key: boolean;
   auth_label: string | null;
+  /** Credential provenance reported by Pi, never the credential itself. */
+  auth_source: string | null;
 }

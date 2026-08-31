@@ -1,7 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Animated,
   Image,
   Modal,
   Platform,
@@ -11,7 +12,7 @@ import {
   View,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { Copy, Pencil, Plus, QrCode, RefreshCw, Trash2, X } from "lucide-react-native";
+import { Copy, MoreHorizontal, Pencil, Plus, QrCode, RefreshCw, Trash2, X } from "lucide-react-native";
 import * as Clipboard from "expo-clipboard";
 import QRCode from "qrcode";
 
@@ -23,8 +24,6 @@ import { useWorkspaceStore } from "@/features/workspace/store";
 import { useOptionalPiClient } from "@aijee/client-sdk";
 import { QrScanner } from "@/features/servers/components/qr-scanner";
 import {
-  SettingsGroup,
-  SettingsRow,
   useSettingsMetrics,
   useSettingsPalette,
 } from "@/features/settings/components/settings-list";
@@ -64,6 +63,10 @@ export function ServersSection({
   const [loginError, setLoginError] = useState<string | null>(null);
   const [qrVisible, setQrVisible] = useState(false);
   const [connecting, setConnecting] = useState<string | null>(null);
+  const [failedServerId, setFailedServerId] = useState<string | null>(null);
+  const [lastConnected, setLastConnected] = useState<Record<string, number>>({});
+  const [menuServerId, setMenuServerId] = useState<string | null>(null);
+  const [menuPosition, setMenuPosition] = useState<{ left: number; top: number } | null>(null);
   const [refreshingCode, setRefreshingCode] = useState(false);
   const [codeDialog, setCodeDialog] = useState<{ code: string; url: string; image: string } | null>(null);
 
@@ -153,6 +156,7 @@ export function ServersSection({
         setConnecting(server.id);
 
         if (server.id === activeServerId) {
+          setLastConnected((current) => ({ ...current, [server.id]: Date.now() }));
           await navigateAfterConnect();
           return;
         }
@@ -162,6 +166,8 @@ export function ServersSection({
           : false;
 
         if (connected) {
+          setFailedServerId(null);
+          setLastConnected((current) => ({ ...current, [server.id]: Date.now() }));
           await navigateAfterConnect();
         } else {
           // A stored token that no longer works is indistinguishable from none:
@@ -172,6 +178,7 @@ export function ServersSection({
         }
       } catch (e) {
         console.error("handleConnect error:", e);
+        setFailedServerId(server.id);
         setLoginError("连接失败，请检查地址与网络。");
       } finally {
         setConnecting(null);
@@ -287,11 +294,12 @@ export function ServersSection({
   }
 
   return (
-    <View style={{ gap: m.groupGap }}>
-      <SettingsGroup
-        header="服务器"
-        footer="点击设备即可连接。设备令牌仅保存在本机，不会同步。"
-      >
+    <View style={[styles.content, { gap: m.groupGap }]}>
+      <View style={styles.sectionHeading}>
+        <Text style={[styles.sectionTitle, { color: p.textSecondary }]}>我的设备 ({servers.length})</Text>
+        <Text style={[styles.sectionCaption, { color: p.textTertiary }]}>设备令牌仅保存在本机，不会同步</Text>
+      </View>
+      <View style={[styles.serverCard, { backgroundColor: p.card, borderColor: p.separator }]}>
         {servers.length === 0 ? (
           <View
             style={{
@@ -316,27 +324,28 @@ export function ServersSection({
               server={server}
               isActive={server.id === activeServerId}
               isConnecting={connecting === server.id}
+              isFailed={failedServerId === server.id}
+              lastConnectedAt={lastConnected[server.id]}
               isLast={idx === servers.length - 1}
               onPress={() => handleConnect(server)}
-              onEdit={() => handleEdit(server)}
-              onDelete={() => handleDelete(server)}
               onShowCode={handleShowCode}
-              isDark={isDark}
+              onToggleMenu={(measure) => {
+                if (menuServerId === server.id) {
+                  setMenuServerId(null);
+                  setMenuPosition(null);
+                  return;
+                }
+                measure((x, y, width, height) => {
+                  setMenuPosition({ left: Math.max(12, x + width - 220), top: y + height + 6 });
+                  setMenuServerId(server.id);
+                });
+              }}
             />
           ))
         )}
-      </SettingsGroup>
-
-      <SettingsGroup>
-        <SettingsRow icon={Plus} label="添加服务器" onPress={handleAdd} />
-        <SettingsRow
-          icon={QrCode}
-          label="扫描授权码"
-          description="扫描 AiJee 设备端生成的授权二维码"
-          onPress={() => setQrVisible(true)}
-          isLast
-        />
-      </SettingsGroup>
+        <FooterAction icon={Plus} label="添加服务器" onPress={handleAdd} isFirst />
+        <FooterAction icon={QrCode} label="扫描授权码" onPress={() => setQrVisible(true)} isLast />
+      </View>
 
       <ServerFormModal
         visible={formVisible}
@@ -354,6 +363,22 @@ export function ServersSection({
         onClose={() => setQrVisible(false)}
         onNeedNewWorkspace={() => router.replace("/")}
       />
+      <Modal transparent visible={!!menuServerId} animationType="fade" onRequestClose={() => setMenuServerId(null)}>
+        <Pressable style={styles.menuBackdrop} onPress={() => { setMenuServerId(null); setMenuPosition(null); }} accessibilityLabel="关闭服务器操作菜单">
+          {(() => {
+            const server = servers.find((entry) => entry.id === menuServerId);
+            if (!server) return null;
+            return (
+              <Pressable style={[styles.menuSheet, menuPosition, { backgroundColor: p.card, borderColor: p.border }]} onPress={(event) => event.stopPropagation()}>
+                <MenuAction icon={Pencil} label="编辑" onPress={() => { setMenuServerId(null); handleEdit(server); }} color={p.text} />
+                <MenuAction icon={X} label="断开连接" onPress={() => { setMenuServerId(null); logoutFromServer(server.id); }} color={p.text} />
+                <View style={[styles.menuDivider, { backgroundColor: p.separator }]} />
+                <MenuAction icon={Trash2} label="删除" onPress={() => { setMenuServerId(null); handleDelete(server); }} color={p.destructive} />
+              </Pressable>
+            );
+          })()}
+        </Pressable>
+      </Modal>
       <Modal visible={!!codeDialog} transparent animationType="fade" onRequestClose={() => setCodeDialog(null)}>
         <Pressable style={styles.codeBackdrop} onPress={() => setCodeDialog(null)} accessibilityLabel="关闭授权对话框">
           <Pressable
@@ -404,142 +429,164 @@ export function ServersSection({
   );
 }
 
+function ConnectionStatusDot({ label, color, connecting }: { label: string; color: string; connecting: boolean }) {
+  const opacity = useRef(new Animated.Value(1)).current;
+  useEffect(() => {
+    if (!connecting) { opacity.setValue(1); return; }
+    const animation = Animated.loop(Animated.sequence([
+      Animated.timing(opacity, { toValue: 0.35, duration: 700, useNativeDriver: true }),
+      Animated.timing(opacity, { toValue: 1, duration: 700, useNativeDriver: true }),
+    ]));
+    animation.start();
+    return () => animation.stop();
+  }, [connecting, opacity]);
+  return <Animated.View accessibilityLabel={label} style={[styles.statusDot, { backgroundColor: color, opacity }]} />;
+}
+
 function ServerRow({
   server,
   isActive,
   isConnecting,
+  isFailed,
+  lastConnectedAt,
   isLast,
   onPress,
-  onEdit,
-  onDelete,
   onShowCode,
-  isDark,
+  onToggleMenu,
 }: {
   server: Server;
   isActive: boolean;
   isConnecting: boolean;
+  isFailed: boolean;
+  lastConnectedAt?: number;
   isLast: boolean;
   onPress: () => void;
-  onEdit: () => void;
-  onDelete: () => void;
   onShowCode: () => void;
-  isDark: boolean;
+  onToggleMenu: (measure: (callback: (x: number, y: number, width: number, height: number) => void) => void) => void;
 }) {
-  const m = useSettingsMetrics();
   const p = useSettingsPalette();
+  const [hovered, setHovered] = useState(false);
+  const moreRef = useRef<any>(null);
+  const address = server.address.replace(/^https?:\/\//, '');
+  const minutes = lastConnectedAt ? Math.max(1, Math.floor((Date.now() - lastConnectedAt) / 60_000)) : null;
+  const status = isConnecting
+    ? { label: '连接中…', color: p.notification }
+    : isFailed
+      ? { label: '连接失败 · 点击重试', color: p.destructive }
+      : isActive
+        ? { label: `${address} · 已连接`, color: p.success }
+        : { label: minutes ? `上次连接 ${minutes} 分钟前` : '离线 · 尚无连接记录', color: p.textTertiary };
 
   return (
-    <Pressable
-      onPress={onPress}
-      accessibilityLabel={`连接到 ${server.name}`}
-      style={({ pressed }) => [
-        {
-          flexDirection: "row",
-          alignItems: "center",
-          gap: 12,
-          paddingHorizontal: m.gutter,
-          paddingVertical: m.rowPaddingV,
-          minHeight: m.rowMinHeight,
-        },
-        !isLast && {
-          borderBottomWidth: StyleSheet.hairlineWidth,
-          borderBottomColor: p.separator,
-        },
-        pressed && { backgroundColor: p.pressed },
-      ]}
-    >
+    <View style={styles.serverRowWrap}>
+      {isActive ? <View style={[styles.activeRail, { backgroundColor: p.success }]} /> : null}
+      <Pressable
+        onPress={onPress}
+        onPointerEnter={() => setHovered(true)}
+        onPointerLeave={() => setHovered(false)}
+        accessibilityRole="button"
+        accessibilityLabel={`连接到 ${server.name}，${status.label}`}
+        style={({ pressed, hovered: rowHovered, focused }: any) => [styles.serverRow, isActive && { backgroundColor: p.pressed }, (pressed || rowHovered) && { backgroundColor: p.pressed }, focused && { outlineWidth: 2, outlineColor: p.accent, outlineOffset: 2 } as any]}
+      >
+      <ConnectionStatusDot label={status.label} color={status.color} connecting={isConnecting} />
       <View
         style={{
-          width: m.tileSize,
-          height: m.tileSize,
-          borderRadius: m.tileRadius,
+          width: 30,
+          height: 30,
+          borderRadius: 8,
           alignItems: "center",
           justifyContent: "center",
-          backgroundColor: isDark ? "#fefdfd" : "#1a1a1a",
+          backgroundColor: p.tile,
         }}
       >
         {isConnecting ? (
-          <ActivityIndicator size="small" color={isDark ? "#1a1a1a" : "#fff"} />
+          <ActivityIndicator size="small" color={p.text} />
         ) : (
-          <PiLogo size={m.tileIcon} color={isDark ? "#1a1a1a" : "#fff"} />
+          <PiLogo size={16} color={p.textSecondary} />
         )}
       </View>
 
       <View style={{ flex: 1, gap: 2 }}>
-        <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-          <Text
-            style={{
-              fontSize: m.labelSize,
-              fontFamily: Fonts.sans,
-              color: p.text,
-            }}
-            numberOfLines={1}
-          >
-            {server.name}
-          </Text>
-          {isActive && (
-            <View style={styles.badge}>
-              <View style={[styles.badgeDot, { backgroundColor: p.success }]} />
-              <Text
-                style={{
-                  fontSize: 11,
-                  lineHeight: 14,
-                  fontFamily: Fonts.sansMedium,
-                  color: p.success,
-                }}
-              >
-                已连接
-              </Text>
-            </View>
-          )}
+        <Text style={{ fontSize: 13, fontFamily: Fonts.sansMedium, color: p.text }} numberOfLines={1}>{server.name}</Text>
+        <View style={styles.statusLine}>
+          <Text style={{ fontSize: 12, fontFamily: Fonts.mono, color: p.textTertiary, opacity: 0.55 }} numberOfLines={1}>{status.label}</Text>
         </View>
-        <Text
-          style={{
-            fontSize: m.descSize,
-            fontFamily: Fonts.sans,
-            color: p.textTertiary,
-          }}
-          numberOfLines={1}
-        >
-          {server.address}
-        </Text>
       </View>
+      </Pressable>
 
       <Pressable
-        onPress={(e) => {
-          e.stopPropagation();
-          onShowCode();
-        }}
+        onPress={onShowCode}
+        accessibilityRole="button"
         accessibilityLabel={`显示 ${server.name} 授权二维码`}
-        style={({ pressed }) => [styles.action, pressed && { opacity: 0.5 }]}
+        hitSlop={8}
+        style={({ pressed, hovered: qrHovered, focused }: any) => [styles.qrAction, (pressed || qrHovered) && { backgroundColor: p.pressed }, focused && { outlineWidth: 2, outlineColor: p.accent, outlineOffset: 2 } as any]}
       >
-        <QrCode size={15} color={p.textTertiary} strokeWidth={1.8} />
+        <QrCode size={20} color={p.textSecondary} strokeWidth={1.5} />
       </Pressable>
       <Pressable
-        onPress={(e) => {
-          e.stopPropagation();
-          onEdit();
-        }}
-        accessibilityLabel={`编辑 ${server.name}`}
-        style={({ pressed }) => [styles.action, pressed && { opacity: 0.5 }]}
+        ref={moreRef}
+        onPress={() => onToggleMenu((callback) => moreRef.current?.measureInWindow((x: number, y: number, width: number, height: number) => callback(x, y, width, height)))}
+        accessibilityRole="button"
+        accessibilityLabel={`管理 ${server.name}`}
+        hitSlop={8}
+        style={({ pressed, hovered: moreHovered, focused }: any) => [styles.moreAction, (hovered || pressed || moreHovered || focused || Platform.OS !== 'web') && { opacity: 1 }, (pressed || moreHovered || focused) && { backgroundColor: p.pressed }, focused && { outlineWidth: 2, outlineColor: p.accent, outlineOffset: 2 } as any]}
       >
-        <Pencil size={15} color={p.textTertiary} strokeWidth={1.8} />
+        <MoreHorizontal size={20} color={p.textSecondary} strokeWidth={1.8} />
       </Pressable>
-      <Pressable
-        onPress={(e) => {
-          e.stopPropagation();
-          onDelete();
-        }}
-        accessibilityLabel={`移除 ${server.name}`}
-        style={({ pressed }) => [styles.action, pressed && { opacity: 0.5 }]}
-      >
-        <Trash2 size={15} color={p.destructive} strokeWidth={1.8} />
-      </Pressable>
+      {!isLast ? <View style={[styles.rowDivider, { backgroundColor: p.separator }]} /> : null}
+    </View>
+  );
+}
+
+function FooterAction({ icon: Icon, label, onPress, isLast = false, isFirst = false }: { icon: any; label: string; onPress: () => void; isLast?: boolean; isFirst?: boolean }) {
+  const p = useSettingsPalette();
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      style={({ pressed, hovered }: any) => [
+        styles.footerAction,
+        !isLast && { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: p.separator },
+        (pressed || hovered) && { backgroundColor: p.pressed },
+        isFirst && { position: 'relative' },
+      ]}
+    >
+      {isFirst ? <View style={[styles.footerDivider, { backgroundColor: p.separator }]} /> : null}
+      <Icon size={16} color={p.textSecondary} strokeWidth={1.8} />
+      <Text style={[styles.footerActionText, { color: p.textSecondary }]}>{label}</Text>
     </Pressable>
   );
 }
 
+function MenuAction({ icon: Icon, label, onPress, color }: { icon: any; label: string; onPress: () => void; color: string }) {
+  return <Pressable onPress={onPress} accessibilityRole="button" accessibilityLabel={label} style={({ pressed }) => [styles.menuAction, pressed && { opacity: 0.6 }]}><Icon size={16} color={color} strokeWidth={1.8} /><Text style={[styles.menuActionText, { color }]}>{label}</Text></Pressable>;
+}
+
 const styles = StyleSheet.create({
+  content: { width: '100%' },
+  // Heading lines up with the card edge, the same way ModelSection titles do.
+  sectionHeading: { gap: 6 },
+  sectionTitle: { fontSize: 13, fontFamily: Fonts.sansMedium },
+  sectionCaption: { fontSize: 12, fontFamily: Fonts.sans, opacity: 0.5, marginTop: 4 },
+  serverCard: { borderWidth: StyleSheet.hairlineWidth, borderRadius: 8, overflow: 'hidden' },
+  serverRowWrap: { minHeight: 56, flexDirection: 'row', alignItems: 'center', position: 'relative' },
+  activeRail: { width: 2, alignSelf: 'stretch' },
+  serverRow: { flex: 1, minWidth: 0, alignSelf: 'stretch', flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 12 },
+  statusLine: { minWidth: 0 },
+  statusDot: { width: 7, height: 7, borderRadius: 4, marginRight: -4 },
+  // Aligned with the model list's divider (12 padding + 30 tile + 12 gap).
+  rowDivider: { position: 'absolute', left: 54, right: 0, bottom: 0, height: StyleSheet.hairlineWidth },
+  qrAction: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 8 },
+  moreAction: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 8, marginLeft: 12, marginRight: 12, opacity: 0, transitionProperty: 'opacity, background-color', transitionDuration: '120ms' } as any,
+  menuBackdrop: { flex: 1 },
+  menuSheet: { width: 220, borderWidth: StyleSheet.hairlineWidth, borderRadius: 10, paddingVertical: 4, position: 'absolute', boxShadow: '0 6px 18px rgba(0,0,0,.16)' } as any,
+  menuAction: { minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 12 },
+  menuActionText: { fontSize: 13, fontFamily: Fonts.sansMedium },
+  menuDivider: { height: StyleSheet.hairlineWidth, marginVertical: 4 },
+  footerAction: { minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 12 },
+  footerActionText: { fontSize: 13, fontFamily: Fonts.sansMedium, opacity: 0.7 },
+  footerDivider: { position: 'absolute', top: 0, left: 12, right: 0, height: StyleSheet.hairlineWidth },
   welcome: {
     flex: 1,
     alignItems: "center",
@@ -586,22 +633,6 @@ const styles = StyleSheet.create({
   welcomeButtonText: {
     fontSize: 14,
     fontFamily: Fonts.sansMedium,
-  },
-  badge: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-  },
-  badgeDot: {
-    width: 5,
-    height: 5,
-    borderRadius: 2.5,
-  },
-  action: {
-    width: 28,
-    height: 28,
-    alignItems: "center",
-    justifyContent: "center",
   },
   codeBackdrop: {
     flex: 1,

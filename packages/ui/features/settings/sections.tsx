@@ -55,18 +55,18 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
     Component: ({ isDark }) => <ServersSection isDark={isDark} />,
   },
   {
+    slug: 'models',
+    title: '模型',
+    summary: '模型接入点、凭据与聊天模型列表',
+    icon: Cpu,
+    Component: ({ isDark }) => <CustomModelsSection isDark={isDark} />,
+  },
+  {
     slug: 'modes',
     title: 'Agent 模式',
     summary: '预设的系统提示与工具组合',
     icon: Layers,
     Component: ({ isDark }) => <AgentModesSection isDark={isDark} />,
-  },
-  {
-    slug: 'models',
-    title: '模型服务',
-    summary: '模型接入点、凭据与聊天模型列表',
-    icon: Cpu,
-    Component: ({ isDark }) => <CustomModelsSection isDark={isDark} />,
   },
   {
     slug: 'notifications',
@@ -86,7 +86,7 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
   {
     slug: 'about',
     title: '关于',
-    summary: 'Pi Agent 版本、更新与服务器信息',
+    summary: 'AiJee 版本与更新日志',
     icon: Info,
     Component: AboutPanel,
     Row: AboutRow,

@@ -25,6 +25,9 @@ export class SessionRegistry {
   get(key: string): EngineSession | undefined { return this.sessions.get(key); }
   list(): SessionDescriptor[] { return [...this.sessions.values()].map((session) => session.describe()); }
   enginesList() { return this.engines.list().map((engine) => engine.describe()); }
+  async reloadResources(): Promise<void> {
+    await Promise.all([...this.sessions.values()].map((session) => session.reloadResources?.()));
+  }
 
   async remove(key: string): Promise<boolean> {
     const session = this.sessions.get(key);

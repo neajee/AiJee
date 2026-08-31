@@ -37,6 +37,7 @@ export interface EngineSession {
   lastAssistantText(): string | null;
   exportHtml(outputPath?: string): Promise<string>;
   commands(): JsonValue[];
+  reloadResources?(): Promise<void>;
   newSession(): Promise<SessionDescriptor>;
   switchSession(sessionFile: string): Promise<SessionDescriptor>;
   dispose(): Promise<void>;

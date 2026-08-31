@@ -1,10 +1,13 @@
-import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useCallback, useEffect, useState, type ReactNode } from 'react';
+import { ActivityIndicator, Linking, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import {
   AlertCircle,
+  ArrowUpCircle,
   Bell,
   CheckCircle2,
+  ChevronDown,
   ChevronRight,
+  ChevronUp,
   Download,
   Info,
   Monitor,
@@ -14,9 +17,8 @@ import {
   Sun,
   Volume2,
 } from 'lucide-react-native';
-
 import { Fonts } from '@/constants/theme';
-import { sdk, unwrapApiData } from '@aijee/client-sdk';
+import { client, sdk, unwrapApiData } from '@aijee/client-sdk';
 import type { PackageStatus } from '@aijee/client-sdk';
 
 import { useAppSettingsStore, type ThemeMode } from '../store';
@@ -33,8 +35,61 @@ const {
   status2: getPackageStatus,
   update: updatePackage,
   install: installPackage,
-  version: getVersion,
 } = sdk;
+
+type ReleaseNote = { type: 'feature' | 'fix' | 'other'; title: string; scope?: string | null; commit?: string | null };
+
+type VersionInfo = {
+  version?: string;
+  tag?: string;
+  commit?: string | null;
+  updated_at?: string | null;
+  timeline?: Array<{ tag: string; published_at: string | null; commit: string | null; notes?: ReleaseNote[] }>;
+  node?: string;
+  remote?: boolean;
+  server_id?: string;
+};
+
+type LatestRelease = {
+  current?: string | null;
+  latest?: string | null;
+  update_available?: boolean;
+  release_url?: string | null;
+  published_at?: string | null;
+  checked_at?: number | null;
+};
+
+function formatReleaseTime(value: string | null | undefined): string {
+  if (!value) return '时间未知';
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? value : date.toLocaleDateString('zh-CN', { year: 'numeric', month: 'short', day: 'numeric' });
+}
+
+/** Compact release timestamp: `08-30 11:23`, year shown only when it differs. */
+function formatReleaseShort(value: string | null | undefined): string {
+  if (!value) return '—';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  const pad = (n: number) => String(n).padStart(2, '0');
+  const sameYear = date.getFullYear() === new Date().getFullYear();
+  const datePart = sameYear
+    ? `${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
+    : `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+  return `${datePart} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+}
+
+/** `v0.1.5-3-g134ff73-dirty` → base tag, commits ahead, dirty flag. */
+function parseDescribeTag(value: string | null | undefined): { tag: string; ahead: number; dirty: boolean } | null {
+  if (!value) return null;
+  const match = value.match(/^(v[^-]+)(?:-(\d+)-g[0-9a-f]+)?(?:-dirty)?$/i);
+  if (!match) return null;
+  return { tag: match[1], ahead: match[2] ? Number(match[2]) : 0, dirty: /-dirty$/.test(value) };
+}
+
+async function getVersionInfo(): Promise<VersionInfo> {
+  const result = await client.get({ url: '/api/version' });
+  return unwrapApiData(result.data) as VersionInfo;
+}
 
 /**
  * Settings content, split by topic.
@@ -360,69 +415,28 @@ function AgentBanner({ text, ok }: { text: string; ok: boolean }) {
 export function AboutRow({ isLast }: { isLast?: boolean }) {
   const m = useSettingsMetrics();
   const p = useSettingsPalette();
-  const agent = useAgentPackage();
   const [serverVersion, setServerVersion] = useState<string>('');
 
   useEffect(() => {
-    getVersion()
-      .then((res) => {
-        const data = unwrapApiData(res.data) as { version?: string } | undefined;
+    getVersionInfo()
+      .then((data) => {
         if (data?.version) setServerVersion(data.version);
       })
       .catch(() => {});
   }, []);
 
-  const { pkg, loading, updating, hasUpdate, needsInstall, actionable, apply } = agent;
-
-  let description: string;
-  if (loading) {
-    description = '正在检查更新…';
-  } else if (needsInstall) {
-    description = `Pi agent 未安装${pkg?.latest_version ? ` · 可安装 ${pkg.latest_version}` : ''}`;
-  } else if (hasUpdate) {
-    description = `Pi agent ${pkg?.installed_version} → ${pkg?.latest_version}`;
-  } else if (pkg?.installed) {
-    description = `Pi agent ${pkg.installed_version ?? '未知'}${
-      serverVersion ? ` · 服务器 ${serverVersion}` : ''
-    }`;
-  } else {
-    description = serverVersion ? `服务器 ${serverVersion}` : (agent.error ?? '');
-  }
-
-  let right: React.ReactNode;
-  if (loading) {
-    right = <ActivityIndicator size="small" color={p.textTertiary} />;
-  } else if (actionable) {
-    right = (
-      <AgentActionButton
-        label={needsInstall ? '安装' : '更新'}
-        icon={needsInstall ? Download : RefreshCw}
-        updating={updating}
-        onPress={apply}
-      />
-    );
-  } else {
-    // No update pending: the version number is the whole story.
-    right = (
-      <Text style={{ fontSize: m.valueSize, fontFamily: Fonts.sans, color: p.textTertiary }}>
-        {pkg?.installed_version ?? serverVersion ?? '—'}
-      </Text>
-    );
-  }
-
-  const banner = agent.success ?? agent.error;
-
   return (
-    <>
-      <SettingsRow
-        icon={Info}
-        label="关于"
-        description={description || undefined}
-        isLast={isLast && !banner}
-        right={right}
-      />
-      {banner ? <AgentBanner text={banner} ok={!!agent.success} /> : null}
-    </>
+    <SettingsRow
+      icon={Info}
+      label="关于"
+      description={serverVersion ? `AiJee ${serverVersion}` : undefined}
+      isLast={isLast}
+      right={
+        <Text style={{ fontSize: m.valueSize, fontFamily: Fonts.sans, color: p.textTertiary }}>
+          {serverVersion || '—'}
+        </Text>
+      }
+    />
   );
 }
 
@@ -430,78 +444,279 @@ export function AboutRow({ isLast }: { isLast?: boolean }) {
 export function AboutPanel() {
   const m = useSettingsMetrics();
   const p = useSettingsPalette();
-  const agent = useAgentPackage();
   const [serverVersion, setServerVersion] = useState<string>('');
+  const [versionInfo, setVersionInfo] = useState<VersionInfo | null>(null);
+  const [checkState, setCheckState] = useState<'idle' | 'checking' | 'checked' | 'error'>('idle');
+  const [release, setRelease] = useState<LatestRelease | null>(null);
 
   useEffect(() => {
-    getVersion()
-      .then((res) => {
-        const data = unwrapApiData(res.data) as { version?: string } | undefined;
+    getVersionInfo()
+      .then((data) => {
         if (data?.version) setServerVersion(data.version);
+        setVersionInfo(data ?? null);
       })
       .catch(() => {});
   }, []);
 
-  const { pkg, loading, updating, hasUpdate, needsInstall, actionable, apply } = agent;
+  const checkLatest = useCallback(async () => {
+    setCheckState('checking');
+    try {
+      const result = await client.get({ url: '/api/version/latest' });
+      const data = unwrapApiData(result.data) as LatestRelease | undefined;
+      setRelease(data ?? null);
+      setCheckState(data?.latest ? 'checked' : 'error');
+    } catch {
+      setCheckState('error');
+    }
+  }, []);
 
-  const versionText = loading
-    ? '正在检查更新…'
-    : hasUpdate
-      ? `可更新至 ${pkg?.latest_version}`
-      : pkg?.installed
-        ? ''
-        : pkg?.latest_version
-          ? `未安装 · 可安装 ${pkg.latest_version}`
-          : (agent.error ?? '');
+  // Checking for updates is the default behavior on this screen.
+  useEffect(() => {
+    if (checkState === 'idle') void checkLatest();
+  }, [checkState, checkLatest]);
 
-  let right: React.ReactNode;
-  if (loading) {
-    right = <ActivityIndicator size="small" color={p.textTertiary} />;
-  } else if (actionable) {
-    right = (
-      <AgentActionButton
-        label={needsInstall ? '安装' : '更新'}
-        icon={needsInstall ? Download : RefreshCw}
-        updating={updating}
-        onPress={apply}
-      />
-    );
-  } else if (pkg) {
-    right = (
-      <Text style={{ fontSize: m.valueSize, fontFamily: Fonts.sans, color: p.textTertiary }}>
-        {pkg.installed_version ?? pkg.latest_version ?? '—'}
-      </Text>
-    );
-  } else {
-    right = <AlertCircle size={16} color={p.destructive} strokeWidth={2} />;
-  }
+  const openRelease = useCallback(() => {
+    if (release?.release_url) Linking.openURL(release.release_url).catch(() => {});
+  }, [release?.release_url]);
 
-  const banner = agent.success ?? agent.error;
+  const parsed = parseDescribeTag(versionInfo?.tag);
+  const versionLabel = parsed?.tag ?? versionInfo?.tag ?? (serverVersion ? `v${serverVersion}` : '—');
+  const suffixParts: string[] = [];
+  if (parsed?.ahead) suffixParts.push(`+${parsed.ahead} 提交`);
+  if (parsed?.dirty) suffixParts.push('工作区已修改');
+  const versionSuffix = suffixParts.length ? suffixParts.join(' · ') : null;
+
+  const timeline = versionInfo?.timeline ?? [];
+  // describe() can yield `v0.1.5-3-g134ff73-dirty` when HEAD sits past a tag;
+  // match against the base tag so the 当前 pill lands on the right row.
+  const currentReleaseTag = timeline.find((release) => release.tag === versionLabel)?.tag ?? timeline[0]?.tag ?? null;
+  const latestLabel = release?.latest ? release.latest.replace(/^v/i, '') : null;
+
+  const heroBuildMeta = `构建于 ${formatReleaseTime(versionInfo?.updated_at)}${versionSuffix ? ` · ${versionSuffix}` : ''}`;
 
   return (
-    <SettingsGroup header="关于" footer={`AiJee · ${PLATFORM_LABEL}`}>
-      <SettingsRow
-        icon={Download}
-        label="智能体版本"
-        description={versionText || undefined}
-        right={right}
-      />
-      {banner ? <AgentBanner text={banner} ok={!!agent.success} /> : null}
-      <SettingsRow
-        icon={Info}
-        label="服务器版本"
-        isLast
-        right={
-          <Text style={{ fontSize: m.valueSize, fontFamily: Fonts.sans, color: p.textTertiary }}>
-            {serverVersion || '—'}
-          </Text>
-        }
-      />
-    </SettingsGroup>
+    <View style={{ gap: m.groupGap }}>
+      {/* 1 · Hero: version number + build meta + update check */}
+      <AboutGroup title="当前版本">
+        <View style={aboutStyles.hero}>
+          <View style={aboutStyles.heroMain}>
+            <Text style={[aboutStyles.heroVersion, { color: p.text }]}>{versionLabel}</Text>
+            <Text style={[aboutStyles.heroMeta, { color: p.textTertiary }]} numberOfLines={2}>
+              {heroBuildMeta}
+            </Text>
+          </View>
+          <View style={aboutStyles.heroAction}>
+            {checkState === 'checking' ? (
+              <View style={[aboutStyles.heroBtn, { borderColor: p.separator }]}>
+                <ActivityIndicator size="small" color={p.textTertiary} />
+                <Text style={[aboutStyles.heroBtnText, { color: p.textTertiary }]}>检查中…</Text>
+              </View>
+            ) : checkState === 'error' ? (
+              <Pressable
+                onPress={() => void checkLatest()}
+                accessibilityRole="button"
+                accessibilityLabel="重新检查更新"
+                style={({ pressed }) => [aboutStyles.heroBtn, { borderColor: p.separator }, pressed && { backgroundColor: p.pressed }]}
+              >
+                <RefreshCw size={14} color={p.textSecondary} strokeWidth={1.8} />
+                <Text style={[aboutStyles.heroBtnText, { color: p.textSecondary }]}>检查失败</Text>
+              </Pressable>
+            ) : release?.update_available && latestLabel ? (
+              <Pressable
+                onPress={openRelease}
+                accessibilityRole="button"
+                accessibilityLabel={`v${latestLabel} 可用，查看发布页`}
+                style={({ pressed }) => [aboutStyles.heroBtnAccent, { backgroundColor: p.accent }, pressed && { opacity: 0.85 }]}
+              >
+                <ArrowUpCircle size={16} color={p.onAccent} strokeWidth={1.8} />
+                <Text style={[aboutStyles.heroBtnTextAccent, { color: p.onAccent }]}>v{latestLabel} 可用</Text>
+              </Pressable>
+            ) : (
+              <Pressable
+                onPress={() => void checkLatest()}
+                accessibilityRole="button"
+                accessibilityLabel="检查更新"
+                style={({ pressed }) => [aboutStyles.heroBtn, { borderColor: p.separator }, pressed && { backgroundColor: p.pressed }]}
+              >
+                {checkState === 'checked' ? (
+                  <CheckCircle2 size={14} color={p.success} strokeWidth={1.8} />
+                ) : (
+                  <RefreshCw size={14} color={p.textSecondary} strokeWidth={1.8} />
+                )}
+                <Text style={[aboutStyles.heroBtnText, { color: checkState === 'checked' ? p.success : p.textSecondary }]}>
+                  {checkState === 'checked' ? '已是最新' : '检查更新'}
+                </Text>
+              </Pressable>
+            )}
+          </View>
+        </View>
+      </AboutGroup>
+
+      {/* 2 · Changelog timeline */}
+      <AboutGroup title={`更新日志 (${timeline.length})`}>
+        {timeline.length ? (
+          <View style={aboutStyles.timelineBlock}>
+            <View style={[aboutStyles.timelineRail, { backgroundColor: p.border }]} />
+            {timeline.map((releaseEntry, index) => (
+              <ReleaseRow
+                key={releaseEntry.tag}
+                release={releaseEntry}
+                current={releaseEntry.tag === currentReleaseTag}
+                defaultOpen={index === 0}
+              />
+            ))}
+          </View>
+        ) : (
+          <View style={aboutStyles.timelineEmpty}>
+            <Text style={[aboutStyles.timelineTime, { color: p.textTertiary }]}>当前构建未附带发布记录。</Text>
+          </View>
+        )}
+      </AboutGroup>
+
+    </View>
+  );
+}
+
+/** One collapsible release row in the changelog timeline. */
+function ReleaseRow({
+  release,
+  current,
+  defaultOpen,
+}: {
+  release: NonNullable<VersionInfo['timeline']>[number];
+  current: boolean;
+  defaultOpen: boolean;
+}) {
+  const p = useSettingsPalette();
+  const [open, setOpen] = useState(defaultOpen);
+  const notes = release.notes ?? [];
+  const featureTotal = notes.filter((note) => note.type === 'feature').length;
+  const fixTotal = notes.filter((note) => note.type === 'fix').length;
+  const otherTotal = notes.filter((note) => note.type === 'other').length;
+  const countText =
+    [featureTotal && `${featureTotal} 新功能`, fixTotal && `${fixTotal} 修复`, otherTotal && `${otherTotal} 其他`]
+      .filter(Boolean)
+      .join(' · ') || '无变更记录';
+
+  return (
+    <View>
+      <Pressable
+        onPress={() => setOpen((value) => !value)}
+        accessibilityRole="button"
+        accessibilityLabel={`${release.tag}，发布于 ${formatReleaseTime(release.published_at)}，${countText}`}
+        accessibilityState={{ expanded: open }}
+        style={({ pressed }) => [aboutStyles.releaseHead, (pressed || open) && { backgroundColor: p.pressed }]}
+      >
+        <View style={[aboutStyles.timelineDot, { backgroundColor: current ? p.accent : p.textTertiary }]} />
+        <Text numberOfLines={1} style={[aboutStyles.timelineTag, { color: current ? p.text : p.textSecondary }]}>
+          {release.tag}
+        </Text>
+        <Text style={[aboutStyles.timelineTime, { color: p.textTertiary }]}>
+          {formatReleaseShort(release.published_at)}
+        </Text>
+        <Text numberOfLines={1} style={[aboutStyles.releaseCount, { color: p.textTertiary }]}>
+          {countText}
+        </Text>
+        {current ? (
+          <View style={[aboutStyles.currentBadge, { backgroundColor: p.tile }]}>
+            <Text style={[aboutStyles.currentBadgeText, { color: p.textSecondary }]}>当前</Text>
+          </View>
+        ) : null}
+        {open ? (
+          <ChevronUp size={14} color={p.textTertiary} strokeWidth={2} />
+        ) : (
+          <ChevronDown size={14} color={p.textTertiary} strokeWidth={2} />
+        )}
+      </Pressable>
+      {open ? (
+        <View style={[aboutStyles.releaseBody, { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: p.separator }]}>
+          {(['feature', 'fix', 'other'] as const).map((type) => {
+            const items = notes.filter((note) => note.type === type);
+            if (!items.length) return null;
+            const label = type === 'feature' ? '新功能' : type === 'fix' ? '修复' : '其他';
+            return (
+              <View key={type} style={aboutStyles.noteGroup}>
+                <Text style={[aboutStyles.noteCat, { color: p.textSecondary }]}>
+                  {label} · {items.length}
+                </Text>
+                {items.map((note, index) => (
+                  <View key={`${note.commit}-${index}`} style={aboutStyles.noteRow}>
+                    <Text numberOfLines={2} style={[aboutStyles.noteTitle, { color: p.text }]}>
+                      {note.title}
+                    </Text>
+                    {note.commit ? (
+                      <Text style={[aboutStyles.noteCommit, { color: p.textTertiary }]}>{note.commit}</Text>
+                    ) : null}
+                  </View>
+                ))}
+              </View>
+            );
+          })}
+          {!notes.length ? (
+            <Text style={[aboutStyles.timelineTime, { color: p.textTertiary }]}>无变更记录</Text>
+          ) : null}
+        </View>
+      ) : null}
+    </View>
+  );
+}
+
+/** Group header that survives the SettingsHeadingProvider suppression. */
+function AboutGroup({ title, children }: { title: string; children: ReactNode }) {
+  const m = useSettingsMetrics();
+  const p = useSettingsPalette();
+  return (
+    <View style={{ gap: 8 }}>
+      <Text style={[aboutStyles.groupTitle, { color: p.textSecondary }]}>{title}</Text>
+      <View
+        style={{
+          backgroundColor: p.card,
+          borderRadius: m.cardRadius,
+          borderWidth: StyleSheet.hairlineWidth,
+          borderColor: p.separator,
+          overflow: 'hidden',
+        }}
+      >
+        {children}
+      </View>
+    </View>
   );
 }
 
 // ─── 样式 ─────────────────────────────────────────────────────
+
+const aboutStyles = StyleSheet.create({
+  groupTitle: { fontSize: 13, fontFamily: Fonts.sansMedium },
+  // ── Hero ──
+  hero: { flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: 12, padding: 16 },
+  heroMain: { flex: 1, minWidth: 0, gap: 6 },
+  heroVersion: { fontSize: 26, lineHeight: 32, fontFamily: Fonts.mono },
+  heroMeta: { fontSize: 12, fontFamily: Fonts.sans },
+  heroAction: { flexShrink: 0 },
+  heroBtn: { minHeight: 34, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingHorizontal: 12, borderRadius: 8, borderWidth: StyleSheet.hairlineWidth },
+  heroBtnAccent: { minHeight: 34, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, paddingHorizontal: 12, borderRadius: 8 },
+  heroBtnText: { fontSize: 12, fontFamily: Fonts.sansMedium },
+  heroBtnTextAccent: { fontSize: 12, fontFamily: Fonts.sansMedium },
+  // ── Changelog timeline ──
+  timelineBlock: { position: 'relative' },
+  // One continuous rail from the first dot's top to the last dot's bottom
+  // (rows are fixed at 44, so 18 == dot top offset in every row).
+  timelineRail: { position: 'absolute', left: 15.5, top: 18, bottom: 18, width: StyleSheet.hairlineWidth },
+  timelineDot: { width: 8, height: 8, borderRadius: 4 },
+  timelineTag: { fontSize: 13, fontFamily: Fonts.mono, flexShrink: 0 },
+  timelineTime: { fontSize: 12, fontFamily: Fonts.sans, flexShrink: 0 },
+  releaseHead: { minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: 12 },
+  releaseCount: { flex: 1, minWidth: 0, fontSize: 11, fontFamily: Fonts.sans, flexShrink: 1 },
+  releaseBody: { paddingHorizontal: 28, paddingVertical: 12, gap: 12 },
+  noteGroup: { gap: 6 },
+  noteCat: { fontSize: 12, fontFamily: Fonts.sansSemiBold },
+  noteRow: { flexDirection: 'row', alignItems: 'baseline', gap: 8 },
+  noteTitle: { flex: 1, fontSize: 13, fontFamily: Fonts.sans, lineHeight: 18 },
+  noteCommit: { fontSize: 11, fontFamily: Fonts.mono, flexShrink: 0 },
+  currentBadge: { borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2, marginLeft: 2 },
+  currentBadgeText: { fontSize: 11, fontFamily: Fonts.sansMedium },
+  timelineEmpty: { minHeight: 44, justifyContent: 'center', paddingHorizontal: 12 },
+});
 
 const panelStyles = StyleSheet.create({
   inlineRow: {

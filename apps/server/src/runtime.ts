@@ -16,4 +16,6 @@ export class AiJeeRuntime {
   async stop(): Promise<void> {
     await this.sessions.dispose();
   }
+
+  reloadResources(): Promise<void> { return this.sessions.reloadResources(); }
 }
