@@ -158,7 +158,7 @@ test("legacy authentication endpoints are not routed", async () => {
   }
 });
 
-test("claims a local-only session without exposing setup", async () => {
+test("keeps a local runtime project-free until the user adds one", async () => {
   const directory = await mkdtemp(join(tmpdir(), "aijee-local-"));
   const server = new AiJeeHttpServer(undefined, join(directory, "runtime.json"));
   await server.listen(0);
@@ -168,7 +168,31 @@ test("claims a local-only session without exposing setup", async () => {
     const session = await fetch(`${origin}/api/auth/session`, { headers: { Authorization: `Bearer ${token}` } });
     assert.equal(session.status, 200);
     const workspaces = await fetch(`${origin}/api/workspaces`, { headers: { Authorization: `Bearer ${token}` } });
-    assert.equal((await workspaces.json() as { data: unknown[] }).data.length, 1);
+    assert.equal((await workspaces.json() as { data: unknown[] }).data.length, 0);
+  } finally {
+    await server.close();
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test("keeps default chat sessions inside the private system workspace", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "aijee-chat-"));
+  let chatCwd = "";
+  const registry = new SessionRegistry(async (input) => {
+    chatCwd = input.cwd;
+    return fakeSession("chat-session", { cwd: input.cwd, sessionFile: join(input.cwd, "chat.jsonl") });
+  });
+  const systemWorkspace = join(directory, "system-workspace");
+  const server = new AiJeeHttpServer(new AiJeeRuntime(registry), join(directory, "runtime.json"), systemWorkspace);
+  await server.listen(0, "127.0.0.1");
+  try {
+    const token = await authorize(server);
+    const headers = { "Content-Type": "application/json", Authorization: `Bearer ${token}` };
+    const created = await fetch(`${server.url()}/api/chat/sessions`, { method: "POST", headers, body: "{}" });
+    assert.equal(created.status, 201);
+    assert.equal(chatCwd, systemWorkspace);
+    const workspaces = await fetch(`${server.url()}/api/workspaces`, { headers });
+    assert.deepEqual((await workspaces.json() as { data: unknown[] }).data, []);
   } finally {
     await server.close();
     await rm(directory, { recursive: true, force: true });

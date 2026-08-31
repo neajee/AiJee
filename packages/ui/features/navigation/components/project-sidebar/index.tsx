@@ -172,9 +172,8 @@ export function ProjectSidebar() {
   );
 
   const handleNewSession = useCallback(() => {
-    if (!selectedWorkspaceId) return;
     requestBrowserNotificationPermission();
-    router.navigate(`/workspace/${selectedWorkspaceId}`);
+    router.navigate((selectedWorkspaceId ? `/workspace/${selectedWorkspaceId}` : "/work") as any);
   }, [selectedWorkspaceId, router]);
 
   const handleContextMenu = useCallback((ws: Workspace, e: any) => {
@@ -284,7 +283,6 @@ export function ProjectSidebar() {
           icon={<SquarePen size={15} color={colors.text} strokeWidth={1.8} />}
           label="新对话"
           onPress={handleNewSession}
-          disabled={!selectedWorkspaceId}
           isDark={isDark}
         />
         <SidebarRow

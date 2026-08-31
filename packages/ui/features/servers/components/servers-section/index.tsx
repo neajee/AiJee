@@ -22,7 +22,6 @@ import { useAuthStore } from "@/features/auth/store";
 import { useWorkspaceStore } from "@/features/workspace/store";
 import { useOptionalPiClient } from "@aijee/client-sdk";
 import { QrScanner } from "@/features/servers/components/qr-scanner";
-import { NewWorkspaceDialog } from "@/features/workspace/components/new-workspace-dialog";
 import {
   SettingsGroup,
   SettingsRow,
@@ -64,7 +63,6 @@ export function ServersSection({
   const [loginLoading, setLoginLoading] = useState(false);
   const [loginError, setLoginError] = useState<string | null>(null);
   const [qrVisible, setQrVisible] = useState(false);
-  const [newWsVisible, setNewWsVisible] = useState(false);
   const [connecting, setConnecting] = useState<string | null>(null);
   const [refreshingCode, setRefreshingCode] = useState(false);
   const [codeDialog, setCodeDialog] = useState<{ code: string; url: string; image: string } | null>(null);
@@ -140,22 +138,12 @@ export function ServersSection({
     }
   }, [activeServerId, client, refreshingCode, servers]);
 
-  /**
-   * A fresh connection may land on a server with no projects yet, in which case
-   * creating one is the only useful next step.
-   */
   const navigateAfterConnect = useCallback(async () => {
     const ws = useWorkspaceStore.getState();
     const serverId = useAuthStore.getState().activeServerId;
     await ws.switchServer(serverId);
     await ws.fetchWorkspaces(serverId);
-    const { workspaces, selectedWorkspaceId } = useWorkspaceStore.getState();
-    const targetId = selectedWorkspaceId ?? workspaces[0]?.id;
-    if (targetId) {
-      router.replace("/");
-    } else {
-      setNewWsVisible(true);
-    }
+    router.replace("/");
   }, [router]);
 
   const handleConnect = useCallback(
@@ -215,11 +203,6 @@ export function ServersSection({
     [editingServer, addServer, updateServer],
   );
 
-  const handleNewWsClose = useCallback(() => {
-    setNewWsVisible(false);
-    router.replace("/");
-  }, [router]);
-
   const modals = (
     <>
       <ServerFormModal
@@ -236,9 +219,8 @@ export function ServersSection({
       <QrScanner
         visible={qrVisible}
         onClose={() => setQrVisible(false)}
-        onNeedNewWorkspace={() => setNewWsVisible(true)}
+        onNeedNewWorkspace={() => router.replace("/")}
       />
-      <NewWorkspaceDialog visible={newWsVisible} onClose={handleNewWsClose} />
     </>
   );
 
@@ -370,9 +352,8 @@ export function ServersSection({
       <QrScanner
         visible={qrVisible}
         onClose={() => setQrVisible(false)}
-        onNeedNewWorkspace={() => setNewWsVisible(true)}
+        onNeedNewWorkspace={() => router.replace("/")}
       />
-      <NewWorkspaceDialog visible={newWsVisible} onClose={handleNewWsClose} />
       <Modal visible={!!codeDialog} transparent animationType="fade" onRequestClose={() => setCodeDialog(null)}>
         <Pressable style={styles.codeBackdrop} onPress={() => setCodeDialog(null)} accessibilityLabel="关闭授权对话框">
           <Pressable

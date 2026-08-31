@@ -117,7 +117,7 @@ function parseTimestamp(value: unknown): number {
 
 function isModeSlashCommand(message: string): boolean {
   const firstToken = message.trim().split(/\s+/)[0];
-  return firstToken === "/chat" || firstToken === "/plan";
+  return firstToken === "/chat" || firstToken === "/work" || firstToken === "/plan";
 }
 
 function getStableMessageId(msg: any, role: ChatMessage["role"], index: number): string {
@@ -560,7 +560,7 @@ function reduceStreamEvents(
             typeof piEvent.statusText === "string"
               ? piEvent.statusText.toLowerCase()
               : "";
-          modes[sessionId] = statusText.includes("plan") ? "plan" : "chat";
+          modes[sessionId] = statusText.includes("plan") ? "plan" : "work";
         }
         const pending = parsePendingExtensionUiRequest(piEvent);
         if (pending) {

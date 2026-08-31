@@ -19,8 +19,17 @@ export async function dispatchRoute(ctx: RouteContext, request: IncomingMessage,
   if (!ctx.authenticated().initialized() && !ctx.localMode) return ctx.error(response, 503, "AiJee setup is required");
   if (!ctx.authorized(request)) return ctx.error(response, 401, "Unauthorized");
   if (request.method === "GET" && url.pathname === "/api/agent/runtime-status") return ctx.ok(response, ctx.runtimeStatus());
-  if (request.method === "GET" && url.pathname === "/api/custom-models") return ctx.ok(response, ctx.customModels);
-  if (request.method === "PUT" && url.pathname === "/api/custom-models") { ctx.customModels = await ctx.body(request); await ctx.persist(); return ctx.ok(response, ctx.customModels); }
+  if (request.method === "GET" && url.pathname === "/api/providers") return ctx.ok(response, await ctx.listBuiltinProviders());
+  const providerKey = /^\/api\/providers\/([^/]+)\/api-key$/.exec(url.pathname);
+  if (providerKey && request.method === "PUT") { const body = await ctx.body(request) as { api_key?: unknown }; await ctx.saveBuiltinProviderKey(providerKey[1], String(body.api_key ?? "")); return ctx.ok(response, null); }
+  if (providerKey && request.method === "DELETE") { await ctx.removeBuiltinProviderKey(providerKey[1]); return ctx.ok(response, null); }
+  const providerOAuth = /^\/api\/providers\/([^/]+)\/oauth(?:\/([^/]+))?$/.exec(url.pathname);
+  if (providerOAuth && request.method === "POST" && !providerOAuth[2]) return ctx.ok(response, await ctx.startProviderOAuth(providerOAuth[1]));
+  if (providerOAuth && request.method === "GET" && providerOAuth[2]) return ctx.ok(response, ctx.oauthStatus(providerOAuth[2]));
+  const oauthPrompt = /^\/api\/providers\/[^/]+\/oauth\/([^/]+)\/prompt\/([^/]+)$/.exec(url.pathname);
+  if (oauthPrompt && request.method === "POST") { const body = await ctx.body(request) as { value?: unknown }; ctx.resolveOAuthPrompt(oauthPrompt[1], oauthPrompt[2], String(body.value ?? "")); return ctx.ok(response, null); }
+  if (request.method === "GET" && url.pathname === "/api/custom-models") return ctx.ok(response, await ctx.getCustomModels());
+  if (request.method === "PUT" && url.pathname === "/api/custom-models") return ctx.ok(response, await ctx.saveCustomModels(await ctx.body(request)));
   if (request.method === "GET" && url.pathname === "/api/modes") return ctx.ok(response, [...ctx.modes.values()].sort((a: any, b: any) => (a.sort_order ?? 0) - (b.sort_order ?? 0)));
   if (request.method === "POST" && url.pathname === "/api/modes") return ctx.createMode(request, response);
   const modeMatch = /^\/api\/modes\/([^/]+)$/.exec(url.pathname);

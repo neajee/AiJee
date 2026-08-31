@@ -74,7 +74,14 @@ function waitForRuntime() {
 }
 
 function createWindow() {
-  mainWindow = new BrowserWindow({ width: 1440, height: 960, webPreferences: { contextIsolation: true, sandbox: true } });
+  mainWindow = new BrowserWindow({
+    width: 1440,
+    height: 960,
+    autoHideMenuBar: true,
+    webPreferences: { contextIsolation: true, sandbox: true },
+  });
+  // The renderer owns the app navigation; never show Electron's legacy menu.
+  mainWindow.setMenuBarVisibility(false);
   mainWindow.webContents.setUserAgent(`${mainWindow.webContents.getUserAgent()} AiJeeDesktop/${app.getVersion()}`);
   mainWindow.loadURL(url);
   mainWindow.once("closed", () => { mainWindow = undefined; });

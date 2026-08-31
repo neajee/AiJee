@@ -251,7 +251,9 @@ export function useAgentConfig(
       );
 
       try {
-        await client.prompt(sessionId, mode === "plan" ? "/plan" : "/chat");
+        // Pi names Work mode "chat" internally; keep that protocol detail out
+        // of the product-facing mode model.
+        await client.prompt(sessionId, mode === "plan" ? "/plan" : "/work");
       } catch {
         loadModels();
       }

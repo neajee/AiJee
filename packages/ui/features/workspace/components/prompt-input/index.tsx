@@ -42,7 +42,7 @@ import { useDraftStore } from "./draft-store";
 
 const EMPTY_SLASH_COMMANDS: SlashCommand[] = [];
 const BUILTIN_COMMANDS: SlashCommand[] = [
-  { name: "chat", description: "Switch to chat mode" },
+  { name: "work", description: "Switch to work mode" },
   { name: "plan", description: "Switch to plan mode" },
   { name: "compact", description: "Compact conversation history" },
 ];

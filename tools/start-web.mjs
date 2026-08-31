@@ -90,45 +90,45 @@ reserved.add(expoPort);
 const webResolution = await resolveServicePort(Number(process.env.AIJEE_WEB_PORT ?? 8081), isAiJeeProxy);
 if (webResolution.reuse) {
   console.log("AiJee web is already running at http://127.0.0.1:" + webResolution.port);
-  process.exit(0);
-}
-const webPort = webResolution.port;
-const childEnv = {
-  ...process.env,
-  AIJEE_API_PORT: String(apiPort),
-  AIJEE_EXPO_PORT: String(expoPort),
-  AIJEE_WEB_PORT: String(webPort),
-  EXPO_PUBLIC_AIJEE_EXPO_PORT: String(expoPort),
-  EXPO_PUBLIC_AIJEE_WEB_PORT: String(webPort),
-};
+} else {
+  const webPort = webResolution.port;
+  const childEnv = {
+    ...process.env,
+    AIJEE_API_PORT: String(apiPort),
+    AIJEE_EXPO_PORT: String(expoPort),
+    AIJEE_WEB_PORT: String(webPort),
+    EXPO_PUBLIC_AIJEE_EXPO_PORT: String(expoPort),
+    EXPO_PUBLIC_AIJEE_WEB_PORT: String(webPort),
+  };
 
-const runtime = apiResolution.reuse
-  ? null
-  : start("node", ["--experimental-strip-types", "apps/server/src/main.ts", "serve", "--port", String(apiPort)], { env: childEnv });
-runtime?.once("exit", (code) => {
-  if (code !== 0) {
-    fetch(`http://127.0.0.1:${apiPort}/api/health`)
-      .then((response) => { if (!response.ok) shutdown(code ?? 1); })
-      .catch(() => shutdown(code ?? 1));
+  const runtime = apiResolution.reuse
+    ? null
+    : start("node", ["--experimental-strip-types", "apps/server/src/main.ts", "serve", "--port", String(apiPort)], { env: childEnv });
+  runtime?.once("exit", (code) => {
+    if (code !== 0) {
+      fetch(`http://127.0.0.1:${apiPort}/api/health`)
+        .then((response) => { if (!response.ok) shutdown(code ?? 1); })
+        .catch(() => shutdown(code ?? 1));
+    }
+  });
+  try {
+    await waitForApi(apiPort);
+  } catch (error) {
+    console.error(error instanceof Error ? error.message : String(error));
+    shutdown(1);
   }
-});
-try {
-  await waitForApi(apiPort);
-} catch (error) {
-  console.error(error instanceof Error ? error.message : String(error));
-  shutdown(1);
-}
-const expo = startYarn(["workspace", "@aijee/client", "dev", "--port", String(expoPort)], { env: childEnv });
-const proxy = start("node", ["tools/dev-web-proxy.mjs"], { env: childEnv });
-console.log(`AiJee web: http://127.0.0.1:${webPort} (Expo ${expoPort}, API ${apiPort})`);
+  const expo = startYarn(["workspace", "@aijee/client", "dev", "--port", String(expoPort)], { env: childEnv });
+  const proxy = start("node", ["tools/dev-web-proxy.mjs"], { env: childEnv });
+  console.log(`AiJee web: http://127.0.0.1:${webPort} (Expo ${expoPort}, API ${apiPort})`);
 
-function shutdown(code = 0) {
-  for (const child of processes) {
-    if (!child.killed) child.kill("SIGTERM");
+  function shutdown(code = 0) {
+    for (const child of processes) {
+      if (!child.killed) child.kill("SIGTERM");
+    }
+    process.exit(code);
   }
-  process.exit(code);
-}
 
-for (const signal of ["SIGINT", "SIGTERM"]) process.once(signal, () => shutdown());
-expo.once("exit", (code) => shutdown(code ?? 0));
-proxy.once("exit", (code) => shutdown(code ?? 0));
+  for (const signal of ["SIGINT", "SIGTERM"]) process.once(signal, () => shutdown());
+  expo.once("exit", (code) => shutdown(code ?? 0));
+  proxy.once("exit", (code) => shutdown(code ?? 0));
+}

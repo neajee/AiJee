@@ -34,6 +34,9 @@ export { default as History } from '../../../node_modules/lucide-react-native/di
 export { default as ImageIcon } from '../../../node_modules/lucide-react-native/dist/esm/icons/image.js';
 export { default as Info } from '../../../node_modules/lucide-react-native/dist/esm/icons/info.js';
 export { default as Layers } from '../../../node_modules/lucide-react-native/dist/esm/icons/layers.js';
+export { default as KeyRound } from '../../../node_modules/lucide-react-native/dist/esm/icons/key-round.js';
+export { default as LogIn } from '../../../node_modules/lucide-react-native/dist/esm/icons/log-in.js';
+export { default as LogOut } from '../../../node_modules/lucide-react-native/dist/esm/icons/log-out.js';
 export { default as Maximize2 } from '../../../node_modules/lucide-react-native/dist/esm/icons/maximize-2.js';
 export { default as Mic } from '../../../node_modules/lucide-react-native/dist/esm/icons/mic.js';
 export { default as Minus } from '../../../node_modules/lucide-react-native/dist/esm/icons/minus.js';

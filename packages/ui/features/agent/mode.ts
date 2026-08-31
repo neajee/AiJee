@@ -1,10 +1,11 @@
-export type AgentMode = "chat" | "plan";
+export type AgentMode = "work" | "plan";
 
 export function normalizeAgentMode(value: unknown): AgentMode | null {
   if (typeof value !== "string") return null;
   const mode = value.trim().toLowerCase();
-  if (mode === "chat" || mode === "plan") {
-    return mode;
+  if (mode === "plan") return "plan";
+  if (mode === "work" || mode === "chat") {
+    return "work";
   }
   return null;
 }
@@ -24,5 +25,5 @@ export function extractAgentMode(
 }
 
 export function formatAgentModeLabel(mode: AgentMode): string {
-  return mode === "plan" ? "Plan" : "Chat";
+  return mode === "plan" ? "Plan" : "Work";
 }

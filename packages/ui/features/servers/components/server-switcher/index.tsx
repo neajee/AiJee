@@ -66,11 +66,7 @@ export function ServerSwitcher() {
       const ok = await activateServer(server);
       if (ok) {
         await fetchWorkspaces(server.id);
-        const { workspaces, selectedWorkspaceId } = useWorkspaceStore.getState();
-        const targetId = selectedWorkspaceId ?? workspaces[0]?.id;
-        if (targetId) {
-          router.replace(`/workspace/${targetId}`);
-        }
+        router.replace("/");
       }
       setSwitchingId(null);
       setPopoverVisible(false);

@@ -17,7 +17,7 @@ export type PersistedSession = {
   mode_id?: string;
 };
 
-export type RuntimeState = { workspaces: unknown[]; identity?: RuntimeIdentity; local_signing_secret?: string; runtime_secret?: string; devices?: unknown[]; device_codes?: unknown[]; local_workspace_seeded?: boolean; custom_models?: Record<string, unknown>; modes?: unknown[]; sessions?: PersistedSession[]; archived_session_ids?: string[] };
+export type RuntimeState = { workspaces: unknown[]; identity?: RuntimeIdentity; /** Legacy read-only migration marker. */ local_workspace_seeded?: boolean; local_signing_secret?: string; runtime_secret?: string; devices?: unknown[]; device_codes?: unknown[]; custom_models?: Record<string, unknown>; modes?: unknown[]; sessions?: PersistedSession[]; archived_session_ids?: string[] };
 
 export class RuntimeStateStore {
   private readonly path: string;
@@ -30,7 +30,7 @@ export class RuntimeStateStore {
   async load(): Promise<RuntimeState> {
     try {
       const parsed = JSON.parse(await readFile(this.path, "utf8")) as Partial<RuntimeState>;
-      return { workspaces: Array.isArray(parsed.workspaces) ? parsed.workspaces : [], identity: parsed.identity, local_signing_secret: parsed.local_signing_secret, runtime_secret: parsed.runtime_secret, devices: Array.isArray(parsed.devices) ? parsed.devices : [], device_codes: Array.isArray(parsed.device_codes) ? parsed.device_codes : [], local_workspace_seeded: parsed.local_workspace_seeded, custom_models: parsed.custom_models, modes: Array.isArray(parsed.modes) ? parsed.modes : [], sessions: Array.isArray(parsed.sessions) ? parsed.sessions : [], archived_session_ids: Array.isArray(parsed.archived_session_ids) ? parsed.archived_session_ids : [] };
+      return { workspaces: Array.isArray(parsed.workspaces) ? parsed.workspaces : [], identity: parsed.identity, local_workspace_seeded: parsed.local_workspace_seeded, local_signing_secret: parsed.local_signing_secret, runtime_secret: parsed.runtime_secret, devices: Array.isArray(parsed.devices) ? parsed.devices : [], device_codes: Array.isArray(parsed.device_codes) ? parsed.device_codes : [], custom_models: parsed.custom_models, modes: Array.isArray(parsed.modes) ? parsed.modes : [], sessions: Array.isArray(parsed.sessions) ? parsed.sessions : [], archived_session_ids: Array.isArray(parsed.archived_session_ids) ? parsed.archived_session_ids : [] };
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code === "ENOENT") return { workspaces: [] };
       throw error;

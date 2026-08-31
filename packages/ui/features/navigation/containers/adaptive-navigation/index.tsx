@@ -85,26 +85,9 @@ export function AdaptiveNavigation({ children }: AdaptiveNavigationProps) {
 
   const persistentAnim = useRef(new Animated.Value(1)).current;
   const hoverAnim = useRef(new Animated.Value(0)).current;
-  const codeModeAnim = useRef(new Animated.Value(isCodeMode ? 1 : 0)).current;
-  const [sidebarMounted, setSidebarMounted] = useState(isCodeMode);
+  const [sidebarMounted] = useState(true);
 
   const isPersistent = sidebarMode === "persistent";
-
-  useEffect(() => {
-    if (isCodeMode) {
-      setSidebarMounted(true);
-    }
-    Animated.spring(codeModeAnim, {
-      toValue: isCodeMode ? 1 : 0,
-      tension: 200,
-      friction: 24,
-      useNativeDriver: false,
-    }).start(({ finished }) => {
-      if (finished && !isCodeMode) {
-        setSidebarMounted(false);
-      }
-    });
-  }, [isCodeMode, codeModeAnim]);
 
   useEffect(() => {
     if (isPersistent) {
@@ -174,15 +157,7 @@ export function AdaptiveNavigation({ children }: AdaptiveNavigationProps) {
   }, [settingsMode]);
 
   if (isWideScreen) {
-    const animatedSidebarWidth = Animated.multiply(
-      persistentAnim,
-      Animated.multiply(codeModeAnim, sidebarWidth),
-    );
-
-    const contentBorderWidth = codeModeAnim.interpolate({
-      inputRange: [0, 1],
-      outputRange: [0, 0.633],
-    });
+    const animatedSidebarWidth = Animated.multiply(persistentAnim, sidebarWidth);
 
     const hoverTranslateX = hoverAnim.interpolate({
       inputRange: [0, 1],
@@ -227,11 +202,11 @@ export function AdaptiveNavigation({ children }: AdaptiveNavigationProps) {
           <Animated.View
             style={[
               styles.content,
-              hasServer && isCodeMode
+              hasServer
                 ? {
-                    borderLeftWidth: contentBorderWidth,
-                    borderTopWidth: contentBorderWidth,
-                    borderRightWidth: contentBorderWidth,
+                    borderLeftWidth: 0.633,
+                    borderTopWidth: 0.633,
+                    borderRightWidth: 0.633,
                     borderLeftColor: contentBorder,
                     borderTopColor: contentBorder,
                     borderRightColor: contentBorder,
@@ -245,7 +220,7 @@ export function AdaptiveNavigation({ children }: AdaptiveNavigationProps) {
 
             {isCodeMode && <TaskOutputPanel />}
 
-            {showSidebar && !isPersistent && isCodeMode && (
+            {showSidebar && !isPersistent && (
               <>
                 {/* With no rail left to hover, the window edge is the trigger. */}
                 <View
@@ -279,7 +254,7 @@ export function AdaptiveNavigation({ children }: AdaptiveNavigationProps) {
 
           {/* One control on the seam, always reachable: its position doubles as
               the sidebar's state, so a collapsed sidebar is never a dead edge. */}
-          {showSidebar && isCodeMode && (
+          {showSidebar && (
             <Animated.View
               pointerEvents="box-none"
               style={[

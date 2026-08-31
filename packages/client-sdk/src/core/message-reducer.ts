@@ -133,7 +133,7 @@ export function createEmptySessionState(): SessionState {
     isLoadingOlderMessages: false,
     hasMoreMessages: false,
     oldestEntryId: null,
-    mode: "chat",
+    mode: "work",
     pendingExtensionUiRequest: null,
     steeringQueue: [],
     followUpQueue: [],
@@ -745,8 +745,10 @@ export function reduceStreamEvent(state: SessionState, envelope: StreamEventEnve
         }
       }
       if (typeof data.mode === "string") {
-        if (data.mode === "plan" || data.mode === "chat") {
-          mode = data.mode;
+        if (data.mode === "plan") {
+          mode = "plan";
+        } else if (data.mode === "chat" || data.mode === "work") {
+          mode = "work";
         }
       }
       agentState = data;
@@ -776,7 +778,7 @@ export function reduceStreamEvent(state: SessionState, envelope: StreamEventEnve
         }
         if (method === "setStatus" && event.statusKey === "plan-mode") {
           const statusText = typeof event.statusText === "string" ? event.statusText.toLowerCase() : "";
-          mode = statusText.includes("plan") ? "plan" : "chat";
+          mode = statusText.includes("plan") ? "plan" : "work";
         }
       }
       break;

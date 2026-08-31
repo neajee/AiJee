@@ -22,6 +22,7 @@ import { WebSocketServer, WebSocket } from "ws";
 import type { Duplex } from "node:stream";
 import { pipeline } from "node:stream/promises";
 import { constants as zlibConstants, createBrotliCompress, createGzip } from "node:zlib";
+import { ModelRuntime } from "@earendil-works/pi-coding-agent";
 
 type Workspace = {
   id: string;
@@ -37,6 +38,11 @@ type Workspace = {
 
 type ManagedSession = { key: string; workspaceId: string; session: EngineSession; createdAt: string; lastActive: number; modeId?: string; draft?: boolean };
 type Mode = { id: string; name: string; description?: string; model?: string; thinking_level?: string; extensions?: string[]; skills?: string[]; extra_args?: string[]; is_default?: boolean; sort_order?: number };
+type OAuthLogin = { id: string; providerId: string; url: string | null; instructions: string | null; status: "pending" | "complete" | "failed"; error: string | null; controller: AbortController; expiresAt: number; prompt: { id: string; message: string; type: string; options?: Array<{ id: string; label: string; description?: string }> } | null; resolvePrompt: ((value: string) => void) | null };
+
+function isObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
 
 export class AiJeeHttpServer {
   private server?: Server;
@@ -62,52 +68,63 @@ export class AiJeeHttpServer {
   private customModels: Record<string, unknown> = { providers: {} };
   private readonly store: RuntimeStateStore;
   private readonly webRoot: string;
+  private readonly systemWorkspacePath: string;
+  private readonly piModelsPath: string;
+  private readonly piAuthPath: string;
+  private readonly oauthLogins = new Map<string, OAuthLogin>();
   private auth?: RuntimeAuth;
   private localMode = true;
   private localSigningSecret = "";
-  private localWorkspaceSeeded = false;
   private runtimeSecret = "";
 
-  constructor(runtime = new AiJeeRuntime(), statePath = join(homedir(), ".aijee", "runtime.json")) {
+  constructor(runtime = new AiJeeRuntime(), statePath = join(homedir(), ".aijee", "runtime.json"), systemWorkspacePath?: string) {
     this.runtime = runtime;
     this.store = new RuntimeStateStore(statePath);
     this.tasks = new TaskService(join(dirname(statePath), "tasks.json"));
     this.webRoot = process.env.AIJEE_WEB_ROOT ?? join(fileURLToPath(new URL("../../public", import.meta.url)));
+    this.systemWorkspacePath = systemWorkspacePath ?? process.env.AIJEE_SYSTEM_WORKSPACE ?? join(homedir(), ".aijee", "system-workspace");
+    this.piModelsPath = join(homedir(), ".pi", "agent", "models.json");
+    this.piAuthPath = join(homedir(), ".pi", "agent", "auth.json");
   }
 
   async listen(port = 10088, host = "127.0.0.1"): Promise<void> {
     if (this.server) throw new Error("AiJee runtime server is already running");
     const state = await this.store.load();
     this.localMode = new Set(["127.0.0.1", "localhost", "::1", "[::1]"]).has(host);
-    this.localWorkspaceSeeded = state.local_workspace_seeded === true;
     recordTelemetry("runtime.listen", { host, port, mode: this.localMode ? "local" : "remote" });
     this.localSigningSecret = state.local_signing_secret ?? randomBytes(32).toString("base64url");
     this.runtimeSecret = state.runtime_secret ?? state.identity?.signing_secret ?? randomBytes(32).toString("base64url");
+    await mkdir(this.systemWorkspacePath, { recursive: true });
     await this.tasks.load();
     for (const candidate of state.workspaces) {
       const workspace = candidate as Workspace;
       if (typeof workspace.id === "string" && typeof workspace.path === "string") this.workspaces.set(workspace.id, workspace);
     }
-    if (this.localMode && !this.localWorkspaceSeeded && this.workspaces.size === 0) {
-      const path = process.cwd();
-      const now = new Date().toISOString();
-      const workspace: Workspace = {
-        id: randomUUID(), name: basename(path), path, color: null, workspace_enabled: true,
-        startup_script: null, status: "active", created_at: now, updated_at: now,
-      };
-      this.workspaces.set(workspace.id, workspace);
-      this.localWorkspaceSeeded = true;
-      recordTelemetry("workspace.seeded", { path });
+    // Versions before the private system workspace registered process.cwd()
+    // as a project. Remove only that unambiguous legacy seed; never touch the
+    // directory and never guess when the user has more than one workspace.
+    let removedLegacySeed = false;
+    if (this.localMode && state.local_workspace_seeded === true && this.workspaces.size === 1) {
+      const [legacy] = this.workspaces.values();
+      if (legacy && resolve(legacy.path) === resolve(process.cwd())) {
+        this.workspaces.delete(legacy.id);
+        removedLegacySeed = true;
+        recordTelemetry("workspace.legacy_seed_removed", { path: legacy.path });
+      }
     }
-    this.customModels = state.custom_models ?? { providers: {} };
+    await this.loadCustomModels(state.custom_models);
     for (const candidate of state.modes ?? []) { const mode = candidate as Mode; if (typeof mode.id === "string" && typeof mode.name === "string") this.modes.set(mode.id, mode); }
-    for (const session of state.sessions ?? []) if (session.session_id && session.session_file && session.cwd) this.sessionRecords.set(session.session_id, session);
+    for (const session of state.sessions ?? []) {
+      if (!session.session_id || !session.session_file || !session.cwd) continue;
+      if (session.workspace_id === "__chat__" && !this.isSystemWorkspacePath(session.cwd)) continue;
+      this.sessionRecords.set(session.session_id, session);
+    }
     for (const sessionId of state.archived_session_ids ?? []) if (typeof sessionId === "string") this.archivedSessionIds.add(sessionId);
     this.auth = new RuntimeAuth(this.runtimeSecret, (state.devices ?? []) as DeviceRecord[], async (secret, devices, deviceCodes) => {
-      await this.store.update({ runtime_secret: secret, devices, device_codes: deviceCodes, local_signing_secret: this.localSigningSecret, local_workspace_seeded: this.localWorkspaceSeeded, workspaces: [...this.workspaces.values()], custom_models: this.customModels, modes: [...this.modes.values()], sessions: [...this.sessionRecords.values()] });
+      await this.store.update({ runtime_secret: secret, devices, device_codes: deviceCodes, local_signing_secret: this.localSigningSecret, workspaces: [...this.workspaces.values()], custom_models: this.customModels, modes: [...this.modes.values()], sessions: [...this.sessionRecords.values()] });
     }, state.identity, (state.device_codes ?? []) as DeviceCode[]);
-    if (!state.local_signing_secret || !state.runtime_secret || !Array.isArray(state.devices) || (this.localMode && state.workspaces.length === 0)) {
-      await this.store.update({ runtime_secret: this.runtimeSecret, devices: this.auth.snapshot(), device_codes: this.auth.codeSnapshot(), local_signing_secret: this.localSigningSecret, local_workspace_seeded: this.localWorkspaceSeeded, workspaces: [...this.workspaces.values()] });
+    if (removedLegacySeed || !state.local_signing_secret || !state.runtime_secret || !Array.isArray(state.devices)) {
+      await this.store.update({ runtime_secret: this.runtimeSecret, devices: this.auth.snapshot(), device_codes: this.auth.codeSnapshot(), local_signing_secret: this.localSigningSecret, workspaces: [...this.workspaces.values()] });
     }
     await this.reconcileSessions();
     this.server = createServer((request, response) => void this.handle(request, response));
@@ -340,7 +357,10 @@ export class AiJeeHttpServer {
     if (!expanded) throw new Error("path is required");
     const candidate = resolve(expanded);
     const roots = [...this.workspaces.values()].filter((workspace) => workspace.status === "active").map((workspace) => resolve(workspace.path));
-    if (!roots.some((root) => candidate === root || candidate.startsWith(`${root}/`))) throw new HttpError(403, "Path is outside configured workspaces");
+    if (!roots.some((root) => {
+      const relative = relativePath(root, candidate);
+      return relative === "" || (!relative.startsWith("..") && !isAbsolute(relative));
+    })) throw new HttpError(403, "Path is outside configured workspaces");
     return candidate;
   }
 
@@ -549,13 +569,13 @@ export class AiJeeHttpServer {
   }
 
   private async createChatSession(_request: IncomingMessage, response: ServerResponse): Promise<void> {
-    await this.createManagedSession(response, process.env.AIJEE_CHAT_CWD ?? process.cwd(), undefined, "__chat__");
+    await this.createManagedSession(response, this.systemWorkspacePath, undefined, "__chat__");
   }
 
   private async listChatSessions(url: URL, response: ServerResponse): Promise<void> {
     const page = Math.max(1, Number(url.searchParams.get("page") ?? 1));
     const limit = Math.min(100, Math.max(1, Number(url.searchParams.get("limit") ?? 20)));
-    const items = await this.mergedSessionItems(process.env.AIJEE_CHAT_CWD ?? process.cwd(), "__chat__");
+    const items = await this.mergedSessionItems(this.systemWorkspacePath, "__chat__");
     const offset = (page - 1) * limit;
     this.ok(response, { items: items.slice(offset, offset + limit), page, limit, total: items.length, has_more: offset + limit < items.length });
   }
@@ -572,11 +592,11 @@ export class AiJeeHttpServer {
     for (const item of await listNativeSessionItems(cwd)) {
       const id = item.id as string;
       if (this.archivedSessionIds.has(id)) continue;
-      if ((item.message_count as number) <= 0 && !item.display_name) emptyNativeIds.add(id);
+      if ((item.message_count as number) <= 0 && !item.display_name && workspaceId !== "__chat__") emptyNativeIds.add(id);
       else items.set(id, item);
     }
     for (const record of this.sessionRecords.values()) {
-      if (record.workspace_id !== workspaceId || this.archivedSessionIds.has(record.session_id) || items.has(record.session_id) || emptyNativeIds.has(record.session_id)) continue;
+      if (record.workspace_id !== workspaceId || (workspaceId === "__chat__" && !this.isSystemWorkspacePath(record.cwd)) || this.archivedSessionIds.has(record.session_id) || items.has(record.session_id) || emptyNativeIds.has(record.session_id)) continue;
       items.set(record.session_id, {
         id: record.session_id,
         file_path: record.session_file,
@@ -589,7 +609,7 @@ export class AiJeeHttpServer {
       });
     }
     for (const managed of this.sessions.values()) {
-      if (managed.workspaceId !== workspaceId || managed.draft || this.archivedSessionIds.has(managed.session.describe().sessionId) || managed.session.messages().length === 0 || items.has(managed.session.describe().sessionId)) continue;
+      if (managed.workspaceId !== workspaceId || managed.draft || this.archivedSessionIds.has(managed.session.describe().sessionId) || (workspaceId !== "__chat__" && managed.session.messages().length === 0) || items.has(managed.session.describe().sessionId)) continue;
       const descriptor = managed.session.describe();
       items.set(descriptor.sessionId, {
         id: descriptor.sessionId,
@@ -609,7 +629,7 @@ export class AiJeeHttpServer {
     const existing = await this.restoreSession(sessionId);
     if (existing) return this.ok(response, this.sessionInfo(sessionId));
     const body = await this.body<{ session_file?: string }>(request);
-    await this.createManagedSession(response, process.env.AIJEE_CHAT_CWD ?? process.cwd(), body.session_file, "__chat__");
+    await this.createManagedSession(response, this.systemWorkspacePath, body.session_file, "__chat__");
   }
 
   private async createManagedSession(response: ServerResponse, cwd: string, sessionFile?: string, workspaceId = "__chat__", modeId?: string): Promise<void> {
@@ -943,7 +963,177 @@ export class AiJeeHttpServer {
     return { ready: true, can_install_pi: false, node: { command: process.execPath, installed: true, version: process.version, path: process.execPath, details: null }, pi: { command: "embedded-sdk", installed: true, version: null, path: null, details: { engines: this.runtime.sessions.enginesList() } } };
   }
   private authenticated(): RuntimeAuth { if (!this.auth) throw new Error("AiJee runtime is not initialized"); return this.auth; }
-  private persist(): Promise<void> { return this.store.save({ workspaces: [...this.workspaces.values()], identity: undefined, runtime_secret: this.runtimeSecret, devices: this.auth?.snapshot(), device_codes: this.auth?.codeSnapshot(), local_signing_secret: this.localSigningSecret, local_workspace_seeded: this.localWorkspaceSeeded, custom_models: this.customModels, modes: [...this.modes.values()], sessions: [...this.sessionRecords.values()], archived_session_ids: [...this.archivedSessionIds] }); }
+  private persist(): Promise<void> { return this.store.save({ workspaces: [...this.workspaces.values()], identity: undefined, runtime_secret: this.runtimeSecret, devices: this.auth?.snapshot(), device_codes: this.auth?.codeSnapshot(), local_signing_secret: this.localSigningSecret, custom_models: this.customModels, modes: [...this.modes.values()], sessions: [...this.sessionRecords.values()], archived_session_ids: [...this.archivedSessionIds] }); }
+
+  /** Pi owns the canonical models file.  The runtime creates a fresh Pi service
+   * graph for every session, so writing here makes a saved provider available
+   * to every subsequently created or reopened session. */
+  async getCustomModels(): Promise<Record<string, unknown>> { return this.customModels; }
+
+  /** Built-in providers are intentionally discovered from the installed Pi SDK,
+   * not copied into AiJee.  This keeps the settings UI aligned with SDK updates. */
+  async listBuiltinProviders(): Promise<unknown[]> {
+    const runtime = await ModelRuntime.create({ signal: AbortSignal.timeout(15_000) });
+    const customIds = new Set(Object.keys((this.customModels.providers as Record<string, unknown>) ?? {}));
+    return Promise.all(runtime.getProviders()
+      .filter((provider) => !customIds.has(provider.id))
+      .map(async (provider) => {
+        const auth = await runtime.checkAuth(provider.id);
+        return {
+          id: provider.id,
+          name: provider.name ?? provider.id,
+          configured: auth !== undefined,
+          model_count: runtime.getModels(provider.id).length,
+          supports_oauth: provider.auth?.oauth !== undefined,
+          supports_api_key: provider.auth?.apiKey !== undefined,
+          auth_label: auth === undefined ? null : "已配置",
+        };
+      }));
+  }
+
+  async saveBuiltinProviderKey(providerId: string, key: string): Promise<void> {
+    const runtime = await ModelRuntime.create({ signal: AbortSignal.timeout(15_000) });
+    const provider = runtime.getProviders().find((candidate) => candidate.id === providerId);
+    if (!provider || provider.auth?.apiKey === undefined) throw new HttpError(404, "Provider does not accept an API key");
+    if (!key.trim()) throw new HttpError(400, "API key is required");
+    await this.saveApiKey(providerId, key.trim());
+  }
+
+  async removeBuiltinProviderKey(providerId: string): Promise<void> {
+    let root: Record<string, unknown> = {};
+    try { const raw = await readFile(this.piAuthPath, "utf8"); if (raw.trim()) { const parsed: unknown = JSON.parse(raw); if (!isObject(parsed)) throw new HttpError(422, "~/.pi/agent/auth.json must contain an object"); root = parsed; } }
+    catch (error) { if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error; }
+    if (!(providerId in root)) return;
+    delete root[providerId];
+    await mkdir(dirname(this.piAuthPath), { recursive: true });
+    const temporary = `${this.piAuthPath}.${randomUUID()}.tmp`;
+    await writeFile(temporary, `${JSON.stringify(root, null, 2)}\n`, "utf8");
+    await rename(temporary, this.piAuthPath);
+  }
+
+  async startProviderOAuth(providerId: string): Promise<Record<string, unknown>> {
+    const runtime = await ModelRuntime.create({ signal: AbortSignal.timeout(15_000) });
+    const provider = runtime.getProviders().find((candidate) => candidate.id === providerId);
+    if (!provider?.auth?.oauth) throw new HttpError(404, "Provider does not support OAuth");
+    const flow: OAuthLogin = { id: randomUUID(), providerId, url: null, instructions: null, status: "pending", error: null, controller: new AbortController(), expiresAt: Date.now() + 10 * 60_000, prompt: null, resolvePrompt: null };
+    this.oauthLogins.set(flow.id, flow);
+    void runtime.login(providerId, "oauth", {
+      signal: flow.controller.signal,
+      notify: (event: any) => { if (event.type === "auth_url") { flow.url = String(event.url); flow.instructions = typeof event.instructions === "string" ? event.instructions : null; } },
+      prompt: async (prompt: any) => new Promise<string>((resolve, reject) => {
+        const id = randomUUID();
+        flow.resolvePrompt = resolve;
+        flow.prompt = { id, message: String(prompt.message ?? "继续登录"), type: String(prompt.type ?? "text"), options: Array.isArray(prompt.options) ? prompt.options.map((option: any) => ({ id: String(option.id), label: String(option.label ?? option.id), ...(typeof option.description === "string" ? { description: option.description } : {}) })) : undefined };
+        prompt.signal?.addEventListener("abort", () => reject(new Error("Login cancelled")), { once: true });
+      }),
+    }).then(() => { flow.status = "complete"; }).catch((error) => { flow.status = "failed"; flow.error = error instanceof Error ? error.message : "OAuth login failed"; });
+    await new Promise((resolve) => setTimeout(resolve, 250));
+    return this.oauthStatus(flow.id);
+  }
+
+  oauthStatus(loginId: string): Record<string, unknown> {
+    const flow = this.oauthLogins.get(loginId);
+    if (!flow || flow.expiresAt < Date.now()) { this.oauthLogins.delete(loginId); throw new HttpError(404, "OAuth login expired"); }
+    return { id: flow.id, provider_id: flow.providerId, url: flow.url, instructions: flow.instructions, status: flow.status, error: flow.error, prompt: flow.prompt };
+  }
+
+  resolveOAuthPrompt(loginId: string, promptId: string, value: string): void { const flow = this.oauthLogins.get(loginId); if (!flow || flow.prompt?.id !== promptId || !flow.resolvePrompt) throw new HttpError(404, "OAuth prompt expired"); const resolve = flow.resolvePrompt; flow.resolvePrompt = null; flow.prompt = null; resolve(value); }
+
+  async saveCustomModels(config: unknown): Promise<Record<string, unknown>> {
+    if (!isObject(config) || !isObject(config.providers)) throw new HttpError(400, "providers must be an object");
+    const submittedProviders = config.providers;
+    for (const [id, provider] of Object.entries(submittedProviders)) {
+      if (!id.trim() || !isObject(provider)) throw new HttpError(400, "Each provider needs an id and object configuration");
+    }
+    const root = await this.readPiModelsRoot();
+    const providers: Record<string, unknown> = {};
+    for (const [id, provider] of Object.entries(submittedProviders)) {
+      const { apiKey, ...modelConfig } = provider as Record<string, unknown>;
+      if (typeof apiKey === "string" && apiKey.trim()) await this.saveApiKey(id, apiKey.trim());
+      providers[id] = modelConfig;
+    }
+    const next = { ...root, providers };
+    await this.writePiModelsRoot(next);
+    this.customModels = { providers };
+    // Retain runtime.json only as a migration fallback for older AiJee installs.
+    await this.persist();
+    return this.customModels;
+  }
+
+  private async loadCustomModels(legacy: Record<string, unknown> | undefined): Promise<void> {
+    try {
+      const root = await this.readPiModelsRoot();
+      const providers = isObject(root.providers) ? root.providers : {};
+      const sanitized: Record<string, unknown> = {};
+      let migratedCredentials = false;
+      for (const [id, value] of Object.entries(providers)) {
+        if (!isObject(value)) continue;
+        const { apiKey, ...modelConfig } = value;
+        if (typeof apiKey === "string" && apiKey.trim()) {
+          await this.saveApiKey(id, apiKey.trim());
+          migratedCredentials = true;
+        }
+        sanitized[id] = modelConfig;
+      }
+      this.customModels = { providers: sanitized };
+      if (migratedCredentials) await this.writePiModelsRoot({ ...root, providers: sanitized });
+    } catch (error) {
+      if (error instanceof SyntaxError) {
+        this.customModels = { providers: {}, parseError: "~/.pi/agent/models.json is not valid JSON" };
+        return;
+      }
+      throw error;
+    }
+    // One-way migration. Do not overwrite an existing Pi file, even if empty.
+    if (Object.keys(this.customModels.providers as object).length === 0 && isObject(legacy?.providers)) {
+      await this.saveCustomModels({ providers: legacy.providers });
+    }
+  }
+
+  private async readPiModelsRoot(): Promise<Record<string, unknown>> {
+    try {
+      const raw = await readFile(this.piModelsPath, "utf8");
+      if (!raw.trim()) return {};
+      const parsed: unknown = JSON.parse(raw);
+      if (!isObject(parsed)) throw new HttpError(422, "~/.pi/agent/models.json must contain an object");
+      return parsed;
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === "ENOENT") return {};
+      throw error;
+    }
+  }
+
+  private async writePiModelsRoot(root: Record<string, unknown>): Promise<void> {
+    await mkdir(dirname(this.piModelsPath), { recursive: true });
+    const temporary = `${this.piModelsPath}.${randomUUID()}.tmp`;
+    await writeFile(temporary, `${JSON.stringify(root, null, 2)}\n`, "utf8");
+    await rename(temporary, this.piModelsPath);
+  }
+
+  private async saveApiKey(providerId: string, key: string): Promise<void> {
+    let root: Record<string, unknown> = {};
+    try {
+      const raw = await readFile(this.piAuthPath, "utf8");
+      if (raw.trim()) {
+        const parsed: unknown = JSON.parse(raw);
+        if (!isObject(parsed)) throw new HttpError(422, "~/.pi/agent/auth.json must contain an object");
+        root = parsed;
+      }
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+    }
+    await mkdir(dirname(this.piAuthPath), { recursive: true });
+    const temporary = `${this.piAuthPath}.${randomUUID()}.tmp`;
+    await writeFile(temporary, `${JSON.stringify({ ...root, [providerId]: { type: "api_key", key } }, null, 2)}\n`, "utf8");
+    await rename(temporary, this.piAuthPath);
+  }
+
+  private isSystemWorkspacePath(path: string): boolean {
+    const root = resolve(this.systemWorkspacePath);
+    const candidate = resolve(path);
+    const relative = relativePath(root, candidate);
+    return relative === "" || (!relative.startsWith("..") && !isAbsolute(relative));
+  }
 
   /**
    * Align persisted session records with the session files that actually exist
@@ -956,6 +1146,7 @@ export class AiJeeHttpServer {
       [...this.sessionRecords.values()],
       [...this.workspaces.values()],
       this.archivedSessionIds,
+      this.systemWorkspacePath,
     );
     if (result.imported === 0 && result.removed === 0) return;
     this.sessionRecords.clear();

@@ -86,3 +86,14 @@ export interface CustomModelsConfigResult {
    */
   parseError?: string;
 }
+
+/** A Pi SDK-owned provider; credentials are never included in this shape. */
+export interface BuiltinProvider {
+  id: string;
+  name: string;
+  configured: boolean;
+  model_count: number;
+  supports_oauth: boolean;
+  supports_api_key: boolean;
+  auth_label: string | null;
+}

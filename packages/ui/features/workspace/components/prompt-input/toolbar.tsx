@@ -21,6 +21,7 @@ import { usePromptTheme } from './use-theme-colors';
 import { ProviderIcon } from './provider-icons';
 import type { AgentConfigHandle } from '@aijee/client-sdk';
 import type { AgentMode } from '@/features/agent/mode';
+import { formatAgentModeLabel } from '@/features/agent/mode';
 import { useAppMode } from '@/hooks/use-app-mode';
 import { TaskSelector } from '@/features/tasks/components/task-selector';
 
@@ -63,7 +64,7 @@ export const TOOLBAR_ANDROID_MARGIN_TOP = Platform.OS === 'android' ? -4 : 0;
 export const TOOLBAR_MODE_TOGGLE_HEIGHT = TOOLBAR_CONTROL_HEIGHT + 2 + 2 * TOOLBAR_BORDER_WIDTH;
 
 /**
- * Temporarily hidden: the task runner and the chat/plan switch are parked while
+ * Temporarily hidden: the task runner and the work/plan switch are parked while
  * the composer settles on one row. The logic stays wired up so flipping these
  * back on is a one-line change.
  */
@@ -104,7 +105,9 @@ function ToolbarComponent({
   const currentModel = agentState?.model ?? models?.[0] ?? null;
   const currentThinking = agentState?.thinkingLevel ?? 'medium';
   const currentMode: AgentMode =
-    agentState?.mode ?? (modeLabel?.trim().toLowerCase() === 'plan' ? 'plan' : 'chat');
+    agentState?.mode === 'plan'
+      ? 'plan'
+      : (modeLabel?.trim().toLowerCase() === 'plan' ? 'plan' : 'work');
 
   // Levels are model-dependent: only offer what the agent will accept.
   const thinkingOptions = useMemo(
@@ -531,18 +534,18 @@ function ToolbarComponent({
             },
           ]}
         >
-          {(['chat', 'plan'] as AgentMode[]).map((mode) => {
+          {(['work', 'plan'] as AgentMode[]).map((mode) => {
             const isActive = displayedMode === mode;
             const isPendingTarget = pendingMode === mode;
             return (
               <Pressable
                 key={mode}
                 accessibilityRole="button"
-                accessibilityLabel={
-                  isPendingTarget
-                    ? `Switching to ${mode} mode`
-                    : `Switch to ${mode} mode`
-                }
+                  accessibilityLabel={
+                    isPendingTarget
+                      ? `Switching to ${formatAgentModeLabel(mode)} mode`
+                      : `Switch to ${formatAgentModeLabel(mode)} mode`
+                  }
                 accessibilityState={{
                   selected: isActive,
                   disabled: toolbarDisabled || false,
@@ -566,7 +569,7 @@ function ToolbarComponent({
                     },
                   ]}
                 >
-                  {mode === 'chat' ? 'Chat' : 'Plan'}
+                  {formatAgentModeLabel(mode)}
                 </Text>
                 {isPendingTarget && (
                   <ActivityIndicator

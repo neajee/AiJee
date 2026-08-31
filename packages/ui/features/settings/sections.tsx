@@ -63,8 +63,8 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
   },
   {
     slug: 'models',
-    title: '自定义模型',
-    summary: 'Ollama、LM Studio、vLLM 等兼容提供商',
+    title: '模型服务',
+    summary: '模型接入点、凭据与聊天模型列表',
     icon: Cpu,
     Component: ({ isDark }) => <CustomModelsSection isDark={isDark} />,
   },

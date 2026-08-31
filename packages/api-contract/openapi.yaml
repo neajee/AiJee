@@ -1825,6 +1825,21 @@
         }
       }
     },
+    "/api/providers": {
+      "get": {
+        "operationId": "get_api_providers",
+        "responses": {
+          "200": {
+            "description": "Pi SDK built-in providers",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ApiEnvelope" }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/custom-models": {
       "get": {
         "operationId": "get_api_custom-models",

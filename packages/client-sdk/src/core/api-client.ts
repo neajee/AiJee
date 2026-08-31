@@ -43,7 +43,7 @@ import type {
   ImageContent,
   ModelInfo,
 } from "../types/stream-events";
-import type { CustomModelsConfigResult } from "../types";
+import type { BuiltinProvider, CustomModelsConfigResult } from "../types";
 
 function unwrapResult<T>(result: { data?: unknown; error?: unknown }): T {
   if (result.error !== undefined && result.error !== null) {
@@ -1207,6 +1207,31 @@ export class ApiClient {
   async getCustomModels(): Promise<CustomModelsConfigResult> {
     const result = await sdk.getCustomModels({});
     return unwrapResult<CustomModelsConfigResult>(result);
+  }
+
+  async listBuiltinProviders(): Promise<BuiltinProvider[]> {
+    const response = await this.authFetch(this.buildApiUrl("/api/providers"));
+    return unwrapResult<BuiltinProvider[]>(await response.json());
+  }
+
+  async saveBuiltinProviderKey(providerId: string, apiKey: string): Promise<void> {
+    const response = await this.authFetch(this.buildApiUrl(`/api/providers/${encodeURIComponent(providerId)}/api-key`), { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ api_key: apiKey }) });
+    unwrapResult(await response.json());
+  }
+
+  async removeBuiltinProviderKey(providerId: string): Promise<void> {
+    const response = await this.authFetch(this.buildApiUrl(`/api/providers/${encodeURIComponent(providerId)}/api-key`), { method: "DELETE" });
+    unwrapResult(await response.json());
+  }
+
+  async startProviderOAuth(providerId: string): Promise<{ id: string; url: string | null; instructions: string | null; status: string; error: string | null }> {
+    const response = await this.authFetch(this.buildApiUrl(`/api/providers/${encodeURIComponent(providerId)}/oauth`), { method: "POST" });
+    return unwrapResult(await response.json());
+  }
+
+  async getProviderOAuth(providerId: string, loginId: string): Promise<{ url: string | null; instructions: string | null; status: "pending" | "complete" | "failed"; error: string | null }> {
+    const response = await this.authFetch(this.buildApiUrl(`/api/providers/${encodeURIComponent(providerId)}/oauth/${encodeURIComponent(loginId)}`));
+    return unwrapResult(await response.json());
   }
 
   async saveCustomModels(config: { providers: Record<string, CustomProvider> }): Promise<void> {

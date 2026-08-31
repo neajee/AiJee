@@ -358,6 +358,8 @@ export class PiClient {
     sessionFile?: string;
   }): Promise<void> {
     const subject = this._getOrCreateSessionSubject(sessionId);
+    // Work is the product name; pi 0.84 still exposes this command as /chat.
+    const engineMessage = message.replace(/^\/work(?=\s|$)/, "/chat");
     const pendingId = `pending-user-${Date.now()}-${Math.random().toString(36).slice(2)}`;
     if ((message.trim() || options?.images?.length) && !isModeSlashCommand(message)) {
       const current = subject.getValue();
@@ -374,7 +376,7 @@ export class PiClient {
       });
     }
     try {
-      await this.api.prompt({ sessionId, message, images: options?.images, streamingBehavior: options?.streamingBehavior, workspaceId: options?.workspaceId, sessionFile: options?.sessionFile });
+      await this.api.prompt({ sessionId, message: engineMessage, images: options?.images, streamingBehavior: options?.streamingBehavior, workspaceId: options?.workspaceId, sessionFile: options?.sessionFile });
     } catch (error) {
       const current = subject.getValue();
       subject.next({ ...current, messages: current.messages.filter((item) => item.id !== pendingId) });

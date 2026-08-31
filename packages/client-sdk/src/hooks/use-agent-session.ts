@@ -35,7 +35,7 @@ const EMPTY: SessionState = {
   isLoadingOlderMessages: false,
   hasMoreMessages: false,
   oldestEntryId: null,
-  mode: "chat",
+  mode: "work",
   pendingExtensionUiRequest: null,
   steeringQueue: [],
   followUpQueue: [],

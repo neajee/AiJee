@@ -112,14 +112,8 @@ export default function DirectConnectScreen() {
       if (cancelled) return;
 
       setStatus("done");
-      const { workspaces, selectedWorkspaceId } = useWorkspaceStore.getState();
-      const targetId = selectedWorkspaceId ?? workspaces[0]?.id;
       setTimeout(() => {
-        if (targetId) {
-          router.replace(`/workspace/${targetId}`);
-          return;
-        }
-        router.replace("/settings");
+        router.replace("/");
       }, 400);
     };
 

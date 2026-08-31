@@ -347,7 +347,7 @@ export type AgentStreamEvent =
 export interface AgentStateData {
   model?: ModelInfo | null;
   thinkingLevel?: string;
-  mode?: "chat" | "plan";
+  mode?: "chat" | "work" | "plan";
   isStreaming?: boolean;
   isCompacting?: boolean;
   steeringMode?: "all" | "one-at-a-time";

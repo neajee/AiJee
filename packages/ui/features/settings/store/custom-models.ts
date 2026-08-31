@@ -70,16 +70,16 @@ export const useCustomModelsStore = create<CustomModelsState>((set, get) => ({
 
   addProvider: async (name, provider) => {
     const providers = { ...get().providers, [name]: provider };
-    await get().save(providers);
+    set({ providers, error: null });
   },
 
   removeProvider: async (name) => {
     const { [name]: _, ...rest } = get().providers;
-    await get().save(rest);
+    set({ providers: rest, error: null });
   },
 
   updateProvider: async (name, provider) => {
     const providers = { ...get().providers, [name]: provider };
-    await get().save(providers);
+    set({ providers, error: null });
   },
 }));

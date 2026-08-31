@@ -54,6 +54,7 @@ export {
   type CustomModelsState,
   type ProvidersMap,
 } from "./use-custom-models";
+export { useBuiltinProviders } from "./use-builtin-providers";
 export {
   useAgentModes,
   type AgentModesHandle,

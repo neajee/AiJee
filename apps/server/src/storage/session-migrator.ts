@@ -55,18 +55,23 @@ export async function reconcileSessionRecords(
   existing: PersistedSession[],
   workspaces: Array<{ id: string; path: string }>,
   archivedSessionIds: ReadonlySet<string> = new Set(),
+  systemWorkspacePath = join(homedir(), ".aijee", "system-workspace"),
 ): Promise<{ sessions: PersistedSession[]; result: ReconcileResult }> {
+  const systemRoot = normalized(systemWorkspacePath);
   // 1. Drop ghost records whose session file is gone (our metadata index only).
-  const kept = existing.filter((record) => !archivedSessionIds.has(record.session_id) && existsSync(record.session_file));
+  const kept = existing.filter((record) =>
+    !archivedSessionIds.has(record.session_id) &&
+    existsSync(record.session_file) &&
+    (record.workspace_id !== "__chat__" || normalized(record.cwd) === systemRoot || normalized(record.cwd).startsWith(`${systemRoot}/`)),
+  );
   const removed = existing.length - kept.length;
 
   // 2. Match session cwd (from the SDK header) to workspace by normalized path.
   const cwdToWorkspace = new Map<string, string>();
   for (const workspace of workspaces) cwdToWorkspace.set(normalized(workspace.path), workspace.id);
-  const piHome = normalized(join(homedir(), ".pi"));
   /**
    * Sessions belong to a registered workspace, or to the chat pseudo-workspace
-   * when they live under the pi home directory (where the chat UI keeps them).
+   * when they live under AiJee's private system workspace.
    * Sessions from unrelated project directories are skipped: they would only
    * add noise, and they get picked up once that workspace is added.
    */
@@ -74,7 +79,7 @@ export async function reconcileSessionRecords(
     const key = normalized(cwd);
     const workspaceId = cwdToWorkspace.get(key);
     if (workspaceId) return workspaceId;
-    return key === piHome || key.startsWith(`${piHome}/`) ? "__chat__" : undefined;
+    return key === systemRoot || key.startsWith(`${systemRoot}/`) ? "__chat__" : undefined;
   };
 
   // 3. Native SDK discovery: every session file it can read, across all projects.

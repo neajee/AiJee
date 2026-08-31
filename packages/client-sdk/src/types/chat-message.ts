@@ -104,7 +104,8 @@ export interface ChatMessage {
   fullOutputPath?: string | null;
 }
 
-export type AgentMode = "chat" | "plan";
+/** Product-facing modes. The engine still receives `/chat` for Work mode. */
+export type AgentMode = "work" | "plan";
 
 export type ExtensionUiDialogMethod = "select" | "confirm" | "input" | "editor";
 

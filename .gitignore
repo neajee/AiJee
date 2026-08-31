@@ -80,3 +80,5 @@ unsloth_compiled_cache/
 # pi local skills
 skills/
 skills-lock.json
+
+.temp
