@@ -47,8 +47,8 @@ function nextForkSessionName(sourceName: string, existingNames: Iterable<string>
   return `${base}（${index}）`;
 }
 
-type ManagedSession = { key: string; workspaceId: string; session: EngineSession; createdAt: string; lastActive: number; modeId?: string; draft?: boolean };
-type Mode = { id: string; name: string; description?: string; model?: string; thinking_level?: string; extensions?: string[]; skills?: string[]; extra_args?: string[]; is_default?: boolean; sort_order?: number };
+type ManagedSession = { key: string; workspaceId: string; session: EngineSession; createdAt: string; lastActive: number; modeId?: string; systemPrompt?: string; draft?: boolean };
+type Mode = { id: string; name: string; description?: string; model?: string; thinking_level?: string; system_prompt?: string; extensions?: string[]; skills?: string[]; extra_args?: string[]; is_default?: boolean; sort_order?: number };
 type OAuthLogin = { id: string; providerId: string; url: string | null; instructions: string | null; status: "pending" | "complete" | "failed"; error: string | null; controller: AbortController; expiresAt: number; prompt: { id: string; message: string; type: string; options?: Array<{ id: string; label: string; description?: string }> } | null; resolvePrompt: ((value: string) => void) | null };
 
 function isObject(value: unknown): value is Record<string, unknown> {
@@ -823,7 +823,8 @@ export class AiJeeHttpServer {
 
   private async createManagedSession(response: ServerResponse, cwd: string, sessionFile?: string, workspaceId = "__chat__", modeId?: string): Promise<void> {
     const key = randomUUID();
-    const descriptor = await this.runtime.createSession(key, { cwd, sessionFile });
+    const mode = modeId ? this.modes.get(modeId) : [...this.modes.values()].find((candidate) => candidate.is_default);
+    const descriptor = await this.runtime.createSession(key, { cwd, sessionFile, appendSystemPrompt: mode?.system_prompt?.trim() ? [mode.system_prompt.trim()] : undefined });
     const session = this.runtime.sessions.get(key);
     if (!session) throw new Error("Session registry lost newly created session");
     const now = new Date().toISOString();
@@ -853,19 +854,20 @@ export class AiJeeHttpServer {
     if (body.draft) {
       const existing = [...this.sessions.values()].find((managed) => managed.draft && managed.workspaceId === workspace.id);
       if (existing) {
-        if (existing.modeId !== body.mode_id) {
-          existing.modeId = body.mode_id;
-          await this.applyMode(existing.session, body.mode_id);
-        }
-        return this.ok(response, this.sessionInfo(existing.session.describe().sessionId), 200);
+        const requestedMode = body.mode_id ? this.modes.get(body.mode_id) : [...this.modes.values()].find((candidate) => candidate.is_default);
+        const requestedPrompt = requestedMode?.system_prompt?.trim() || undefined;
+        if (existing.modeId === body.mode_id && existing.systemPrompt === requestedPrompt) return this.ok(response, this.sessionInfo(existing.session.describe().sessionId), 200);
+        this.sessions.delete(existing.session.describe().sessionId);
+        await existing.session.dispose();
       }
     }
     const key = randomUUID();
-    const descriptor = await this.runtime.createSession(key, { cwd: workspace.path, sessionFile: body.session_path });
+    const mode = body.mode_id ? this.modes.get(body.mode_id) : [...this.modes.values()].find((candidate) => candidate.is_default);
+    const descriptor = await this.runtime.createSession(key, { cwd: workspace.path, sessionFile: body.session_path, appendSystemPrompt: mode?.system_prompt?.trim() ? [mode.system_prompt.trim()] : undefined });
     const session = this.runtime.sessions.get(key);
     if (!session) throw new Error("Session registry lost newly created session");
     const now = new Date().toISOString();
-    this.sessions.set(descriptor.sessionId, { key, workspaceId: workspace.id, session, createdAt: now, lastActive: Date.now(), modeId: body.mode_id, draft: body.draft });
+    this.sessions.set(descriptor.sessionId, { key, workspaceId: workspace.id, session, createdAt: now, lastActive: Date.now(), modeId: body.mode_id, systemPrompt: mode?.system_prompt?.trim() || undefined, draft: body.draft });
     if (!body.draft) this.sessionRecords.set(descriptor.sessionId, { session_id: descriptor.sessionId, session_file: descriptor.sessionFile ?? "", workspace_id: workspace.id, cwd: descriptor.cwd, created_at: now, last_active: Date.now(), mode_id: body.mode_id });
     await this.applyMode(session, body.mode_id);
     if (!body.draft) await this.persist();
@@ -1183,7 +1185,8 @@ export class AiJeeHttpServer {
   private async openPersistedSession(sessionId: string, record: PersistedSession): Promise<ManagedSession> {
     // Stable registry key so the engine registry itself also deduplicates.
     const key = `session:${sessionId}`;
-    const descriptor = await this.runtime.createSession(key, { cwd: record.cwd, sessionFile: record.session_file });
+    const mode = record.mode_id ? this.modes.get(record.mode_id) : [...this.modes.values()].find((candidate) => candidate.is_default);
+    const descriptor = await this.runtime.createSession(key, { cwd: record.cwd, sessionFile: record.session_file, appendSystemPrompt: mode?.system_prompt?.trim() ? [mode.system_prompt.trim()] : undefined });
     const session = this.runtime.sessions.get(key);
     if (!session) throw new Error("Session registry lost restored session");
     const managed = { key, workspaceId: record.workspace_id, session, createdAt: record.created_at, lastActive: record.last_active, modeId: record.mode_id };

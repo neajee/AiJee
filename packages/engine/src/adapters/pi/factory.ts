@@ -12,9 +12,12 @@ import type { CreateSessionInput } from "../../core/types.ts";
 import { PiSession } from "./pi-session.ts";
 import { piCapabilities } from "./capabilities.ts";
 
-async function createPiRuntime({ cwd, sessionFile }: CreateSessionInput): Promise<AgentSessionRuntime> {
+async function createPiRuntime({ cwd, sessionFile, appendSystemPrompt }: CreateSessionInput): Promise<AgentSessionRuntime> {
   const createRuntime: CreateAgentSessionRuntimeFactory = async ({ cwd: effectiveCwd, sessionManager, sessionStartEvent }) => {
-    const services = await createAgentSessionServices({ cwd: effectiveCwd });
+    const services = await createAgentSessionServices({
+      cwd: effectiveCwd,
+      resourceLoaderOptions: appendSystemPrompt?.length ? { appendSystemPrompt } : undefined,
+    });
     return {
       ...(await createAgentSessionFromServices({ services, sessionManager, sessionStartEvent })),
       services,
@@ -33,7 +36,7 @@ export function createPiEngineAdapter(): EngineAdapter {
     id: "pi",
     capabilities: piCapabilities,
     probe: () => true,
-    describe: () => ({ id: "pi", version: "0.84.3", embedded: true }),
+    describe: () => ({ id: "pi", version: "0.84.4", embedded: true }),
     async createSession(input) {
       return new PiSession(await createPiRuntime(input), input.cwd);
     },

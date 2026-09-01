@@ -1249,7 +1249,12 @@ export class ApiClient {
 
   async listModes(): Promise<AgentMode[]> {
     const result = await sdk.listModes();
-    return unwrapResult<AgentMode[]>(result);
+    return unwrapResult<AgentMode[]>(result).map((mode) => ({
+      ...mode,
+      extensions: Array.isArray(mode.extensions) ? mode.extensions : [],
+      skills: Array.isArray(mode.skills) ? mode.skills : [],
+      extra_args: Array.isArray(mode.extra_args) ? mode.extra_args : [],
+    }));
   }
 
   async createMode(params: {
@@ -1257,6 +1262,7 @@ export class ApiClient {
     description?: string;
     model?: string;
     thinkingLevel?: string;
+    systemPrompt?: string;
     extensions?: string[];
     skills?: string[];
     extraArgs?: string[];
@@ -1269,6 +1275,7 @@ export class ApiClient {
         description: params.description,
         model: params.model,
         thinking_level: params.thinkingLevel,
+        system_prompt: params.systemPrompt,
         extensions: Array.isArray(params.extensions) && params.extensions.length > 0 ? params.extensions : undefined,
         skills: Array.isArray(params.skills) && params.skills.length > 0 ? params.skills : undefined,
         extra_args: Array.isArray(params.extraArgs) && params.extraArgs.length > 0 ? params.extraArgs : undefined,
@@ -1286,6 +1293,7 @@ export class ApiClient {
       description?: string;
       model?: string;
       thinkingLevel?: string;
+      systemPrompt?: string;
       extensions?: string[];
       skills?: string[];
       extraArgs?: string[];
@@ -1300,6 +1308,7 @@ export class ApiClient {
         description: params.description,
         model: params.model,
         thinking_level: params.thinkingLevel,
+        system_prompt: params.systemPrompt,
         extensions: Array.isArray(params.extensions) ? params.extensions : undefined,
         skills: Array.isArray(params.skills) ? params.skills : undefined,
         extra_args: Array.isArray(params.extraArgs) ? params.extraArgs : undefined,

@@ -25,6 +25,7 @@ export interface AgentModesHandle extends AgentModesState {
     description?: string;
     model?: string;
     thinkingLevel?: string;
+    systemPrompt?: string;
     extensions?: string[];
     skills?: string[];
     extraArgs?: string[];
@@ -38,6 +39,7 @@ export interface AgentModesHandle extends AgentModesState {
       description?: string;
       model?: string;
       thinkingLevel?: string;
+      systemPrompt?: string;
       extensions?: string[];
       skills?: string[];
       extraArgs?: string[];

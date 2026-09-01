@@ -107,7 +107,8 @@ export function ModePickerDialog({
               const parts: string[] = [];
               if (mode.model) parts.push(mode.model);
               if (mode.thinking_level) parts.push(`thinking: ${mode.thinking_level}`);
-              if (mode.extensions.length) parts.push(`${mode.extensions.length} ext`);
+              const extensionCount = Array.isArray(mode.extensions) ? mode.extensions.length : 0;
+              if (extensionCount) parts.push(`${extensionCount} ext`);
 
               return (
                 <Pressable

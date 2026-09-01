@@ -24,6 +24,7 @@ export type SessionStats = JsonObject;
 export type CreateSessionInput = {
   cwd: string;
   sessionFile?: string;
+  appendSystemPrompt?: string[];
 };
 
 export type SessionEventListener = (event: AgentEvent) => void;

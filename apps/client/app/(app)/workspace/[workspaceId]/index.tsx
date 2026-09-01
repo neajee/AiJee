@@ -20,11 +20,9 @@ import { WorkspaceHero } from "@/features/workspace/components/workspace-hero";
 import { ComposerContextBar } from "@/features/workspace/components/composer-context-bar";
 import { WorkspaceSidebar } from "@/features/workspace/components/workspace-sidebar";
 import { WorkspaceRightPane } from "@/features/preview/components/workspace-right-pane";
-import { ModePickerDialog } from "@/features/workspace/components/mode-picker-dialog";
 import { useWorkspaceStore } from "@/features/workspace/store";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { usePiClient, useAgentModes } from "@aijee/client-sdk";
-import type { AgentMode } from "@aijee/client-sdk";
 import { requestBrowserNotificationPermission } from "@/features/agent/browser-notifications";
 
 export default function WorkspaceScreen() {
@@ -44,9 +42,6 @@ export default function WorkspaceScreen() {
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const [sending, setSending] = useState(false);
   const [preSessionId, setPreSessionId] = useState<string | null>(null);
-  const [showModePicker, setShowModePicker] = useState(false);
-  const [selectedModeId, setSelectedModeId] = useState<string | undefined>(undefined);
-  const [modeResolved, setModeResolved] = useState(false);
   const pendingRef = useRef<Promise<{ session_id: string }> | null>(null);
   const currentWorkspaceRef = useRef<string | null>(workspaceId ?? null);
 
@@ -61,31 +56,10 @@ export default function WorkspaceScreen() {
     currentWorkspaceRef.current = workspaceId ?? null;
     setPreSessionId(null);
     setSending(false);
-    setSelectedModeId(undefined);
-    setModeResolved(false);
     pendingRef.current = null;
   }, [workspaceId]);
 
-  useEffect(() => {
-    if (!modesLoaded || modeResolved) return;
-    if (modes.length > 0) {
-      setShowModePicker(true);
-    } else {
-      setModeResolved(true);
-    }
-  }, [modesLoaded, modes.length, modeResolved]);
-
-  const handleModeSelected = useCallback((mode: AgentMode) => {
-    setSelectedModeId(mode.id);
-    setShowModePicker(false);
-    setModeResolved(true);
-  }, []);
-
-  const handleModeSkipped = useCallback(() => {
-    setSelectedModeId(undefined);
-    setShowModePicker(false);
-    setModeResolved(true);
-  }, []);
+  const selectedModeId = modes.find((mode) => mode.is_default)?.id;
 
   const ensureSession = useCallback(
     async (targetWorkspaceId: string): Promise<string> => {
@@ -119,15 +93,15 @@ export default function WorkspaceScreen() {
   );
 
   useEffect(() => {
-    if (!workspaceId || preSessionId || !modeResolved) return;
+    if (!workspaceId || preSessionId || !modesLoaded) return;
     void ensureSession(workspaceId).catch((error) => {
       setAlertMessage(error instanceof Error ? error.message : "Failed to prepare session");
     });
-  }, [ensureSession, preSessionId, workspaceId, modeResolved]);
+  }, [ensureSession, preSessionId, workspaceId, modesLoaded]);
 
   const handleSend = useCallback(
     async (text: string, attachments: Attachment[]) => {
-      if (!workspaceId || !modeResolved || sending) return;
+      if (!workspaceId || !modesLoaded || sending) return;
       setAlertMessage(null);
       requestBrowserNotificationPermission();
       setSending(true);
@@ -147,7 +121,7 @@ export default function WorkspaceScreen() {
         throw e;
       }
     },
-    [workspaceId, modeResolved, sending, ensureSession, client, router],
+    [workspaceId, modesLoaded, sending, ensureSession, client, router],
   );
 
   const clearAlert = useCallback(() => setAlertMessage(null), []);
@@ -185,12 +159,6 @@ export default function WorkspaceScreen() {
         },
       ]}
     >
-      <ModePickerDialog
-        visible={showModePicker}
-        modes={modes}
-        onSelect={handleModeSelected}
-        onSkip={handleModeSkipped}
-      />
       <View style={styles.upperRow}>
         <View style={[styles.editorColumn, { backgroundColor: editorBg }]}>
           {/* Hero and composer are one vertically centred group, so the mark,

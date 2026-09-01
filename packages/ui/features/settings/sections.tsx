@@ -63,8 +63,8 @@ export const SETTINGS_SECTIONS: SettingsSection[] = [
   },
   {
     slug: 'modes',
-    title: 'Agent 模式',
-    summary: '预设的系统提示与工具组合',
+    title: '个性化',
+    summary: '为所有聊天设置自定义指令',
     icon: Layers,
     Component: ({ isDark }) => <AgentModesSection isDark={isDark} />,
   },

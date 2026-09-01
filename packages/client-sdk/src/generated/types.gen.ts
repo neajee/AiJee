@@ -61,6 +61,7 @@ export type AgentMode = {
     name: string;
     skills: Array<string>;
     sort_order: number;
+    system_prompt?: string | null;
     thinking_level?: string | null;
     updated_at: string;
 };
@@ -159,6 +160,7 @@ export type CreateAgentModeRequest = {
     skills?: Array<string> | null;
     sort_order?: number | null;
     thinking_level?: string | null;
+    system_prompt?: string | null;
 };
 
 export type CreateAgentSessionRequest = {
@@ -685,6 +687,7 @@ export type UpdateAgentModeRequest = {
     skills?: Array<string> | null;
     sort_order?: number | null;
     thinking_level?: string | null;
+    system_prompt?: string | null;
 };
 
 export type UpdateWorkspaceRequest = {
