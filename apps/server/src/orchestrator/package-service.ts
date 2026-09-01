@@ -19,8 +19,11 @@ export class PackageService {
 
   async installed(cwd = homedir()): Promise<Record<string, unknown>> {
     const manager = this.manager(cwd);
-    const packages = manager.listConfiguredPackages().map((item) => ({ name: item.source, scope: item.scope, installed: Boolean(item.installedPath), path: item.installedPath ?? null }));
-    return { packages, output: packages.length ? packages.map((item) => `${item.name} [${item.scope}]${item.installed ? "" : " (未解析)"}`).join("\n") : "暂无已安装插件" };
+    const packages = manager.listConfiguredPackages().map((item) => {
+      const locked = /^(?:npm:(?:@[^/]+\/)?[^@]+|git:[^@]+)@.+$/.test(item.source);
+      return { name: item.source, scope: item.scope, locked, installed: Boolean(item.installedPath), path: item.installedPath ?? null };
+    });
+    return { packages, output: packages.length ? packages.map((item) => `${item.name} [${item.scope} · ${item.locked ? "已锁定" : "跟随更新"}]${item.installed ? "" : " (未解析)"}`).join("\n") : "暂无已安装插件" };
   }
 
   async marketplace(query = "", category = "", limit = 30): Promise<Record<string, unknown>> {
@@ -70,6 +73,17 @@ export class PackageService {
       release();
       this.operationLock = undefined;
     }
+  }
+
+  enqueueOperation(request: { operation: string; name: string; scope?: string; version?: string | null; cwd?: string }, afterComplete?: (result: Record<string, unknown>) => Promise<void>): Record<string, unknown> {
+    const operation = request.operation;
+    const base = request.name.startsWith("npm:") || request.name.startsWith("git:") ? request.name : `npm:${request.name}`;
+    if (!['install', 'remove', 'update'].includes(operation)) throw new Error('Unsupported package operation');
+    if (!/^(npm|git):[^\s]+$/.test(base) || (request.scope && !['user', 'project'].includes(request.scope))) throw new Error('Invalid package source or scope');
+    void this.operationRequest(request).then(async (result) => {
+      if (result.success) await afterComplete?.(result);
+    }).catch(() => undefined);
+    return { operation, output: '任务已提交，完成后刷新已安装列表', success: true, queued: true };
   }
 
   cancel(): boolean { if (!this.operationLock) return false; this.cancelRequested = true; return true; }

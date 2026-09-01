@@ -1,6 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
 import {
-  Modal,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -10,6 +9,7 @@ import {
 import { Star, Layers, Check, CircleOff } from 'lucide-react-native';
 
 import { Fonts } from '@/constants/theme';
+import { AppModal } from '@/components/ui';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import type { AgentMode } from '@aijee/client-sdk';
 
@@ -60,9 +60,7 @@ export function ModePickerDialog({
   const isNoneSelected = selectedId === NO_MODE_ID;
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onSkip}>
-      <Pressable style={[styles.overlay, { backgroundColor: overlayBg }]} onPress={onSkip}>
-        <Pressable style={[styles.dialog, { backgroundColor: bg, borderColor }]} onPress={(e) => e.stopPropagation()}>
+    <AppModal visible={visible} onClose={onSkip} contentStyle={[styles.dialog, { backgroundColor: bg, borderColor }]}>
           <View style={styles.header}>
             <Layers size={18} color={textPrimary} strokeWidth={1.8} />
             <Text style={[styles.title, { color: textPrimary }]}>Select Mode</Text>
@@ -178,9 +176,7 @@ export function ModePickerDialog({
               </Text>
             </Pressable>
           </View>
-        </Pressable>
-      </Pressable>
-    </Modal>
+    </AppModal>
   );
 }
 

@@ -3,7 +3,7 @@ import { Animated, Modal, Pressable, StyleSheet, Text, View } from 'react-native
 import { Check } from 'lucide-react-native';
 
 import { Fonts } from '@/constants/theme';
-import { buildThinkingLevelOptions, ThinkingLevel } from './constants';
+import { buildThinkingLevelOptions, ThinkingPreference } from './constants';
 import { usePromptTheme } from './use-theme-colors';
 import type { AgentConfigHandle } from '@aijee/client-sdk';
 
@@ -12,6 +12,8 @@ interface MobileEffortSheetProps {
   sessionId?: string | null;
   onClose: () => void;
   config: AgentConfigHandle;
+  thinkingPreference?: ThinkingPreference;
+  onThinkingPreferenceChange?: (level: ThinkingPreference) => void;
 }
 
 function MobileEffortSheetComponent({
@@ -19,12 +21,13 @@ function MobileEffortSheetComponent({
   sessionId,
   onClose,
   config,
+  thinkingPreference = 'auto',
+  onThinkingPreferenceChange,
 }: MobileEffortSheetProps) {
   const theme = usePromptTheme();
   const slideAnim = useRef(new Animated.Value(300)).current;
   const overlayAnim = useRef(new Animated.Value(0)).current;
 
-  const currentThinking = config.state?.thinkingLevel ?? 'medium';
 
   // Only offer the levels the current model actually supports.
   const thinkingOptions = useMemo(
@@ -52,8 +55,9 @@ function MobileEffortSheetComponent({
     animateClose(() => onClose());
   };
 
-  const handleSelect = (level: ThinkingLevel) => {
-    config.setThinkingLevel(level);
+  const handleSelect = (level: ThinkingPreference) => {
+    onThinkingPreferenceChange?.(level);
+    if (level !== 'auto') config.setThinkingLevel(level);
     animateClose(() => onClose());
   };
 
@@ -78,8 +82,8 @@ function MobileEffortSheetComponent({
             <View style={[styles.handleBar, { backgroundColor: theme.isDark ? '#555' : '#CCC' }]} />
           </View>
           <Text style={[styles.title, { color: theme.textPrimary }]}>思考深度</Text>
-          {thinkingOptions.map((item) => {
-            const isActive = item.level === currentThinking;
+          {[{ level: 'auto' as const, label: 'Auto' }, ...thinkingOptions].map((item) => {
+            const isActive = item.level === thinkingPreference;
             return (
               <Pressable
                 key={item.level}
@@ -93,11 +97,6 @@ function MobileEffortSheetComponent({
                   <Text style={[styles.label, { color: isActive ? theme.accentColor : theme.textPrimary }]}>
                     {item.label}
                   </Text>
-                  {!!item.description && (
-                    <Text style={[styles.desc, { color: theme.textMuted }]}>
-                      {item.description}
-                    </Text>
-                  )}
                 </View>
                 {isActive && <Check size={16} color={theme.accentColor} strokeWidth={2} />}
               </Pressable>
@@ -147,15 +146,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 20,
-    paddingVertical: 14,
+    paddingVertical: 11,
   },
   label: {
     fontSize: 13,
     fontFamily: Fonts.sansMedium,
-  },
-  desc: {
-    fontSize: 12,
-    fontFamily: Fonts.sans,
-    marginTop: 2,
   },
 });

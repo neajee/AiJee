@@ -2,7 +2,6 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Linking,
-  Modal,
   Platform,
   Pressable,
   ScrollView,
@@ -17,6 +16,7 @@ import { Download, ExternalLink, Search, ShieldAlert, X } from 'lucide-react-nat
 import { usePiClient } from '@aijee/client-sdk';
 import type { MarketplacePackage } from '@aijee/client-sdk';
 import { Fonts } from '@/constants/theme';
+import { AppModal } from '@/components/ui';
 import {
   useSettingsMetrics,
   useSettingsPalette,
@@ -52,7 +52,7 @@ export function PackageMarketplace() {
   const p = useSettingsPalette();
   const phone = useSettingsPhoneLayout();
 
-  const [tab, setTab] = useState<Tab>('discover');
+  const [tab, setTab] = useState<Tab>('installed');
   const [query, setQuery] = useState('');
   const [category, setCategory] = useState('all');
   const [items, setItems] = useState<MarketplacePackage[]>([]);
@@ -61,6 +61,7 @@ export function PackageMarketplace() {
 
   const [installedOutput, setInstalledOutput] = useState<string | null>(null);
   const [installedLoading, setInstalledLoading] = useState(false);
+  const [installedMessage, setInstalledMessage] = useState<string | null>(null);
 
   const [selected, setSelected] = useState<MarketplacePackage | null>(null);
 
@@ -118,7 +119,8 @@ export function PackageMarketplace() {
 
   const handleInstalled = useCallback(
     (output: string) => {
-      setInstalledOutput(output.trim() || '安装完成');
+      setInstalledMessage(output.trim() || '任务已提交，完成后刷新已安装列表');
+      setInstalledOutput(null);
       setSelected(null);
       setTab('installed');
     },
@@ -140,8 +142,8 @@ export function PackageMarketplace() {
         </View>
         <Segmented
           options={[
-            { value: 'discover', label: '发现' },
             { value: 'installed', label: '已安装' },
+            { value: 'discover', label: '发现' },
           ]}
           value={tab}
           onChange={(value) => setTab(value as Tab)}
@@ -202,6 +204,8 @@ export function PackageMarketplace() {
           error={error}
           onRefresh={loadInstalled}
           gutter={gutter}
+          single={phone}
+          message={installedMessage}
         />
       )}
 
@@ -423,12 +427,16 @@ function InstalledView({
   error,
   onRefresh,
   gutter,
+  single,
+  message,
 }: {
   output: string | null;
   loading: boolean;
   error: string | null;
   onRefresh: () => void;
   gutter: number;
+  single: boolean;
+  message: string | null;
 }) {
   const client = usePiClient();
   const m = useSettingsMetrics();
@@ -447,27 +455,109 @@ function InstalledView({
         <View style={styles.installedActions}><SecondaryButton label="全部更新" onPress={() => void client.api.marketplaceOperation({ operation: 'update', name: '*', scope: 'user' })} /><SecondaryButton label="刷新" onPress={onRefresh} /></View>
       </View>
 
+      {message ? <Text style={[styles.operationMessage, { color: p.textSecondary, backgroundColor: p.tile, borderColor: p.separator, borderRadius: m.tileRadius }]}>{message}</Text> : null}
       {error ? <Notice text={error} tone="error" /> : null}
 
-      {/* The server returns the CLI's own output. Showing it verbatim in a mono
-          block is honest about that, and keeps every line readable. */}
-      <View
-        style={[
-          styles.outputBlock,
-          { backgroundColor: p.tile, borderColor: p.separator, borderRadius: m.cardRadius },
-        ]}
-      >
-        {loading ? (
-          <ActivityIndicator size="small" color={p.textTertiary} />
-        ) : (
-          <>{(output ?? '').split('\n').map((line) => {
-            const source = line.split(' [')[0] ?? '';
-            if (!source || source === '暂无已安装插件') return <Text key={line} style={[styles.outputText, { color: p.textSecondary }]}>{line}</Text>;
-            return <View key={line} style={styles.installedRow}><Text style={[styles.outputText, { color: p.textSecondary, flex: 1 }]} selectable>{line}</Text><SecondaryButton label="更新" onPress={() => void client.api.marketplaceOperation({ operation: 'update', name: source, scope: 'user' })} /><SecondaryButton label="卸载" onPress={() => void client.api.marketplaceOperation({ operation: 'remove', name: source, scope: 'user' })} /></View>;
-          })}</>
-        )}
-      </View>
+      {loading ? (
+        <View style={styles.centered}><ActivityIndicator size="small" color={p.textTertiary} /></View>
+      ) : output === '暂无已安装插件' ? (
+        <Text style={[styles.emptyText, { color: p.textTertiary, fontSize: m.descSize }]}>暂无已安装插件。</Text>
+      ) : (
+        <View style={styles.installedGrid}>
+          {parseInstalledPackages(output).map((pkg, index) => (
+            <InstalledPackageCard
+              key={`${pkg.name}-${index}`}
+              pkg={pkg}
+              single={single}
+              onUpdate={() => void client.api.marketplaceOperation({ operation: 'update', name: pkg.name, scope: 'user' }).then(onRefresh)}
+              onRemove={() => void client.api.marketplaceOperation({ operation: 'remove', name: pkg.name, scope: 'user' }).then(onRefresh)}
+            />
+          ))}
+        </View>
+      )}
     </ScrollView>
+  );
+}
+
+type InstalledPackage = { name: string; detail: string | null };
+
+function parseInstalledPackages(output: string | null): InstalledPackage[] {
+  return (output ?? '')
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line && line !== '暂无已安装插件')
+    .map((line) => {
+      const match = line.match(/^([^\s]+)(?:\s+\[([^\]]+)\])?(?:\s+(.*))?$/);
+      return {
+        name: match?.[1] || line,
+        detail: [match?.[2], match?.[3]].filter(Boolean).join(' · ') || null,
+      };
+    });
+}
+
+function InstalledPackageCard({
+  pkg,
+  single,
+  onUpdate,
+  onRemove,
+}: {
+  pkg: InstalledPackage;
+  single: boolean;
+  onUpdate: () => void;
+  onRemove: () => void;
+}) {
+  const m = useSettingsMetrics();
+  const p = useSettingsPalette();
+
+  return (
+    <View
+      style={[
+        styles.installedCard,
+        {
+          backgroundColor: p.card,
+          borderColor: p.separator,
+          borderRadius: m.cardRadius,
+          padding: m.gutter,
+          width: single ? '100%' : undefined,
+          flexBasis: single ? undefined : CARD_MIN_WIDTH,
+        },
+      ]}
+    >
+      <View style={styles.installedCardTop}>
+        <View style={styles.installedCopy}>
+          <Text style={[styles.installedName, { color: p.text, fontSize: m.labelSize }]} numberOfLines={1}>{pkg.name}</Text>
+          {pkg.detail ? <Text style={[styles.meta, { color: p.textTertiary }]} numberOfLines={1}>{pkg.detail}</Text> : null}
+        </View>
+      </View>
+      <View style={[styles.installedFooter, { borderTopColor: p.separator }]}>
+        <InstalledAction label="更新" onPress={onUpdate} />
+        <InstalledAction label="卸载" destructive onPress={onRemove} />
+      </View>
+    </View>
+  );
+}
+
+function InstalledAction({
+  label,
+  destructive = false,
+  onPress,
+}: {
+  label: string;
+  destructive?: boolean;
+  onPress: () => void;
+}) {
+  const m = useSettingsMetrics();
+  const p = useSettingsPalette();
+  const color = destructive ? p.destructive : p.textSecondary;
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      style={({ pressed, hovered }: any) => [styles.installedAction, hovered && { backgroundColor: p.pressed }, pressed && { opacity: 0.6 }]}
+    >
+      <Text style={{ color, fontSize: m.descSize, fontFamily: Fonts.sansMedium }}>{label}</Text>
+    </Pressable>
   );
 }
 
@@ -511,7 +601,7 @@ function PackageDetail({
         operation: 'install',
         name: pkg.name,
         version: target,
-        scope: 'global',
+        scope: 'user',
         lock_version: true,
         workspace_id: null,
       });
@@ -528,24 +618,24 @@ function PackageDetail({
   const maxHeight = Math.min(screenHeight - 64, 680);
 
   return (
-    <Modal visible transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent>
-      <View style={styles.backdropWrap}>
-        <Pressable
-          style={[styles.backdrop, { backgroundColor: p.isDark ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.28)' }]}
-          onPress={onClose}
-          accessibilityLabel="关闭详情"
-        />
+    <AppModal
+      visible
+      onClose={onClose}
+      contentStyle={[
+        styles.dialog,
+        {
+          backgroundColor: p.card,
+          borderColor: p.border,
+          borderRadius: phone ? 0 : m.cardRadius + 4,
+          width: phone ? '100%' : 560,
+          height: phone ? '100%' : undefined,
+          maxHeight: phone ? undefined : maxHeight,
+        },
+      ]}
+    >
         <View
           style={[
-            styles.dialog,
-            {
-              backgroundColor: p.card,
-              borderColor: p.border,
-              borderRadius: phone ? 0 : m.cardRadius + 4,
-              width: phone ? '100%' : 560,
-              height: phone ? '100%' : undefined,
-              maxHeight: phone ? undefined : maxHeight,
-            },
+            styles.dialogInner,
           ]}
         >
           <View style={[styles.dialogHeader, { borderBottomColor: p.separator, padding: m.gutter }]}>
@@ -617,8 +707,7 @@ function PackageDetail({
             />
           </View>
         </View>
-      </View>
-    </Modal>
+    </AppModal>
   );
 }
 
@@ -840,15 +929,62 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   installedActions: { flexDirection: 'row', gap: 8 },
-  installedRow: { flexDirection: 'row', alignItems: 'center', gap: 8, paddingVertical: 6 },
-  outputBlock: {
-    padding: 12,
+  operationMessage: {
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    fontSize: 12,
+    fontFamily: Fonts.sans,
     borderWidth: StyleSheet.hairlineWidth,
   },
-  outputText: {
-    fontSize: 12,
-    lineHeight: 18,
-    fontFamily: Fonts.mono,
+  installedGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    alignItems: 'stretch',
+  },
+  installedCard: {
+    flexGrow: 1,
+    minWidth: CARD_MIN_WIDTH,
+    minHeight: 112,
+    justifyContent: 'space-between',
+    gap: 14,
+    borderWidth: StyleSheet.hairlineWidth,
+  },
+  installedCardTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  installedIcon: {
+    width: 32,
+    height: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: StyleSheet.hairlineWidth,
+  },
+  installedCopy: {
+    flex: 1,
+    gap: 3,
+    minWidth: 0,
+  },
+  installedName: {
+    fontFamily: Fonts.sansMedium,
+  },
+  installedFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+    alignSelf: 'stretch',
+    paddingTop: 8,
+    borderTopWidth: StyleSheet.hairlineWidth,
+  },
+  installedAction: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingHorizontal: 7,
+    paddingVertical: 5,
+    borderRadius: 5,
   },
   backdropWrap: {
     flex: 1,
@@ -864,6 +1000,9 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     boxShadow: '0px 12px 32px rgba(0, 0, 0, 0.22)',
     elevation: 12,
+  },
+  dialogInner: {
+    flex: 1,
   },
   dialogHeader: {
     flexDirection: 'row',

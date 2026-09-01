@@ -54,12 +54,16 @@ export const BashToolCall = memo(function BashToolCall({
     <View>
       <ToolHeader
         expanded={expanded}
-        expandable
+        expandable={hasOutput}
         onToggle={toggle}
         isDark={isDark}
         accessibilityLabel={`${expanded ? "Collapse" : "Expand"} output of ${command || "bash"}`}
       >
-        <Text style={[styles.ranLabel, { color: colors.textSecondary }]}>
+        <Text
+          style={[styles.ranLabel, { color: colors.textSecondary }]}
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
           Ran <Text style={[styles.command, { color: colors.text }]}>{command || "bash"}</Text>
           {cdPath ? (
             <Text>
@@ -70,37 +74,29 @@ export const BashToolCall = memo(function BashToolCall({
         </Text>
       </ToolHeader>
 
-      <ToolBody expanded={expanded}>
-        <ToolSurface isDark={isDark}>
-          <ScrollView
-            ref={scrollRef}
-            style={styles.scroll}
-            nestedScrollEnabled
-            showsVerticalScrollIndicator
-            onContentSizeChange={handleOutputGrowth}
-            onScrollBeginDrag={stopFollowing}
-          >
-            <View style={styles.promptLine}>
-              <Text style={[styles.promptChar, { color: colors.textTertiary }]}>{">"}</Text>
-              <Text style={[styles.cmdText, { color: colors.text }]} selectable>
-                {command}
+      {hasOutput && (
+        <ToolBody expanded={expanded}>
+          <ToolSurface isDark={isDark}>
+            <ScrollView
+              ref={scrollRef}
+              style={styles.scroll}
+              nestedScrollEnabled
+              showsVerticalScrollIndicator
+              onContentSizeChange={handleOutputGrowth}
+              onScrollBeginDrag={stopFollowing}
+            >
+              <Text style={[styles.outputText, { color: colors.textSecondary }]} selectable>
+                {displayOutput}
               </Text>
-            </View>
-            {hasOutput && (
-              <>
-                <Text style={[styles.outputText, { color: colors.textSecondary }]} selectable>
-                  {displayOutput}
+              {truncated && (
+                <Text style={[styles.truncatedText, { color: colors.textTertiary }]}>
+                  … output truncated
                 </Text>
-                {truncated && (
-                  <Text style={[styles.truncatedText, { color: colors.textTertiary }]}>
-                    … output truncated
-                  </Text>
-                )}
-              </>
-            )}
-          </ScrollView>
-        </ToolSurface>
-      </ToolBody>
+              )}
+            </ScrollView>
+          </ToolSurface>
+        </ToolBody>
+      )}
 
       {tc.resultImages && tc.resultImages.length > 0 && (
         <ToolResultImages images={tc.resultImages} isDark={isDark} />
@@ -121,23 +117,6 @@ const styles = StyleSheet.create({
   },
   scroll: {
     maxHeight: BASH_OUTPUT_MAX_HEIGHT,
-  },
-  promptLine: {
-    flexDirection: "row",
-    gap: 6,
-    marginBottom: 6,
-  },
-  promptChar: {
-    fontSize: 12,
-    lineHeight: 18,
-    fontFamily: Fonts.mono,
-    fontWeight: "700",
-  },
-  cmdText: {
-    fontSize: 12,
-    lineHeight: 18,
-    fontFamily: Fonts.mono,
-    flex: 1,
   },
   outputText: {
     fontSize: 11,

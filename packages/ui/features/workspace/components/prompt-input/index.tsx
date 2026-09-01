@@ -28,6 +28,8 @@ import { useSpeechSettingsStore } from "@/features/speech/store";
 import {
   SlashCommand,
   Attachment,
+  resolveAutoThinkingLevel,
+  type ThinkingPreference,
 } from "./constants";
 import { usePromptTheme } from "./use-theme-colors";
 import { SlashCommandDropdown } from "./slash-command-dropdown";
@@ -174,6 +176,7 @@ export function PromptInput({
   const [toolbarPopoverOpen, setToolbarPopoverOpen] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const [entryDone, setEntryDone] = useState(false);
+  const [thinkingPreference, setThinkingPreference] = useState<ThinkingPreference>('auto');
   // Wide viewports fold the model/mode controls into the input card's action
   // row, so the composer is a single line; narrow ones keep the separate strip
   // below the card, where there is room for them.
@@ -353,12 +356,17 @@ export function PromptInput({
     textBeforeSpeechRef.current = "";
     onClearError?.();
     try {
+      if (thinkingPreference === 'auto' && sessionId) {
+        await agentConfig.setThinkingLevel(
+          resolveAutoThinkingLevel(savedText, agentConfig.availableThinkingLevels),
+        );
+      }
       await onSend?.(savedText, savedAttachments, { queueBehavior });
     } catch {
       setText(savedText);
       setAttachments(savedAttachments);
     }
-  }, [attachments, clearDraft, draftKey, hasDraft, onClearError, onSend, setText, setAttachments, trimmedText]);
+  }, [agentConfig, attachments, clearDraft, draftKey, hasDraft, onClearError, onSend, sessionId, setText, setAttachments, thinkingPreference, trimmedText]);
 
   // Queued messages are display-only: pi 0.84.3 has no `clear_queue` RPC command,
   // so AiJee cannot drop them. Stopping only aborts the current run.
@@ -758,6 +766,8 @@ export function PromptInput({
               }
               ready={!!sessionReady && !!sessionId}
               config={agentConfig}
+              thinkingPreference={thinkingPreference}
+              onThinkingPreferenceChange={setThinkingPreference}
             />
           )}
           {contextUsage ? (
@@ -835,6 +845,8 @@ export function PromptInput({
             }
             ready={!!sessionReady && !!sessionId}
             config={agentConfig}
+            thinkingPreference={thinkingPreference}
+            onThinkingPreferenceChange={setThinkingPreference}
           />
         </View>
       )}
@@ -843,7 +855,7 @@ export function PromptInput({
         <MobileModelSheet visible sessionId={sessionId} onClose={closeMobileSheet} config={agentConfig} />
       )}
       {sessionReady && mobileSheet === "effort" && (
-        <MobileEffortSheet visible sessionId={sessionId} onClose={closeMobileSheet} config={agentConfig} />
+        <MobileEffortSheet visible sessionId={sessionId} onClose={closeMobileSheet} config={agentConfig} thinkingPreference={thinkingPreference} onThinkingPreferenceChange={setThinkingPreference} />
       )}
     </Animated.View>
   );

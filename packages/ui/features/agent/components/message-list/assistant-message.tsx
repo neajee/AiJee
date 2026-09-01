@@ -11,7 +11,7 @@ import Animated, {
 import { Colors, Fonts } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
-import { BottomSheet } from "@/components/ui/bottom-sheet";
+import { BottomSheet } from "@/components/ui";
 import { Portal } from "@/components/ui/portal";
 import type { ChatMessage } from "../../types";
 import { AssistantMarkdown } from "./assistant-markdown";

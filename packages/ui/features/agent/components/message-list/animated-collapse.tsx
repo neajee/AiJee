@@ -78,15 +78,25 @@ export function AnimatedCollapse({
     });
   }, [expanded, mounted, settled, maxHeight, targetHeight, height, opacity]);
 
-  const style = useAnimatedStyle(
-    () => ({
-      height: settled ? undefined : height.value,
-      opacity: opacity.value,
-    }),
-    [settled],
-  );
+  const style = useAnimatedStyle(() => ({
+    height: height.value,
+    opacity: opacity.value,
+  }));
 
   if (!mounted) return null;
+
+  // Reanimated cannot reliably clear an animated height on RN Web. Once the
+  // opening motion has finished, hand the subtree back to a normal View so
+  // nested disclosures grow the parent layout instead of being clipped.
+  if (expanded && settled) {
+    return (
+      <View style={styles.container}>
+        <View onLayout={handleLayout} style={styles.content}>
+          {children}
+        </View>
+      </View>
+    );
+  }
 
   return (
     <Animated.View style={[styles.container, style]}>

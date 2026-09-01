@@ -1,6 +1,6 @@
-import { memo } from "react";
-import { Image, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
-import { Check, Pencil, X } from "lucide-react-native";
+import { memo, useEffect, useMemo, useState } from "react";
+import { Image, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Check, ChevronDown, Pencil, X } from "lucide-react-native";
 import { Colors, Fonts } from "@/constants/theme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import type { ChatMessage } from "../../types";
@@ -16,6 +16,17 @@ interface UserMessageProps {
   onSubmitEdit?: () => void;
 }
 
+const COLLAPSE_AFTER_LINES = 12;
+const COLLAPSE_AFTER_CHARS = 1600;
+
+function previewText(text: string): { preview: string; collapsible: boolean } {
+  const lines = text.split("\n");
+  const collapsible = lines.length > COLLAPSE_AFTER_LINES || text.length > COLLAPSE_AFTER_CHARS;
+  if (!collapsible) return { preview: text, collapsible: false };
+  const preview = lines.slice(0, COLLAPSE_AFTER_LINES).join("\n");
+  return { preview: `${preview.slice(0, COLLAPSE_AFTER_CHARS)}\n…`, collapsible: true };
+}
+
 export const UserMessage = memo(function UserMessage({
   message,
   isDark,
@@ -29,6 +40,16 @@ export const UserMessage = memo(function UserMessage({
   const colors = useThemeTokens();
   const attachments = message.attachments ?? [];
   const images = attachments.filter((a) => a.type === "image" && !!a.data);
+  const { preview, collapsible } = useMemo(() => previewText(message.text), [message.text]);
+  const [expanded, setExpanded] = useState(false);
+
+  useEffect(() => setExpanded(false), [message.id, message.text]);
+  useEffect(() => {
+    if (Platform.OS !== "web") return;
+    const collapse = () => setExpanded(false);
+    window.addEventListener("blur", collapse);
+    return () => window.removeEventListener("blur", collapse);
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -70,9 +91,26 @@ export const UserMessage = memo(function UserMessage({
             </View>
           </>
         ) : !!message.text && (
-          <Text style={[styles.text, { color: colors.text }]} selectable>
-            {message.text}
-          </Text>
+          <>
+            <Text style={[styles.text, { color: colors.text }]} selectable>
+              {expanded || !collapsible ? message.text : preview}
+            </Text>
+            {collapsible && (
+              <View style={styles.disclosureRow}>
+                <View style={[styles.disclosureLine, { backgroundColor: colors.border }]} />
+                <Pressable
+                  onPress={() => setExpanded((value) => !value)}
+                  accessibilityRole="button"
+                  accessibilityLabel={expanded ? "收起长消息" : "展开长消息"}
+                  style={({ pressed }) => [styles.disclosure, pressed && styles.disclosurePressed]}
+                >
+                  <Text style={[styles.disclosureText, { color: colors.textTertiary }]}>{expanded ? "收起" : "展开全文"}</Text>
+                  <ChevronDown size={12} color={colors.textTertiary} style={expanded && styles.disclosureIconExpanded} />
+                </Pressable>
+                <View style={[styles.disclosureLine, { backgroundColor: colors.border }]} />
+              </View>
+            )}
+          </>
         )}
       </View>
       {!editing && onEdit && (
@@ -112,6 +150,12 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     fontFamily: Fonts.sans,
   },
+  disclosureRow: { flexDirection: "row", alignItems: "center", gap: 9, marginTop: 10 },
+  disclosureLine: { height: StyleSheet.hairlineWidth, flex: 1 },
+  disclosure: { flexDirection: "row", alignItems: "center", gap: 4, minHeight: 24, paddingHorizontal: 2 },
+  disclosurePressed: { opacity: 0.68 },
+  disclosureText: { fontSize: 12, fontFamily: Fonts.sansMedium },
+  disclosureIconExpanded: { transform: [{ rotate: "180deg" }] },
   editor: {
     minWidth: 220,
     minHeight: 64,

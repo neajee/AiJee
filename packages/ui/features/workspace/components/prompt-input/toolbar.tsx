@@ -15,7 +15,7 @@ import {
 import { ChevronDown, Check, RotateCw } from 'lucide-react-native';
 
 import { Fonts } from '@/constants/theme';
-import { buildThinkingLevelOptions, thinkingLevelLabel, FlatModel, ThinkingLevel } from './constants';
+import { buildThinkingLevelOptions, thinkingLevelLabel, FlatModel, ThinkingLevel, ThinkingPreference } from './constants';
 import { matchesModelSearch } from './model-search';
 import { usePromptTheme } from './use-theme-colors';
 import { ProviderIcon } from './provider-icons';
@@ -42,6 +42,8 @@ interface ToolbarProps {
    * row, instead of the bordered strip that hangs below the card.
    */
   inline?: boolean;
+  thinkingPreference?: ThinkingPreference;
+  onThinkingPreferenceChange?: (level: ThinkingPreference) => void;
 }
 
 /**
@@ -82,11 +84,14 @@ function ToolbarComponent({
   ready = true,
   config,
   inline = false,
+  thinkingPreference = 'auto',
+  onThinkingPreferenceChange,
 }: ToolbarProps) {
   const theme = usePromptTheme();
   const appMode = useAppMode();
   const modelScrollRef = useRef<ScrollView>(null);
   const modelSearchRef = useRef<TextInput>(null);
+  const toolbarRef = useRef<View>(null);
 
   // config is passed in from PromptInput (shared instance)
   const models = config.models;
@@ -116,7 +121,8 @@ function ToolbarComponent({
   );
   // A model without extended thinking has nothing to choose from.
   const thinkingDisabled = !config.supportsThinking;
-  const thinkingLabel = thinkingLevelLabel(currentThinking);
+  const thinkingLabel = thinkingPreference === 'auto' ? 'Auto' : thinkingLevelLabel(currentThinking);
+  const effortOptions = useMemo(() => [{ level: 'auto' as const, label: 'Auto', description: '' }, ...thinkingOptions], [thinkingOptions]);
   const [pendingMode, setPendingMode] = useState<AgentMode | null>(null);
   const displayedMode = pendingMode ?? currentMode;
 
@@ -138,6 +144,16 @@ function ToolbarComponent({
     onDropdownOpenChange?.(activeDropdown !== null);
     return () => onDropdownOpenChange?.(false);
   }, [activeDropdown, onDropdownOpenChange]);
+
+  useEffect(() => {
+    if (Platform.OS !== 'web' || !activeDropdown) return;
+    const closeOnOutsidePointer = (event: PointerEvent) => {
+      const element = toolbarRef.current as unknown as { contains?: (node: EventTarget | null) => boolean } | null;
+      if (!element?.contains?.(event.target)) setActiveDropdown(null);
+    };
+    document.addEventListener('pointerdown', closeOnOutsidePointer, true);
+    return () => document.removeEventListener('pointerdown', closeOnOutsidePointer, true);
+  }, [activeDropdown]);
 
   useEffect(() => {
     setPendingMode(null);
@@ -199,11 +215,12 @@ function ToolbarComponent({
   }, [config, inputRef]);
 
   // Choosing a level closes its own popover, as choosing a model closes its.
-  const handleSelectThinking = useCallback((level: ThinkingLevel) => {
-    config.setThinkingLevel(level);
+  const handleSelectThinking = useCallback((level: ThinkingPreference) => {
+    onThinkingPreferenceChange?.(level);
+    if (level !== 'auto') config.setThinkingLevel(level);
     setActiveDropdown(null);
     setTimeout(() => inputRef.current?.focus(), 0);
-  }, [config, inputRef]);
+  }, [config, inputRef, onThinkingPreferenceChange]);
 
   const handleSelectMode = useCallback((mode: AgentMode) => {
     if (mode === currentMode) {
@@ -230,14 +247,14 @@ function ToolbarComponent({
           setPopoverIndex(idx >= 0 ? idx : 0);
           setTimeout(() => modelSearchRef.current?.focus(), 50);
         } else if (type === 'effort') {
-          const idx = thinkingOptions.findIndex((e) => e.level === currentThinking);
+          const idx = effortOptions.findIndex((e) => e.level === thinkingPreference);
           setPopoverIndex(idx >= 0 ? idx : 0);
           setTimeout(() => inputRef.current?.focus(), 0);
         }
         return type;
       });
     },
-    [flatModels, currentModel, currentThinking, thinkingOptions, inputRef]
+    [flatModels, currentModel, effortOptions, thinkingPreference, inputRef]
   );
 
   const handleSearchKeyPress = useCallback(
@@ -311,7 +328,7 @@ function ToolbarComponent({
   }
 
   return (
-    <View style={[inline ? styles.inlineWrap : styles.wrap, activeDropdown && { zIndex: 10 }]}>
+    <View ref={toolbarRef} style={[inline ? styles.inlineWrap : styles.wrap, activeDropdown && { zIndex: 10 }]}>
       <View
         style={[
           inline ? styles.inlineToolbar : styles.toolbar,
@@ -442,6 +459,7 @@ function ToolbarComponent({
             accessibilityState={{ expanded: activeDropdown === 'effort', disabled: toolbarDisabled || thinkingDisabled }}
             style={({ pressed }) => [
               styles.button,
+              styles.effortButton,
               { height: controlHeight },
               (pressed || toolbarDisabled || thinkingDisabled) && { opacity: 0.7 },
             ]}
@@ -460,6 +478,7 @@ function ToolbarComponent({
               accessibilityLabel="Thinking level selection"
               style={[
                 styles.popover,
+                styles.effortPopover,
                 // Inline the control sits on the right of the action row, so the
                 // panel hangs from that edge instead of overflowing the window.
                 inline ? { left: undefined, right: 0 } : null,
@@ -478,9 +497,9 @@ function ToolbarComponent({
                 },
               ]}
             >
-              {thinkingOptions.map((item, index) => {
+              {effortOptions.map((item, index) => {
                 const isHighlighted = index === popoverIndex;
-                const isActive = item.level === currentThinking;
+                const isActive = item.level === thinkingPreference;
                 return (
                   <Pressable
                     key={item.level}
@@ -502,11 +521,6 @@ function ToolbarComponent({
                       </Text>
                       {isActive && <Check size={14} color={theme.accentColor} strokeWidth={2} />}
                     </View>
-                    {!!item.description && (
-                      <Text style={[styles.effortDesc, { color: theme.textMuted }]}>
-                        {item.description}
-                      </Text>
-                    )}
                   </Pressable>
                 );
               })}
@@ -661,6 +675,10 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.sansMedium,
     flexShrink: 1,
   },
+  effortButton: {
+    gap: 3,
+    paddingHorizontal: 6,
+  },
   modeToggle: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -701,6 +719,9 @@ const styles = StyleSheet.create({
     boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.15)',
     elevation: 8,
     zIndex: 10,
+  },
+  effortPopover: {
+    minWidth: 118,
   },
   popoverScroll: {
     maxHeight: 320,
@@ -751,8 +772,9 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.sans,
   },
   effortItem: {
-    paddingHorizontal: 14,
-    paddingVertical: 10,
+    minHeight: 32,
+    paddingHorizontal: 10,
+    justifyContent: 'center',
   },
   effortRow: {
     flexDirection: 'row',
@@ -762,10 +784,5 @@ const styles = StyleSheet.create({
   effortLabel: {
     fontSize: 13,
     fontFamily: Fonts.sansMedium,
-  },
-  effortDesc: {
-    fontSize: 12,
-    fontFamily: Fonts.sans,
-    marginTop: 2,
   },
 });
