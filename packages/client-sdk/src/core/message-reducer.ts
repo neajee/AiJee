@@ -303,22 +303,82 @@ function findToolCallIndex(toolCalls: ToolCallInfo[], contentIndex?: number): nu
   return toolCalls.length - 1;
 }
 
+/**
+ * Merges a server-side snapshot's tool call blocks into the tool calls the
+ * stream has already produced.
+ *
+ * Identity is resolved in two passes:
+ *  1. Exact match — stable id chain (`id`/`previousId`) first, content index
+ *     as a weaker signal. Snapshot ids can differ from the provisional ids
+ *     the stream assigned earlier (`tc-<index>` or a partial id), so neither
+ *     is authoritative on its own.
+ *  2. Order match — the stream emits tool calls in call order and the snapshot
+ *     keeps that order, so an unmatched block continues the next unmatched
+ *     local call. This is what keeps a completed tool "complete" (and its
+ *     collapse state alive) across a snapshot that re-christens its id.
+ *
+ * Finally, calls the snapshot simply did not mention (a snapshot can arrive
+ * while the stream is still assembling later calls) are kept when they are
+ * still in flight, so a mid-stream remix can never temporarily drop a running
+ * tool and make the UI flap around it.
+ */
 function buildToolCallsFromContent(
   content: Record<string, unknown>[],
   previousToolCalls: ToolCallInfo[] | undefined,
   defaultStatus: ToolCallInfo["status"],
 ): ToolCallInfo[] {
-  const nextToolCalls: ToolCallInfo[] = [];
+  const prev = previousToolCalls ?? [];
+  const unclaimed = [...prev];
+  interface Entry {
+    block: Record<string, unknown>;
+    contentIndex: number;
+    id: string;
+    name: string;
+    previous?: ToolCallInfo;
+  }
+  const entries: Entry[] = [];
+
+  const claim = (tc: ToolCallInfo) => {
+    const at = unclaimed.indexOf(tc);
+    if (at !== -1) unclaimed.splice(at, 1);
+  };
+  // Tool type names are stable across the stream, so a block whose name does
+  // not match a local call is a brand-new call, never a continuation.
+  const nameCompatible = (tc: ToolCallInfo, blockName: string) =>
+    !blockName || !tc.name || tc.name === blockName;
 
   for (const [contentIndex, block] of content.entries()) {
     if (block["type"] !== "toolCall") continue;
 
     const id = typeof block["id"] === "string" ? block["id"] : `tc-${contentIndex}`;
-    const previous = previousToolCalls?.find(
-      (tc) => tc.id === id || tc.previousId === id || tc.contentIndex === contentIndex,
-    );
-    const previousId = previous?.previousId ?? (previous && previous.id !== id ? previous.id : undefined);
+    const name = typeof block["name"] === "string" ? block["name"] : "";
+    const previous =
+      unclaimed.find((tc) => (tc.id === id || tc.previousId === id) && nameCompatible(tc, name)) ??
+      unclaimed.find((tc) => tc.contentIndex === contentIndex && nameCompatible(tc, name));
+    if (previous) claim(previous);
+    entries.push({ block, contentIndex, id, name, previous });
+  }
 
+  // Second pass: pair the unmatched blocks with the unmatched local calls, in
+  // order, so snapshots that renamed nothing still keep identity. Incompatible
+  // names are skipped — those local calls are still in flight and will be
+  // merged back below rather than mistaken for the new block.
+  for (const entry of entries) {
+    if (entry.previous) continue;
+    for (let cursor = 0; cursor < unclaimed.length; cursor++) {
+      const candidate = unclaimed[cursor]!;
+      if (nameCompatible(candidate, entry.name)) {
+        entry.previous = candidate;
+        claim(candidate);
+        break;
+      }
+    }
+  }
+
+  const nextToolCalls: ToolCallInfo[] = [];
+  const seen = new Set<string>();
+  for (const { block, contentIndex, id, name, previous } of entries) {
+    const previousId = previous?.previousId ?? (previous && previous.id !== id ? previous.id : undefined);
     nextToolCalls.push({
       ...previous,
       id,
@@ -327,6 +387,23 @@ function buildToolCallsFromContent(
       status: previous?.status ?? defaultStatus,
       contentIndex,
       ...(previousId ? { previousId } : {}),
+    });
+    seen.add(id);
+    if (previousId) seen.add(previousId);
+  }
+
+  // Keep in-flight calls the snapshot did not mention (the stream is still
+  // assembling them), restored to their original relative order.
+  const remaining = unclaimed.filter((tc) => IN_FLIGHT_TOOL_STATUS.includes(tc.status));
+  if (remaining.length) {
+    const prevIndex = new Map(prev.map((tc, i) => [tc.id, i]));
+    nextToolCalls.push(...remaining);
+    nextToolCalls.sort((a, b) => {
+      const ia = (a.previousId ? prevIndex.get(a.previousId) : undefined) ?? prevIndex.get(a.id);
+      const ib = (b.previousId ? prevIndex.get(b.previousId) : undefined) ?? prevIndex.get(b.id);
+      if (ia === undefined) return ib === undefined ? 0 : 1;
+      if (ib === undefined) return -1;
+      return ia - ib;
     });
   }
 

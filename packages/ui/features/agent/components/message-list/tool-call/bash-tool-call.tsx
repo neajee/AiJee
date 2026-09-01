@@ -1,16 +1,24 @@
-import { memo, useCallback, useState } from "react";
+import { memo, useCallback, useRef, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { Colors, Fonts } from "@/constants/theme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import type { ToolCallInfo } from "../../../types";
 import { parseToolArguments, truncateOutput } from "../utils";
-import { ToolBody, ToolHeader, ToolSurface, TOOL_BODY_MAX_HEIGHT } from "./tool-disclosure";
+import { ToolBody, ToolHeader, ToolSurface } from "./tool-disclosure";
 import { ToolResultImages } from "./tool-result-images";
 
 interface BashToolCallProps {
   tc: ToolCallInfo;
   isDark: boolean;
 }
+
+/**
+ * Command output is the turn's primary artifact, so it gets more room than the
+ * generic tool body cap: ~26 lines instead of ~16, and anything longer scrolls
+ * with a visible indicator. The data layer still truncates at 50 lines so a
+ * runaway `cat` cannot render megabytes into the list.
+ */
+const BASH_OUTPUT_MAX_HEIGHT = 420;
 
 export const BashToolCall = memo(function BashToolCall({
   tc,
@@ -20,6 +28,18 @@ export const BashToolCall = memo(function BashToolCall({
   // Results stay collapsed by default, even while the tool is running.
   const [expanded, setExpanded] = useState(false);
   const toggle = useCallback(() => setExpanded((p) => !p), []);
+  // While streaming, the panel tracks the tail of the output so the reader
+  // always sees the newest lines; dragging inside the panel stops the chase.
+  const scrollRef = useRef<ScrollView>(null);
+  const followTailRef = useRef(true);
+  const handleOutputGrowth = useCallback(() => {
+    if (expanded && followTailRef.current) {
+      scrollRef.current?.scrollToEnd({ animated: false });
+    }
+  }, [expanded]);
+  const stopFollowing = useCallback(() => {
+    followTailRef.current = false;
+  }, []);
 
   const parsed = parseToolArguments(tc.arguments);
   const rawCommand = (parsed.command as string) || "";
@@ -39,7 +59,7 @@ export const BashToolCall = memo(function BashToolCall({
         isDark={isDark}
         accessibilityLabel={`${expanded ? "Collapse" : "Expand"} output of ${command || "bash"}`}
       >
-        <Text style={[styles.ranLabel, { color: colors.textSecondary }]} numberOfLines={1}>
+        <Text style={[styles.ranLabel, { color: colors.textSecondary }]}>
           Ran <Text style={[styles.command, { color: colors.text }]}>{command || "bash"}</Text>
           {cdPath ? (
             <Text>
@@ -53,9 +73,12 @@ export const BashToolCall = memo(function BashToolCall({
       <ToolBody expanded={expanded}>
         <ToolSurface isDark={isDark}>
           <ScrollView
+            ref={scrollRef}
             style={styles.scroll}
             nestedScrollEnabled
-            showsVerticalScrollIndicator={false}
+            showsVerticalScrollIndicator
+            onContentSizeChange={handleOutputGrowth}
+            onScrollBeginDrag={stopFollowing}
           >
             <View style={styles.promptLine}>
               <Text style={[styles.promptChar, { color: colors.textTertiary }]}>{">"}</Text>
@@ -97,7 +120,7 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.mono,
   },
   scroll: {
-    maxHeight: TOOL_BODY_MAX_HEIGHT,
+    maxHeight: BASH_OUTPUT_MAX_HEIGHT,
   },
   promptLine: {
     flexDirection: "row",

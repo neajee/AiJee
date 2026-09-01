@@ -168,8 +168,18 @@ const GroupedToolCalls = memo(function GroupedToolCalls({
 
   const activeCall = calls.find(isToolActive);
 
+  /**
+   * Auto-open exactly once, the moment the first call of the group starts.
+   * Keying this off the `activeCall` object itself would re-fire on every
+   * streaming frame (each frame carries a fresh object) and re-open a panel
+   * the reader just collapsed while a command was still streaming.
+   */
+  const autoOpenedRef = useRef(false);
   useEffect(() => {
-    if (activeCall) setExpanded(true);
+    if (activeCall && !autoOpenedRef.current) {
+      autoOpenedRef.current = true;
+      setExpanded(true);
+    }
   }, [activeCall]);
 
   const toggle = useCallback(() => setExpanded((p) => !p), []);

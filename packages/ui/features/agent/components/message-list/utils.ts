@@ -31,7 +31,15 @@ function extractJsonStringValue(raw: string, key: string): string | undefined {
     } else if (ch === "\\") {
       escaped = true;
     } else if (ch === '"') {
-      return unescapeJsonString(result);
+      // Streamed arguments can carry unescaped quotes inside the value (e.g. a
+      // heredoc body). Only treat this quote as the end of the string when what
+      // follows marks a value boundary: `,` (next key), `}` (object end), a
+      // newline or the end of the buffer. Anything else is content.
+      const next = raw[i + 1];
+      if (next === undefined || next === "," || next === "}" || next === "\n") {
+        return unescapeJsonString(result);
+      }
+      result += '"';
     } else {
       result += ch;
     }

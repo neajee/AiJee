@@ -717,7 +717,17 @@ const WorkActivityGroup = memo(function WorkActivityGroup({
       : step.kind === "tools" && step.toolCalls.some(isToolActive),
   );
   const [override, setOverride] = useState<boolean | null>(null);
-  const expanded = override ?? running;
+  /**
+   * Auto-open once, when work starts, and stay open for the rest of the turn.
+   * Following `running` directly would re-collapse the panel in the gaps
+   * between consecutive tools — and re-open it on the next one — while a
+   * command's output is still streaming in, which reads as the panel flapping.
+   */
+  const [autoExpanded, setAutoExpanded] = useState(running);
+  useEffect(() => {
+    if (running) setAutoExpanded(true);
+  }, [running]);
+  const expanded = override ?? autoExpanded;
   const actions = useMemo(() => summarizeTurnActions(steps), [steps]);
   const label = actions.length
     ? actions.map(formatTurnAction).join(" · ")
@@ -751,8 +761,9 @@ const WorkActivityGroup = memo(function WorkActivityGroup({
 
 /**
  * A whole assistant turn: the work history behind one "Worked for X" divider,
- * plus the final answer. The divider auto-expands while the turn runs and
- * collapses once it settles, unless the reader toggled it by hand.
+ * plus the final answer. The divider auto-opens while the turn runs and stays
+ * open once it has — the reader's place is not yanked away when the turn
+ * settles or the next one starts — until they collapse it by hand.
  */
 const TurnBlock = memo(function TurnBlock({
   turn,
@@ -769,7 +780,17 @@ const TurnBlock = memo(function TurnBlock({
 }) {
   const colors = useThemeTokens();
   const [override, setOverride] = useState<boolean | null>(null);
-  const expanded = override ?? active;
+  /**
+   * Once the turn is seen running, keep its work log open for the rest of its
+   * life. Following `active` directly would collapse the log the moment the
+   * turn finishes (or the next turn claims the list tail), taking the tool
+   * output the reader was looking at with it.
+   */
+  const [autoExpanded, setAutoExpanded] = useState(active);
+  useEffect(() => {
+    if (active) setAutoExpanded(true);
+  }, [active]);
+  const expanded = override ?? autoExpanded;
   const hasWork = turn.steps.length > 0;
 
   const chevronRotate = useSharedValue(expanded ? 90 : 0);
