@@ -99,6 +99,7 @@ export class PiSession implements EngineSession {
   sessionStats(): SessionStats { return this.session.getSessionStats() as unknown as SessionStats; }
   setSessionName(name: string): void { this.session.setSessionName(name); }
   entries(since?: string): SessionEntry[] { const entries = this.session.sessionManager.getEntries(); return (since ? entries.slice(entries.findIndex((entry) => entry.id === since) + 1) : entries) as unknown as SessionEntry[]; }
+  activeEntries(): SessionEntry[] { return this.session.sessionManager.getBranch() as unknown as SessionEntry[]; }
   tree(): JsonValue { return this.session.sessionManager.getTree() as unknown as JsonValue; }
   async fork(entryId: string, options?: { position?: "before" | "at" }): Promise<JsonValue> {
     const result = await this.runtime.fork(entryId, options);

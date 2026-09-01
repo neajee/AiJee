@@ -1,13 +1,14 @@
 import { useState, type ReactNode } from 'react';
 import { Pressable, Text, View } from 'react-native';
+import { Plus } from 'lucide-react-native';
+import { ProviderIcon as LobeProviderIcon } from '@lobehub/icons-rn';
 import { ProviderIcon } from '../../workspace/components/prompt-input/provider-icons';
 import { type CustomProvider } from '../store/custom-models';
 import { API_TYPES, ApiTypeSelector, Field, ModelEntryRow } from './custom-models-form';
 import { useColors } from './custom-models-theme';
 import { providerPageStyles } from './custom-models-styles';
 
-
-function providerBrand(name: string, id = ''): 'OpenAI' | 'Anthropic' | 'Google' | 'Meta' | null {
+function legacyBrand(name: string, id = ''): 'OpenAI' | 'Anthropic' | 'Google' | 'Meta' | null {
   const value = `${id} ${name}`.toLowerCase();
   if (value.includes('anthropic') || value.includes('claude')) return 'Anthropic';
   if (value.includes('openai') || value.includes('chatgpt')) return 'OpenAI';
@@ -16,13 +17,33 @@ function providerBrand(name: string, id = ''): 'OpenAI' | 'Anthropic' | 'Google'
   return null;
 }
 
+function lobeProviderKey(name: string, id = '') {
+  const value = `${id} ${name}`.toLowerCase();
+  const aliases: Array<[string, string]> = [
+    ['vertex', 'vertex-ai'], ['github-copilot', 'copilot'], ['copilot', 'copilot'],
+    ['openrouter', 'openrouter'], ['kimi', 'kimi'], ['moonshot', 'moonshot'],
+    ['radius', 'radius'], ['xai', 'xai'], ['google', 'google'], ['gemini', 'gemini'],
+    ['amazon bedrock', 'bedrock'], ['bedrock', 'bedrock'], ['baseten', 'baseten'],
+    ['cerebras', 'cerebras'], ['cloudflare', 'cloudflare'], ['fireworks', 'fireworks'],
+    ['github', 'github'], ['groq', 'groq'], ['huggingface', 'huggingface'],
+    ['together', 'together'], ['zai', 'zai'], ['qwen', 'qwen'],
+    ['anthropic', 'anthropic'], ['claude', 'claude'], ['openai-codex', 'codex'],
+    ['openai', 'openai'], ['deepseek', 'deepseek'], ['mistral', 'mistral'],
+  ];
+  return aliases.find(([alias]) => value.includes(alias))?.[1] ?? null;
+}
+
+
 export function ProviderMark({ name, id, colors }: { name: string; id?: string; colors: ReturnType<typeof useColors> }) {
-  const brand = providerBrand(name, id);
   const initial = name.trim().match(/[A-Za-z\u4e00-\u9fff]/)?.[0]?.toUpperCase() ?? '?';
+  const provider = lobeProviderKey(name, id);
+  const brand = legacyBrand(name, id);
   return (
     <View style={[providerPageStyles.mark, { backgroundColor: colors.accentBg }]}>
-      {brand ? (
-        <ProviderIcon provider={brand} size={17} color={colors.textSecondary} />
+      {provider ? (
+        <LobeProviderIcon provider={provider} size={18} type="mono" color="#000000" />
+      ) : brand ? (
+        <ProviderIcon provider={brand} size={17} color="#000000" />
       ) : (
         <Text style={[providerPageStyles.markText, { color: colors.textSecondary }]}>{initial}</Text>
       )}
@@ -178,8 +199,9 @@ export function CustomProviderRow({
           <Field label="API 密钥" value={provider.apiKey ?? ''} onChangeText={(value) => onUpdate({ ...provider, apiKey: value || undefined })} placeholder="可选" colors={colors} />
           <View style={providerPageStyles.modelEditorHeader}>
             <Text style={[providerPageStyles.rowMeta, { color: colors.textSecondary }]}>模型</Text>
-            <Pressable onPress={() => onUpdate({ ...provider, models: [...(provider.models ?? []), { id: `model-${modelCount + 1}` }] })} accessibilityRole="button">
-              <Text style={[providerPageStyles.linkText, { color: colors.textPrimary }]}>+ 添加模型</Text>
+            <Pressable onPress={() => onUpdate({ ...provider, models: [...(provider.models ?? []), { id: `model-${modelCount + 1}` }] })} accessibilityRole="button" style={({ pressed }) => [providerPageStyles.addModelButton, { borderColor: colors.borderColor }, pressed && { backgroundColor: colors.pressedBg }]}>
+              <Plus size={14} color={colors.textSecondary} strokeWidth={2} />
+              <Text style={[providerPageStyles.linkText, { color: colors.textSecondary }]}>添加模型</Text>
             </Pressable>
           </View>
           {(provider.models ?? []).map((model, index) => (

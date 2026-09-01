@@ -1,3 +1,9 @@
+import { EnvHttpProxyAgent, setGlobalDispatcher } from "undici";
+
+if (process.env.HTTP_PROXY || process.env.HTTPS_PROXY || process.env.ALL_PROXY) {
+  setGlobalDispatcher(new EnvHttpProxyAgent());
+}
+
 export { runCli } from "./cli/commands.ts";
 
 if (process.argv[1]?.replaceAll("\\", "/").endsWith("/main.ts")) {

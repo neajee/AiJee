@@ -930,7 +930,9 @@ export class AiJeeHttpServer {
     const managed = await this.restoreSession(sessionId);
     if (!managed) return this.error(response, 404, "Session not found");
     const limit = Math.min(100, Math.max(1, Number(url.searchParams.get("limit") ?? 20)));
-    const entries = managed.session.entries() as Array<Record<string, unknown>>;
+    // A session file is append-only and retains discarded branches. The chat
+    // transcript must only expose the active branch after an edited resend.
+    const entries = (managed.session.activeEntries?.() ?? managed.session.entries()) as Array<Record<string, unknown>>;
     const before = url.searchParams.get("before");
     const end = before ? Math.max(0, entries.findIndex((entry) => entry.id === before)) : entries.length;
     const selected = entries.slice(Math.max(0, end - limit), end);
@@ -1289,12 +1291,16 @@ export class AiJeeHttpServer {
     void runtime.login(providerId, "oauth", {
       signal: flow.controller.signal,
       notify: (event: any) => { if (event.type === "auth_url") { flow.url = String(event.url); flow.instructions = typeof event.instructions === "string" ? event.instructions : null; } },
-      prompt: async (prompt: any) => new Promise<string>((resolve, reject) => {
+      prompt: async (prompt: any) => {
+        const options = Array.isArray(prompt.options) ? prompt.options : [];
+        if (prompt.type === "select" && options.some((option: any) => String(option.id) === "browser")) return "browser";
+        return new Promise<string>((resolve, reject) => {
         const id = randomUUID();
         flow.resolvePrompt = resolve;
-        flow.prompt = { id, message: String(prompt.message ?? "继续登录"), type: String(prompt.type ?? "text"), options: Array.isArray(prompt.options) ? prompt.options.map((option: any) => ({ id: String(option.id), label: String(option.label ?? option.id), ...(typeof option.description === "string" ? { description: option.description } : {}) })) : undefined };
+        flow.prompt = { id, message: String(prompt.message ?? "继续登录"), type: String(prompt.type ?? "text"), options: options.length ? options.map((option: any) => ({ id: String(option.id), label: String(option.label ?? option.id), ...(typeof option.description === "string" ? { description: option.description } : {}) })) : undefined };
         prompt.signal?.addEventListener("abort", () => reject(new Error("Login cancelled")), { once: true });
-      }),
+        });
+      },
     }).then(() => { flow.status = "complete"; }).catch((error) => { flow.status = "failed"; flow.error = error instanceof Error ? error.message : "OAuth login failed"; });
     await new Promise((resolve) => setTimeout(resolve, 250));
     return this.oauthStatus(flow.id);

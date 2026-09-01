@@ -1228,14 +1228,19 @@ export class ApiClient {
     unwrapResult(await response.json());
   }
 
-  async startProviderOAuth(providerId: string): Promise<{ id: string; url: string | null; instructions: string | null; status: string; error: string | null }> {
+  async startProviderOAuth(providerId: string): Promise<{ id: string; url: string | null; instructions: string | null; status: string; error: string | null; prompt?: { id: string; message: string; type: string } | null }> {
     const response = await this.authFetch(this.buildApiUrl(`/api/providers/${encodeURIComponent(providerId)}/oauth`), { method: "POST" });
     return unwrapResult(await response.json());
   }
 
-  async getProviderOAuth(providerId: string, loginId: string): Promise<{ url: string | null; instructions: string | null; status: "pending" | "complete" | "failed"; error: string | null }> {
+  async getProviderOAuth(providerId: string, loginId: string): Promise<{ url: string | null; instructions: string | null; status: "pending" | "complete" | "failed"; error: string | null; prompt?: { id: string; message: string; type: string } | null }> {
     const response = await this.authFetch(this.buildApiUrl(`/api/providers/${encodeURIComponent(providerId)}/oauth/${encodeURIComponent(loginId)}`));
     return unwrapResult(await response.json());
+  }
+
+  async resolveProviderOAuthPrompt(providerId: string, loginId: string, promptId: string, value: string): Promise<void> {
+    const response = await this.authFetch(this.buildApiUrl(`/api/providers/${encodeURIComponent(providerId)}/oauth/${encodeURIComponent(loginId)}/prompt/${encodeURIComponent(promptId)}`), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ value }) });
+    unwrapResult(await response.json());
   }
 
   async saveCustomModels(config: { providers: Record<string, CustomProvider> }): Promise<void> {

@@ -364,14 +364,19 @@ export class PiClient {
     fromEntryId?: string;
   }): Promise<void> {
     const subject = this._getOrCreateSessionSubject(sessionId);
+    const current = subject.getValue();
+    const previousMessages = current.messages;
+    const editIndex = options?.fromEntryId
+      ? current.messages.findIndex((item) => item.entryId === options.fromEntryId)
+      : -1;
     // Work is the product name; pi 0.84 still exposes this command as /chat.
     const engineMessage = message.replace(/^\/work(?=\s|$)/, "/chat");
     const pendingId = `pending-user-${Date.now()}-${Math.random().toString(36).slice(2)}`;
     if ((message.trim() || options?.images?.length) && !isModeSlashCommand(message)) {
-      const current = subject.getValue();
+      const baseMessages = editIndex >= 0 ? current.messages.slice(0, editIndex) : current.messages;
       subject.next({
         ...current,
-        messages: [...current.messages, {
+        messages: [...baseMessages, {
           id: pendingId,
           role: "user",
           text: message,
@@ -385,7 +390,10 @@ export class PiClient {
       await this.api.prompt({ sessionId, message: engineMessage, images: options?.images, streamingBehavior: options?.streamingBehavior, workspaceId: options?.workspaceId, sessionFile: options?.sessionFile, fromEntryId: options?.fromEntryId });
     } catch (error) {
       const current = subject.getValue();
-      subject.next({ ...current, messages: current.messages.filter((item) => item.id !== pendingId) });
+      subject.next({
+        ...current,
+        messages: options?.fromEntryId ? previousMessages : current.messages.filter((item) => item.id !== pendingId),
+      });
       throw error;
     }
   }

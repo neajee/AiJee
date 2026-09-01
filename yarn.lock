@@ -132,8 +132,11 @@ __metadata:
   resolution: "@aijee/ui@workspace:packages/ui"
   dependencies:
     "@aijee/client-sdk": "workspace:*"
+    "@lobehub/icons-rn": "npm:^2.12.0"
+    expo-linear-gradient: "npm:^57.0.1"
     react: "npm:19.1.0"
     react-native: "npm:0.81.5"
+    react-native-svg: "npm:^15.15.5"
   languageName: unknown
   linkType: soft
 
@@ -2967,6 +2970,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@lobehub/icons-rn@npm:^2.12.0":
+  version: 2.12.0
+  resolution: "@lobehub/icons-rn@npm:2.12.0"
+  dependencies:
+    es-toolkit: "npm:^1.43.0"
+  peerDependencies:
+    expo-linear-gradient: ">=14.1.5"
+    react: ^19.0.0
+    react-native: ">=0.76.9"
+    react-native-svg: ">=15.8.0"
+  checksum: 10c0/df6c86c991e211d364db148f1568dad90274088f839550cc38ecabdf978fd2a724abe39556f6dcb0bfe6b41c175fab40c707b96d2e080abd44e43fd2ed0e9364
+  languageName: node
+  linkType: hard
+
 "@malept/cross-spawn-promise@npm:^2.0.0":
   version: 2.0.0
   resolution: "@malept/cross-spawn-promise@npm:2.0.0"
@@ -4803,6 +4820,7 @@ __metadata:
     "@types/node": "npm:^24.0.0"
     "@types/ws": "npm:^8.18.1"
     typescript: "npm:^5.9.2"
+    undici: "npm:^8.9.0"
     ws: "npm:^8.21.3"
   bin:
     aijee: bin/aijee.cjs
@@ -6909,6 +6927,20 @@ __metadata:
   languageName: node
   linkType: hard
 
+"es-toolkit@npm:^1.43.0":
+  version: 1.52.0
+  resolution: "es-toolkit@npm:1.52.0"
+  dependenciesMeta:
+    "@trivago/prettier-plugin-sort-imports@4.3.0":
+      unplugged: true
+    prettier-plugin-sort-re-exports@0.0.1:
+      unplugged: true
+    vitepress-plugin-sandpack@1.1.4:
+      unplugged: true
+  checksum: 10c0/465988c0a6b84b6d1d171287cbbe40c3247a1f94acea210ae14bc66b7d90c93e6839bd6937cbaf2a1d206669f3179eb26141a89d9125969a4b8e58cb7d86a2ca
+  languageName: node
+  linkType: hard
+
 "es6-error@npm:^4.1.1":
   version: 4.1.1
   resolution: "es6-error@npm:4.1.1"
@@ -7543,6 +7575,17 @@ __metadata:
     expo: "*"
     react: "*"
   checksum: 10c0/23064b18285498e70be0aa525dc875cc809fc723b9a101d51e4721a09b1460eb041c73ebeb6d51e9175bb4c9b7a668bc08a48b99ebddac4cfaadb5a47194d329
+  languageName: node
+  linkType: hard
+
+"expo-linear-gradient@npm:^57.0.1":
+  version: 57.0.1
+  resolution: "expo-linear-gradient@npm:57.0.1"
+  peerDependencies:
+    expo: "*"
+    react: "*"
+    react-native: "*"
+  checksum: 10c0/d52735f8d1e28142525032361a7881dd77455fe402941f5b35007f4f7c6bf6f3fe675b07e6499d3c52e10cf87c7a496405fb6353974f6575939e2beb02fed6ae
   languageName: node
   linkType: hard
 
@@ -11971,6 +12014,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-native-svg@npm:^15.15.5":
+  version: 15.15.5
+  resolution: "react-native-svg@npm:15.15.5"
+  dependencies:
+    css-select: "npm:^5.1.0"
+    css-tree: "npm:^1.1.3"
+  peerDependencies:
+    react: "*"
+    react-native: "*"
+  checksum: 10c0/34b71b6c83d7235efbc4263abaffcbad780375f9e0fca95786e4f1a543a2b6d07e90c7df426f708e85be68331c412066cdc639f4a6ce82bed42bc728050d9402
+  languageName: node
+  linkType: hard
+
 "react-native-web@npm:~0.21.0":
   version: 0.21.2
   resolution: "react-native-web@npm:0.21.2"
@@ -13753,6 +13809,13 @@ __metadata:
   version: 6.28.0
   resolution: "undici@npm:6.28.0"
   checksum: 10c0/3029a70df06b38b5b2f30732932a1e92544c753cd82c8abdf0d35afad48e0ba91612e79fe3a442dbbb9434d6a9eba2b714d5ea28984c903dda2b5d5444f38354
+  languageName: node
+  linkType: hard
+
+"undici@npm:^8.9.0":
+  version: 8.10.1
+  resolution: "undici@npm:8.10.1"
+  checksum: 10c0/90ac5636aa9d22fb710a261ef05e136df6b4bd7a0122201796bd2eb59ccab6661cdf4f635e543ca04420379eafe3f4d214031bbc7623214287988881c24dad55
   languageName: node
   linkType: hard
 

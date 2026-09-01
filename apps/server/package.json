@@ -1,6 +1,6 @@
 {
   "name": "aijee",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "AiJee embedded Pi SDK runtime and companion plugin",
   "keywords": [
     "pi-package"
@@ -28,6 +28,7 @@
   "dependencies": {
     "@aijee/engine": "workspace:*",
     "@earendil-works/pi-coding-agent": "0.84.4",
+    "undici": "^8.9.0",
     "ws": "^8.21.3"
   },
   "devDependencies": {

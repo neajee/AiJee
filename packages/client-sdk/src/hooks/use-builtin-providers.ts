@@ -24,5 +24,6 @@ export function useBuiltinProviders() {
   const removeApiKey = useCallback(async (providerId: string) => { await client.api.removeBuiltinProviderKey(providerId); await load(); }, [client, load]);
   const startOAuth = useCallback((providerId: string) => client.api.startProviderOAuth(providerId), [client]);
   const getOAuth = useCallback((providerId: string, loginId: string) => client.api.getProviderOAuth(providerId, loginId), [client]);
-  return { ...useObservable(state$.current, INITIAL), reload: load, saveApiKey, removeApiKey, startOAuth, getOAuth };
+  const resolveOAuth = useCallback((providerId: string, loginId: string, promptId: string, value: string) => client.api.resolveProviderOAuthPrompt(providerId, loginId, promptId, value), [client]);
+  return { ...useObservable(state$.current, INITIAL), reload: load, saveApiKey, removeApiKey, startOAuth, getOAuth, resolveOAuth };
 }

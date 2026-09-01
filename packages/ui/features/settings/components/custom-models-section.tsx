@@ -1,13 +1,14 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Linking, Pressable, Text, TextInput, View } from 'react-native';
-import { ChevronDown, ChevronUp, LogIn, LogOut, Plus } from 'lucide-react-native';
+import { Linking, Platform, Pressable, Text, TextInput, View } from 'react-native';
+import { ChevronDown, ChevronUp, KeyRound, LogIn, LogOut, Plus, X } from 'lucide-react-native';
 import { useBuiltinProviders, type BuiltinProvider } from '@aijee/client-sdk';
 import { useCustomModelsStore } from '../store/custom-models';
 import { useSettingsHeadingVisible } from './settings-list';
 import { AddProviderForm, Field } from './custom-models-form';
-import { ModelSection, ProviderRow, RowDivider, CustomProviderRow } from './custom-models-provider-list';
+import { ModelSection, ProviderMark, ProviderRow, RowDivider, CustomProviderRow } from './custom-models-provider-list';
 import { useColors } from './custom-models-theme';
-import { providerPageStyles } from './custom-models-styles';
+import { fieldNativeStyles, fieldWebStyles, providerPageStyles } from './custom-models-styles';
+import { AppModal } from '@/components/ui';
 
 const COMMON_PROVIDER_HINTS = ['anthropic', 'github-copilot', 'kimi', 'openai-codex', 'openrouter', 'radius', 'xai', 'google'];
 
@@ -15,16 +16,20 @@ export function CustomModelsSection({ isDark, isNative }: { isDark: boolean; isN
   const colors = useColors(isDark, isNative);
   const headingVisible = useSettingsHeadingVisible();
   const { providers, loaded, saving, error, parseError, load, save, addProvider, removeProvider, updateProvider } = useCustomModelsStore();
-  const { providers: builtinProviders, loaded: builtinsLoaded, error: builtinsError, saveApiKey, removeApiKey, startOAuth, getOAuth, reload: reloadBuiltins } = useBuiltinProviders();
+  const { providers: builtinProviders, loaded: builtinsLoaded, error: builtinsError, saveApiKey, removeApiKey, startOAuth, getOAuth, resolveOAuth, reload: reloadBuiltins } = useBuiltinProviders();
   const [adding, setAdding] = useState(false);
   const [showAllBuiltins, setShowAllBuiltins] = useState(false);
   const [activeBuiltinId, setActiveBuiltinId] = useState<string | null>(null);
+  const [builtinAuthMode, setBuiltinAuthMode] = useState<'oauth' | 'apiKey'>('oauth');
   const [builtinKey, setBuiltinKey] = useState('');
   const [savingBuiltinKey, setSavingBuiltinKey] = useState(false);
   const [disconnectingBuiltinId, setDisconnectingBuiltinId] = useState<string | null>(null);
   const [oauthProviderId, setOauthProviderId] = useState<string | null>(null);
+  const [oauthLoginId, setOauthLoginId] = useState<string | null>(null);
   const [oauthMessage, setOauthMessage] = useState<string | null>(null);
   const [oauthUrl, setOauthUrl] = useState<string | null>(null);
+  const [oauthPrompt, setOauthPrompt] = useState<{ id: string; message: string } | null>(null);
+  const [oauthInput, setOauthInput] = useState('');
   const [providerSearch, setProviderSearch] = useState('');
   const [savedSnapshot, setSavedSnapshot] = useState<string | null>(null);
   const [saveMessage, setSaveMessage] = useState<string | null>(null);
@@ -55,27 +60,47 @@ export function CustomModelsSection({ isDark, isNative }: { isDark: boolean; isN
     provider.auth_source === 'stored credential' || provider.auth_source === 'OAuth';
 
   const beginOAuth = useCallback(async (providerId: string) => {
+    const popup = Platform.OS === 'web' && typeof window !== 'undefined' ? window.open('', '_blank') : null;
     setOauthProviderId(providerId);
+    setOauthLoginId(null);
+    setOauthUrl(null);
+    setOauthPrompt(null);
+    setOauthInput('');
     setOauthMessage('正在准备授权…');
     try {
       const login = await startOAuth(providerId);
+      setOauthLoginId(login.id);
       setOauthUrl(login.url);
+      setOauthPrompt(login.prompt?.type === 'manual_code' ? { id: login.prompt.id, message: login.prompt.message } : null);
+      if (login.prompt?.type === 'manual_code') setActiveBuiltinId(providerId);
+      if (login.url) {
+        if (popup) popup.location.href = login.url;
+        else await Linking.openURL(login.url);
+      }
       const check = async () => {
         const status = await getOAuth(providerId, login.id);
         if (status.status === 'pending') {
           setOauthMessage(status.instructions ?? '请在浏览器中完成授权…');
+          setOauthPrompt(status.prompt?.type === 'manual_code' ? { id: status.prompt.id, message: status.prompt.message } : null);
+          if (status.prompt?.type === 'manual_code') setActiveBuiltinId(providerId);
           setTimeout(() => void check(), 1200);
           return;
         }
         setOauthProviderId(null);
+        setOauthLoginId(null);
         setOauthUrl(null);
+        setOauthPrompt(null);
+        setOauthInput('');
         setOauthMessage(status.status === 'complete' ? '授权完成' : (status.error ?? '授权失败'));
         await reloadBuiltins();
       };
       void check();
     } catch (oauthError) {
       setOauthProviderId(null);
+      setOauthLoginId(null);
       setOauthUrl(null);
+      setOauthPrompt(null);
+      setOauthInput('');
       setOauthMessage(oauthError instanceof Error ? oauthError.message : '无法启动 OAuth 登录');
     }
   }, [getOAuth, reloadBuiltins, startOAuth]);
@@ -91,14 +116,27 @@ export function CustomModelsSection({ isDark, isNative }: { isDark: boolean; isN
   }, [removeApiKey]);
 
   const renderBuiltinPanel = (provider: BuiltinProvider) => activeBuiltinId === provider.id ? (
-    <View style={[providerPageStyles.inlinePanel, { borderTopColor: colors.separator }]}>
-      {!provider.configured && provider.supports_oauth ? (
+    <AppModal visible onClose={() => setActiveBuiltinId(null)} contentStyle={[providerPageStyles.modalPanel, { backgroundColor: colors.cardBg, borderColor: colors.borderColor }]}>
+      <View style={[providerPageStyles.modalHeader, { borderBottomColor: colors.separator }]}>
+        <View style={providerPageStyles.modalTitleGroup}>
+          <ProviderMark name={provider.name} id={provider.id} colors={colors} />
+          <View style={providerPageStyles.modalTitleCopy}>
+            <Text style={[providerPageStyles.modalTitle, { color: colors.textPrimary }]}>{provider.name}</Text>
+            <Text style={[providerPageStyles.rowMeta, { color: colors.textMuted }]}>{oauthPrompt ? '完成浏览器授权' : '配置连接凭据'}</Text>
+          </View>
+        </View>
+        <Pressable accessibilityRole="button" accessibilityLabel="关闭弹窗" onPress={() => setActiveBuiltinId(null)} style={({ pressed }) => [providerPageStyles.modalClose, pressed && { backgroundColor: colors.pressedBg }]}>
+          <X size={16} color={colors.textMuted} strokeWidth={1.8} />
+        </Pressable>
+      </View>
+      <View style={providerPageStyles.modalBody}>
+      {!provider.configured && provider.supports_oauth && (!provider.supports_api_key || builtinAuthMode === 'oauth') ? (
         <Pressable disabled={oauthProviderId === provider.id} onPress={() => void beginOAuth(provider.id)} style={({ pressed }) => [providerPageStyles.secondaryButton, { borderColor: colors.borderColor }, pressed && { backgroundColor: colors.pressedBg }]}>
           <LogIn size={15} color={colors.textSecondary} />
           <Text style={[providerPageStyles.linkText, { color: colors.textPrimary }]}>{oauthProviderId === provider.id ? '正在登录…' : '使用账号登录'}</Text>
         </Pressable>
       ) : null}
-      {provider.supports_api_key ? <Field label={`${provider.name} API Key`} value={builtinKey} onChangeText={setBuiltinKey} placeholder={provider.configured ? '输入新 Key 可替换当前凭据' : '粘贴 API Key'} colors={colors} /> : null}
+      {provider.supports_api_key && (provider.configured || !provider.supports_oauth || builtinAuthMode === 'apiKey') ? <Field label={`${provider.name} API Key`} value={builtinKey} onChangeText={setBuiltinKey} placeholder={provider.configured ? '输入新 Key 可替换当前凭据' : '粘贴 API Key'} colors={colors} /> : null}
       <View style={providerPageStyles.panelActions}>
         {provider.configured && canDisconnect(provider) ? (
           <Pressable onPress={() => void disconnectBuiltin(provider.id)} style={({ pressed }) => [providerPageStyles.textButton, pressed && { opacity: 0.6 }]} accessibilityRole="button">
@@ -106,19 +144,32 @@ export function CustomModelsSection({ isDark, isNative }: { isDark: boolean; isN
           </Pressable>
         ) : null}
         <Pressable onPress={() => setActiveBuiltinId(null)} style={[providerPageStyles.secondaryButton, { borderColor: colors.borderColor }]}><Text style={[providerPageStyles.linkText, { color: colors.textSecondary }]}>取消</Text></Pressable>
-        {provider.supports_api_key ? (
+        {provider.supports_api_key && (provider.configured || !provider.supports_oauth || builtinAuthMode === 'apiKey') ? (
           <Pressable disabled={!builtinKey.trim() || savingBuiltinKey} onPress={() => { setSavingBuiltinKey(true); void saveApiKey(provider.id, builtinKey).then(() => { setBuiltinKey(''); setActiveBuiltinId(null); }).finally(() => setSavingBuiltinKey(false)); }} style={[providerPageStyles.primaryButton, { backgroundColor: colors.actionBg }, (!builtinKey.trim() || savingBuiltinKey) && { opacity: 0.45 }]}>
             <Text style={[providerPageStyles.linkText, { color: colors.actionText }]}>{savingBuiltinKey ? '保存中…' : '保存 Key'}</Text>
           </Pressable>
         ) : null}
       </View>
-      {oauthMessage ? <Text accessibilityRole="alert" style={[providerPageStyles.rowMeta, { color: colors.textMuted }]}>{oauthMessage}</Text> : null}
-      {oauthUrl ? <Pressable onPress={() => void Linking.openURL(oauthUrl)} accessibilityRole="link"><Text style={[providerPageStyles.linkText, { color: colors.textPrimary }]}>打开授权页</Text></Pressable> : null}
+      {oauthProviderId === provider.id && oauthMessage ? <Text accessibilityRole="alert" style={[providerPageStyles.rowMeta, { color: colors.textMuted }]}>{oauthMessage}</Text> : null}
+      {oauthProviderId === provider.id && oauthUrl ? <Pressable onPress={() => void Linking.openURL(oauthUrl)} accessibilityRole="link"><Text style={[providerPageStyles.linkText, { color: colors.textPrimary }]}>打开授权页</Text></Pressable> : null}
+      {oauthProviderId === provider.id && oauthPrompt && oauthLoginId ? <View style={{ gap: 6 }}><Text style={[providerPageStyles.rowMeta, { color: colors.textMuted }]}>{oauthPrompt.message}</Text><View style={{ flexDirection: 'row', gap: 8 }}><TextInput value={oauthInput} onChangeText={setOauthInput} placeholder="粘贴授权码或回调 URL" placeholderTextColor={colors.textMuted} style={[isNative ? fieldNativeStyles.input : fieldWebStyles.input, { color: colors.textPrimary, borderColor: colors.borderColor, flex: 1 }]} autoCapitalize="none" autoCorrect={false} /><Pressable disabled={!oauthInput.trim()} onPress={() => void resolveOAuth(provider.id, oauthLoginId, oauthPrompt.id, oauthInput.trim()).then(() => setOauthInput(''))} style={[providerPageStyles.secondaryButton, { borderColor: colors.borderColor }, !oauthInput.trim() && { opacity: 0.45 }]}><Text style={[providerPageStyles.linkText, { color: colors.textSecondary }]}>提交</Text></Pressable></View></View> : null}
       {provider.configured && !canDisconnect(provider) ? (
         <Text style={[providerPageStyles.rowMeta, { color: colors.textMuted }]}>
           由 {provider.auth_source} 配置；请从启动 AiJee 的环境中移除后重启运行时。
         </Text>
       ) : null}
+      </View>
+    </AppModal>
+  ) : null;
+
+  const quickAuthActions = (provider: BuiltinProvider) => !provider.configured && (provider.supports_oauth || provider.supports_api_key) ? (
+    <View style={{ flexDirection: 'row', gap: 2 }}>
+      {provider.supports_oauth ? <Pressable accessibilityRole="button" accessibilityLabel={`${provider.name}账号登录`} onPress={() => { setBuiltinAuthMode('oauth'); setBuiltinKey(''); setActiveBuiltinId(null); void beginOAuth(provider.id); }} style={({ pressed }) => [providerPageStyles.iconAction, pressed && { backgroundColor: colors.pressedBg }]}>
+        <LogIn size={15} color={colors.textMuted} strokeWidth={1.8} />
+      </Pressable> : null}
+      {provider.supports_api_key ? <Pressable accessibilityRole="button" accessibilityLabel={`${provider.name}API Key`} onPress={() => { setBuiltinAuthMode('apiKey'); setBuiltinKey(''); setActiveBuiltinId(provider.id); }} style={({ pressed }) => [providerPageStyles.iconAction, pressed && { backgroundColor: colors.pressedBg }]}>
+        <KeyRound size={15} color={colors.textMuted} strokeWidth={1.8} />
+      </Pressable> : null}
     </View>
   ) : null;
 
@@ -157,7 +208,7 @@ export function CustomModelsSection({ isDark, isNative }: { isDark: boolean; isN
                 connected
                 meta={Number.isFinite(provider.model_count) ? `${provider.model_count} 个模型${provider.auth_source ? ` · ${provider.auth_source}` : ''}` : provider.auth_source}
                 colors={colors}
-                onPress={() => { setBuiltinKey(''); setActiveBuiltinId((id) => id === provider.id ? null : provider.id); }}
+                onPress={() => { setBuiltinKey(''); setBuiltinAuthMode(provider.supports_oauth ? 'oauth' : 'apiKey'); setActiveBuiltinId((id) => id === provider.id ? null : provider.id); }}
                 trailing={canDisconnect(provider) ? (
                   <Pressable
                     disabled={disconnectingBuiltinId === provider.id}
@@ -184,7 +235,7 @@ export function CustomModelsSection({ isDark, isNative }: { isDark: boolean; isN
         {addableBuiltins.map((provider, index) => (
           <View key={provider.id}>
             {index ? <RowDivider colors={colors} /> : null}
-            <ProviderRow name={provider.name} id={provider.id} meta={!provider.supports_oauth && provider.supports_api_key ? '需要 API Key' : null} colors={colors} onPress={() => { setBuiltinKey(''); setActiveBuiltinId((id) => id === provider.id ? null : provider.id); }} />
+            <ProviderRow name={provider.name} id={provider.id} colors={colors} trailing={quickAuthActions(provider)} />
             {renderBuiltinPanel(provider)}
           </View>
         ))}

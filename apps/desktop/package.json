@@ -1,6 +1,6 @@
 {
   "name": "@aijee/desktop",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "AiJee desktop shell",
   "author": "AiJee contributors",
   "private": true,
@@ -23,7 +23,7 @@
     "appId": "com.anthaathi.aijee",
     "productName": "AiJee",
     "executableName": "aijee",
-    "icon": "assets/icon.ico",
+    "icon": "assets/icon.png",
     "linux": {
       "target": [
         "AppImage"
