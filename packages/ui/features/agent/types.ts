@@ -86,6 +86,7 @@ export interface TurnFileStats {
 
 export interface ChatMessage {
   id: string;
+  entryId?: string;
   role: "user" | "assistant" | "system";
   text: string;
   attachments?: {

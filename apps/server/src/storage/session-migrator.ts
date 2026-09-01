@@ -1,4 +1,4 @@
-import { existsSync } from "node:fs";
+import { existsSync, statSync } from "node:fs";
 import { homedir } from "node:os";
 import { join, resolve } from "node:path";
 import { SessionManager } from "@earendil-works/pi-coding-agent";
@@ -19,7 +19,17 @@ import type { PersistedSession } from "./state-store.ts";
 export interface ReconcileResult {
   imported: number;
   removed: number;
+  remapped: number;
   total: number;
+}
+
+function sessionModifiedAt(path: string, sdkModified: Date | string): number {
+  const sdkTime = sdkModified instanceof Date ? sdkModified.getTime() : new Date(sdkModified).getTime();
+  try {
+    return Math.max(Number.isNaN(sdkTime) ? 0 : sdkTime, statSync(path).mtimeMs);
+  } catch {
+    return Number.isNaN(sdkTime) ? Date.now() : sdkTime;
+  }
 }
 
 /**
@@ -39,7 +49,7 @@ export async function listNativeSessionItems(cwd: string): Promise<Array<Record<
       cwd: info.cwd ?? cwd,
       display_name: info.name ?? firstMessage,
       created_at: Number.isNaN(created.getTime()) ? new Date().toISOString() : created.toISOString(),
-      last_active: Number.isNaN(modified.getTime()) ? Date.now() : modified.getTime(),
+      last_active: sessionModifiedAt(info.path, modified),
       message_count: info.messageCount ?? 0,
       version: info.messageCount ?? 0,
     };
@@ -86,7 +96,14 @@ export async function reconcileSessionRecords(
   const infos = await SessionManager.listAll();
 
   // 4. Merge by session id: keep existing records, import everything else.
-  const byId = new Map(kept.map((record) => [record.session_id, record]));
+  let remapped = 0;
+  const remappedExisting = kept.map((record) => {
+    const workspaceId = workspaceOf(record.cwd);
+    if (!workspaceId || workspaceId === record.workspace_id) return record;
+    remapped += 1;
+    return { ...record, workspace_id: workspaceId };
+  });
+  const byId = new Map(remappedExisting.map((record) => [record.session_id, record]));
   let imported = 0;
   for (const info of infos) {
     if (archivedSessionIds.has(info.id) || byId.has(info.id)) continue;
@@ -99,12 +116,12 @@ export async function reconcileSessionRecords(
       workspace_id: workspaceId,
       cwd: info.cwd ?? "",
       created_at: Number.isNaN(created) ? new Date().toISOString() : new Date(created).toISOString(),
-      last_active: info.modified instanceof Date ? info.modified.getTime() : Date.now(),
+      last_active: sessionModifiedAt(info.path, info.modified),
     });
     imported++;
   }
 
   // 5. Stable ordering: most recently active first (matches old disk-scan UX).
   const sessions = [...byId.values()].sort((a, b) => b.last_active - a.last_active);
-  return { sessions, result: { imported, removed, total: sessions.length } };
+  return { sessions, result: { imported, removed, remapped, total: sessions.length } };
 }

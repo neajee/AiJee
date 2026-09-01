@@ -64,7 +64,14 @@ export class PiSession implements EngineSession {
 
   state(): JsonObject {
     const state = this.session.state as unknown as JsonObject;
-    return { ...state, messages: this.messages(), model: (this.session.model ?? null) as JsonValue, thinkingLevel: this.session.thinkingLevel, isStreaming: this.session.isStreaming };
+    return {
+      ...state,
+      messages: this.messages(),
+      model: (this.session.model ?? null) as JsonValue,
+      thinkingLevel: this.session.thinkingLevel,
+      isStreaming: this.session.isStreaming,
+      sessionName: this.session.sessionName ?? null,
+    };
   }
 
   messages(): JsonValue[] { return this.session.messages as unknown as JsonValue[]; }
@@ -93,7 +100,12 @@ export class PiSession implements EngineSession {
   setSessionName(name: string): void { this.session.setSessionName(name); }
   entries(since?: string): SessionEntry[] { const entries = this.session.sessionManager.getEntries(); return (since ? entries.slice(entries.findIndex((entry) => entry.id === since) + 1) : entries) as unknown as SessionEntry[]; }
   tree(): JsonValue { return this.session.sessionManager.getTree() as unknown as JsonValue; }
-  async fork(entryId: string): Promise<JsonValue> { return (await this.runtime.fork(entryId)) as unknown as JsonValue; }
+  async fork(entryId: string, options?: { position?: "before" | "at" }): Promise<JsonValue> {
+    const result = await this.runtime.fork(entryId, options);
+    if (!result.cancelled) this.bind();
+    return result as unknown as JsonValue;
+  }
+  async navigateTree(entryId: string): Promise<{ cancelled: boolean }> { return this.session.navigateTree(entryId, { summarize: false }); }
   forkMessages(): Array<{ entryId: string; text: string }> { return this.session.getUserMessagesForForking(); }
   lastAssistantText(): string | null { return this.session.getLastAssistantText() ?? null; }
   async exportHtml(outputPath?: string): Promise<string> { return this.session.exportToHtml(outputPath); }

@@ -36,6 +36,7 @@ import type {
   FsUploadResponse,
   PathCompletion,
   SessionHistoryResponse,
+  SessionListItem,
 } from "../generated/types.gen";
 import type {
   AgentStateData,
@@ -252,6 +253,7 @@ export class ApiClient {
     streamingBehavior?: "steer" | "followUp";
     workspaceId?: string;
     sessionFile?: string;
+    fromEntryId?: string;
   }): Promise<void> {
     const result = await sdk.prompt({
       body: {
@@ -261,7 +263,8 @@ export class ApiClient {
         streaming_behavior: params.streamingBehavior,
         workspace_id: params.workspaceId,
         session_file: params.sessionFile,
-      },
+        from_entry_id: params.fromEntryId,
+      } as never,
     });
     unwrapResult(result);
   }
@@ -491,9 +494,10 @@ export class ApiClient {
   async fork(
     sessionId: string,
     entryId: string,
-  ): Promise<{ text: string; cancelled: boolean }> {
+    position: "before" | "at" = "before",
+  ): Promise<{ text?: string; selectedText?: string; cancelled: boolean; session?: { sessionId: string; sessionFile?: string; workspaceId?: string; listItem?: SessionListItem } }> {
     const result = await sdk.fork({
-      body: { session_id: sessionId, entryId },
+      body: { session_id: sessionId, entryId, position } as never,
     });
     return unwrapResult(result);
   }

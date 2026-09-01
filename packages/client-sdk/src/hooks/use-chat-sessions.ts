@@ -141,12 +141,24 @@ export function useChatSessions(): ChatSessionsHandle {
   );
 
   useEffect(() => {
-    const subscription = client.events$.subscribe((event) => {
+    const eventSubscription = client.events$.subscribe((event) => {
       if (!shouldRefreshChatSessions(event)) return;
       scheduleRefetch();
     });
-    return () => subscription.unsubscribe();
-  }, [client, scheduleRefetch]);
+    const listSubscription = client.sessionListChanged$.subscribe((change) => {
+      if (change.workspaceId) return;
+      const current = state$.current.value;
+      const exists = current.sessions.some((session) => session.id === change.session.id);
+      emit({
+        sessions: [change.session, ...current.sessions.filter((session) => session.id !== change.session.id)],
+        total: exists ? current.total : current.total + 1,
+      });
+    });
+    return () => {
+      eventSubscription.unsubscribe();
+      listSubscription.unsubscribe();
+    };
+  }, [client, scheduleRefetch, emit]);
 
   useEffect(() => {
     return () => {

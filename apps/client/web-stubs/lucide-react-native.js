@@ -26,6 +26,7 @@ export { default as FolderGit2 } from '../../../node_modules/lucide-react-native
 export { default as FolderOpen } from '../../../node_modules/lucide-react-native/dist/esm/icons/folder-open.js';
 export { default as Folder } from '../../../node_modules/lucide-react-native/dist/esm/icons/folder.js';
 export { default as GitBranch } from '../../../node_modules/lucide-react-native/dist/esm/icons/git-branch.js';
+export { default as GitFork } from '../../../node_modules/lucide-react-native/dist/esm/icons/git-fork.js';
 export { default as GitCompare } from '../../../node_modules/lucide-react-native/dist/esm/icons/git-compare.js';
 export { default as Gitlab } from '../../../node_modules/lucide-react-native/dist/esm/icons/gitlab.js';
 export { default as Github } from '../../../node_modules/lucide-react-native/dist/esm/icons/github.js';

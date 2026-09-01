@@ -105,7 +105,7 @@ export async function dispatchRoute(ctx: RouteContext, request: IncomingMessage,
   if (request.method === "POST" && url.pathname === "/api/agent/cycle-model") return ctx.sessionCommand(request, response, (session: any) => session.cycleModel(), "models");
   if (request.method === "POST" && url.pathname === "/api/agent/bash") return ctx.agentBash(request, response);
   if (request.method === "POST" && url.pathname === "/api/agent/export-html") return ctx.sessionCommand(request, response, async (session: any, body: any) => ({ path: await session.exportHtml(body.outputPath) }));
-  if (request.method === "POST" && url.pathname === "/api/agent/fork") return ctx.sessionCommand(request, response, (session: any, body: any) => session.fork(String(body.entryId ?? body.entry_id)), "fork");
+  if (request.method === "POST" && url.pathname === "/api/agent/fork") return ctx.forkAgent(request, response);
   if (request.method === "POST" && url.pathname === "/api/agent/clone") return ctx.sessionCommand(request, response, (session: any) => session.fork(String((session.entries() as Array<Record<string, any>>).at(-1)?.id ?? "")), "fork");
   if (request.method === "POST" && url.pathname === "/api/agent/fork-messages") return ctx.sessionCommand(request, response, (session: any) => ({ messages: session.forkMessages() }), "fork");
   if (request.method === "POST" && url.pathname === "/api/agent/last-assistant-text") return ctx.sessionCommand(request, response, (session: any) => ({ text: session.lastAssistantText() }));

@@ -25,6 +25,7 @@ export class PiClient {
   private readonly _config: PiClientConfig;
   private readonly _serverRestart$ = new Subject<void>();
   private readonly _fileSystemChanged$ = new Subject<void>();
+  private readonly _sessionListChanged$ = new Subject<{ workspaceId?: string; session: SessionListItem }>();
   private _instanceId: string | null = null;
   private _activeSessionIds = new Set<string>();
   private _streamingSessionIds = new Set<string>();
@@ -110,6 +111,10 @@ export class PiClient {
 
   get fileSystemChanged$(): Observable<void> {
     return this._fileSystemChanged$.asObservable();
+  }
+
+  get sessionListChanged$(): Observable<{ workspaceId?: string; session: SessionListItem }> {
+    return this._sessionListChanged$.asObservable();
   }
 
   get activeSessions$(): Observable<Set<string>> {
@@ -356,6 +361,7 @@ export class PiClient {
     streamingBehavior?: "steer" | "followUp";
     workspaceId?: string;
     sessionFile?: string;
+    fromEntryId?: string;
   }): Promise<void> {
     const subject = this._getOrCreateSessionSubject(sessionId);
     // Work is the product name; pi 0.84 still exposes this command as /chat.
@@ -376,7 +382,7 @@ export class PiClient {
       });
     }
     try {
-      await this.api.prompt({ sessionId, message: engineMessage, images: options?.images, streamingBehavior: options?.streamingBehavior, workspaceId: options?.workspaceId, sessionFile: options?.sessionFile });
+      await this.api.prompt({ sessionId, message: engineMessage, images: options?.images, streamingBehavior: options?.streamingBehavior, workspaceId: options?.workspaceId, sessionFile: options?.sessionFile, fromEntryId: options?.fromEntryId });
     } catch (error) {
       const current = subject.getValue();
       subject.next({ ...current, messages: current.messages.filter((item) => item.id !== pendingId) });
@@ -402,6 +408,17 @@ export class PiClient {
 
   async abort(sessionId: string): Promise<void> {
     return this.api.abort(sessionId);
+  }
+
+  async fork(sessionId: string, entryId: string, position: "before" | "at" = "before") {
+    const result = await this.api.fork(sessionId, entryId, position);
+    if (!result.cancelled && result.session?.listItem) {
+      this._sessionListChanged$.next({
+        workspaceId: result.session.workspaceId,
+        session: result.session.listItem,
+      });
+    }
+    return result;
   }
 
   async setModel(sessionId: string, params: { provider: string; modelId: string }): Promise<void> {

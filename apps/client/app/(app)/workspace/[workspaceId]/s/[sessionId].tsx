@@ -1,4 +1,4 @@
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -34,6 +34,7 @@ export default function SessionScreen() {
     workspaceId: string;
     sessionId: string;
   }>();
+  const router = useRouter();
   const colors = useThemeTokens();
   const { isWideScreen } = useResponsiveLayout();
   const insets = useSafeAreaInsets();
@@ -180,7 +181,13 @@ export default function SessionScreen() {
         <View style={styles.upperRow}>
           <View style={[styles.editorColumn, { backgroundColor: editorBg }]}>
             {agentSession.isReady && hasMessages && sessionId ? (
-              <MessageList key={sessionId} sessionId={sessionId} />
+              <MessageList
+                key={sessionId}
+                sessionId={sessionId}
+                onForked={(nextSessionId) => {
+                  router.replace(`/workspace/${workspaceId}/s/${nextSessionId}`);
+                }}
+              />
             ) : agentSession.isLoading || (!agentSession.isReady && sessionId) ? (
               Platform.OS === "ios" ? (
                 <View style={styles.emptyCenter}>

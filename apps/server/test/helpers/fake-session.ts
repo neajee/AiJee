@@ -7,6 +7,7 @@ export function fakeSession(sessionId: string, options: { cwd?: string; sessionF
   const messages = options.messages ?? [];
   const listeners = new Set<(event: { type: string; data: null; timestamp: number }) => void>();
   const descriptor = { sessionId, sessionFile, cwd, streaming: false };
+  let sessionName: string | undefined;
   const session = {
     capabilities: { models: true, tools: true, streaming: true, bash: true, steering: true, followUp: true, compaction: true, retry: true, fork: true, sessionHistory: true, extensions: true },
     sessionId,
@@ -21,7 +22,7 @@ export function fakeSession(sessionId: string, options: { cwd?: string; sessionF
     steer: async () => undefined,
     followUp: async () => undefined,
     abort: async () => undefined,
-    state: () => ({}),
+    state: () => ({ sessionName }),
     messages: () => messages,
     listModels: () => [{ provider: "test", id: "test-model" }],
     listTools: () => [],
@@ -39,10 +40,11 @@ export function fakeSession(sessionId: string, options: { cwd?: string; sessionF
     abortBash: () => undefined,
     bash: async () => null,
     sessionStats: () => ({}),
-    setSessionName: () => undefined,
+    setSessionName: (name: string) => { sessionName = name; },
     entries: () => messages.map((message, index) => ({ id: `entry-${index}`, type: "message", message })),
     tree: () => null,
     fork: async () => null,
+    navigateTree: async () => ({ cancelled: false }),
     forkMessages: () => [],
     lastAssistantText: () => null,
     exportHtml: async () => "",

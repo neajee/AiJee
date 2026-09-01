@@ -12,11 +12,12 @@ interface UseAgentSessionOptions {
 export interface AgentSessionHandle extends SessionState {
   prompt: (
     message: string,
-    options?: { images?: ImageContent[]; streamingBehavior?: "steer" | "followUp" },
+    options?: { images?: ImageContent[]; streamingBehavior?: "steer" | "followUp"; fromEntryId?: string },
   ) => Promise<void>;
   steer: (message: string, options?: { images?: ImageContent[] }) => Promise<void>;
   followUp: (message: string, options?: { images?: ImageContent[] }) => Promise<void>;
   abort: () => Promise<void>;
+  fork: (entryId: string, position?: "before" | "at") => Promise<{ session?: { sessionId: string; sessionFile?: string }; cancelled: boolean }>;
   loadOlderMessages: () => Promise<void>;
   sendExtensionUiResponse: (params: {
     id: string;
@@ -78,12 +79,13 @@ export function useAgentSession(
   const prompt = useCallback(
     (
       message: string,
-      opts?: { images?: ImageContent[]; streamingBehavior?: "steer" | "followUp" },
+      opts?: { images?: ImageContent[]; streamingBehavior?: "steer" | "followUp"; fromEntryId?: string },
     ) => {
       if (!sessionId) return Promise.resolve();
       return client.prompt(sessionId, message, {
         images: opts?.images,
         streamingBehavior: opts?.streamingBehavior,
+        fromEntryId: opts?.fromEntryId,
         workspaceId: options?.workspaceId,
         sessionFile: options?.sessionFile,
       });
@@ -120,6 +122,11 @@ export function useAgentSession(
     return client.abort(sessionId);
   }, [client, sessionId]);
 
+  const fork = useCallback((entryId: string, position: "before" | "at" = "before") => {
+    if (!sessionId) return Promise.resolve({ cancelled: false });
+    return client.fork(sessionId, entryId, position);
+  }, [client, sessionId]);
+
   const loadOlderMessages = useCallback(() => {
     if (!sessionId) return Promise.resolve();
     return client.loadOlderMessages(sessionId);
@@ -139,6 +146,7 @@ export function useAgentSession(
     steer,
     followUp,
     abort,
+    fork,
     loadOlderMessages,
     sendExtensionUiResponse,
   };

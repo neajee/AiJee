@@ -107,8 +107,13 @@ test("reuses a hidden draft session and publishes it only after the first prompt
 test("forwards image attachments and the queue behaviour to the engine", async () => {
   const directory = await mkdtemp(join(tmpdir(), "aijee-images-"));
   const sent: Array<{ text: string; options?: { images?: unknown; streamingBehavior?: string } }> = [];
+  const navigated: string[] = [];
   const registry = new SessionRegistry(async (input) => {
     const session = fakeSession("image-session", { cwd: input.cwd });
+    session.navigateTree = async (entryId: string) => {
+      navigated.push(entryId);
+      return { cancelled: false };
+    };
     session.prompt = async (text: string, options?: { images?: unknown; streamingBehavior?: string }) => {
       sent.push({ text, options });
     };
@@ -131,14 +136,56 @@ test("forwards image attachments and the queue behaviour to the engine", async (
         session_id: sessionId,
         message: "what is this",
         streaming_behavior: "followUp",
+        from_entry_id: "entry-7",
         images: [{ type: "image", data: "QUJD", mimeType: "image/png" }],
       }),
     });
     assert.equal(response.status, 200);
 
     assert.equal(sent.length, 1);
+    assert.deepEqual(navigated, ["entry-7"]);
     assert.deepEqual(sent[0]!.options?.images, [{ type: "image", data: "QUJD", mimeType: "image/png" }]);
     assert.equal(sent[0]!.options?.streamingBehavior, "followUp", "pi rejects a mid-turn prompt without one");
+  } finally {
+    await server.close();
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test("fork keeps the source session and registers the new session", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "aijee-fork-"));
+  const descriptor = { sessionId: "source-session", sessionFile: join(directory, "source.jsonl"), cwd: directory, streaming: false };
+  const registry = new SessionRegistry(async () => {
+    const session = fakeSession(descriptor.sessionId, { cwd: directory, sessionFile: descriptor.sessionFile });
+    session.describe = () => descriptor;
+    session.setSessionName("修复侧边栏");
+    session.fork = async () => {
+      descriptor.sessionId = "forked-session";
+      descriptor.sessionFile = join(directory, "forked.jsonl");
+      return { cancelled: false };
+    };
+    return session;
+  });
+  const server = new AiJeeHttpServer(new AiJeeRuntime(registry), join(directory, "runtime.json"));
+  await server.listen(0, "0.0.0.0");
+  try {
+    const token = await authorize(server);
+    const headers = { "Content-Type": "application/json", Authorization: `Bearer ${token}` };
+    const created = await fetch(`${server.url()}/api/workspaces`, { method: "POST", headers, body: JSON.stringify({ name: "AiJee", path: directory }) });
+    const workspaceId = (await created.json() as { data: { id: string } }).data.id;
+    const opened = await fetch(`${server.url()}/api/agent/sessions`, { method: "POST", headers, body: JSON.stringify({ workspace_id: workspaceId }) });
+    const sourceId = (await opened.json() as { data: { session_id: string } }).data.session_id;
+
+    const forked = await fetch(`${server.url()}/api/agent/fork`, { method: "POST", headers, body: JSON.stringify({ session_id: sourceId, entryId: "entry-0", position: "at" }) });
+    assert.equal(forked.status, 200);
+    const forkedBody = await forked.json() as { data: { session: { sessionId: string; listItem: { display_name: string } } } };
+    assert.equal(forkedBody.data.session.sessionId, "forked-session");
+    assert.equal(forkedBody.data.session.listItem.display_name, "修复侧边栏（2）");
+
+    const listed = await fetch(`${server.url()}/api/workspaces/${workspaceId}/sessions`, { headers });
+    const listedBody = await listed.json() as { data: { items: Array<{ id: string }>; total: number } };
+    assert.equal(listedBody.data.total, 2);
+    assert.deepEqual(new Set(listedBody.data.items.map((item) => item.id)), new Set([sourceId, "forked-session"]));
   } finally {
     await server.close();
     await rm(directory, { recursive: true, force: true });
@@ -356,9 +403,9 @@ test("restores persisted sessions on demand for model and history reads", async 
     assert.equal(history.status, 200);
     const modelsBody = await models.json() as { data: { models: Array<{ id: string }> } };
     assert.deepEqual(modelsBody.data.models, [{ provider: "test", id: "test-model" }]);
-    const historyBody = await history.json() as { data: { messages: Array<{ role?: string; content?: string }> } };
+    const historyBody = await history.json() as { data: { messages: Array<{ role?: string; content?: string; entryId?: string }> } };
     assert.equal(historyBody.data.messages.length, 1);
-    assert.deepEqual(historyBody.data.messages[0], { role: "user", content: "hi" });
+    assert.deepEqual(historyBody.data.messages[0], { role: "user", content: "hi", entryId: "entry-1" });
     assert.equal(creates, 1, "concurrent restores must share one engine session");
   } finally {
     await server.close();

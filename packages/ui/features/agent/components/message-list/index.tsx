@@ -20,7 +20,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from "react-native-reanimated";
-import { ArrowDown, ChevronRight } from "lucide-react-native";
+import { ArrowDown, ChevronRight, GitFork } from "lucide-react-native";
 import { useAgentSession } from "@aijee/client-sdk";
 import { useWorkspaceStore } from "@/features/workspace/store";
 import { Colors, Fonts } from "@/constants/theme";
@@ -43,7 +43,6 @@ import { UserMessage } from "./user-message";
 import {
   AssistantMessage,
   MessageToolbar,
-  hasMessageActions,
 } from "./assistant-message";
 import { AssistantMarkdown } from "./assistant-markdown";
 import { SystemMessage } from "./system-message";
@@ -54,6 +53,7 @@ import { ThinkingBlock } from "./thinking-block";
 
 interface MessageListProps {
   sessionId: string;
+  onForked?: (sessionId: string) => void;
 }
 
 const SCROLL_THRESHOLD = 200;
@@ -92,12 +92,16 @@ const WINDOW_SIZE = 7;
 
 export const MessageList = memo(function MessageList({
   sessionId,
+  onForked,
 }: MessageListProps) {
   const colorScheme = useColorScheme() ?? "light";
   const isDark = colorScheme === "dark";
   const colors = useThemeTokens();
   const listRef = useRef<FlatList<ListItem>>(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
+  const [editing, setEditing] = useState<{ entryId: string; text: string; images?: Array<{ type: "image"; data: string; mimeType: string }> } | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [forkingEntryId, setForkingEntryId] = useState<string | null>(null);
   /**
    * Follow state is a ref, not state: it changes on scroll events at 60fps and
    * nothing renders from it. Re-rendering the whole list on every frame of a
@@ -108,6 +112,32 @@ export const MessageList = memo(function MessageList({
   const session = useAgentSession(sessionId);
   const messages = session.messages as ChatMessage[];
   const isStreaming = session.isStreaming;
+  const editMessage = useCallback(async () => {
+    if (!editing || !editing.text.trim() || isStreaming) return;
+    setActionError(null);
+    try {
+      await session.prompt(editing.text, { fromEntryId: editing.entryId, images: editing.images });
+      setEditing(null);
+    } catch (error) {
+      setActionError(error instanceof Error ? error.message : "Failed to edit message");
+    }
+  }, [editing, isStreaming, session]);
+  const forkFrom = useCallback(async (entryId: string) => {
+    if (forkingEntryId || isStreaming) return;
+    setActionError(null);
+    setForkingEntryId(entryId);
+    try {
+      const result = await session.fork(entryId, "at");
+      if (result.cancelled) return;
+      const nextId = result.session?.sessionId;
+      if (!nextId) throw new Error("Forked session was not returned");
+      if (nextId !== sessionId) onForked?.(nextId);
+    } catch (error) {
+      setActionError(error instanceof Error ? error.message : "Failed to fork session");
+    } finally {
+      setForkingEntryId(null);
+    }
+  }, [forkingEntryId, isStreaming, onForked, session, sessionId]);
   /**
    * Prepended pages are the only thing that needs an anchor, and they can only
    * arrive while history remains. Once it is exhausted the prop goes away so it
@@ -341,9 +371,26 @@ export const MessageList = memo(function MessageList({
         item={item}
         isDark={isDark}
         active={item.key === activeTurnKey}
+        editing={editing}
+        onEdit={(message) => {
+          if (!message.entryId) return;
+          setActionError(null);
+          setEditing({
+            entryId: message.entryId,
+            text: message.text,
+            ...(message.attachments?.length
+              ? { images: message.attachments.map(({ data, mimeType }) => ({ type: "image" as const, data, mimeType })) }
+              : {}),
+          });
+        }}
+        onChangeEdit={(text) => setEditing((current) => current ? { ...current, text } : current)}
+        onCancelEdit={() => setEditing(null)}
+        onSubmitEdit={() => void editMessage()}
+        onFork={(entryId) => void forkFrom(entryId)}
+        forkingEntryId={forkingEntryId}
       />
     ),
-    [isDark, activeTurnKey],
+    [activeTurnKey, editMessage, editing, forkFrom, forkingEntryId, isDark],
   );
 
   const keyExtractor = useCallback((item: ListItem) => item.key, []);
@@ -427,6 +474,11 @@ export const MessageList = memo(function MessageList({
             <ArrowDown size={16} color={colors.icon} strokeWidth={2} />
           </Pressable>
         </Animated.View>
+      )}
+      {actionError && (
+        <Pressable onPress={() => setActionError(null)} style={[styles.actionError, { backgroundColor: colors.surfaceRaised, borderColor: colors.destructive }]}>
+          <Text style={[styles.actionErrorText, { color: colors.destructive }]}>{actionError}</Text>
+        </Pressable>
       )}
     </View>
   );
@@ -706,10 +758,14 @@ const TurnBlock = memo(function TurnBlock({
   turn,
   isDark,
   active,
+  onFork,
+  forkingEntryId,
 }: {
   turn: TurnListItem;
   isDark: boolean;
   active: boolean;
+  onFork?: (entryId: string) => void;
+  forkingEntryId?: string | null;
 }) {
   const colors = useThemeTokens();
   const [override, setOverride] = useState<boolean | null>(null);
@@ -756,6 +812,7 @@ const TurnBlock = memo(function TurnBlock({
       : null;
 
   const showDivider = hasWork || active || !!settledMs;
+  const forkEntryId = turn.final?.entryId ?? turn.sourceEntryId;
 
   const divider = (
     <View style={styles.dividerWrap}>
@@ -831,9 +888,24 @@ const TurnBlock = memo(function TurnBlock({
         <TurnSummary stats={turn.fileStats} changes={fileChanges} isDark={isDark} />
       )}
       {/* Last in the turn: the answer, then what it changed, then the actions. */}
-      {turn.final && hasMessageActions(turn.final) && (
+      {turn.final && !turn.final.isStreaming && (turn.final.text || turn.final.errorMessage) && (
         <View style={styles.turnToolbar}>
           <MessageToolbar message={turn.final} isDark={isDark} hovered={hovered} />
+          {forkEntryId && onFork && (
+            <Pressable
+              onPress={() => onFork(forkEntryId)}
+              disabled={active || !!forkingEntryId}
+              accessibilityRole="button"
+              accessibilityLabel="Fork from this reply"
+              style={styles.actionButton}
+            >
+              {forkingEntryId === forkEntryId ? (
+                <ActivityIndicator size={12} color={colors.textTertiary} />
+              ) : (
+                <GitFork size={14} color={colors.textTertiary} strokeWidth={1.8} />
+              )}
+            </Pressable>
+          )}
         </View>
       )}
     </View>
@@ -844,10 +916,24 @@ const ListRow = memo(function ListRow({
   item,
   isDark,
   active,
+  editing,
+  onEdit,
+  onChangeEdit,
+  onCancelEdit,
+  onSubmitEdit,
+  onFork,
+  forkingEntryId,
 }: {
   item: ListItem;
   isDark: boolean;
   active: boolean;
+  editing: { entryId: string; text: string } | null;
+  onEdit: (message: ChatMessage) => void;
+  onChangeEdit: (text: string) => void;
+  onCancelEdit: () => void;
+  onSubmitEdit: () => void;
+  onFork: (entryId: string) => void;
+  forkingEntryId: string | null;
 }) {
   return (
     <Animated.View
@@ -856,9 +942,18 @@ const ListRow = memo(function ListRow({
       style={styles.itemWrap}
     >
       {item.kind === "turn" ? (
-        <TurnBlock turn={item} isDark={isDark} active={active} />
+        <TurnBlock turn={item} isDark={isDark} active={active} onFork={onFork} forkingEntryId={forkingEntryId} />
       ) : item.message.role === "user" ? (
-        <UserMessage message={item.message} isDark={isDark} />
+        <UserMessage
+          message={item.message}
+          isDark={isDark}
+          editing={editing?.entryId === (item.message.entryId ?? item.message.id)}
+          editText={editing?.entryId === (item.message.entryId ?? item.message.id) ? editing?.text ?? "" : item.message.text}
+          onEdit={item.message.entryId ? () => onEdit(item.message) : undefined}
+          onChangeEdit={onChangeEdit}
+          onCancelEdit={onCancelEdit}
+          onSubmitEdit={onSubmitEdit}
+        />
       ) : (
         <SystemMessage message={item.message} isDark={isDark} />
       )}
@@ -880,7 +975,24 @@ const styles = StyleSheet.create({
   turnToolbar: {
     paddingHorizontal: 16,
     paddingTop: 6,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-end",
+    gap: 4,
   },
+  actionButton: { width: 26, height: 26, borderRadius: 6, alignItems: "center", justifyContent: "center" },
+  actionError: {
+    position: "absolute",
+    left: 16,
+    right: 16,
+    bottom: 12,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    zIndex: 30,
+  },
+  actionErrorText: { fontSize: 12, lineHeight: 18, fontFamily: Fonts.sans },
   summaryWrap: {
     paddingHorizontal: 16,
     paddingTop: 10,

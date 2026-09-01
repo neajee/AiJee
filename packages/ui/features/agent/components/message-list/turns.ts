@@ -31,6 +31,8 @@ export interface TurnListItem {
   durationMs?: number;
   fileStats?: TurnFileStats;
   startedAt: number;
+  /** Persisted user entry that starts this assistant turn. */
+  sourceEntryId?: string;
 }
 
 export type ListItem = MessageListItem | TurnListItem;
@@ -39,7 +41,7 @@ function isAbortedMessage(msg: ChatMessage): boolean {
   return !msg.isStreaming && msg.stopReason === "aborted";
 }
 
-function buildTurn(msgs: ChatMessage[], requestedAt?: number): TurnListItem {
+function buildTurn(msgs: ChatMessage[], requestedAt?: number, sourceEntryId?: string): TurnListItem {
   // The answer is the last message that produced visible output; everything
   // before it (thinking, narration, tool calls) is work history.
   let finalIdx = -1;
@@ -107,6 +109,7 @@ function buildTurn(msgs: ChatMessage[], requestedAt?: number): TurnListItem {
     durationMs,
     fileStats,
     startedAt: requestedAt ?? msgs[0]!.timestamp,
+    ...(sourceEntryId ? { sourceEntryId } : {}),
   };
 }
 
@@ -115,12 +118,14 @@ export function buildListItems(messages: ChatMessage[]): ListItem[] {
   const items: ListItem[] = [];
   let turn: ChatMessage[] = [];
   let requestedAt: number | undefined;
+  let sourceEntryId: string | undefined;
 
   const flushTurn = () => {
     if (turn.length === 0) return;
-    items.push(buildTurn(turn, requestedAt));
+    items.push(buildTurn(turn, requestedAt, sourceEntryId));
     turn = [];
     requestedAt = undefined;
+    sourceEntryId = undefined;
   };
 
   for (const msg of messages) {
@@ -131,6 +136,7 @@ export function buildListItems(messages: ChatMessage[]): ListItem[] {
     flushTurn();
     items.push({ kind: "message", key: msg.id, message: msg });
     requestedAt = msg.role === "user" ? msg.timestamp : undefined;
+    sourceEntryId = msg.role === "user" ? msg.entryId : undefined;
   }
   flushTurn();
 
@@ -157,6 +163,7 @@ function sameItem(a: ListItem, b: ListItem): boolean {
     a.durationMs !== b.durationMs ||
     a.fileStats !== b.fileStats ||
     a.startedAt !== b.startedAt ||
+    a.sourceEntryId !== b.sourceEntryId ||
     a.steps.length !== b.steps.length
   ) {
     return false;

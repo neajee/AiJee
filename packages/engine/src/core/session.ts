@@ -32,7 +32,8 @@ export interface EngineSession {
   setSessionName(name: string): void;
   entries(since?: string): SessionEntry[];
   tree(): JsonValue;
-  fork(entryId: string): Promise<JsonValue>;
+  fork(entryId: string, options?: { position?: "before" | "at" }): Promise<JsonValue>;
+  navigateTree?(entryId: string): Promise<{ cancelled: boolean }>;
   forkMessages(): Array<{ entryId: string; text: string }>;
   lastAssistantText(): string | null;
   exportHtml(outputPath?: string): Promise<string>;

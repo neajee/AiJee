@@ -38,6 +38,15 @@ type Workspace = {
   updated_at: string;
 };
 
+function nextForkSessionName(sourceName: string, existingNames: Iterable<string>): string {
+  const trimmed = sourceName.trim();
+  const base = trimmed.replace(/\s*[（(]\d+[）)]$/, "").trim() || trimmed;
+  const used = new Set(existingNames);
+  let index = 2;
+  while (used.has(`${base}（${index}）`)) index += 1;
+  return `${base}（${index}）`;
+}
+
 type ManagedSession = { key: string; workspaceId: string; session: EngineSession; createdAt: string; lastActive: number; modeId?: string; draft?: boolean };
 type Mode = { id: string; name: string; description?: string; model?: string; thinking_level?: string; extensions?: string[]; skills?: string[]; extra_args?: string[]; is_default?: boolean; sort_order?: number };
 type OAuthLogin = { id: string; providerId: string; url: string | null; instructions: string | null; status: "pending" | "complete" | "failed"; error: string | null; controller: AbortController; expiresAt: number; prompt: { id: string; message: string; type: string; options?: Array<{ id: string; label: string; description?: string }> } | null; resolvePrompt: ((value: string) => void) | null };
@@ -766,7 +775,15 @@ export class AiJeeHttpServer {
       else items.set(id, item);
     }
     for (const record of this.sessionRecords.values()) {
-      if (record.workspace_id !== workspaceId || (workspaceId === "__chat__" && !this.isSystemWorkspacePath(record.cwd)) || this.archivedSessionIds.has(record.session_id) || items.has(record.session_id) || emptyNativeIds.has(record.session_id)) continue;
+      if (record.workspace_id !== workspaceId || (workspaceId === "__chat__" && !this.isSystemWorkspacePath(record.cwd)) || this.archivedSessionIds.has(record.session_id) || emptyNativeIds.has(record.session_id)) continue;
+      const nativeItem = items.get(record.session_id);
+      if (nativeItem) {
+        items.set(record.session_id, {
+          ...nativeItem,
+          last_active: Math.max(nativeItem.last_active as number, record.last_active),
+        });
+        continue;
+      }
       items.set(record.session_id, {
         id: record.session_id,
         file_path: record.session_file,
@@ -785,7 +802,9 @@ export class AiJeeHttpServer {
         id: descriptor.sessionId,
         file_path: descriptor.sessionFile ?? "",
         cwd: descriptor.cwd,
-        display_name: null,
+        display_name: typeof managed.session.state().sessionName === "string"
+          ? managed.session.state().sessionName
+          : null,
         created_at: managed.createdAt,
         last_active: managed.lastActive,
         message_count: managed.session.messages().length,
@@ -823,7 +842,8 @@ export class AiJeeHttpServer {
     if (!managed) throw new Error("Session not found");
     const descriptor = managed.session.describe();
     const entries = managed.session.entries() as Array<Record<string, unknown>>;
-    return { id: sessionId, file_path: descriptor.sessionFile ?? "", cwd: descriptor.cwd, display_name: null, created_at: managed.createdAt, last_active: managed.lastActive, message_count: managed.session.messages().length, version: entries.length };
+    const sessionName = managed.session.state().sessionName;
+    return { id: sessionId, file_path: descriptor.sessionFile ?? "", cwd: descriptor.cwd, display_name: typeof sessionName === "string" ? sessionName : null, created_at: managed.createdAt, last_active: managed.lastActive, message_count: managed.session.messages().length, version: entries.length };
   }
 
   private async createSession(request: IncomingMessage, response: ServerResponse): Promise<void> {
@@ -863,7 +883,7 @@ export class AiJeeHttpServer {
   }
 
   private async prompt(request: IncomingMessage, response: ServerResponse, action: "prompt" | "steer" | "followUp"): Promise<void> {
-    const body = await this.body<{ session_id?: string; message?: string; images?: unknown; streaming_behavior?: unknown }>(request, maxPromptBodyBytes);
+    const body = await this.body<{ session_id?: string; message?: string; images?: unknown; streaming_behavior?: unknown; from_entry_id?: string }>(request, maxPromptBodyBytes);
     const managed = body.session_id ? await this.restoreSession(body.session_id) : undefined;
     if (!managed || !body.message) return this.error(response, 404, "Session or message not found");
     if (managed.draft) {
@@ -884,6 +904,11 @@ export class AiJeeHttpServer {
     // message runs now or queues, which pi only does when it is told how to
     // queue: dropping this field made every mid-turn message fail silently.
     const streamingBehavior = body.streaming_behavior === "followUp" ? ("followUp" as const) : ("steer" as const);
+    if (body.from_entry_id) {
+      if (!managed.session.navigateTree) return this.error(response, 501, "Message editing is not supported by the selected engine");
+      const navigation = await managed.session.navigateTree(body.from_entry_id);
+      if (navigation.cancelled) return this.error(response, 409, "Session navigation was cancelled");
+    }
     const operation = action === "prompt"
       ? managed.session.prompt(body.message, { images, streamingBehavior })
       : action === "steer" ? managed.session.steer(body.message, images) : managed.session.followUp(body.message, images);
@@ -912,10 +937,17 @@ export class AiJeeHttpServer {
         const raw = entry.raw;
         if (raw && typeof raw === "object" && !Array.isArray(raw)) {
           const message = (raw as Record<string, unknown>).message;
-          if (message && typeof message === "object" && !Array.isArray(message)) return message;
+          if (message && typeof message === "object" && !Array.isArray(message)) {
+            return { ...(message as Record<string, unknown>), entryId: entry.id };
+          }
         }
         const message = entry.message;
-        return message && typeof message === "object" && !Array.isArray(message) ? message : raw ?? entry;
+        if (message && typeof message === "object" && !Array.isArray(message)) {
+          return { ...(message as Record<string, unknown>), entryId: entry.id };
+        }
+        return raw && typeof raw === "object" && !Array.isArray(raw)
+          ? { ...(raw as Record<string, unknown>), entryId: entry.id }
+          : entry;
       }),
       oldest_entry_id: selected[0]?.id ?? null,
       has_more: end - limit > 0,
@@ -939,6 +971,59 @@ export class AiJeeHttpServer {
     if (!managed) return this.error(response, 404, "Session not found");
     if (capability && !managed.session.capabilities[capability]) return this.error(response, 501, `${capability} is not supported by the selected engine`);
     this.ok(response, await command(managed.session, body));
+  }
+
+  private async forkAgent(request: IncomingMessage, response: ServerResponse): Promise<void> {
+    const body = await this.body<Record<string, unknown>>(request);
+    const oldId = typeof body.session_id === "string" ? body.session_id : "";
+    const managed = await this.restoreSession(oldId);
+    if (!managed) return this.error(response, 404, "Session not found");
+    if (!managed.session.capabilities.fork) return this.error(response, 501, "fork is not supported by the selected engine");
+    if (managed.session.describe().streaming) return this.error(response, 409, "Agent busy");
+    const entryId = String(body.entryId ?? body.entry_id ?? "");
+    if (!entryId) return this.error(response, 422, "entryId is required");
+    const position = body.position === "at" ? "at" : "before";
+    const sourceDescriptor = managed.session.describe();
+    const siblings = await this.mergedSessionItems(sourceDescriptor.cwd, managed.workspaceId);
+    const sourceItem = siblings.find((item) => item.id === oldId);
+    const stateName = managed.session.state().sessionName;
+    const sourceName = typeof stateName === "string" && stateName.trim()
+      ? stateName.trim()
+      : typeof sourceItem?.display_name === "string" ? sourceItem.display_name.trim() : "";
+    const result = await managed.session.fork(entryId, { position });
+    if ((result as { cancelled?: boolean } | null)?.cancelled) return this.ok(response, result);
+    const descriptor = managed.session.describe();
+    const newId = descriptor.sessionId;
+    const createdAt = new Date().toISOString();
+    if (sourceName) {
+      managed.session.setSessionName(nextForkSessionName(
+        sourceName,
+        siblings.flatMap((item) => typeof item.display_name === "string" ? [item.display_name] : []),
+      ));
+    }
+    this.unbindSessionEvents(oldId);
+    this.sessions.delete(oldId);
+    this.sessions.set(newId, { ...managed, createdAt, lastActive: Date.now() });
+    this.sessionRecords.set(newId, {
+      session_id: newId,
+      session_file: descriptor.sessionFile ?? "",
+      workspace_id: managed.workspaceId,
+      cwd: descriptor.cwd,
+      created_at: createdAt,
+      last_active: Date.now(),
+      mode_id: managed.modeId,
+    });
+    await this.persist();
+    this.bindSessionEvents(newId, managed.session, managed.workspaceId);
+    return this.ok(response, {
+      ...(result as Record<string, unknown>),
+      session: {
+        sessionId: newId,
+        sessionFile: descriptor.sessionFile,
+        workspaceId: managed.workspaceId === "__chat__" ? undefined : managed.workspaceId,
+        listItem: this.chatSessionInfo(newId),
+      },
+    });
   }
 
   private async mutateSession(request: IncomingMessage, response: ServerResponse, command: (session: EngineSession, body: Record<string, unknown>) => unknown, capability?: keyof EngineSession["capabilities"]): Promise<void> { return this.sessionCommand(request, response, async (session, body) => { await command(session, body); return null; }, capability); }
@@ -1329,12 +1414,12 @@ export class AiJeeHttpServer {
       this.archivedSessionIds,
       this.systemWorkspacePath,
     );
-    if (result.imported === 0 && result.removed === 0) return;
+    if (result.imported === 0 && result.removed === 0 && result.remapped === 0) return;
     this.sessionRecords.clear();
     for (const session of sessions) this.sessionRecords.set(session.session_id, session);
     // Patch only the sessions key so devices/identity/etc. are left untouched.
     await this.store.update({ sessions });
-    recordTelemetry("sessions.reconciled", { before, imported: result.imported, removed: result.removed, total: result.total });
+    recordTelemetry("sessions.reconciled", { before, imported: result.imported, removed: result.removed, remapped: result.remapped, total: result.total });
   }
   private sessionInfo(sessionId: string): Record<string, unknown> {
     const managed = this.sessions.get(sessionId);
