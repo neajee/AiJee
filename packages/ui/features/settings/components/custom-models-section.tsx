@@ -78,7 +78,19 @@ export function CustomModelsSection({ isDark, isNative }: { isDark: boolean; isN
         else await Linking.openURL(login.url);
       }
       const check = async () => {
-        const status = await getOAuth(providerId, login.id);
+        let status;
+        try {
+          status = await getOAuth(providerId, login.id);
+        } catch (error) {
+          setOauthProviderId(null);
+          setOauthLoginId(null);
+          setOauthUrl(null);
+          setOauthPrompt(null);
+          setOauthInput('');
+          setActiveBuiltinId(null);
+          setOauthMessage(error instanceof Error ? error.message : '授权状态获取失败，请重新登录');
+          return;
+        }
         if (status.status === 'pending') {
           setOauthMessage(status.instructions ?? '请在浏览器中完成授权…');
           setOauthPrompt(status.prompt?.type === 'manual_code' ? { id: status.prompt.id, message: status.prompt.message } : null);
