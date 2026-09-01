@@ -754,8 +754,6 @@ const { session } = await createAgentSession({ resourceLoader: loader });
 
 Sessions use a tree structure with `id`/`parentId` linking, enabling in-place branching.
 
-The installed Pi SDK exposes session listing and file access, but does not expose a public archive/move method. AiJee currently implements archive at the server boundary by moving the persisted JSONL file into the SDK's `.archive/` directory. This is an application integration point and may be replaced if a future SDK version provides an archive API.
-
 ```typescript
 import {
   type CreateAgentSessionRuntimeFactory,
