@@ -7,7 +7,18 @@ import type { PropsWithChildren } from "react";
  */
 function GlobalScrollbarStyleReset() {
   return (
-    <style id="expo-scrollbar-reset" dangerouslySetInnerHTML={{ __html: `
+      <style id="expo-scrollbar-reset" dangerouslySetInnerHTML={{ __html: `
+      :root {
+        --aijee-background: #ffffff;
+        --aijee-text: #1c1c1c;
+        --aijee-accent: #2563eb;
+        --aijee-ui-font-size: 14px;
+        --aijee-code-font-size: 13px;
+      }
+      body { background: var(--aijee-background); color: var(--aijee-text); }
+      @media (prefers-reduced-motion: reduce) {
+        *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+      }
       * {
         scrollbar-width: none !important;   /* Firefox */
         -ms-overflow-style: none !important; /* IE 11+ / Edge legacy */

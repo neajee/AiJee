@@ -10,6 +10,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { Colors, Fonts } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { BottomSheet } from "@/components/ui/bottom-sheet";
 import { Portal } from "@/components/ui/portal";
 import type { ChatMessage } from "../../types";
@@ -40,7 +41,7 @@ export const AssistantMessage = memo(function AssistantMessage({
   isDark,
 }: AssistantMessageProps) {
   const colorScheme = useColorScheme() ?? "light";
-  const colors = Colors[colorScheme];
+  const colors = useThemeTokens();
 
   const hasText = !!message.text;
   const hasError = !!message.errorMessage;
@@ -85,7 +86,7 @@ export const MessageToolbar = memo(function MessageToolbar({
   isDark: boolean;
   hovered: boolean;
 }) {
-  const colors = isDark ? Colors.dark : Colors.light;
+  const colors = useThemeTokens();
   const [showInfo, setShowInfo] = useState(false);
   const [copied, setCopied] = useState(false);
   const isWeb = Platform.OS === "web";

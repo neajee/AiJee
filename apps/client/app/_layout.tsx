@@ -21,6 +21,7 @@ import "react-native-reanimated";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { useAppSettingsStore } from "@/features/settings/store";
 import { useAuthStore } from "@/features/auth/store";
 import { useServersStore } from "@/features/servers/store";
@@ -46,6 +47,10 @@ export const unstable_settings = {
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
+  const themeTokens = useThemeTokens();
+  const themePreset = useAppSettingsStore((s) => s.themePreset);
+  const uiFontSize = useAppSettingsStore((s) => s.uiFontSize);
+  const codeFontSize = useAppSettingsStore((s) => s.codeFontSize);
   const settingsLoaded = useAppSettingsStore((s) => s.loaded);
   const loadSettings = useAppSettingsStore((s) => s.load);
   const authLoaded = useAuthStore((s) => s.loaded);
@@ -57,6 +62,31 @@ export default function RootLayout() {
   const claimLocalServer = useAuthStore((s) => s.claimLocalServer);
   const authorizeWithCode = useAuthStore((s) => s.authorizeWithCode);
   const bootstrapAttempted = useRef(false);
+
+  useEffect(() => {
+    if (Platform.OS !== 'web' || typeof document === 'undefined') return;
+    const root = document.documentElement;
+    const css = {
+      '--aijee-background': themeTokens.background,
+      '--aijee-surface': themeTokens.surface,
+      '--aijee-surface-raised': themeTokens.surfaceRaised,
+      '--aijee-text': themeTokens.text,
+      '--aijee-text-secondary': themeTokens.textSecondary,
+      '--aijee-border': themeTokens.border,
+      '--aijee-accent': themeTokens.accent,
+      '--aijee-code-background': themeTokens.code,
+      '--aijee-code-text': themeTokens.codeText,
+      '--aijee-ui-font-size': `${uiFontSize}px`,
+      '--aijee-code-font-size': `${codeFontSize}px`,
+      '--aijee-ui-font-family': themeTokens.uiFont,
+      '--aijee-code-font-family': themeTokens.codeFont,
+    } as Record<string, string>;
+    Object.entries(css).forEach(([key, value]) => root.style.setProperty(key, value));
+    root.dataset.aijeeTheme = `${themePreset}-${colorScheme ?? 'light'}`;
+    document.body.style.backgroundColor = themeTokens.background;
+    document.body.style.color = themeTokens.text;
+    document.body.style.fontSize = `${uiFontSize}px`;
+  }, [codeFontSize, colorScheme, themePreset, themeTokens, uiFontSize]);
 
   useEffect(() => {
     if (Platform.OS !== 'web' || typeof window === 'undefined') return;

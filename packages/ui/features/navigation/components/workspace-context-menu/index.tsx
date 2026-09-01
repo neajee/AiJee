@@ -22,6 +22,7 @@ import {
 
 import { Colors, Fonts } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { useGitStatus, useNestedRepos } from "@aijee/client-sdk";
 import { remotesToLinks, type RemoteLink } from "@/features/workspace/utils/git-remote-url";
 
@@ -77,6 +78,7 @@ export function WorkspaceContextMenu({
   onClose,
 }: WorkspaceContextMenuProps) {
   const colorScheme = useColorScheme() ?? "light";
+  const colors = useThemeTokens();
   const isDark = colorScheme === "dark";
   const { width: screenWidth, height: screenHeight } = useWindowDimensions();
 
@@ -96,7 +98,7 @@ export function WorkspaceContextMenu({
     ),
   ];
 
-  const textPrimary = isDark ? "#fefdfd" : Colors[colorScheme].text;
+  const textPrimary = colors.text;
   const textDanger = "#E5484D";
   const menuBg = isDark ? "#252525" : "#FFFFFF";
   const menuBorder = isDark ? "#3b3a39" : "rgba(0,0,0,0.12)";

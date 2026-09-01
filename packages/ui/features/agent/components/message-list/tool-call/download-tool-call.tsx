@@ -1,6 +1,7 @@
 import { memo } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Colors, Fonts } from "@/constants/theme";
+import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import type { ToolCallInfo } from "../../../types";
 import { parseToolArguments } from "../utils";
 
@@ -13,7 +14,7 @@ export const DownloadToolCall = memo(function DownloadToolCall({
   tc,
   isDark,
 }: DownloadToolCallProps) {
-  const colors = isDark ? Colors.dark : Colors.light;
+  const colors = useThemeTokens();
   const parsed = parseToolArguments(tc.arguments);
   const url = (parsed.url as string) || "";
 

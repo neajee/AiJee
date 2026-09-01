@@ -25,6 +25,7 @@ import { useAgentSession } from "@aijee/client-sdk";
 import { useWorkspaceStore } from "@/features/workspace/store";
 import { Colors, Fonts } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import type { ChatMessage, TurnFileStats } from "../../types";
 import {
   buildListItems,
@@ -94,7 +95,7 @@ export const MessageList = memo(function MessageList({
 }: MessageListProps) {
   const colorScheme = useColorScheme() ?? "light";
   const isDark = colorScheme === "dark";
-  const colors = Colors[colorScheme];
+  const colors = useThemeTokens();
   const listRef = useRef<FlatList<ListItem>>(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
   /**
@@ -464,7 +465,7 @@ const FileChangeRow = memo(function FileChangeRow({
   removeColor: string;
   isDark: boolean;
 }) {
-  const colors = isDark ? Colors.dark : Colors.light;
+  const colors = useThemeTokens();
   const created = change.kind === "created";
   const shown = relativePath(change.path, root);
   const name = basename(shown);
@@ -513,7 +514,7 @@ const TurnSummary = memo(function TurnSummary({
   changes: TurnFileChange[];
   isDark: boolean;
 }) {
-  const colors = isDark ? Colors.dark : Colors.light;
+  const colors = useThemeTokens();
   const [expanded, setExpanded] = useState(false);
   const toggle = useCallback(() => setExpanded((prev) => !prev), []);
 
@@ -621,7 +622,7 @@ const WorkStepView = memo(function WorkStepView({
   step: WorkStep;
   isDark: boolean;
 }) {
-  const colors = isDark ? Colors.dark : Colors.light;
+  const colors = useThemeTokens();
 
   switch (step.kind) {
     case "thinking":
@@ -657,7 +658,7 @@ const WorkActivityGroup = memo(function WorkActivityGroup({
   steps: WorkStep[];
   isDark: boolean;
 }) {
-  const colors = isDark ? Colors.dark : Colors.light;
+  const colors = useThemeTokens();
   const running = steps.some((step) =>
     step.kind === "thinking"
       ? step.streaming
@@ -710,7 +711,7 @@ const TurnBlock = memo(function TurnBlock({
   isDark: boolean;
   active: boolean;
 }) {
-  const colors = isDark ? Colors.dark : Colors.light;
+  const colors = useThemeTokens();
   const [override, setOverride] = useState<boolean | null>(null);
   const expanded = override ?? active;
   const hasWork = turn.steps.length > 0;

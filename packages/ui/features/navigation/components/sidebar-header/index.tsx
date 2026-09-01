@@ -4,6 +4,7 @@ import { Search } from "lucide-react-native";
 
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { ServerSwitcher } from "@/features/servers/components/server-switcher";
 import { CommandPalette } from "../command-palette";
 
@@ -15,7 +16,7 @@ import { CommandPalette } from "../command-palette";
  */
 export function SidebarHeader() {
   const colorScheme = useColorScheme() ?? "light";
-  const colors = Colors[colorScheme];
+  const colors = useThemeTokens();
   const isDark = colorScheme === "dark";
   const [paletteVisible, setPaletteVisible] = useState(false);
 

@@ -1,23 +1,23 @@
-import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useThemeTokens } from "@/hooks/use-theme-tokens";
 
 export function useChangesTheme() {
   const colorScheme = useColorScheme() ?? "light";
-  const colors = Colors[colorScheme];
-  const isDark = colorScheme === "dark";
+  const colors = useThemeTokens();
+  const isDark = colorScheme === 'dark';
 
   return {
     isDark,
     colors,
-    surfaceBg: isDark ? "#151515" : "#FAFAFA",
-    dividerColor: isDark ? "#323131" : "rgba(0,0,0,0.08)",
-    textPrimary: isDark ? "#fefdfd" : colors.text,
-    textSecondary: isDark ? "#f1ece8" : colors.textSecondary,
-    textMuted: isDark ? "#cdc8c5" : colors.textTertiary,
-    hoverBg: isDark ? "#252525" : "#E8E8E8",
-    inputBg: isDark ? "#1a1a1a" : "#F6F6F6",
-    inputBorder: isDark ? "#3b3a39" : "rgba(0,0,0,0.12)",
-    sendColor: isDark ? "#fefdfd" : colors.text,
-    hashColor: isDark ? "#8B8685" : "#888",
+    surfaceBg: colors.background,
+    dividerColor: colors.border,
+    textPrimary: colors.text,
+    textSecondary: colors.textSecondary,
+    textMuted: colors.textTertiary,
+    hoverBg: colors.surfaceRaised,
+    inputBg: colors.surfaceRaised,
+    inputBorder: colors.border,
+    sendColor: colors.accent,
+    hashColor: colors.textTertiary,
   };
 }

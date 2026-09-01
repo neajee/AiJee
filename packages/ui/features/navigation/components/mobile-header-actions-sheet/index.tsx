@@ -12,6 +12,7 @@ import { Gesture, GestureDetector } from "react-native-gesture-handler";
 
 import { Colors, Fonts } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useThemeTokens } from "@/hooks/use-theme-tokens";
 
 const SHEET_HEIGHT = 360;
 const TIMING_CONFIG = { duration: 280, easing: Easing.out(Easing.cubic) };
@@ -36,7 +37,7 @@ export function MobileHeaderActionsSheet({
 }: MobileHeaderActionsSheetProps) {
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme() ?? "light";
-  const colors = Colors[colorScheme];
+  const colors = useThemeTokens();
   const isDark = colorScheme === "dark";
   const textPrimary = isDark ? "#fefdfd" : colors.text;
   const textSecondary = isDark ? "#a9a29f" : "#6f6a66";

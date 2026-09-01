@@ -13,6 +13,7 @@ import { usePathname, useRouter } from 'expo-router';
 
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-tokens';
 import { useWorkspaceStore } from '@/features/workspace/store';
 import { useWorkspaceSessions as useSessions } from '@aijee/client-sdk';
 import { SessionSheetContent } from '../session-sheet-content';
@@ -29,7 +30,7 @@ export function MobileSessionsSheet({ visible, onClose }: MobileSessionsSheetPro
   const insets = useSafeAreaInsets();
   const pathname = usePathname();
   const colorScheme = useColorScheme() ?? 'light';
-  const colors = Colors[colorScheme];
+  const colors = useThemeTokens();
   const isDark = colorScheme === 'dark';
 
   const translateY = useSharedValue(SHEET_HEIGHT);

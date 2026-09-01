@@ -3,6 +3,7 @@ import { Plus } from 'lucide-react-native';
 
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-tokens';
 
 interface AddWorkspaceButtonProps {
   onPress: () => void;
@@ -14,7 +15,7 @@ export function AddWorkspaceButton({
   layout = 'vertical',
 }: AddWorkspaceButtonProps) {
   const colorScheme = useColorScheme() ?? 'light';
-  const colors = Colors[colorScheme];
+  const colors = useThemeTokens();
 
   return (
     <View

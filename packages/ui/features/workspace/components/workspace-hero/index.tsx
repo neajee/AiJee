@@ -1,9 +1,10 @@
 import { useRef, useEffect, useMemo } from "react";
 import { Animated, StyleSheet, Text, View } from "react-native";
 
-import { Colors, Fonts } from "@/constants/theme";
+import { Fonts } from "@/constants/theme";
 import { AiJeeLogo } from "@/components/aijee-logo";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { useResponsiveLayout } from "@/features/navigation/hooks/use-responsive-layout";
 
 const GREETINGS = [
@@ -89,11 +90,11 @@ function getGreeting(): string {
 
 export function WorkspaceHero() {
   const colorScheme = useColorScheme() ?? "light";
-  const colors = Colors[colorScheme];
+  const colors = useThemeTokens();
   const { isWideScreen } = useResponsiveLayout();
 
   const isDark = colorScheme === "dark";
-  const textPrimary = isDark ? "#fefdfd" : colors.text;
+  const textPrimary = colors.text;
 
   const greeting = useMemo(() => getGreeting(), []);
 

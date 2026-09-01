@@ -10,10 +10,10 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { Colors } from "@/constants/theme";
 import { useResponsiveLayout } from "@/features/navigation/hooks/use-responsive-layout";
 import { PromptInput } from "@/features/workspace/components/prompt-input";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { MessageList } from "@/features/agent/components/message-list";
 import { ChatShimmer } from "@/features/agent/components/message-list/chat-shimmer";
 import { ExtensionUiDialog } from "@/features/agent/components/extension-ui-dialog";
@@ -31,7 +31,7 @@ export default function WorkSessionScreen() {
     sessionFile?: string;
   }>();
   const colorScheme = useColorScheme() ?? "light";
-  const colors = Colors[colorScheme];
+  const colors = useThemeTokens();
   const { isWideScreen } = useResponsiveLayout();
   const insets = useSafeAreaInsets();
   const [alertMessage, setAlertMessage] = useState<string | null>(null);

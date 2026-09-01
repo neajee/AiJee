@@ -1,6 +1,7 @@
 import { memo, useCallback, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { Colors, Fonts } from "@/constants/theme";
+import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import type { ToolCallInfo } from "../../../types";
 import { toolDisplayName } from "../utils";
 import { ToolBody, ToolHeader, ToolSurface, TOOL_BODY_MAX_HEIGHT } from "./tool-disclosure";
@@ -15,7 +16,7 @@ export const GenericToolCall = memo(function GenericToolCall({
   tc,
   isDark,
 }: GenericToolCallProps) {
-  const colors = isDark ? Colors.dark : Colors.light;
+  const colors = useThemeTokens();
   // Results stay collapsed by default, even while the tool is running.
   const [expanded, setExpanded] = useState(false);
   const toggle = useCallback(() => setExpanded((p) => !p), []);

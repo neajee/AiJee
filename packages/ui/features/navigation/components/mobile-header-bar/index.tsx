@@ -14,6 +14,7 @@ import { usePathname } from 'expo-router';
 
 import { Colors, Fonts } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-tokens';
 import { useAppMode } from '@/hooks/use-app-mode';
 import { useWorkspaceStore } from '@/features/workspace/store';
 import { useGitStatus, useNestedRepos } from '@aijee/client-sdk';
@@ -45,7 +46,7 @@ export function MobileHeaderBar({
   onTaskOutputPress,
 }: MobileHeaderBarProps) {
   const colorScheme = useColorScheme() ?? 'light';
-  const colors = Colors[colorScheme];
+  const colors = useThemeTokens();
   const isDark = colorScheme === 'dark';
   const appMode = useAppMode();
   const pathname = usePathname();

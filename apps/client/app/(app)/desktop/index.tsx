@@ -12,8 +12,9 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { Square, Monitor, ChevronUp, ChevronDown } from 'lucide-react-native';
 
-import { Colors, Fonts } from '@/constants/theme';
+import { Fonts } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-tokens';
 import { useAuthStore } from '@/features/auth/store';
 import { useServersStore } from '@/features/servers/store';
 import { useDesktopStore } from '@/features/desktop/store';
@@ -24,7 +25,7 @@ import { useResponsiveLayout } from '@/features/navigation/hooks/use-responsive-
 export default function DesktopScreen() {
   const colorScheme = useColorScheme() ?? 'light';
   const isDark = colorScheme === 'dark';
-  const colors = Colors[colorScheme];
+  const colors = useThemeTokens();
   const insets = useSafeAreaInsets();
   const { isWideScreen } = useResponsiveLayout();
 

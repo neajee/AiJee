@@ -8,6 +8,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { Colors } from "@/constants/theme";
+import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { AnimatedCollapse } from "../animated-collapse";
 
 /**
@@ -44,7 +45,7 @@ export const ToolHeader = memo(function ToolHeader({
   alignTop = false,
   children,
 }: ToolHeaderProps) {
-  const colors = isDark ? Colors.dark : Colors.light;
+  const colors = useThemeTokens();
   const rotate = useDerivedValue(
     () =>
       withTiming(expanded ? 90 : 0, {
@@ -116,7 +117,7 @@ export function ToolSurface({
   padded?: boolean;
   children: ReactNode;
 }) {
-  const colors = isDark ? Colors.dark : Colors.light;
+  const colors = useThemeTokens();
   return (
     <View
       style={[

@@ -2,6 +2,7 @@ import { memo, useCallback, useRef, useState } from "react";
 import { Animated, Easing, Modal, Pressable, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { Maximize2, X } from "lucide-react-native";
 import { Colors, Fonts } from "@/constants/theme";
+import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { CodePreview } from "../code-preview";
 import type { ToolCallInfo } from "../../../types";
 import { basename, isToolActive, parseToolArguments } from "../utils";
@@ -16,7 +17,7 @@ export const EditToolCall = memo(function EditToolCall({
   tc,
   isDark,
 }: EditToolCallProps) {
-  const colors = isDark ? Colors.dark : Colors.light;
+  const colors = useThemeTokens();
   const { width, height } = useWindowDimensions();
   const active = isToolActive(tc);
   // Results stay collapsed by default, even while the tool is running.

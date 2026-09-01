@@ -3,6 +3,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-tokens';
 import { useWorkspaceStore } from '@/features/workspace/store';
 
 interface MobileWorkspaceTriggerProps {
@@ -12,7 +13,7 @@ interface MobileWorkspaceTriggerProps {
 export function MobileWorkspaceTrigger({ onPress }: MobileWorkspaceTriggerProps) {
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme() ?? 'light';
-  const colors = Colors[colorScheme];
+  const colors = useThemeTokens();
 
   const workspace = useWorkspaceStore((s) =>
     s.workspaces.find((w) => w.id === s.selectedWorkspaceId)

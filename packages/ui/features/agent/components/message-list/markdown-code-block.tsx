@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import * as Clipboard from "expo-clipboard";
 import { Check, Copy } from "lucide-react-native";
 import { Colors, Fonts } from "@/constants/theme";
+import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { CodePreview } from "./code-preview";
 
 interface MarkdownCodeBlockProps {
@@ -24,7 +25,7 @@ export const MarkdownCodeBlock = memo(function MarkdownCodeBlock({
   language,
   isDark,
 }: MarkdownCodeBlockProps) {
-  const colors = isDark ? Colors.dark : Colors.light;
+  const colors = useThemeTokens();
   const [copied, setCopied] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 

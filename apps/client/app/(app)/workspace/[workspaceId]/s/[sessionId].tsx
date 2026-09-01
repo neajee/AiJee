@@ -9,13 +9,12 @@ import {
   View,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Colors } from "@/constants/theme";
 import { useResponsiveLayout } from "@/features/navigation/hooks/use-responsive-layout";
 import { PromptInput } from "@/features/workspace/components/prompt-input";
 import { WorkspaceSidebar } from "@/features/workspace/components/workspace-sidebar";
 import { WorkspaceRightPane } from "@/features/preview/components/workspace-right-pane";
 import { useWorkspaceStore } from "@/features/workspace/store";
-import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { MessageList } from "@/features/agent/components/message-list";
 import { ChatShimmer } from "@/features/agent/components/message-list/chat-shimmer";
 import { ExtensionUiDialog } from "@/features/agent/components/extension-ui-dialog";
@@ -35,8 +34,7 @@ export default function SessionScreen() {
     workspaceId: string;
     sessionId: string;
   }>();
-  const colorScheme = useColorScheme() ?? "light";
-  const colors = Colors[colorScheme];
+  const colors = useThemeTokens();
   const { isWideScreen } = useResponsiveLayout();
   const insets = useSafeAreaInsets();
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
@@ -128,8 +126,7 @@ export default function SessionScreen() {
 
   const clearAlert = useCallback(() => setAlertMessage(null), []);
 
-  const isDark = colorScheme === "dark";
-  const editorBg = isDark ? "#151515" : "#FAFAFA";
+  const editorBg = colors.background;
 
   const keyboardPadding = useRef(new Animated.Value(0)).current;
 
@@ -173,7 +170,7 @@ export default function SessionScreen() {
         style={[
           styles.container,
           {
-            backgroundColor: isDark ? "#121212" : colors.background,
+          backgroundColor: colors.background,
             paddingBottom: isWideScreen
               ? 0
               : Animated.add(keyboardPadding, insets.bottom),

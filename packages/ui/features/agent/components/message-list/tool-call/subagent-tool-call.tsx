@@ -1,9 +1,11 @@
 import { memo, useCallback, useMemo, useState } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { Colors, Fonts } from "@/constants/theme";
+import { useThemeTokens } from "@/hooks/use-theme-tokens";
+import { useAppSettingsStore } from "@/features/settings/store";
 import type { ToolCallInfo } from "../../../types";
 import { useStableMarkdown } from "../../../hooks/use-stable-markdown";
-import { markedDarkOptions, markedLightOptions } from "../../../theme";
+import { createMarkedOptions } from "../../../theme";
 import { isToolActive, parseToolArguments } from "../utils";
 import { ToolBody, ToolHeader, ToolSurface } from "./tool-disclosure";
 
@@ -19,7 +21,7 @@ export const SubagentToolCall = memo(function SubagentToolCall({
   tc,
   isDark,
 }: SubagentToolCallProps) {
-  const colors = isDark ? Colors.dark : Colors.light;
+  const colors = useThemeTokens();
   const active = isToolActive(tc);
   // Results stay collapsed by default, even while the tool is running.
   const [expanded, setExpanded] = useState(false);
@@ -35,7 +37,7 @@ export const SubagentToolCall = memo(function SubagentToolCall({
   const hasDetail = !!transcript || recentTools.length > 0 || recentOutput.length > 0 || hasProgressMeta;
 
 
-  const markdownOptions = isDark ? markedDarkOptions : markedLightOptions;
+  const markdownOptions = createMarkedOptions(useThemeTokens(), isDark ? 'dark' : 'light', useAppSettingsStore((s) => s.codeFontSize));
   const markdownElements = useStableMarkdown(
     transcript,
     markdownOptions,

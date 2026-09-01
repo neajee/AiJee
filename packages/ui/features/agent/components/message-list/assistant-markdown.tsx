@@ -1,7 +1,9 @@
 import { memo } from "react";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useThemeTokens } from "@/hooks/use-theme-tokens";
+import { useAppSettingsStore } from "@/features/settings/store";
 import { useStableMarkdown } from "../../hooks/use-stable-markdown";
-import { markedDarkOptions, markedLightOptions } from "../../theme";
+import { createMarkedOptions } from "../../theme";
 
 interface AssistantMarkdownProps {
   text: string;
@@ -17,7 +19,9 @@ export const AssistantMarkdown = memo(function AssistantMarkdown({
   isStreaming,
 }: AssistantMarkdownProps) {
   const colorScheme = useColorScheme() ?? "light";
-  const options = colorScheme === "dark" ? markedDarkOptions : markedLightOptions;
+  const tokens = useThemeTokens();
+  const codeFontSize = useAppSettingsStore((s) => s.codeFontSize);
+  const options = createMarkedOptions(tokens, colorScheme, codeFontSize);
   const elements = useStableMarkdown(text, options, isStreaming);
   return <>{elements}</>;
 });

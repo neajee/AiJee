@@ -1,6 +1,7 @@
 import { memo, useCallback, useEffect, useRef, useState, useMemo } from "react";
 import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
 import { Colors, Fonts } from "@/constants/theme";
+import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import type { ToolCallInfo } from "../../../types";
 import { isToolActive, toolDisplayName, basename, parseToolArguments } from "../utils";
 import { ToolBody, ToolHeader } from "./tool-disclosure";
@@ -161,7 +162,7 @@ const GroupedToolCalls = memo(function GroupedToolCalls({
   calls: ToolCallInfo[];
   isDark: boolean;
 }) {
-  const colors = isDark ? Colors.dark : Colors.light;
+  const colors = useThemeTokens();
   const [expanded, setExpanded] = useState(false);
   const [showAll, setShowAll] = useState(false);
 

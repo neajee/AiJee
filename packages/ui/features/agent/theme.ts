@@ -1,4 +1,5 @@
 import { Fonts } from "@/constants/theme";
+import type { ThemeTokens } from "@/constants/theme";
 import type { useMarkdownHookOptions } from "react-native-marked";
 
 type MarkdownTheme = NonNullable<useMarkdownHookOptions["theme"]>;
@@ -35,10 +36,14 @@ function createStyles(colors: {
   border: string;
   code: string;
   codeText: string;
+  baseFontSize?: number;
+  codeFontSize?: number;
 }): MarkdownStyles {
+  const baseFontSize = colors.baseFontSize ?? 14;
+  const codeFontSize = colors.codeFontSize ?? 13;
   return {
     text: {
-      fontSize: 14,
+      fontSize: baseFontSize,
       lineHeight: 22,
       fontFamily: Fonts.sans,
       color: colors.text,
@@ -118,7 +123,7 @@ function createStyles(colors: {
     codespan: {
       fontFamily: Fonts.mono,
       fontStyle: "normal",
-      fontSize: 13,
+      fontSize: codeFontSize,
       lineHeight: 20,
       color: colors.codeText,
       backgroundColor: colors.code,
@@ -198,3 +203,20 @@ export const markedLightOptions: useMarkdownHookOptions = {
     codeText: "#24292e",
   }),
 };
+
+export function createMarkedOptions(tokens: ThemeTokens, scheme: 'light' | 'dark', codeFontSize = 13): useMarkdownHookOptions {
+  return {
+    colorScheme: scheme,
+    theme: createTheme({ text: tokens.text, link: tokens.accent, border: tokens.border, code: tokens.code }),
+    styles: createStyles({
+      text: tokens.text,
+      textStrong: tokens.text,
+      textMuted: tokens.textTertiary,
+      link: tokens.accent,
+      border: tokens.border,
+      code: tokens.code,
+      codeText: tokens.codeText,
+      codeFontSize,
+    }),
+  };
+}

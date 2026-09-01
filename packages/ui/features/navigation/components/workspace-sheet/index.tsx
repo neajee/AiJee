@@ -24,6 +24,7 @@ import { SquarePen, RefreshCw, Plus } from 'lucide-react-native';
 
 import { Colors, Fonts } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-tokens';
 import { useWorkspaceStore } from '@/features/workspace/store';
 import { useWorkspaceSessions as useSessions } from '@aijee/client-sdk';
 import { NewWorkspaceDialog } from '@/features/workspace/components/new-workspace-dialog';
@@ -43,7 +44,7 @@ export function WorkspaceSheet({ visible, onClose }: WorkspaceSheetProps) {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const colorScheme = useColorScheme() ?? 'light';
-  const colors = Colors[colorScheme];
+  const colors = useThemeTokens();
   const isDark = colorScheme === 'dark';
 
   // Adapt to the viewport so the sheet never over-covers short screens nor
@@ -351,7 +352,7 @@ interface SessionPageProps {
 
 function SessionPage({ workspaceId, onSessionPress, onDismiss }: SessionPageProps) {
   const colorScheme = useColorScheme() ?? 'light';
-  const colors = Colors[colorScheme];
+  const colors = useThemeTokens();
   const isDark = colorScheme === 'dark';
   const router = useRouter();
   const pathname = usePathname();

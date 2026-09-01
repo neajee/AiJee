@@ -1,6 +1,7 @@
 import { memo } from "react";
 import { Image, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Colors, Fonts } from "@/constants/theme";
+import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import type { ChatMessage } from "../../types";
 
 interface UserMessageProps {
@@ -12,7 +13,7 @@ export const UserMessage = memo(function UserMessage({
   message,
   isDark,
 }: UserMessageProps) {
-  const colors = isDark ? Colors.dark : Colors.light;
+  const colors = useThemeTokens();
   const attachments = message.attachments ?? [];
   const images = attachments.filter((a) => a.type === "image" && !!a.data);
 

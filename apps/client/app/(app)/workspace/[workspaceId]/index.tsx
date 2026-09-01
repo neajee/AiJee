@@ -11,7 +11,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { Colors, Fonts } from "@/constants/theme";
+import { Fonts } from "@/constants/theme";
 import { useResponsiveLayout } from "@/features/navigation/hooks/use-responsive-layout";
 import { PromptInput } from "@/features/workspace/components/prompt-input";
 import { attachmentsToImages } from "@/features/workspace/components/prompt-input/attachment-images";
@@ -22,7 +22,7 @@ import { WorkspaceSidebar } from "@/features/workspace/components/workspace-side
 import { WorkspaceRightPane } from "@/features/preview/components/workspace-right-pane";
 import { ModePickerDialog } from "@/features/workspace/components/mode-picker-dialog";
 import { useWorkspaceStore } from "@/features/workspace/store";
-import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { usePiClient, useAgentModes } from "@aijee/client-sdk";
 import type { AgentMode } from "@aijee/client-sdk";
 import { requestBrowserNotificationPermission } from "@/features/agent/browser-notifications";
@@ -30,8 +30,7 @@ import { requestBrowserNotificationPermission } from "@/features/agent/browser-n
 export default function WorkspaceScreen() {
   const { workspaceId } = useLocalSearchParams<{ workspaceId: string }>();
   const router = useRouter();
-  const colorScheme = useColorScheme() ?? "light";
-  const colors = Colors[colorScheme];
+  const colors = useThemeTokens();
   const { isWideScreen } = useResponsiveLayout();
   const insets = useSafeAreaInsets();
   const client = usePiClient();
@@ -153,8 +152,7 @@ export default function WorkspaceScreen() {
 
   const clearAlert = useCallback(() => setAlertMessage(null), []);
 
-  const isDark = colorScheme === "dark";
-  const editorBg = isDark ? "#151515" : "#FAFAFA";
+  const editorBg = colors.background;
   const keyboardPadding = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -182,7 +180,7 @@ export default function WorkspaceScreen() {
       style={[
         styles.container,
         {
-          backgroundColor: isDark ? "#121212" : colors.background,
+          backgroundColor: colors.background,
           paddingBottom: isWideScreen ? 0 : Animated.add(keyboardPadding, insets.bottom),
         },
       ]}
@@ -200,8 +198,8 @@ export default function WorkspaceScreen() {
           <View style={styles.centerStack}>
             {sending ? (
               <View style={styles.sendingContainer}>
-                <ActivityIndicator size="small" color={isDark ? "#cdc8c5" : colors.textTertiary} />
-                <Text style={[styles.sendingText, { color: isDark ? "#cdc8c5" : colors.textTertiary }]}>
+                <ActivityIndicator size="small" color={colors.textSecondary} />
+                <Text style={[styles.sendingText, { color: colors.textSecondary }]}>
                   Starting session…
                 </Text>
               </View>

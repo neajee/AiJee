@@ -20,6 +20,7 @@ import { useRouter } from 'expo-router';
 
 import { Colors, Fonts } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-tokens';
 import { useWorkspaceStore } from '@/features/workspace/store';
 
 interface CommandPaletteProps {
@@ -38,7 +39,7 @@ interface CommandItem {
 
 export function CommandPalette({ visible, onClose }: CommandPaletteProps) {
   const colorScheme = useColorScheme() ?? 'light';
-  const colors = Colors[colorScheme];
+  const colors = useThemeTokens();
   const isDark = colorScheme === 'dark';
   const router = useRouter();
 

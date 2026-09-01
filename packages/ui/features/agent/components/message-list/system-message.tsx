@@ -1,6 +1,7 @@
 import { memo, useState } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Colors, Fonts } from "@/constants/theme";
+import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import type { ChatMessage } from "../../types";
 import { AssistantMarkdown } from "./assistant-markdown";
 
@@ -13,7 +14,7 @@ export const SystemMessage = memo(function SystemMessage({
   message,
   isDark,
 }: SystemMessageProps) {
-  const colors = isDark ? Colors.dark : Colors.light;
+  const colors = useThemeTokens();
   const [expanded, setExpanded] = useState(false);
 
   if (message.systemKind === "compaction") {

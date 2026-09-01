@@ -4,6 +4,7 @@ import { ChevronLeft, ChevronRight } from "lucide-react-native";
 
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useThemeTokens } from "@/hooks/use-theme-tokens";
 
 /** Both panel seams size their control from here, so the two stay identical. */
 export const SEAM_TOGGLE_WIDTH = 18;
@@ -47,7 +48,7 @@ export function SeamToggle({
   onHoverOut,
 }: SeamToggleProps) {
   const colorScheme = useColorScheme() ?? "light";
-  const colors = Colors[colorScheme];
+  const colors = useThemeTokens();
   const isDark = colorScheme === "dark";
   const isWeb = Platform.OS === "web";
 

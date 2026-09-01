@@ -1,7 +1,6 @@
 import { Platform, StyleSheet, View, type ViewStyle, type StyleProp } from "react-native";
 
-import { Fonts } from "@/constants/theme";
-import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useThemeTokens } from "@/hooks/use-theme-tokens";
 
 export interface SelectOption<T extends string = string> {
   value: T;
@@ -26,13 +25,11 @@ export function Select<T extends string = string>({
   disabled,
   style,
 }: SelectProps<T>) {
-  const colorScheme = useColorScheme() ?? "light";
-  const isDark = colorScheme === "dark";
-
-  const textColor = isDark ? "#fefdfd" : "#1A1A1A";
-  const bg = isDark ? "#111" : "#F8F8F8";
-  const border = isDark ? "#333" : "#E0E0E0";
-  const mutedColor = isDark ? "#888" : "#999";
+  const tokens = useThemeTokens();
+  const textColor = tokens.text;
+  const bg = tokens.surfaceRaised;
+  const border = tokens.borderStrong;
+  const mutedColor = tokens.textTertiary;
 
   if (Platform.OS === "web") {
     return (
@@ -45,7 +42,7 @@ export function Select<T extends string = string>({
           }
           style={{
             width: "100%",
-            fontFamily: Fonts.sans,
+            fontFamily: tokens.uiFont,
             fontSize: 13,
             color: value ? textColor : mutedColor,
             backgroundColor: bg,

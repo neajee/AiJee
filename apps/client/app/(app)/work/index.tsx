@@ -11,8 +11,8 @@ import {
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { Colors, Fonts } from "@/constants/theme";
-import { useColorScheme } from "@/hooks/use-color-scheme";
+import { Fonts } from "@/constants/theme";
+import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { useResponsiveLayout } from "@/features/navigation/hooks/use-responsive-layout";
 import { PromptInput } from "@/features/workspace/components/prompt-input";
 import { WorkspaceHero } from "@/features/workspace/components/workspace-hero";
@@ -26,8 +26,7 @@ type PendingWorkSession = { session_id: string; session_file?: string };
 export default function WorkIndex() {
   const router = useRouter();
   const client = usePiClient();
-  const colorScheme = useColorScheme() ?? "light";
-  const colors = Colors[colorScheme];
+  const colors = useThemeTokens();
   const { isWideScreen } = useResponsiveLayout();
   const insets = useSafeAreaInsets();
   const [sending, setSending] = useState(false);
@@ -95,15 +94,14 @@ export default function WorkIndex() {
     };
   }, [insets.bottom, keyboardPadding]);
 
-  const isDark = colorScheme === "dark";
-  const editorBg = isDark ? "#151515" : "#FAFAFA";
+    const editorBg = colors.background;
 
   return (
     <Animated.View
       style={[
         styles.container,
         {
-          backgroundColor: isDark ? "#121212" : colors.background,
+          backgroundColor: colors.background,
           paddingBottom: isWideScreen ? 0 : Animated.add(keyboardPadding, insets.bottom),
         },
       ]}
@@ -112,8 +110,8 @@ export default function WorkIndex() {
         <View style={styles.centerStack}>
           {sending ? (
             <View style={styles.sendingContainer}>
-              <ActivityIndicator size="small" color={isDark ? "#cdc8c5" : colors.textTertiary} />
-              <Text style={[styles.sendingText, { color: isDark ? "#cdc8c5" : colors.textTertiary }]}>
+              <ActivityIndicator size="small" color={colors.textSecondary} />
+              <Text style={[styles.sendingText, { color: colors.textSecondary }]}>
                 Starting Work…
               </Text>
             </View>

@@ -10,6 +10,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { Colors, Fonts } from "@/constants/theme";
+import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { AnimatedCollapse } from "./animated-collapse";
 import { formatDuration } from "./turns";
 
@@ -38,7 +39,7 @@ export const ThinkingBlock = memo(function ThinkingBlock({
   isStreaming,
   isDark,
 }: ThinkingBlockProps) {
-  const colors = isDark ? Colors.dark : Colors.light;
+  const colors = useThemeTokens();
   const [expanded, setExpanded] = useState(false);
 
   const toggle = useCallback(() => {

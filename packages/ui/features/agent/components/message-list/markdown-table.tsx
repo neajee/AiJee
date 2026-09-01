@@ -8,6 +8,7 @@ import {
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { Colors } from "@/constants/theme";
+import { useThemeTokens } from "@/hooks/use-theme-tokens";
 
 /**
  * Markdown tables that fit the message column.
@@ -54,7 +55,7 @@ export const MarkdownTable = memo(function MarkdownTable({
   rows,
   isDark,
 }: MarkdownTableProps) {
-  const colors = isDark ? Colors.dark : Colors.light;
+  const colors = useThemeTokens();
   const columnCount = Math.max(
     header.length,
     ...rows.map((row) => row.length),

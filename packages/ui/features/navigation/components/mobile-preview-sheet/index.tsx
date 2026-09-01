@@ -12,6 +12,7 @@ import { Gesture, GestureDetector } from "react-native-gesture-handler";
 
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { PreviewPanel } from "@/features/preview/components/preview-panel";
 import { useSheetHeight } from "../../hooks/use-sheet-height";
 
@@ -26,7 +27,7 @@ interface MobilePreviewSheetProps {
 export function MobilePreviewSheet({ visible, onClose, sessionId }: MobilePreviewSheetProps) {
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme() ?? "light";
-  const colors = Colors[colorScheme];
+  const colors = useThemeTokens();
   const isDark = colorScheme === "dark";
 
   // Adapt to the viewport so the sheet never over-covers short screens nor

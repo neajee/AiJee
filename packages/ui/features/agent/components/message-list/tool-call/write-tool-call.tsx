@@ -1,6 +1,7 @@
 import { memo, useCallback, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Colors, Fonts } from "@/constants/theme";
+import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import type { ToolCallInfo } from "../../../types";
 import { basename, isToolActive, parseToolArguments, countLines } from "../utils";
 import { CodePreview } from "../code-preview";
@@ -15,7 +16,7 @@ export const WriteToolCall = memo(function WriteToolCall({
   tc,
   isDark,
 }: WriteToolCallProps) {
-  const colors = isDark ? Colors.dark : Colors.light;
+  const colors = useThemeTokens();
   const active = isToolActive(tc);
   // Results stay collapsed by default, even while the tool is running.
   const [expanded, setExpanded] = useState(false);

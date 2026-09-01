@@ -15,8 +15,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { usePathname } from "expo-router";
 
-import { Colors } from "@/constants/theme";
-import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { useResponsiveLayout } from "../../hooks/use-responsive-layout";
 import { MobileHeaderBar } from "../../components/mobile-header-bar";
 import { WorkspaceSheet } from "../../components/workspace-sheet";
@@ -51,8 +50,7 @@ interface AdaptiveNavigationProps {
 
 export function AdaptiveNavigation({ children }: AdaptiveNavigationProps) {
   const { isWideScreen } = useResponsiveLayout();
-  const colorScheme = useColorScheme() ?? "light";
-  const colors = Colors[colorScheme];
+  const colors = useThemeTokens();
   const activeServerId = useAuthStore((s) => s.activeServerId);
   const hasServer = !!activeServerId;
   const hasWorkspaces = useWorkspaceStore((s) => s.workspaces.length > 0);
@@ -79,9 +77,8 @@ export function AdaptiveNavigation({ children }: AdaptiveNavigationProps) {
     (state) => state.notifyOpened,
   );
 
-  const isDark = colorScheme === "dark";
-  const contentBorder = isDark ? "#3b3a39" : "rgba(0,0,0,0.12)";
-  const overlayBg = isDark ? "rgba(0,0,0,0.3)" : "rgba(0,0,0,0.08)";
+  const contentBorder = colors.borderStrong;
+  const overlayBg = colors.overlay;
 
   const persistentAnim = useRef(new Animated.Value(1)).current;
   const hoverAnim = useRef(new Animated.Value(0)).current;
@@ -179,7 +176,7 @@ export function AdaptiveNavigation({ children }: AdaptiveNavigationProps) {
 
     return (
       <SafeAreaView
-        style={[styles.wideContainer, { backgroundColor: isDesktopMode && desktopImmersive ? '#000' : colors.background }]}
+        style={[styles.wideContainer, { backgroundColor: colors.background }]}
         edges={isDesktopMode && desktopImmersive ? [] : ["top"]}
       >
         <View style={styles.bodyRow}>
@@ -289,7 +286,7 @@ export function AdaptiveNavigation({ children }: AdaptiveNavigationProps) {
       style={[styles.narrowContainer, { backgroundColor: colors.background }]}
     >
       <SafeAreaView
-        style={[styles.narrowSafeArea, { backgroundColor: isDesktopMode && desktopImmersive ? '#000' : colors.background }]}
+        style={[styles.narrowSafeArea, { backgroundColor: colors.background }]}
         edges={isDesktopMode && desktopImmersive ? [] : ["top"]}
       >
         {hasServer && !isDesktopMode && (

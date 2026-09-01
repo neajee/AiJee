@@ -1,20 +1,17 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { X, Plus } from 'lucide-react-native';
 
-import { Colors, Fonts } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { Fonts } from '@/constants/theme';
+import { useThemeTokens } from '@/hooks/use-theme-tokens';
 
 export function TerminalPanel() {
-  const colorScheme = useColorScheme() ?? 'light';
-  const colors = Colors[colorScheme];
-
-  const isDark = colorScheme === 'dark';
-  const surfaceBg = isDark ? '#151515' : '#FAFAFA';
-  const topBorder = isDark ? '#000000' : 'rgba(0,0,0,0.15)';
-  const tabDivider = isDark ? '#323131' : 'rgba(0,0,0,0.08)';
-  const activeTabBorder = isDark ? '#ede8e4' : '#1A1A1A';
-  const textPrimary = isDark ? '#fefdfd' : colors.text;
-  const textMuted = isDark ? '#cdc8c5' : colors.textTertiary;
+  const colors = useThemeTokens();
+  const surfaceBg = colors.background;
+  const topBorder = colors.borderStrong;
+  const tabDivider = colors.border;
+  const activeTabBorder = colors.accent;
+  const textPrimary = colors.text;
+  const textMuted = colors.textTertiary;
 
   return (
     <View
@@ -52,7 +49,7 @@ export function TerminalPanel() {
             { color: textMuted, fontFamily: Fonts.mono },
           ]}
         >
-          <Text style={{ color: isDark ? '#30D158' : '#34C759' }}>~</Text>{' '}
+          <Text style={{ color: colors.success }}>~</Text>{' '}
           <Text style={{ color: textPrimary }}>$</Text> _
         </Text>
       </View>

@@ -2,6 +2,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-tokens';
 
 const OUTER_SIZE = 40;
 const INNER_SIZE = 32;
@@ -38,7 +39,7 @@ export function WorkspaceAvatar({
   layout = 'vertical',
 }: WorkspaceAvatarProps) {
   const colorScheme = useColorScheme() ?? 'light';
-  const colors = Colors[colorScheme];
+  const colors = useThemeTokens();
   const initial = title.charAt(0).toUpperCase();
   const isVertical = layout === 'vertical';
   const isDark = colorScheme === 'dark';

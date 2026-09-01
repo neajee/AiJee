@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Colors, WorkspaceColors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-tokens';
 import { useWorkspaceStore } from '@/features/workspace/store';
 import { WorkspaceAvatar } from '../workspace-avatar';
 import { AddWorkspaceButton } from '../add-workspace-button';
@@ -14,7 +15,7 @@ export function BottomNavigation() {
   const router = useRouter();
   const pathname = usePathname();
   const colorScheme = useColorScheme() ?? 'light';
-  const colors = Colors[colorScheme];
+  const colors = useThemeTokens();
 
   const workspaces = useWorkspaceStore((s) => s.workspaces);
   const selectedWorkspaceId = useWorkspaceStore((s) => s.selectedWorkspaceId);
@@ -90,7 +91,7 @@ function BottomBarIcon({
   onPress: () => void;
 }) {
   const colorScheme = useColorScheme() ?? 'light';
-  const colors = Colors[colorScheme];
+  const colors = useThemeTokens();
 
   return (
     <Pressable

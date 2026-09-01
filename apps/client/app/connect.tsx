@@ -9,8 +9,8 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 
-import { Colors, Fonts } from "@/constants/theme";
-import { useColorScheme } from "@/hooks/use-color-scheme";
+import { Fonts } from "@/constants/theme";
+import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { useAuthStore } from "@/features/auth/store";
 import { useServersStore } from "@/features/servers/store";
 import { useWorkspaceStore } from "@/features/workspace/store";
@@ -43,9 +43,7 @@ function resolveBaseUrl(params: ConnectParams) {
 
 export default function DirectConnectScreen() {
   const router = useRouter();
-  const colorScheme = useColorScheme() ?? "light";
-  const colors = Colors[colorScheme];
-  const isDark = colorScheme === "dark";
+  const colors = useThemeTokens();
 
   const authLoaded = useAuthStore((state) => state.loaded);
   const serversLoaded = useServersStore((state) => state.loaded);
@@ -147,13 +145,13 @@ export default function DirectConnectScreen() {
   };
 
   return (
-    <View style={[styles.screen, { backgroundColor: isDark ? "#121212" : colors.background }]}>
+    <View style={[styles.screen, { backgroundColor: colors.background }]}>
       <View
         style={[
           styles.card,
           {
-            backgroundColor: isDark ? "#1a1a1a" : "#FFFFFF",
-            borderColor: isDark ? "#2a2a2a" : "rgba(0,0,0,0.08)",
+            backgroundColor: colors.surface,
+            borderColor: colors.borderStrong,
           },
         ]}
       >
@@ -161,7 +159,7 @@ export default function DirectConnectScreen() {
           <View
             style={[
               styles.badge,
-              { backgroundColor: isDark ? "rgba(255,69,58,0.16)" : "rgba(255,59,48,0.12)" },
+              { backgroundColor: colors.destructive + '22' },
             ]}
           />
         ) : (
@@ -170,10 +168,10 @@ export default function DirectConnectScreen() {
             color={status === "done" ? colors.success : colors.text}
           />
         )}
-        <Text style={[styles.title, { color: isDark ? "#fefdfd" : colors.text }]}>
+        <Text style={[styles.title, { color: colors.text }]}>
           {titleByStatus[status]}
         </Text>
-        <Text style={[styles.description, { color: isDark ? "#cdc8c5" : colors.textSecondary }]}>
+        <Text style={[styles.description, { color: colors.textSecondary }]}>
           {descriptionByStatus[status]}
         </Text>
         {status === "error" && (
@@ -181,14 +179,14 @@ export default function DirectConnectScreen() {
             onPress={() => router.replace("/servers")}
             style={({ pressed }) => [
               styles.button,
-              { backgroundColor: isDark ? "#fefdfd" : "#1a1a1a" },
+              { backgroundColor: colors.accent },
               pressed && { opacity: 0.75 },
             ]}
           >
             <Text
               style={[
                 styles.buttonText,
-                { color: isDark ? "#1a1a1a" : "#FFFFFF" },
+                { color: colors.onAccent },
               ]}
             >
               Go to Servers

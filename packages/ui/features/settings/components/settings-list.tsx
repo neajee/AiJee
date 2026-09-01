@@ -1,8 +1,9 @@
-import { createContext, memo, useContext, useMemo, type ReactNode } from 'react';
+import { createContext, memo, useContext, useMemo, useState, type ReactNode } from 'react';
 import { Platform, Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 
-import { Colors, Fonts } from '@/constants/theme';
+import { Fonts } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-tokens';
 import { useResponsiveLayout } from '../../navigation/hooks/use-responsive-layout';
 
 /**
@@ -176,7 +177,7 @@ export interface SettingsPalette {
 export function useSettingsPalette(): SettingsPalette {
   const scheme = useColorScheme() ?? 'light';
   const isDark = scheme === 'dark';
-  const c = Colors[scheme];
+  const c = useThemeTokens();
 
   return useMemo(
     () => ({
@@ -193,8 +194,8 @@ export function useSettingsPalette(): SettingsPalette {
       separator: c.border,
       border: c.borderStrong,
       pressed: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)',
-      accent: c.text,
-      onAccent: c.background,
+      accent: c.accent,
+      onAccent: c.onAccent,
       success: c.success,
       notification: c.notificationDot,
       destructive: c.destructive,
@@ -320,6 +321,7 @@ export function SettingsRow({
   const m = useSettingsMetrics();
   const p = useSettingsPalette();
   const destructive = tone === 'destructive';
+  const [hovered, setHovered] = useState(false);
 
   const body = (
     <View
@@ -330,7 +332,10 @@ export function SettingsRow({
         paddingHorizontal: m.gutter,
         paddingVertical: m.rowPaddingV,
         minHeight: m.rowMinHeight,
+        backgroundColor: hovered ? 'rgba(255, 255, 255, 0.03)' : undefined,
       }}
+      onPointerEnter={() => setHovered(true)}
+      onPointerLeave={() => setHovered(false)}
     >
       {icon ? <SettingsIconTile icon={icon} tone={tone} /> : null}
       <View style={{ flex: 1, gap: 2 }}>

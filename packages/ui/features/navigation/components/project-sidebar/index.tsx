@@ -26,6 +26,7 @@ import {
 
 import { Colors, Fonts } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { useWorkspaceStore } from "@/features/workspace/store";
 import {
   useWorkspaceSessions as useSessions,
@@ -58,7 +59,7 @@ const SESSION_PREVIEW_COUNT = 5;
  */
 export function ProjectSidebar() {
   const colorScheme = useColorScheme() ?? "light";
-  const colors = Colors[colorScheme];
+  const colors = useThemeTokens();
   const isDark = colorScheme === "dark";
   const router = useRouter();
   const pathname = usePathname();
@@ -375,7 +376,7 @@ export function ProjectSidebar() {
 
 export function SettingsSidebar() {
   const colorScheme = useColorScheme() ?? "light";
-  const colors = Colors[colorScheme];
+  const colors = useThemeTokens();
   const isDark = colorScheme === "dark";
   const router = useRouter();
   const pathname = usePathname();
@@ -447,7 +448,7 @@ function SectionHeader({
   actions?: React.ReactNode;
   isDark: boolean;
 }) {
-  const colors = isDark ? Colors.dark : Colors.light;
+  const colors = useThemeTokens();
   return (
     <View style={styles.sectionHeader}>
       <Text style={[styles.sectionTitle, { color: colors.textTertiary }]}>
@@ -508,7 +509,7 @@ function SidebarRow({
   disabled?: boolean;
   isDark: boolean;
 }) {
-  const colors = isDark ? Colors.dark : Colors.light;
+  const colors = useThemeTokens();
   const [hovered, setHovered] = useState(false);
   const hoverBg = isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.035)";
   const activeBg = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)";
@@ -572,7 +573,7 @@ function WorkspaceRow({
   onLongPress: (e: any) => void;
   isDark: boolean;
 }) {
-  const colors = isDark ? Colors.dark : Colors.light;
+  const colors = useThemeTokens();
   const [hovered, setHovered] = useState(false);
   const hoverBg = isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.035)";
   const moreRef = useRef<View>(null);
@@ -727,7 +728,7 @@ function WorkspaceSessions({
   onArchived: (workspaceId: string, sessionId: string) => void;
   isDark: boolean;
 }) {
-  const colors = isDark ? Colors.dark : Colors.light;
+  const colors = useThemeTokens();
   const [showAll, setShowAll] = useState(false);
   const {
     sessions,
@@ -827,7 +828,7 @@ function MoreRow({
   disabled?: boolean;
   isDark: boolean;
 }) {
-  const colors = isDark ? Colors.dark : Colors.light;
+  const colors = useThemeTokens();
   const [hovered, setHovered] = useState(false);
 
   return (
@@ -867,7 +868,7 @@ function SessionRow({
   onArchive: () => Promise<void>;
   isDark: boolean;
 }) {
-  const colors = isDark ? Colors.dark : Colors.light;
+  const colors = useThemeTokens();
   const isWorking = useIsSessionStreaming(session.id);
   const [hovered, setHovered] = useState(false);
   const title = session.display_name ?? session.id;

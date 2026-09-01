@@ -9,8 +9,8 @@ import {
 } from 'react-native';
 import { Redirect, Slot, usePathname, useRouter } from 'expo-router';
 
-import { Colors, Fonts } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { Fonts } from '@/constants/theme';
+import { useThemeTokens } from '@/hooks/use-theme-tokens';
 
 import { PiClientProvider, type PiClientConfig } from '@aijee/client-sdk';
 import { AdaptiveNavigation } from '@/features/navigation/containers/adaptive-navigation';
@@ -48,9 +48,7 @@ function StartupScreen({
   secondaryLabel?: string;
   onSecondaryPress?: () => void;
 }) {
-  const colorScheme = useColorScheme() ?? 'light';
-  const colors = Colors[colorScheme];
-  const isDark = colorScheme === 'dark';
+  const colors = useThemeTokens();
 
   return (
     <View
@@ -59,7 +57,7 @@ function StartupScreen({
         justifyContent: 'center',
         alignItems: 'center',
         padding: 24,
-        backgroundColor: isDark ? '#121212' : colors.background,
+        backgroundColor: colors.background,
       }}
     >
       <View
@@ -70,8 +68,8 @@ function StartupScreen({
           paddingVertical: 28,
           borderRadius: 24,
           borderWidth: 1,
-          backgroundColor: isDark ? '#1a1a1a' : '#fff',
-          borderColor: isDark ? '#2a2a2a' : 'rgba(0,0,0,0.08)',
+          backgroundColor: colors.surface,
+          borderColor: colors.borderStrong,
         }}
       >
         <Text
@@ -79,7 +77,7 @@ function StartupScreen({
             fontFamily: Fonts.sansSemiBold,
             fontSize: 24,
             lineHeight: 30,
-            color: isDark ? '#fefdfd' : colors.text,
+            color: colors.text,
           }}
         >
           {title}
@@ -90,7 +88,7 @@ function StartupScreen({
             fontFamily: Fonts.sans,
             fontSize: 15,
             lineHeight: 22,
-            color: isDark ? '#cdc8c5' : colors.textSecondary,
+            color: colors.textSecondary,
           }}
         >
           {description}
@@ -105,7 +103,7 @@ function StartupScreen({
               paddingHorizontal: 18,
               paddingVertical: 14,
               alignItems: 'center',
-              backgroundColor: isDark ? '#fefdfd' : '#1a1a1a',
+              backgroundColor: colors.accent,
               opacity: pressed ? 0.75 : 1,
             })}
           >
@@ -113,7 +111,7 @@ function StartupScreen({
               style={{
                 fontFamily: Fonts.sansSemiBold,
                 fontSize: 15,
-                color: isDark ? '#1a1a1a' : '#fff',
+                color: colors.onAccent,
               }}
             >
               {primaryLabel}
@@ -131,7 +129,7 @@ function StartupScreen({
               paddingVertical: 14,
               alignItems: 'center',
               borderWidth: 1,
-              borderColor: isDark ? '#3a3a3a' : 'rgba(0,0,0,0.12)',
+              borderColor: colors.borderStrong,
               opacity: pressed ? 0.75 : 1,
             })}
           >
@@ -139,7 +137,7 @@ function StartupScreen({
               style={{
                 fontFamily: Fonts.sansMedium,
                 fontSize: 15,
-                color: isDark ? '#fefdfd' : colors.text,
+                color: colors.text,
               }}
             >
               {secondaryLabel}
@@ -152,17 +150,16 @@ function StartupScreen({
 }
 
 function UnconnectedNotice({ onAddDevice }: { onAddDevice: () => void }) {
-  const colorScheme = useColorScheme() ?? 'light';
-  const isDark = colorScheme === 'dark';
+  const colors = useThemeTokens();
 
   return (
-    <View style={{ flex: 1, padding: 16, backgroundColor: isDark ? '#121212' : Colors[colorScheme].background }}>
-      <View style={{ alignSelf: 'center', width: '100%', maxWidth: 760, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 16, paddingHorizontal: 18, paddingVertical: 14, borderRadius: 12, backgroundColor: isDark ? '#252321' : '#f4f2ef' }}>
-        <Text style={{ flex: 1, fontFamily: Fonts.sans, fontSize: 14, color: isDark ? '#fefdfd' : Colors[colorScheme].text }}>
+    <View style={{ flex: 1, padding: 16, backgroundColor: colors.background }}>
+      <View style={{ alignSelf: 'center', width: '100%', maxWidth: 760, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 16, paddingHorizontal: 18, paddingVertical: 14, borderRadius: 12, backgroundColor: colors.surfaceRaised }}>
+        <Text style={{ flex: 1, fontFamily: Fonts.sans, fontSize: 14, color: colors.text }}>
           未连接 AiJee 设备。连接后即可同步工作区与会话。
         </Text>
-        <Pressable onPress={onAddDevice} style={({ pressed }) => ({ borderRadius: 8, paddingHorizontal: 14, paddingVertical: 9, backgroundColor: isDark ? '#fefdfd' : '#1a1a1a', opacity: pressed ? 0.7 : 1 })}>
-          <Text style={{ fontFamily: Fonts.sansSemiBold, fontSize: 14, color: isDark ? '#1a1a1a' : '#fff' }}>添加设备</Text>
+        <Pressable onPress={onAddDevice} style={({ pressed }) => ({ borderRadius: 8, paddingHorizontal: 14, paddingVertical: 9, backgroundColor: colors.accent, opacity: pressed ? 0.7 : 1 })}>
+          <Text style={{ fontFamily: Fonts.sansSemiBold, fontSize: 14, color: colors.onAccent }}>添加设备</Text>
         </Pressable>
       </View>
     </View>
@@ -172,7 +169,7 @@ function UnconnectedNotice({ onAddDevice }: { onAddDevice: () => void }) {
 export default function AppLayout() {
   const pathname = usePathname();
   const router = useRouter();
-  const colorScheme = useColorScheme() ?? 'light';
+  const colors = useThemeTokens();
   const serversLoaded = useServersStore((s) => s.loaded);
   const bootstrapReady = useServersStore((s) => s.bootstrapReady);
   const servers = useServersStore((s) => s.servers);
@@ -338,7 +335,7 @@ export default function AppLayout() {
 
   if (!serversLoaded || !authLoaded || !bootstrapReady || status === 'loading') {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: Colors[colorScheme].background }}>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background }}>
         <MorphLoading size="lg" />
       </View>
     );

@@ -1,6 +1,7 @@
 import { memo, useMemo } from "react";
 import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { Colors, Fonts } from "@/constants/theme";
+import { useThemeTokens } from "@/hooks/use-theme-tokens";
 
 interface CodePreviewProps {
   code: string;
@@ -149,7 +150,7 @@ function normalizeLanguage(language?: string): string {
   return (language || "").toLowerCase().trim();
 }
 
-function createTokenColors(isDark: boolean) {
+function createTokenColors(isDark: boolean, tokens: ReturnType<typeof useThemeTokens>) {
   return {
     plain: isDark ? "#D4D4D4" : "#24292E",
     keyword: isDark ? "#C792EA" : "#6F42C1",
@@ -159,9 +160,9 @@ function createTokenColors(isDark: boolean) {
     operator: isDark ? "#89DDFF" : "#005CC5",
     property: isDark ? "#82AAFF" : "#005CC5",
     punctuation: isDark ? "#89DDFF" : "#586069",
-    diffAdd: isDark ? "#3FB950" : "#1A7F37",
-    diffRemove: isDark ? "#F85149" : "#CF222E",
-    diffMeta: isDark ? "#D2A8FF" : "#8250DF",
+    diffAdd: tokens.diffAdded,
+    diffRemove: tokens.diffRemoved,
+    diffMeta: tokens.skill,
   } satisfies Record<TokenKind, string>;
 }
 
@@ -331,8 +332,8 @@ export const CodePreview = memo(function CodePreview({
   fill = false,
   bare = false,
 }: CodePreviewProps) {
-  const colors = isDark ? Colors.dark : Colors.light;
-  const tokenColors = useMemo(() => createTokenColors(isDark), [isDark]);
+  const colors = useThemeTokens();
+  const tokenColors = useMemo(() => createTokenColors(isDark, colors), [colors, isDark]);
   const lines = useMemo(() => code.split("\n"), [code]);
 
   return (
