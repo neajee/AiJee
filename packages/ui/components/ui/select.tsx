@@ -14,6 +14,7 @@ interface SelectProps<T extends string = string> {
   onChange: (value: T) => void;
   placeholder?: string;
   disabled?: boolean;
+  compact?: boolean;
   style?: StyleProp<ViewStyle>;
 }
 
@@ -23,6 +24,7 @@ export function Select<T extends string = string>({
   onChange,
   placeholder,
   disabled,
+  compact = false,
   style,
 }: SelectProps<T>) {
   const tokens = useThemeTokens();
@@ -43,15 +45,15 @@ export function Select<T extends string = string>({
           style={{
             width: "100%",
             fontFamily: tokens.uiFont,
-            fontSize: 13,
+            fontSize: compact ? 12 : 13,
             color: value ? textColor : mutedColor,
             backgroundColor: bg,
             border: `0.633px solid ${border}`,
             borderRadius: 6,
-            paddingLeft: 10,
-            paddingRight: 10,
-            paddingTop: 8,
-            paddingBottom: 8,
+            paddingLeft: compact ? 8 : 10,
+            paddingRight: compact ? 8 : 10,
+            paddingTop: compact ? 5 : 8,
+            paddingBottom: compact ? 5 : 8,
             cursor: disabled ? "not-allowed" : "pointer",
             opacity: disabled ? 0.5 : 1,
           } as React.CSSProperties}

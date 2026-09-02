@@ -139,12 +139,7 @@ function SettingsDesktopSection({
         ]}
       >
         <View style={desktopStyles.detailHeaderCopy}>
-          <Text style={[desktopStyles.detailTitle, { color: p.text }]}>
-            {section.title}
-          </Text>
-          <Text style={[desktopStyles.detailSummary, { color: p.textTertiary }]}>
-            {section.summary}
-          </Text>
+          <Text style={[desktopStyles.detailTitle, { color: p.text }]}>{section.title}</Text>
         </View>
       </View>
       <ScrollView
@@ -311,10 +306,6 @@ const desktopStyles = StyleSheet.create({
   detailTitle: {
     fontSize: 15,
     fontFamily: Fonts.sansSemiBold,
-  },
-  detailSummary: {
-    fontSize: 12,
-    fontFamily: Fonts.sans,
   },
   detailScroll: {
     flex: 1,

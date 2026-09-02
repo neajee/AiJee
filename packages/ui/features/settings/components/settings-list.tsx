@@ -127,22 +127,22 @@ const PHONE_METRICS: SettingsMetrics = {
  * bolted onto the side of the project tree.
  */
 const DESKTOP_METRICS: SettingsMetrics = {
-  gutter: 12,
-  groupGap: 14,
-  cardRadius: 8,
-  rowMinHeight: 36,
-  rowPaddingV: 8,
-  tileSize: 22,
-  tileRadius: 6,
-  tileIcon: 13,
-  labelSize: 13.5,
-  descSize: 12,
-  valueSize: 13,
-  headerSize: 11,
-  headerInset: 4,
-  titleSize: 20,
-  chevronSize: 14,
-  switchScale: 0.8,
+  gutter: 10,
+  groupGap: 10,
+  cardRadius: 7,
+  rowMinHeight: 32,
+  rowPaddingV: 6,
+  tileSize: 20,
+  tileRadius: 5,
+  tileIcon: 12,
+  labelSize: 12,
+  descSize: 10.5,
+  valueSize: 12,
+  headerSize: 10,
+  headerInset: 2,
+  titleSize: 18,
+  chevronSize: 13,
+  switchScale: 0.75,
   contentMaxWidth: 640,
 };
 
@@ -223,7 +223,7 @@ export function SettingsGroup({
   const headerInset = m.headerInset;
 
   return (
-    <View style={{ gap: 8 }}>
+    <View style={{ gap: m.rowMinHeight > 40 ? 8 : 5 }}>
       {header && headingVisible ? (
         <Text
           style={{
@@ -328,7 +328,7 @@ export function SettingsRow({
       style={{
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 12,
+        gap: m.rowMinHeight > 40 ? 12 : 8,
         paddingHorizontal: m.gutter,
         paddingVertical: m.rowPaddingV,
         minHeight: m.rowMinHeight,
@@ -367,7 +367,9 @@ export function SettingsRow({
 
   // iOS-style separator inset: starts after the icon tile so the list reads as
   // a column of items rather than a stack of full-width bars.
-  const separatorInset = icon ? m.gutter + m.tileSize + 12 : m.gutter;
+  const separatorInset = icon
+    ? m.gutter + m.tileSize + (m.rowMinHeight > 40 ? 12 : 8)
+    : m.gutter;
 
   return (
     <View>

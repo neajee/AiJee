@@ -234,6 +234,7 @@ export function AppearancePanel() {
             value={themePreset}
             options={PRESETS.map((item) => ({ value: item.key, label: item.label }))}
             onChange={(value) => update({ themePreset: value })}
+            compact
             style={appearanceStyles.themeSelect}
           />
         }
@@ -245,6 +246,7 @@ export function AppearancePanel() {
             value={accentPreset}
             options={ACCENTS.map((item) => ({ value: item.key, label: item.label }))}
             onChange={(value) => update({ accentPreset: value })}
+            compact
             style={appearanceStyles.accentSelect}
           />
         }
@@ -266,11 +268,11 @@ function SizeStepper({ value, onChange, min, max, palette }: { value: number; on
 }
 
 const appearanceStyles = StyleSheet.create({
-  themeSelect: { width: 140, maxWidth: '100%' },
-  accentSelect: { width: 140, maxWidth: '100%' },
-  stepper: { flexDirection: 'row', alignItems: 'center', borderWidth: StyleSheet.hairlineWidth, borderRadius: 8, overflow: 'hidden' },
-  stepButton: { width: 32, height: 30, alignItems: 'center', justifyContent: 'center' },
-  stepperValue: { width: 48, textAlign: 'center', fontFamily: Fonts.mono, fontSize: 12 },
+  themeSelect: { width: 120, maxWidth: '100%' },
+  accentSelect: { width: 120, maxWidth: '100%' },
+  stepper: { flexDirection: 'row', alignItems: 'center', borderWidth: StyleSheet.hairlineWidth, borderRadius: 6, overflow: 'hidden' },
+  stepButton: { width: 28, height: 26, alignItems: 'center', justifyContent: 'center' },
+  stepperValue: { width: 44, textAlign: 'center', fontFamily: Fonts.mono, fontSize: 11 },
 });
 
 // ─── 通知 ─────────────────────────────────────────────────────
