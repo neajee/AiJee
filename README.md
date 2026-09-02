@@ -101,14 +101,13 @@ eas build --platform android --profile preview --local
 
 ## 截图
 
-<p float="left">
-  <img src="docs/screenshots/mobile-workspace-home.png" width="250" alt="移动端工作区" />
-  <img src="docs/screenshots/mobile-workspaces-sessions.jpeg" width="250" alt="工作区与会话" />
-</p>
+<div align="center">
+  <img src="docs/screen/web/home.png" width="31%" alt="工作区首页" />
+  <img src="docs/screen/web/chat.png" width="31%" alt="代码会话" />
+  <img src="docs/screen/web/model.png" width="31%" alt="模型设置" />
+</div>
 
-<p float="left">
-  <img src="docs/screenshots/mobile-chat-mode.jpeg" width="250" alt="移动端对话" />
-  <img src="docs/screenshots/mobile-settings.jpeg" width="250" alt="移动端设置" />
-</p>
-
-<img src="docs/screenshots/desktop-code-session.png" width="700" alt="桌面端代码会话" />
+<div align="center">
+  <img src="docs/screen/phone/chat.png" width="22%" alt="移动端对话" />
+  <img src="docs/screen/phone/model.png" width="22%" alt="移动端模型设置" />
+</div>
