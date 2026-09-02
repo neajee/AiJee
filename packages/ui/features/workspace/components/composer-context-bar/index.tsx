@@ -2,11 +2,13 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Animated,
+  Modal,
   Platform,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from "react-native";
 import { useRouter } from "expo-router";
@@ -16,6 +18,7 @@ import {
   FolderGit2,
   GitBranch,
   Globe,
+  Plus,
 } from "lucide-react-native";
 
 import { Fonts } from "@/constants/theme";
@@ -23,6 +26,7 @@ import { usePromptTheme } from "@/features/workspace/components/prompt-input/use
 import { useWorkspaceStore } from "@/features/workspace/store";
 import { useServersStore, type Server } from "@/features/servers/store";
 import { useAuthStore } from "@/features/auth/store";
+import { NewWorkspaceDialog } from "@/features/workspace/components/new-workspace-dialog";
 import { usePiClient, useGitStatus } from "@aijee/client-sdk";
 import type { GitBranch as GitBranchInfo } from "@aijee/client-sdk";
 
@@ -47,6 +51,10 @@ export function ComposerContextBar() {
   const [branches, setBranches] = useState<GitBranchInfo[] | null>(null);
   const [branchesLoading, setBranchesLoading] = useState(false);
   const [busy, setBusy] = useState<string | null>(null);
+  const [newWorkspaceVisible, setNewWorkspaceVisible] = useState(false);
+  const [newBranchVisible, setNewBranchVisible] = useState(false);
+  const [newBranchName, setNewBranchName] = useState("");
+  const [branchError, setBranchError] = useState<string | null>(null);
   const anim = useRef(new Animated.Value(0)).current;
 
   const workspaces = useWorkspaceStore((s) => s.workspaces);
@@ -177,6 +185,24 @@ export function ComposerContextBar() {
     [client, cwd, git],
   );
 
+  const handleCreateBranch = useCallback(async () => {
+    const branch = newBranchName.trim();
+    if (!cwd || !branch) return;
+    setBusy("new-branch");
+    setBranchError(null);
+    try {
+      await client.api.gitCheckout(cwd, { branch, create: true });
+      await git.refresh();
+      setBranches(null);
+      setNewBranchVisible(false);
+      setNewBranchName("");
+    } catch (error) {
+      setBranchError(error instanceof Error ? error.message : "无法创建分支");
+    } finally {
+      setBusy(null);
+    }
+  }, [client, cwd, git, newBranchName]);
+
   const localBranches = useMemo(
     () => (branches ?? []).filter((b) => !b.is_remote),
     [branches],
@@ -234,7 +260,8 @@ export function ComposerContextBar() {
   );
 
   return (
-    <View style={styles.wrapper} {...({ "data-composer-context": true } as any)}>
+    <>
+      <View style={styles.wrapper} {...({ "data-composer-context": true } as any)}>
       <View style={styles.bar}>
         {/* Project */}
         <View style={styles.anchor}>
@@ -268,11 +295,10 @@ export function ComposerContextBar() {
                         (pressed || hovered) && { backgroundColor: theme.hoverBg },
                       ]}
                     >
-                      <View style={styles.itemMain}>
-                        <View
-                          style={[styles.colorDot, { backgroundColor: w.color }]}
-                        />
-                        <View style={styles.itemLabels}>
+                        <View style={styles.itemMain}>
+                          <View
+                            style={[styles.colorDot, { backgroundColor: w.color }]}
+                          />
                           <Text
                             style={[
                               styles.itemText,
@@ -286,14 +312,7 @@ export function ComposerContextBar() {
                           >
                             {w.title}
                           </Text>
-                          <Text
-                            style={[styles.itemSub, { color: theme.textMuted }]}
-                            numberOfLines={1}
-                          >
-                            {w.path}
-                          </Text>
                         </View>
-                      </View>
                       {isActive && (
                         <Check
                           size={13}
@@ -305,6 +324,22 @@ export function ComposerContextBar() {
                   );
                 })}
               </ScrollView>
+              <Pressable
+                onPress={() => {
+                  setOpen(null);
+                  setNewWorkspaceVisible(true);
+                }}
+                accessibilityRole="menuitem"
+                accessibilityLabel="添加新项目"
+                style={({ pressed, hovered }: any) => [
+                  styles.addProject,
+                  { borderTopColor: theme.dropdownBorder },
+                  (pressed || hovered) && { backgroundColor: theme.hoverBg },
+                ]}
+              >
+                <Plus size={13} color={theme.textMuted} strokeWidth={1.8} />
+                <Text style={[styles.addProjectText, { color: theme.textSecondary }]}>添加新项目</Text>
+              </Pressable>
             </Animated.View>
           )}
         </View>
@@ -414,6 +449,7 @@ export function ComposerContextBar() {
                     No branches found
                   </Text>
                 ) : (
+                  <>
                   <ScrollView
                     style={styles.popoverScroll}
                     showsVerticalScrollIndicator={false}
@@ -470,13 +506,49 @@ export function ComposerContextBar() {
                       </Pressable>
                     ))}
                   </ScrollView>
+                  <Pressable
+                    onPress={() => {
+                      setOpen(null);
+                      setBranchError(null);
+                      setNewBranchName("");
+                      setNewBranchVisible(true);
+                    }}
+                    style={({ pressed, hovered }: any) => [
+                      styles.createBranchAction,
+                      { borderTopColor: theme.dropdownBorder },
+                      (pressed || hovered) && { backgroundColor: theme.hoverBg },
+                    ]}
+                  >
+                    <Plus size={13} color={theme.textMuted} strokeWidth={1.8} />
+                    <Text style={[styles.createBranchText, { color: theme.textSecondary }]}>新建分支</Text>
+                  </Pressable>
+                  </>
                 )}
               </Animated.View>
             )}
           </View>
         )}
       </View>
-    </View>
+      </View>
+      <NewWorkspaceDialog
+        visible={newWorkspaceVisible}
+        onClose={() => setNewWorkspaceVisible(false)}
+      />
+      <Modal visible={newBranchVisible} transparent animationType="fade" onRequestClose={() => setNewBranchVisible(false)}>
+        <Pressable style={styles.branchOverlay} onPress={() => setNewBranchVisible(false)}>
+          <Pressable style={[styles.branchDialog, { backgroundColor: theme.dropdownBg, borderColor: theme.dropdownBorder }]} onPress={(event) => event.stopPropagation()}>
+            <Text style={[styles.branchTitle, { color: theme.textPrimary }]}>新建分支</Text>
+            <Text style={[styles.branchHint, { color: theme.textMuted }]}>将从当前分支 {currentBranch ?? "HEAD"} 创建并立即切换。</Text>
+            <TextInput value={newBranchName} onChangeText={setNewBranchName} onSubmitEditing={() => void handleCreateBranch()} autoFocus autoCapitalize="none" autoCorrect={false} placeholder="例如：feat/new-flow" placeholderTextColor={theme.textMuted} style={[styles.branchInput, { color: theme.textPrimary, borderColor: theme.dropdownBorder, backgroundColor: theme.hoverBg }]} />
+            {branchError ? <Text style={[styles.branchError, { color: theme.colors.destructive }]}>{branchError}</Text> : null}
+            <View style={styles.branchActions}>
+              <Pressable onPress={() => setNewBranchVisible(false)} style={({ pressed }) => [styles.branchCancel, { borderColor: theme.dropdownBorder }, pressed && { opacity: 0.7 }]}><Text style={{ color: theme.textPrimary }}>取消</Text></Pressable>
+              <Pressable disabled={!newBranchName.trim() || busy === "new-branch"} onPress={() => void handleCreateBranch()} style={({ pressed }) => [styles.branchCreate, { backgroundColor: theme.accentColor }, (!newBranchName.trim() || busy === "new-branch") && { opacity: 0.45 }, pressed && { opacity: 0.75 }]}><Text style={[styles.branchCreateText, { color: theme.colors.onAccent }]}>{busy === "new-branch" ? "创建中…" : "创建并切换"}</Text></Pressable>
+            </View>
+          </Pressable>
+        </Pressable>
+      </Modal>
+    </>
   );
 }
 
@@ -562,6 +634,30 @@ const styles = StyleSheet.create({
     lineHeight: 14,
     fontFamily: Fonts.mono,
   },
+  addProject: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    paddingHorizontal: 10,
+    paddingVertical: 9,
+  },
+  addProjectText: {
+    fontSize: 12,
+    fontFamily: Fonts.sansMedium,
+  },
+  createBranchAction: { flexDirection: "row", alignItems: "center", gap: 8, borderTopWidth: StyleSheet.hairlineWidth, paddingHorizontal: 10, paddingVertical: 9 },
+  createBranchText: { fontSize: 12, fontFamily: Fonts.sansMedium },
+  branchOverlay: { flex: 1, alignItems: "center", justifyContent: "center", padding: 24, backgroundColor: "rgba(0,0,0,0.48)" },
+  branchDialog: { width: "100%", maxWidth: 360, borderWidth: StyleSheet.hairlineWidth, borderRadius: 12, padding: 20 },
+  branchTitle: { fontSize: 16, fontFamily: Fonts.sansSemiBold },
+  branchHint: { marginTop: 6, fontSize: 12, fontFamily: Fonts.sans },
+  branchInput: { height: 38, marginTop: 16, borderWidth: StyleSheet.hairlineWidth, borderRadius: 7, paddingHorizontal: 10, fontSize: 13, fontFamily: Fonts.mono, outlineStyle: "none" } as any,
+  branchError: { marginTop: 8, fontSize: 12, fontFamily: Fonts.sans },
+  branchActions: { flexDirection: "row", justifyContent: "flex-end", gap: 8, marginTop: 18 },
+  branchCancel: { height: 32, borderWidth: StyleSheet.hairlineWidth, borderRadius: 7, paddingHorizontal: 13, justifyContent: "center" },
+  branchCreate: { height: 32, borderRadius: 7, paddingHorizontal: 13, justifyContent: "center" },
+  branchCreateText: { fontSize: 12, fontFamily: Fonts.sansMedium },
   loadingRow: {
     paddingVertical: 16,
     alignItems: "center",

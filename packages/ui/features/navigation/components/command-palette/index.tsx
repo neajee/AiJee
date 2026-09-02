@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState, useCallback } from 'react';
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import {
+  ActivityIndicator,
   Animated,
   Modal,
   Platform,
@@ -12,9 +13,7 @@ import {
 } from 'react-native';
 import {
   Search,
-  FolderOpen,
-  Settings,
-  Plus,
+  MessageSquare,
 } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
 
@@ -22,6 +21,7 @@ import { Colors, Fonts } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useThemeTokens } from '@/hooks/use-theme-tokens';
 import { useWorkspaceStore } from '@/features/workspace/store';
+import { usePiClient, type SessionListItem } from '@aijee/client-sdk';
 
 interface CommandPaletteProps {
   visible: boolean;
@@ -37,14 +37,22 @@ interface CommandItem {
   onSelect: () => void;
 }
 
+interface WorkspaceSession extends SessionListItem {
+  workspaceId: string;
+  workspaceTitle: string;
+}
+
 export function CommandPalette({ visible, onClose }: CommandPaletteProps) {
   const colorScheme = useColorScheme() ?? 'light';
   const colors = useThemeTokens();
   const isDark = colorScheme === 'dark';
   const router = useRouter();
+  const { api } = usePiClient();
 
   const [search, setSearch] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [sessions, setSessions] = useState<WorkspaceSession[]>([]);
+  const [sessionsLoading, setSessionsLoading] = useState(false);
   const inputRef = useRef<TextInput>(null);
   const scrollRef = useRef<ScrollView>(null);
   const itemRefs = useRef<Record<number, View | null>>({});
@@ -54,7 +62,6 @@ export function CommandPalette({ visible, onClose }: CommandPaletteProps) {
 
   const workspaces = useWorkspaceStore((s) => s.workspaces);
   const selectWorkspace = useWorkspaceStore((s) => s.selectWorkspace);
-  const selectedWorkspaceId = useWorkspaceStore((s) => s.selectedWorkspaceId);
 
   const bg = isDark ? '#1e1e1e' : '#FFFFFF';
   const borderColor = isDark ? '#3b3a39' : 'rgba(0,0,0,0.12)';
@@ -63,78 +70,6 @@ export function CommandPalette({ visible, onClose }: CommandPaletteProps) {
   const textDim = isDark ? '#888' : '#999';
   const hoverBg = isDark ? '#2a2a2a' : '#F0F0F0';
   const selectedBg = isDark ? '#333' : '#E8E8E8';
-
-  const commands: CommandItem[] = [
-    // Workspaces
-    ...workspaces.map((ws) => ({
-      id: `ws-${ws.id}`,
-      label: ws.title,
-      description: ws.path,
-      icon: FolderOpen,
-      section: 'Workspaces',
-      onSelect: () => {
-        selectWorkspace(ws.id);
-        router.replace(`/workspace/${ws.id}`);
-        handleClose();
-      },
-    })),
-    // Actions
-    {
-      id: 'new-session',
-      label: 'New Session',
-      description: 'Start a new chat session',
-      icon: Plus,
-      section: 'Actions',
-      onSelect: () => {
-        if (!selectedWorkspaceId) return;
-        handleClose();
-        router.navigate(`/workspace/${selectedWorkspaceId}`);
-      },
-    },
-    {
-      id: 'new-workspace',
-      label: 'New Workspace',
-      description: 'Create a new workspace',
-      icon: FolderOpen,
-      section: 'Actions',
-      onSelect: () => handleClose(),
-    },
-    // Navigation
-    {
-      id: 'settings',
-      label: 'Settings',
-      description: 'Open application settings',
-      icon: Settings,
-      section: 'Navigation',
-      onSelect: () => {
-        router.push('/settings');
-        handleClose();
-      },
-    },
-  ];
-
-  const query = search.toLowerCase();
-  const filtered = query
-    ? commands.filter(
-        (c) =>
-          c.label.toLowerCase().includes(query) ||
-          c.description?.toLowerCase().includes(query) ||
-          c.section.toLowerCase().includes(query)
-      )
-    : commands;
-
-  // Group by section
-  const sections: { title: string; items: CommandItem[] }[] = [];
-  for (const item of filtered) {
-    let section = sections.find((s) => s.title === item.section);
-    if (!section) {
-      section = { title: item.section, items: [] };
-      sections.push(section);
-    }
-    section.items.push(item);
-  }
-
-  const flatItems = filtered;
 
   const handleClose = useCallback(() => {
     Animated.parallel([
@@ -145,6 +80,66 @@ export function CommandPalette({ visible, onClose }: CommandPaletteProps) {
       onClose();
     });
   }, [onClose, overlayAnim, scaleAnim]);
+
+  useEffect(() => {
+    if (!visible) return;
+    let cancelled = false;
+    setSessionsLoading(true);
+
+    void Promise.all(
+      workspaces.map(async (workspace) => {
+        try {
+          const page = await api.listWorkspaceSessions(workspace.id, { page: 1, limit: 100 });
+          return (page.items ?? []).map((session) => ({
+            ...session,
+            workspaceId: workspace.id,
+            workspaceTitle: workspace.title,
+          }));
+        } catch {
+          return [];
+        }
+      }),
+    )
+      .then((pages) => {
+        if (cancelled) return;
+        setSessions(
+          pages.flat().sort((a, b) => b.last_active - a.last_active),
+        );
+      })
+      .finally(() => {
+        if (!cancelled) setSessionsLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [api, visible, workspaces]);
+
+  const query = search.trim().toLocaleLowerCase();
+  const flatItems = useMemo<CommandItem[]>(() => {
+    const matched = sessions.filter((session) =>
+      !query || [session.display_name, session.cwd, session.workspaceTitle]
+        .filter(Boolean)
+        .some((value) => value!.toLocaleLowerCase().includes(query)),
+    );
+
+    return matched.slice(0, query ? 30 : 8).map((session) => ({
+      id: session.id,
+      label: session.display_name?.trim() || '未命名对话',
+      description: session.workspaceTitle,
+      icon: MessageSquare,
+      section: query ? '搜索结果' : '最近对话',
+      onSelect: () => {
+        selectWorkspace(session.workspaceId);
+        handleClose();
+        router.navigate(`/workspace/${session.workspaceId}/s/${session.id}`);
+      },
+    }));
+  }, [handleClose, query, router, selectWorkspace, sessions]);
+
+  const sections = useMemo(() => (
+    flatItems.length ? [{ title: flatItems[0].section, items: flatItems }] : []
+  ), [flatItems]);
 
   useEffect(() => {
     setSelectedIndex(0);
@@ -194,6 +189,10 @@ export function CommandPalette({ visible, onClose }: CommandPaletteProps) {
   const handleKeyPress = useCallback(
     (e: any) => {
       const key = e.nativeEvent.key;
+      if (flatItems.length === 0) {
+        if (key === 'Escape') handleClose();
+        return;
+      }
       if (key === 'ArrowDown') {
         e.preventDefault?.();
         setSelectedIndex((prev) => (prev >= flatItems.length - 1 ? 0 : prev + 1));
@@ -241,7 +240,7 @@ export function CommandPalette({ visible, onClose }: CommandPaletteProps) {
               value={search}
               onChangeText={setSearch}
               onKeyPress={handleKeyPress}
-              placeholder="Type a command or search..."
+              placeholder="搜索对话…"
               placeholderTextColor={textDim}
               autoCapitalize="none"
               autoCorrect={false}
@@ -257,10 +256,14 @@ export function CommandPalette({ visible, onClose }: CommandPaletteProps) {
             keyboardShouldPersistTaps="handled"
           >
             <View ref={scrollContentRef}>
-            {sections.length === 0 && (
+            {sessionsLoading ? (
+              <View style={styles.emptyState}>
+                <ActivityIndicator size="small" color={textMuted} />
+              </View>
+            ) : sections.length === 0 && (
               <View style={styles.emptyState}>
                 <Text style={[styles.emptyText, { color: textDim }]}>
-                  No results found
+                  {query ? '没有匹配的对话' : '暂无最近对话'}
                 </Text>
               </View>
             )}

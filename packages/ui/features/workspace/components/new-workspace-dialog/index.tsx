@@ -14,7 +14,7 @@ import {
   TextInputKeyPressEventData,
   View,
 } from 'react-native';
-import { Folder, File, X } from 'lucide-react-native';
+import { Folder, File } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Colors, Fonts, WorkspaceColors } from '@/constants/theme';
@@ -240,12 +240,13 @@ export function NewWorkspaceDialog({ visible, onClose }: NewWorkspaceDialogProps
   );
 
   const canCreate = path.trim().length > 0;
+  const pathPreview = path.trim().replace(/\/+$/, '') || path.trim();
 
   const formContent = (
     <>
       {/* Path input */}
       <View style={[styles.field, { zIndex: 10 }]}>
-        <Text style={[styles.label, { color: textMuted }]}>Project Path</Text>
+        <Text style={[styles.label, { color: textMuted }]}>项目路径</Text>
         <View style={[styles.inputRow, { backgroundColor: inputBg, borderColor: inputBorder }]}>
           <Folder size={16} color={textMuted} strokeWidth={1.8} />
           <TextInput
@@ -254,7 +255,7 @@ export function NewWorkspaceDialog({ visible, onClose }: NewWorkspaceDialogProps
             value={path}
             onChangeText={handlePathChange}
             onKeyPress={handlePathKeyPress}
-            placeholder="~/work/my-project"
+            placeholder="例如：~/work/my-project"
             placeholderTextColor={textMuted}
             autoCapitalize="none"
             autoCorrect={false}
@@ -272,6 +273,15 @@ export function NewWorkspaceDialog({ visible, onClose }: NewWorkspaceDialogProps
             <ActivityIndicator size="small" color={textMuted} />
           )}
         </View>
+
+        {pathPreview && !showSuggestions ? (
+          <View style={styles.pathPreview}>
+            <Text style={[styles.pathPreviewLabel, { color: textMuted }]}>位置</Text>
+            <Text style={[styles.pathPreviewValue, { color: textPrimary }]} numberOfLines={1}>
+              {pathPreview}
+            </Text>
+          </View>
+        ) : null}
 
         {/* Path suggestions popover */}
         {showSuggestions && suggestions.length > 0 && (
@@ -352,7 +362,7 @@ export function NewWorkspaceDialog({ visible, onClose }: NewWorkspaceDialogProps
 
       {/* Name input */}
       <View style={styles.field}>
-        <Text style={[styles.label, { color: textMuted }]}>Project Name</Text>
+        <Text style={[styles.label, { color: textMuted }]}>项目名称</Text>
         <View style={[styles.inputRow, { backgroundColor: inputBg, borderColor: inputBorder }]}>
           <TextInput
             ref={nameRef}
@@ -360,13 +370,13 @@ export function NewWorkspaceDialog({ visible, onClose }: NewWorkspaceDialogProps
             value={name}
             onChangeText={handleNameChange}
             onKeyPress={handleNameKeyPress}
-            placeholder="My Project"
+            placeholder="例如：My Project"
             placeholderTextColor={textMuted}
           />
         </View>
         {!nameEdited && name.length > 0 && (
           <Text style={[styles.hint, { color: textMuted }]}>
-            Auto-detected from path
+            已根据路径自动生成
           </Text>
         )}
       </View>
@@ -381,7 +391,7 @@ export function NewWorkspaceDialog({ visible, onClose }: NewWorkspaceDialogProps
             pressed && { opacity: 0.7 },
           ]}
         >
-          <Text style={[styles.cancelText, { color: textPrimary }]}>Cancel</Text>
+          <Text style={[styles.cancelText, { color: textPrimary }]}>取消</Text>
         </Pressable>
         <Pressable
           onPress={handleCreate}
@@ -393,7 +403,7 @@ export function NewWorkspaceDialog({ visible, onClose }: NewWorkspaceDialogProps
           ]}
         >
           <Text style={[styles.createText, { color: canCreate ? (isDark ? '#121212' : '#FFFFFF') : textMuted }]}>
-            Create
+            添加项目
           </Text>
         </Pressable>
       </View>
@@ -427,7 +437,7 @@ export function NewWorkspaceDialog({ visible, onClose }: NewWorkspaceDialogProps
               <View style={styles.sheetHandle}>
                 <View style={[styles.sheetHandleBar, { backgroundColor: isDark ? '#555' : '#CCC' }]} />
               </View>
-              <Text style={[styles.sheetTitle, { color: textPrimary }]}>New Workspace</Text>
+              <Text style={[styles.sheetTitle, { color: textPrimary }]}>新建项目</Text>
               <ScrollView
                 style={styles.sheetBody}
                 contentContainerStyle={styles.sheetBodyContent}
@@ -453,7 +463,7 @@ export function NewWorkspaceDialog({ visible, onClose }: NewWorkspaceDialogProps
     >
       <Pressable style={styles.overlay} onPress={onClose}>
         <Pressable
-          style={[styles.dialog, { backgroundColor: isDark ? '#1e1e1e' : '#FFFFFF' }]}
+          style={[styles.dialog, { backgroundColor: isDark ? '#1e1e1e' : '#FFFFFF', borderColor: inputBorder }]}
           onPress={(e) => e.stopPropagation()}
         >
           {showSuggestions && (
@@ -463,13 +473,10 @@ export function NewWorkspaceDialog({ visible, onClose }: NewWorkspaceDialogProps
             />
           )}
           <View style={styles.header}>
-            <Text style={[styles.title, { color: textPrimary }]}>New Workspace</Text>
-            <Pressable
-              onPress={onClose}
-              style={({ pressed }) => [styles.closeButton, pressed && { opacity: 0.5 }]}
-            >
-              <X size={18} color={textMuted} strokeWidth={2} />
-            </Pressable>
+            <View style={styles.headerCopy}>
+              <Text style={[styles.title, { color: textPrimary }]}>新建项目</Text>
+              <Text style={[styles.subtitle, { color: textMuted }]}>添加本地目录，随时切换</Text>
+            </View>
           </View>
           {formContent}
         </Pressable>
@@ -489,36 +496,32 @@ const styles = StyleSheet.create({
   },
   dialog: {
     width: '100%',
-    maxWidth: 440,
-    borderRadius: 14,
+    maxWidth: 560,
+    borderRadius: 12,
+    borderWidth: StyleSheet.hairlineWidth,
     padding: 20,
-    boxShadow: '0px 8px 24px rgba(0, 0, 0, 0.2)',
+    boxShadow: '0px 12px 32px rgba(0, 0, 0, 0.24)',
     elevation: 10,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 20,
+    marginBottom: 18,
   },
+  headerCopy: { gap: 3 },
   title: {
-    fontSize: 17,
+    fontSize: 16,
     fontFamily: Fonts.sansSemiBold,
   },
-  closeButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  subtitle: { fontSize: 12, fontFamily: Fonts.sans },
 
   // Shared form
   field: {
-    marginBottom: 16,
+    marginBottom: 14,
   },
   label: {
-    fontSize: 13,
+    fontSize: 12,
     fontFamily: Fonts.sansMedium,
     marginBottom: 6,
   },
@@ -526,17 +529,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    height: 42,
-    borderRadius: 8,
+    height: 38,
+    borderRadius: 7,
     borderWidth: 0.633,
     paddingHorizontal: 12,
   },
   input: {
     flex: 1,
-    fontSize: 14,
+    fontSize: 13,
     fontFamily: Fonts.sans,
     outlineStyle: 'none',
   } as any,
+  pathPreview: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 6,
+    paddingHorizontal: 2,
+  },
+  pathPreviewLabel: { fontSize: 11, fontFamily: Fonts.sansMedium },
+  pathPreviewValue: { flex: 1, fontSize: 11, fontFamily: Fonts.mono },
   nameInput: {
     paddingLeft: 0,
   },
@@ -594,26 +606,26 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   cancelButton: {
-    height: 36,
-    paddingHorizontal: 16,
-    borderRadius: 8,
+    height: 32,
+    paddingHorizontal: 13,
+    borderRadius: 7,
     borderWidth: 0.633,
     alignItems: 'center',
     justifyContent: 'center',
   },
   cancelText: {
-    fontSize: 14,
+    fontSize: 12,
     fontFamily: Fonts.sansMedium,
   },
   createButton: {
-    height: 36,
-    paddingHorizontal: 20,
-    borderRadius: 8,
+    height: 32,
+    paddingHorizontal: 13,
+    borderRadius: 7,
     alignItems: 'center',
     justifyContent: 'center',
   },
   createText: {
-    fontSize: 14,
+    fontSize: 12,
     fontFamily: Fonts.sansMedium,
   },
 

@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Alert,
+  Modal,
   Platform,
   Pressable,
   ScrollView,
@@ -16,7 +17,6 @@ import {
   ChevronLeft,
   Folder,
   MoreHorizontal,
-  Pin,
   Plus,
   Settings,
   PackageOpen,
@@ -103,6 +103,7 @@ export function ProjectSidebar() {
 
   const [showNewDialog, setShowNewDialog] = useState(false);
   const [editWorkspace, setEditWorkspace] = useState<Workspace | null>(null);
+  const [deleteWorkspace, setDeleteWorkspace] = useState<Workspace | null>(null);
   // Only holds projects whose state differs from the default (selected = open).
   const [overrides, setOverrides] = useState<Record<string, boolean>>({});
   const [contextMenu, setContextMenu] = useState<{
@@ -212,23 +213,16 @@ export function ProjectSidebar() {
 
   const handleDelete = useCallback(
     (ws: Workspace) => {
-      if (Platform.OS === "web") {
-        if (window.confirm(`删除项目「${ws.title}」？`)) {
-          removeWorkspace(ws.id);
-        }
-        return;
-      }
-      Alert.alert("删除项目", `删除「${ws.title}」？`, [
-        { text: "取消", style: "cancel" },
-        {
-          text: "删除",
-          style: "destructive",
-          onPress: () => removeWorkspace(ws.id),
-        },
-      ]);
+      setDeleteWorkspace(ws);
     },
-    [removeWorkspace],
+    [],
   );
+
+  const confirmDelete = useCallback(() => {
+    if (!deleteWorkspace) return;
+    void removeWorkspace(deleteWorkspace.id);
+    setDeleteWorkspace(null);
+  }, [deleteWorkspace, removeWorkspace]);
 
   const renderWorkspace = (ws: Workspace) => {
     const isSelected = ws.id === selectedWorkspaceId;
@@ -243,14 +237,13 @@ export function ProjectSidebar() {
             workspace={ws}
             isSelected={isSelected}
             isOpen={isOpen}
-            isPinned={pinnedIds.includes(ws.id)}
             isRunning={activityByWorkspace[ws.id]?.running ?? false}
             hasUnread={
               (activityByWorkspace[ws.id]?.unread ?? false) ||
               ws.hasNotifications
             }
             onPress={() => handleToggleWorkspace(ws.id, isOpen)}
-            onTogglePin={() => togglePinned(ws.id)}
+            onNewSession={() => handleNewSessionIn(ws.id)}
             onMenu={(x, y) => handleMenuAt(ws, x, y)}
             onLongPress={(e) => handleLongPress(ws, e)}
             isDark={isDark}
@@ -370,6 +363,38 @@ export function ProjectSidebar() {
         }}
         onClose={() => setContextMenu((prev) => ({ ...prev, visible: false }))}
       />
+      <Modal
+        visible={!!deleteWorkspace}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setDeleteWorkspace(null)}
+      >
+        <Pressable style={styles.deleteOverlay} onPress={() => setDeleteWorkspace(null)}>
+          <Pressable
+            accessibilityRole="alert"
+            style={[styles.deleteDialog, { backgroundColor: colors.surfaceRaised, borderColor: colors.borderStrong }]}
+            onPress={(event) => event.stopPropagation()}
+          >
+            <Text style={[styles.deleteTitle, { color: colors.text }]}>删除项目？</Text>
+            <Text style={[styles.deleteDescription, { color: colors.textSecondary }]}>“{deleteWorkspace?.title}” 将从 AiJee 移除。</Text>
+            <Text style={[styles.deleteHint, { color: colors.textTertiary }]}>本地目录和其中的对话文件不会被删除。</Text>
+            <View style={styles.deleteActions}>
+              <Pressable
+                onPress={() => setDeleteWorkspace(null)}
+                style={({ pressed }) => [styles.deleteCancel, { borderColor: colors.borderStrong }, pressed && { opacity: 0.7 }]}
+              >
+                <Text style={[styles.deleteCancelText, { color: colors.text }]}>取消</Text>
+              </Pressable>
+              <Pressable
+                onPress={confirmDelete}
+                style={({ pressed }) => [styles.deleteConfirm, { backgroundColor: colors.destructive }, pressed && { opacity: 0.78 }]}
+              >
+                <Text style={styles.deleteConfirmText}>删除项目</Text>
+              </Pressable>
+            </View>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </View>
   );
 }
@@ -548,11 +573,10 @@ function WorkspaceRow({
   workspace,
   isSelected,
   isOpen,
-  isPinned,
   isRunning,
   hasUnread,
   onPress,
-  onTogglePin,
+  onNewSession,
   onMenu,
   onLongPress,
   isDark,
@@ -560,14 +584,13 @@ function WorkspaceRow({
   workspace: Workspace;
   isSelected: boolean;
   isOpen: boolean;
-  isPinned: boolean;
   /** At least one session in this project is working right now. */
   isRunning: boolean;
   /** A turn finished here and hasn't been looked at. */
   hasUnread: boolean;
   /** Left click folds and unfolds; opening a project happens by session. */
   onPress: () => void;
-  onTogglePin: () => void;
+  onNewSession: () => void;
   /** Viewport coordinates to anchor the actions menu to. */
   onMenu: (x: number, y: number) => void;
   onLongPress: (e: any) => void;
@@ -631,24 +654,17 @@ function WorkspaceRow({
         </Text>
       </Pressable>
 
-      {/* Pinning is one click on the row, not two through a menu. Once pinned
-          the icon stays put as the badge for that state. */}
       <View style={styles.rowActions}>
-        {(showActions || isPinned) && (
+        {showActions && (
           <RowAction
-            label={
-              isPinned
-                ? `取消置顶 ${workspace.title}`
-                : `置顶 ${workspace.title}`
-            }
-            onPress={onTogglePin}
+            label={`在 ${workspace.title} 中新建对话`}
+            onPress={onNewSession}
             isDark={isDark}
           >
-            <Pin
+            <SquarePen
               size={13}
-              color={isPinned ? colors.text : colors.textTertiary}
+              color={colors.textTertiary}
               strokeWidth={1.8}
-              fill={isPinned ? colors.text : "transparent"}
             />
           </RowAction>
         )}
@@ -1010,6 +1026,64 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     height: "100%",
+  },
+  deleteOverlay: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 24,
+    backgroundColor: "rgba(0,0,0,0.48)",
+  },
+  deleteDialog: {
+    width: "100%",
+    maxWidth: 360,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: 12,
+    padding: 20,
+    boxShadow: "0px 12px 32px rgba(0, 0, 0, 0.24)",
+    elevation: 12,
+  } as any,
+  deleteTitle: {
+    fontSize: 16,
+    fontFamily: Fonts.sansSemiBold,
+  },
+  deleteDescription: {
+    marginTop: 8,
+    fontSize: 13,
+    fontFamily: Fonts.sans,
+  },
+  deleteHint: {
+    marginTop: 4,
+    fontSize: 12,
+    fontFamily: Fonts.sans,
+  },
+  deleteActions: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    gap: 8,
+    marginTop: 20,
+  },
+  deleteCancel: {
+    height: 32,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderRadius: 7,
+    paddingHorizontal: 13,
+    justifyContent: "center",
+  },
+  deleteCancelText: {
+    fontSize: 12,
+    fontFamily: Fonts.sansMedium,
+  },
+  deleteConfirm: {
+    height: 32,
+    borderRadius: 7,
+    paddingHorizontal: 13,
+    justifyContent: "center",
+  },
+  deleteConfirmText: {
+    color: "#FFFFFF",
+    fontSize: 12,
+    fontFamily: Fonts.sansMedium,
   },
   serverRow: {
     borderBottomWidth: 0.633,
