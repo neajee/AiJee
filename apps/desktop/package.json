@@ -34,6 +34,13 @@
       "assets/**/*",
       "src/**/*",
       "dist-runtime/**/*",
+      {
+        "from": "../server/public",
+        "to": "public",
+        "filter": [
+          "**/*"
+        ]
+      },
       "package.json",
       "node_modules/**/*"
     ]
