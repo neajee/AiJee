@@ -28,7 +28,7 @@ export function AppModal({
         <Pressable
           style={[
             styles.content,
-            { backgroundColor: isDark ? 'rgba(38, 40, 44, 0.88)' : 'rgba(250, 251, 253, 0.88)' },
+            { backgroundColor: isDark ? 'rgba(24, 26, 30, 0.96)' : 'rgba(250, 251, 253, 0.92)' },
             contentStyle,
           ]}
           onPress={(event) => event.stopPropagation()}
