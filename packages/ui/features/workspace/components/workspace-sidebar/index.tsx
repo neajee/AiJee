@@ -20,6 +20,8 @@ import {
   SEAM_TOGGLE_WIDTH,
 } from "@/components/ui/seam-toggle";
 import { usePanelCoordination } from "@/features/navigation/store/panel-coordination";
+import { useWorkspaceStore } from "@/features/workspace/store";
+import { useGitStatus } from "@aijee/client-sdk";
 import {
   WorkspacePaneContext,
   type WorkspacePaneTab,
@@ -171,7 +173,6 @@ interface WorkspaceSidebarProps {
    */
   locked?: boolean;
   /** Hide Git controls when the workspace is not a repository. */
-  gitAvailable?: boolean;
 }
 
 export function WorkspaceSidebar({
@@ -179,11 +180,12 @@ export function WorkspaceSidebar({
   storageScope = DEFAULT_SCOPE,
   defaultCollapsed = false,
   locked = false,
-  gitAvailable = true,
 }: WorkspaceSidebarProps) {
   const colorScheme = useColorScheme() ?? "light";
   const colors = Colors[colorScheme];
   const isDark = colorScheme === "dark";
+  const workspace = useWorkspaceStore((s) => s.workspaces.find((w) => w.id === s.selectedWorkspaceId));
+  const { isGitRepo } = useGitStatus(workspace?.path ?? null);
 
   const scope = getScope(storageScope, defaultCollapsed);
 
@@ -440,7 +442,7 @@ export function WorkspaceSidebar({
             >
               <Files size={17} color={colors.textSecondary} strokeWidth={1.8} />
             </RailButton>
-            {gitAvailable && <RailButton
+            {isGitRepo && <RailButton
               label="Open Git"
               active={activePaneTab === "git"}
               onPress={() => openPane("git")}
