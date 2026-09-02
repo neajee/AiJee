@@ -366,8 +366,9 @@ export class AiJeeHttpServer {
   private async fsComplete(url: URL, response: ServerResponse): Promise<void> {
     const input = url.searchParams.get("q") ?? "";
     const expanded = input.startsWith("~/") ? join(homedir(), input.slice(2)) : input;
-    const parent = dirname(expanded || ".");
-    const prefix = basename(expanded);
+    const directoryQuery = expanded.length > 1 && expanded.endsWith("/");
+    const parent = directoryQuery ? expanded : dirname(expanded || ".");
+    const prefix = directoryQuery ? "" : basename(expanded);
     try {
       const entries = await readdir(parent, { withFileTypes: true });
       this.ok(response, entries.filter((entry) => entry.name.startsWith(prefix)).map((entry) => ({ path: join(parent, entry.name), is_dir: entry.isDirectory() })));

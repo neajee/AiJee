@@ -5,7 +5,8 @@ export type Ctx = { safePath(input: string): string; ok(response: ServerResponse
 
 export const gitRoutes = {
   async status(ctx: Ctx, url: URL, response: ServerResponse) { ctx.ok(response, await gitStatus(ctx.safePath(url.searchParams.get("cwd") ?? ""))); },
-  async branches(ctx: Ctx, url: URL, response: ServerResponse) { const output = await git(ctx.safePath(url.searchParams.get("cwd") ?? ""), ["branch", "--format=%(refname:short)\t%(HEAD)\t%(upstream:short)"]); ctx.ok(response, output.split("\n").filter(Boolean).map((line) => { const [name, head, upstream] = line.split("\t"); return { name, current: head === "*", upstream: upstream || null }; })); },
+  async branches(ctx: Ctx, url: URL, response: ServerResponse) { const output = await git(ctx.safePath(url.searchParams.get("cwd") ?? ""), ["branch", "--format=%(refname:short)\t%(HEAD)\t%(upstream:short)"]); ctx.ok(response, output.split("\n").filter(Boolean).map((line) => { const [name, head, upstream] = line.split("\t"); return { name, is_current: head === "*", is_remote: false, upstream: upstream || null }; })); },
+  async checkout(ctx: Ctx, request: IncomingMessage, response: ServerResponse, queryCwd: string | null) { const body = await ctx.body<{ branch?: string; create?: boolean }>(request); const branch = body.branch?.trim(); if (!branch) return ctx.error(response, 422, "branch is required"); const cwd = ctx.safePath(queryCwd ?? ""); const args = ["checkout", ...(body.create ? ["-b"] : []), branch]; ctx.ok(response, { output: await git(cwd, args), success: true }); },
   async diff(ctx: Ctx, url: URL, response: ServerResponse) { ctx.ok(response, { diff: await git(ctx.safePath(url.searchParams.get("cwd") ?? ""), ["diff", "--no-ext-diff"]), files: [] }); },
   async diffFile(ctx: Ctx, url: URL, response: ServerResponse) {
     const cwd = ctx.safePath(url.searchParams.get("cwd") ?? "");

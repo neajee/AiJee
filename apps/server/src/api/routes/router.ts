@@ -58,7 +58,7 @@ export async function dispatchRoute(ctx: RouteContext, request: IncomingMessage,
   if (request.method === "GET" && url.pathname === "/api/git/worktrees") return gitRoutes.worktreeList(ctx, url, response);
   if (request.method === "POST" && url.pathname === "/api/git/worktrees") return gitRoutes.worktreeAdd(ctx, request, response, url.searchParams.get("cwd"));
   if (request.method === "DELETE" && url.pathname === "/api/git/worktrees") return gitRoutes.worktreeRemove(ctx, request, response, url.searchParams.get("cwd"));
-  if (request.method === "POST" && url.pathname === "/api/git/checkout") return gitRoutes.mutation(ctx, request, response, "checkout", url.searchParams.get("cwd"));
+  if (request.method === "POST" && url.pathname === "/api/git/checkout") return gitRoutes.checkout(ctx, request, response, url.searchParams.get("cwd"));
   if (request.method === "POST" && url.pathname === "/api/git/stage") return gitRoutes.mutation(ctx, request, response, "add", url.searchParams.get("cwd"));
   if (request.method === "POST" && url.pathname === "/api/git/unstage") return gitRoutes.mutation(ctx, request, response, "reset", url.searchParams.get("cwd"));
   if (request.method === "POST" && url.pathname === "/api/git/discard") return gitRoutes.mutation(ctx, request, response, "restore", url.searchParams.get("cwd"));
