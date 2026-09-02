@@ -217,7 +217,8 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 34,
     left: 0,
-    right: 0,
+    width: 236,
+    maxWidth: 280,
     borderRadius: 10,
     borderWidth: 0.633,
     zIndex: 1000,
@@ -227,8 +228,9 @@ const styles = StyleSheet.create({
   } as any,
   popoverHeader: {
     paddingHorizontal: 14,
-    paddingTop: 10,
-    paddingBottom: 6,
+    paddingTop: 11,
+    paddingBottom: 8,
+    minHeight: 34,
   },
   popoverTitle: {
     fontSize: 11,
@@ -244,7 +246,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 10,
     paddingHorizontal: 14,
-    paddingVertical: 9,
+    paddingVertical: 10,
+    minHeight: 54,
   },
   popoverItemIcon: {
     width: 24,
