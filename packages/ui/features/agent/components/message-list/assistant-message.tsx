@@ -1,7 +1,7 @@
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import { memo, useCallback, useEffect, useState } from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import * as Clipboard from "expo-clipboard";
-import { Copy, Info } from "lucide-react-native";
+import { Copy } from "lucide-react-native";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -11,8 +11,6 @@ import Animated, {
 import { Colors, Fonts } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
-import { BottomSheet } from "@/components/ui";
-import { Portal } from "@/components/ui/portal";
 import type { ChatMessage } from "../../types";
 import { AssistantMarkdown } from "./assistant-markdown";
 import { StreamingCursor } from "./streaming-cursor";
@@ -87,12 +85,7 @@ export const MessageToolbar = memo(function MessageToolbar({
   hovered: boolean;
 }) {
   const colors = useThemeTokens();
-  const [showInfo, setShowInfo] = useState(false);
   const [copied, setCopied] = useState(false);
-  const isWeb = Platform.OS === "web";
-  const wrapRef = useRef<View | null>(null);
-  const infoBtnRef = useRef<View | null>(null);
-  const [anchor, setAnchor] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
 
   const opacity = useSharedValue(0);
   useEffect(() => {
@@ -107,51 +100,9 @@ export const MessageToolbar = memo(function MessageToolbar({
     setTimeout(() => setCopied(false), 1500);
   }, [message.text]);
 
-  const openInfo = useCallback(() => {
-    if (isWeb) {
-      const node = infoBtnRef.current as unknown as { measureInWindow?: (cb: (x: number, y: number, width: number, height: number) => void) => void } | null;
-      node?.measureInWindow?.((x, y, width, height) => {
-        setAnchor({ x, y, width, height });
-        setShowInfo((v) => !v);
-      });
-      if (!node?.measureInWindow) setShowInfo((v) => !v);
-      return;
-    }
-    setShowInfo((v) => !v);
-  }, [isWeb]);
-  const closeInfo = useCallback(() => setShowInfo(false), []);
-
-  useEffect(() => {
-    if (!isWeb || !showInfo) return;
-    const handlePointerDown = (event: MouseEvent) => {
-      const node = wrapRef.current as unknown as { contains?: (target: Node | null) => boolean } | null;
-      if (node?.contains?.(event.target as Node | null)) return;
-      setShowInfo(false);
-    };
-    document.addEventListener("mousedown", handlePointerDown);
-    return () => document.removeEventListener("mousedown", handlePointerDown);
-  }, [isWeb, showInfo]);
-
-  const infoLines = useMemo(() => {
-    const lines: { label: string; value: string }[] = [];
-    if (message.model) lines.push({ label: "Model", value: message.model });
-    if (message.provider) lines.push({ label: "Provider", value: message.provider });
-    const cost = message.usage?.totalCost;
-    if (cost != null && cost > 0) lines.push({ label: "Cost", value: `$${cost.toFixed(4)}` });
-    const tokens = message.usage?.totalTokens;
-    if (tokens != null && tokens > 0) lines.push({ label: "Tokens", value: tokens.toLocaleString() });
-    const input = message.usage?.input;
-    if (input != null) lines.push({ label: "Input", value: input.toLocaleString() });
-    const output = message.usage?.output;
-    if (output != null) lines.push({ label: "Output", value: output.toLocaleString() });
-    const cacheRead = message.usage?.cacheRead;
-    if (cacheRead != null && cacheRead > 0) lines.push({ label: "Cache read", value: cacheRead.toLocaleString() });
-    return lines;
-  }, [message.model, message.provider, message.usage]);
-
   return (
     <>
-      <View ref={wrapRef} style={styles.toolbarWrap}>
+      <View style={styles.toolbarWrap}>
         <Animated.View style={[styles.toolbar, animStyle]}>
           <View style={styles.toolbarBtns}>
             <Pressable
@@ -165,61 +116,9 @@ export const MessageToolbar = memo(function MessageToolbar({
                 <Copy size={13} color={colors.textTertiary} strokeWidth={1.8} />
               )}
             </Pressable>
-            <Pressable
-              ref={infoBtnRef}
-              onPress={openInfo}
-              style={[styles.toolbarBtn, showInfo && { backgroundColor: colors.surfaceRaised }]}
-              hitSlop={4}
-            >
-              <Info size={13} color={colors.textTertiary} strokeWidth={1.8} />
-            </Pressable>
           </View>
         </Animated.View>
-
-        {isWeb && showInfo && anchor ? (
-          <Portal>
-            <Pressable style={styles.webBackdrop} onPress={closeInfo}>
-              <Pressable
-                onPress={(e) => e.stopPropagation()}
-                style={[
-                  styles.inlinePopover,
-                  {
-                    backgroundColor: colors.sheetBackground,
-                    borderColor: colors.border,
-                    left: Math.max(12, anchor.x - 8),
-                    top: anchor.y + anchor.height + 8,
-                    zIndex: 1000,
-                  },
-                ]}
-              >
-                {infoLines.map((l, i) => (
-                  <View key={i} style={styles.infoRow}>
-                    <Text style={[styles.infoLabel, { color: colors.textTertiary }]}>{l.label}</Text>
-                    <Text style={[styles.infoValue, { color: colors.text }]} selectable>{l.value}</Text>
-                  </View>
-                ))}
-              </Pressable>
-            </Pressable>
-          </Portal>
-        ) : null}
       </View>
-
-      {!isWeb ? (
-        <BottomSheet visible={showInfo} onClose={closeInfo} title="Message Info">
-          {infoLines.map((l, i) => (
-            <View
-              key={i}
-              style={[
-                styles.sheetRow,
-                i > 0 && { borderTopWidth: 0.5, borderTopColor: colors.border },
-              ]}
-            >
-              <Text style={[styles.sheetLabel, { color: colors.textTertiary }]}>{l.label}</Text>
-              <Text style={[styles.sheetValue, { color: colors.text }]} selectable>{l.value}</Text>
-            </View>
-          ))}
-        </BottomSheet>
-      ) : null}
     </>
   );
 });
@@ -262,57 +161,5 @@ const styles = StyleSheet.create({
   toolbarWrap: {
     position: "relative",
     zIndex: 20,
-  },
-  webBackdrop: {
-    position: "fixed" as any,
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    zIndex: 999,
-  },
-  inlinePopover: {
-    position: "absolute",
-    left: 0,
-    top: 30,
-    borderRadius: 8,
-    borderWidth: 0.5,
-    padding: 10,
-    minWidth: 240,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.12,
-    shadowRadius: 8,
-    elevation: 4,
-    gap: 6,
-  },
-  infoRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    gap: 12,
-  },
-  infoLabel: {
-    fontSize: 11,
-    fontFamily: Fonts.sans,
-  },
-  infoValue: {
-    fontSize: 11,
-    fontFamily: Fonts.mono,
-    textAlign: "right",
-  },
-  sheetRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingVertical: 12,
-    gap: 12,
-  },
-  sheetLabel: {
-    fontSize: 14,
-    fontFamily: Fonts.sans,
-  },
-  sheetValue: {
-    fontSize: 14,
-    fontFamily: Fonts.mono,
-    textAlign: "right",
   },
 });
