@@ -170,6 +170,8 @@ interface WorkspaceSidebarProps {
    * the whole width while a session is still being prepared).
    */
   locked?: boolean;
+  /** Hide Git controls when the workspace is not a repository. */
+  gitAvailable?: boolean;
 }
 
 export function WorkspaceSidebar({
@@ -177,6 +179,7 @@ export function WorkspaceSidebar({
   storageScope = DEFAULT_SCOPE,
   defaultCollapsed = false,
   locked = false,
+  gitAvailable = true,
 }: WorkspaceSidebarProps) {
   const colorScheme = useColorScheme() ?? "light";
   const colors = Colors[colorScheme];
@@ -437,13 +440,13 @@ export function WorkspaceSidebar({
             >
               <Files size={17} color={colors.textSecondary} strokeWidth={1.8} />
             </RailButton>
-            <RailButton
+            {gitAvailable && <RailButton
               label="Open Git"
               active={activePaneTab === "git"}
               onPress={() => openPane("git")}
             >
               <GitBranch size={17} color={colors.textSecondary} strokeWidth={1.8} />
-            </RailButton>
+            </RailButton>}
             {isDesktopShell && (
               <RailButton
                 label="Open browser"
