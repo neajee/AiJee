@@ -34,15 +34,17 @@
       "assets/**/*",
       "src/**/*",
       "dist-runtime/**/*",
+      "package.json",
+      "node_modules/**/*"
+    ],
+    "extraResources": [
       {
         "from": "../server/public",
         "to": "public",
         "filter": [
           "**/*"
         ]
-      },
-      "package.json",
-      "node_modules/**/*"
+      }
     ]
   }
 }
