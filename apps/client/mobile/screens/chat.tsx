@@ -7,7 +7,7 @@ import {
   StyleSheet,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { ArrowLeft, FilePenLine, MessageSquare, SquarePen, Wrench } from 'lucide-react-native';
+import { FilePenLine, Menu, MessageSquare, SquarePen, Wrench } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text, View } from 'tamagui';
 
@@ -79,8 +79,8 @@ export default function ChatScreen() {
   return (
     <KeyboardAvoidingView behavior={keyboardBehavior} style={[styles.screen, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
-        <Pressable accessibilityLabel="返回对话列表" accessibilityRole="button" onPress={() => router.replace(`/workspace/${workspaceId}`)} style={({ pressed }) => [styles.headerButton, { backgroundColor: colors.surfaceRaised, borderColor: colors.borderStrong }, pressed && styles.pressed]}>
-          <ArrowLeft color={colors.text} size={19} strokeWidth={1.8} />
+        <Pressable accessibilityLabel="打开菜单" accessibilityRole="button" onPress={() => router.replace(`/workspace/${workspaceId}`)} style={({ pressed }) => [styles.menuButton, pressed && styles.pressed]}>
+          <Menu color={colors.text} size={22} strokeWidth={1.7} />
         </Pressable>
         <View style={styles.segmented}>
           <View style={[styles.segment, { backgroundColor: colors.surfaceRaised }]}><MessageSquare color={colors.text} size={14} strokeWidth={1.9} /><Text style={[styles.segmentText, { color: colors.text }]}>聊天</Text></View>
@@ -207,10 +207,11 @@ function normalizeParam(value?: string | string[]) {
 
 const styles = StyleSheet.create({
   screen: { flex: 1 },
-  header: { minHeight: 55, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: mobileLayout.pageHorizontal, paddingTop: 5 },
-  headerButton: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderRadius: 14 },
-  segmented: { height: 36, flexDirection: 'row', alignItems: 'center', padding: 3, borderRadius: mobileRadius.pill },
-  segment: { height: 30, flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 12, borderRadius: 15 },
+  header: { minHeight: 55, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: mobileLayout.pageHorizontal, paddingTop: 4 },
+  menuButton: { width: 36, height: 36, alignItems: 'flex-start', justifyContent: 'center' },
+  headerButton: { width: 38, height: 38, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderRadius: 14 },
+  segmented: { height: 36, flexDirection: 'row', alignItems: 'center', padding: 3, borderRadius: mobileRadius.pill, backgroundColor: '#202024' },
+  segment: { height: 30, flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 13, borderRadius: 15 },
   segmentText: { fontFamily: Fonts.sansSemiBold, fontSize: 13 },
   inactiveSegment: { paddingHorizontal: 12, fontFamily: Fonts.sansMedium, fontSize: 13 },
   statusLine: { minHeight: 28, flexDirection: 'row', alignItems: 'center', gap: 8, paddingHorizontal: mobileLayout.pageHorizontal },

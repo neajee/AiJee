@@ -36,7 +36,7 @@ export function ChatComposer({
         autoCapitalize="sentences"
         autoCorrect
         editable={!disabled}
-        multiline
+        multiline={false}
         onChangeText={onChangeText}
         onSubmitEditing={canSend ? onSend : undefined}
         placeholder="问点什么…"
@@ -54,7 +54,6 @@ export function ChatComposer({
         >
           <Plus color={colors.textTertiary} size={18} strokeWidth={1.8} />
         </Pressable>
-        <View style={styles.toolbarSpacer} />
         <Mic color={colors.textTertiary} size={18} strokeWidth={1.8} />
         {isStreaming && onAbort ? (
           <Pressable
@@ -87,32 +86,28 @@ export function ChatComposer({
 
 const styles = StyleSheet.create({
   container: {
-    minHeight: 96,
+    minHeight: 58,
     marginHorizontal: mobileLayout.pageHorizontal,
     marginBottom: 10,
     paddingHorizontal: 14,
-    paddingTop: 12,
-    paddingBottom: 9,
+    paddingVertical: 8,
     borderWidth: 1,
     borderRadius: mobileRadius.card,
   },
   input: {
+    flex: 1,
     minHeight: 34,
-    maxHeight: 110,
     padding: 0,
     fontFamily: Fonts.sans,
     fontSize: 15,
     lineHeight: 21,
-    textAlignVertical: 'top',
+    textAlignVertical: 'center',
   },
   toolbar: {
     height: 34,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-  },
-  toolbarSpacer: {
-    flex: 1,
   },
   toolButton: {
     width: 30,
