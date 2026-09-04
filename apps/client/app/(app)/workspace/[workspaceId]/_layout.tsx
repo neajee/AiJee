@@ -1,5 +1,1 @@
-import { Stack } from 'expo-router';
-
-export default function WorkspaceLayout() {
-  return <Stack screenOptions={{ headerShown: false, animation: 'none' }} />;
-}
+export { default } from '../../../../desktop/screens/workspace/[workspaceId]/_layout';
