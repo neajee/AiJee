@@ -13,11 +13,15 @@ AiJee/
 │   ├── client/             # Expo Web / Android / iOS entry
 │   └── desktop/            # Electron platform entry
 ├── apps/client/
-│   ├── app/                # Platform-owned Expo Router screens
-│       ├── _layout.tsx     # PiClientProvider, AdaptiveNavigation
-│       ├── settings.tsx
-│       ├── chat/
-│       └── workspace/
+│   ├── app/                # Expo Router thin dispatchers only
+│   │   └── (app)/           # .tsx → desktop, .native.tsx → mobile
+│   ├── mobile/              # Native thin client, Tamagui screens/styles
+│   │   ├── screens/
+│   │   ├── components/
+│   │   └── styles/
+│   ├── desktop/             # Web + Electron screen ownership
+│   │   ├── screens/
+│   │   └── components/
 │   └── platform config
 ├── packages/ui/            # Shared product UI, themes and feature modules
 │   ├── features/           # Feature modules (UI + shared state)
@@ -34,6 +38,10 @@ AiJee/
 ├── apps/server/            # Pi SDK runtime, CLI, HTTP/SSE and product services
 └── public/                 # Expo web source assets
 ```
+
+`mobile/` may consume shared `packages/ui` features but never imports
+`desktop/`; desktop screens follow the inverse boundary. Both platforms use
+the same URL and `packages/client-sdk` data contract.
 
 ## @aijee/client-sdk package
 

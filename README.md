@@ -34,13 +34,19 @@ apps/server → packages/engine → Pi SDK
 
 ```text
 apps/server                      唯一后端、CLI、REST/SSE/WS与运行时
-apps/client                      Expo Web / iOS / Android客户端
+apps/client/app                  Expo Router平台路由薄壳
+apps/client/mobile               iOS / Android薄客户端与移动端新画布
+apps/client/desktop              Web / Electron同簇视图
 apps/desktop                     Electron 外壳与Server发现
 packages/engine                  统一引擎抽象与适配器
 packages/api-contract            OpenAPI协议唯一源头
 packages/client-sdk              生成客户端与薄封装
 packages/ui                      跨端组件、状态与数据hooks
 ```
+
+客户端平台路由保持同一URL：native文件转发到`apps/client/mobile`，普通文件
+转发到`apps/client/desktop`。移动端聊天只渲染消息文本、思考/工具/编辑状态
+和轻量输入框，不引入桌面端完整消息树与自适应导航。
 
 ## 配置
 

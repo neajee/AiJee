@@ -23,6 +23,9 @@ AiJee/
 │   │   │   └── telemetry/         # 日志、指标
 │   │   └── package.json
 │   ├── client/                    # Expo Web / iOS / Android
+│   │   ├── app/(app)/             # 仅做平台路由转发
+│   │   ├── mobile/                # iOS/Android薄客户端与新画布
+│   │   └── desktop/               # Web/Electron同簇视图
 │   └── desktop/                   # Electron窗口、托盘、更新、Server发现
 │
 ├── packages/
@@ -42,6 +45,16 @@ AiJee/
 │
 └── docs/spec/{architecture.md,sdk.md,engines.md}
 ```
+
+### Client平台边界
+
+`apps/client/app/(app)`是唯一路由入口：`.native.tsx`转发到
+`mobile/screens`，普通`.tsx`转发到`desktop/screens`。路由不包含视图，三端
+继续使用同一组URL（包括`/workspace/:id/s/:sid`）。
+
+`mobile/`只承载移动端页面级视图与轻量组件，可复用`packages/ui`的stores、
+hooks、tokens和通用组件；`desktop/`承载Web/Electron现状视图。两者互不导入，
+共享数据只经过`@aijee/client-sdk`与平台无关feature边界。
 
 ## 运行时依赖方向
 
