@@ -1,1 +1,1 @@
-export { default } from '../../mobile/screens/workspace-list';
+export { default } from '../../mobile/screens/home-chat';
