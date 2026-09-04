@@ -84,6 +84,7 @@ async function waitForApi(port) {
 
 const apiResolution = await resolveServicePort(Number(process.env.AIJEE_API_PORT ?? 10088), isAiJeeApi);
 const apiPort = apiResolution.port;
+const apiHost = process.env.AIJEE_API_HOST ?? process.env.AIJEE_HOST ?? "0.0.0.0";
 const reserved = new Set([apiPort]);
 const expoPort = await availablePort(Number(process.env.AIJEE_EXPO_PORT ?? 8082), reserved);
 reserved.add(expoPort);
@@ -103,7 +104,7 @@ if (webResolution.reuse) {
 
   const runtime = apiResolution.reuse
     ? null
-    : start("node", ["--experimental-strip-types", "apps/server/src/main.ts", "serve", "--port", String(apiPort)], { env: childEnv });
+    : start("node", ["--experimental-strip-types", "apps/server/src/main.ts", "serve", "--host", apiHost, "--port", String(apiPort)], { env: childEnv });
   runtime?.once("exit", (code) => {
     if (code !== 0) {
       fetch(`http://127.0.0.1:${apiPort}/api/health`)
