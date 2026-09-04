@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const [outputDir, version] = process.argv.slice(2);
-if (!outputDir || !version) throw new Error("Usage: node tools/prepare-npm-release.mjs <output> <version>");
+if (!outputDir || !version) throw new Error("Usage: node scripts/prepare-npm-release.mjs <output> <version>");
 
 const root = join(fileURLToPath(new URL("..", import.meta.url)));
 const destination = join(outputDir, "aijee");

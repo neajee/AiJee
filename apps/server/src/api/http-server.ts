@@ -145,7 +145,7 @@ function gitCommitsFor(root: string, tag: string, prev: string | null): ReleaseN
  * Current release + release history.
  *
  * Priority: a build-time snapshot (`dist/releases.json`, written by
- * tools/write-releases-snapshot.mjs and copied into the web root) → live
+ * scripts/write-releases-snapshot.mjs and copied into the web root) → live
  * `git` in a source checkout → env-var / package fallback. The snapshot is
  * what packaged builds rely on, since no .git ships with them.
  */

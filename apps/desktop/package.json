@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "electron .",
     "build": "yarn build:runtime && electron-builder",
-    "build:runtime": "node tools/build-runtime.mjs",
+    "build:runtime": "node scripts/build-runtime.mjs",
     "check": "node --check src/main.cjs"
   },
   "dependencies": {

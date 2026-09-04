@@ -118,7 +118,7 @@ if (webResolution.reuse) {
     shutdown(1);
   }
   const expo = startYarn(["workspace", "@aijee/client", "dev", "--port", String(expoPort)], { env: childEnv });
-  const proxy = start("node", ["tools/dev-web-proxy.mjs"], { env: childEnv });
+  const proxy = start("node", ["scripts/dev-web-proxy.mjs"], { env: childEnv });
   console.log(`AiJee web: http://127.0.0.1:${webPort} (Expo ${expoPort}, API ${apiPort})`);
 
   function shutdown(code = 0) {
