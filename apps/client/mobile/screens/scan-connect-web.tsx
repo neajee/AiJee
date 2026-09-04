@@ -13,7 +13,13 @@ export default function ScanConnectWebScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const colors = useThemeTokens();
-  const onClose = useCallback(() => router.replace('/mobile-preview' as never), [router]);
+  const onClose = useCallback(() => {
+    if (typeof window !== 'undefined') {
+      window.location.replace('/mobile-preview');
+      return;
+    }
+    router.replace('/mobile-preview' as never);
+  }, [router]);
   const controller = useQrScannerController({ baseUrl: typeof window !== 'undefined' ? window.location.origin : undefined, visible: true, onClose });
   const { manualUrl, error, handleManualUrlChange, handleManualSubmit } = controller;
 
