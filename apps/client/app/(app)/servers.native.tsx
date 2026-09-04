@@ -1,1 +1,1 @@
-export { default } from '../../mobile/screens/scan-connect';
+export { default } from '../../mobile/screens/servers';
