@@ -11,7 +11,7 @@ import { X } from 'lucide-react-native';
 import { Colors, Fonts } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useTasksStore } from '../../store';
-import { TasksPanelContent } from '../tasks-panel-content';
+import { TasksPanelContent } from './content';
 
 interface TasksDropdownProps {
   /**

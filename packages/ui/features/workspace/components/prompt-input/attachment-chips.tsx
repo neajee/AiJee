@@ -2,8 +2,8 @@ import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-nati
 import { X, FileText, ImageIcon } from 'lucide-react-native';
 
 import { Fonts } from '@/constants/theme';
-import { Attachment } from './constants';
-import { usePromptTheme } from './use-theme-colors';
+import { Attachment } from '../../utils/prompt-input';
+import { usePromptTheme } from '@/components/surface-theme/use-prompt-theme';
 
 interface AttachmentChipsProps {
   attachments: Attachment[];

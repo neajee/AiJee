@@ -2,7 +2,7 @@ import { StyleSheet, Text, View } from "react-native";
 import { GitBranch, ArrowUp, ArrowDown } from "lucide-react-native";
 
 import { Fonts } from "@/constants/theme";
-import { useChangesTheme } from "./use-theme-colors";
+import { useChangesTheme } from "../../hooks/use-changes-theme";
 
 /**
  * The current branch, riding along at the end of the tab row.

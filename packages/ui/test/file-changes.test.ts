@@ -3,7 +3,7 @@ import { test } from "node:test";
 import {
   collectFileChanges,
   relativePath,
-} from "../features/agent/components/message-list/utils.ts";
+} from "../features/agent/utils/message-list.ts";
 import type { ToolCallInfo } from "../features/agent/types.ts";
 
 function tool(partial: Partial<ToolCallInfo>): ToolCallInfo {

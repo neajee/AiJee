@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from "react-native";
 import { Colors, Fonts } from "@/constants/theme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import type { ToolCallInfo } from "../../../types";
-import { basename, isToolActive, parseToolArguments, countLines } from "../utils";
+import { basename, isToolActive, parseToolArguments, countLines } from "../../../utils/message-list";
 import { CodePreview } from "../code-preview";
 import { ToolBody, ToolHeader, TOOL_BODY_MAX_HEIGHT } from "./tool-disclosure";
 

@@ -10,7 +10,7 @@ import {
 
 import { Fonts } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-import { STATUS_COLORS, statusLabel } from "./constants";
+import { STATUS_COLORS, statusLabel } from "../../utils/changes-panel";
 import { DiffView } from "./diff-view";
 import { FileTypeBadge } from "../file-type-badge";
 

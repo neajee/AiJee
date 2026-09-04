@@ -6,7 +6,7 @@ import { useAppSettingsStore } from "@/features/settings/store";
 import type { ToolCallInfo } from "../../../types";
 import { useStableMarkdown } from "../../../hooks/use-stable-markdown";
 import { createMarkedOptions } from "../../../theme";
-import { isToolActive, parseToolArguments } from "../utils";
+import { isToolActive, parseToolArguments } from "../../../utils/message-list";
 import { ToolBody, ToolHeader, ToolSurface } from "./tool-disclosure";
 
 interface SubagentToolCallProps {

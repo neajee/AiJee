@@ -12,10 +12,10 @@ import {
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Fonts } from "@/constants/theme";
-import { useResponsiveLayout } from "@/features/navigation/hooks/use-responsive-layout";
+import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
 import { PromptInput } from "@/features/workspace/components/prompt-input";
-import { attachmentsToImages } from "@/features/workspace/components/prompt-input/attachment-images";
-import type { Attachment } from "@/features/workspace/components/prompt-input/constants";
+import { attachmentsToImages } from "@/features/workspace/utils/prompt-input-attachments";
+import type { Attachment } from "@/features/workspace/utils/prompt-input";
 import { WorkspaceHero } from "@/features/workspace/components/workspace-hero";
 import { ComposerContextBar } from "@/features/workspace/components/composer-context-bar";
 import { WorkspaceSidebar } from "@/features/workspace/components/workspace-sidebar";

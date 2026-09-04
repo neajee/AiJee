@@ -1,6 +1,7 @@
 export { default as Archive } from '../../../node_modules/lucide-react-native/dist/esm/icons/archive.js';
 export { default as ArrowDown } from '../../../node_modules/lucide-react-native/dist/esm/icons/arrow-down.js';
 export { default as ArrowUp } from '../../../node_modules/lucide-react-native/dist/esm/icons/arrow-up.js';
+export { default as ArrowUpCircle } from '../../../node_modules/lucide-react-native/dist/esm/icons/circle-arrow-up.js';
 export { default as Bell } from '../../../node_modules/lucide-react-native/dist/esm/icons/bell.js';
 export { default as Brain } from '../../../node_modules/lucide-react-native/dist/esm/icons/brain.js';
 export { default as Check } from '../../../node_modules/lucide-react-native/dist/esm/icons/check.js';
@@ -40,6 +41,7 @@ export { default as LogIn } from '../../../node_modules/lucide-react-native/dist
 export { default as LogOut } from '../../../node_modules/lucide-react-native/dist/esm/icons/log-out.js';
 export { default as Maximize2 } from '../../../node_modules/lucide-react-native/dist/esm/icons/maximize-2.js';
 export { default as Mic } from '../../../node_modules/lucide-react-native/dist/esm/icons/mic.js';
+export { default as MessageSquare } from '../../../node_modules/lucide-react-native/dist/esm/icons/message-square.js';
 export { default as Minus } from '../../../node_modules/lucide-react-native/dist/esm/icons/minus.js';
 export { default as MonitorUp } from '../../../node_modules/lucide-react-native/dist/esm/icons/monitor-up.js';
 export { default as Monitor } from '../../../node_modules/lucide-react-native/dist/esm/icons/monitor.js';

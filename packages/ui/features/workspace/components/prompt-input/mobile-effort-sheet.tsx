@@ -3,8 +3,8 @@ import { Animated, Modal, Pressable, StyleSheet, Text, View } from 'react-native
 import { Check } from 'lucide-react-native';
 
 import { Fonts } from '@/constants/theme';
-import { buildThinkingLevelOptions, ThinkingPreference } from './constants';
-import { usePromptTheme } from './use-theme-colors';
+import { buildThinkingLevelOptions, ThinkingPreference } from '../../utils/prompt-input';
+import { usePromptTheme } from '@/components/surface-theme/use-prompt-theme';
 import type { AgentConfigHandle } from '@aijee/client-sdk';
 
 interface MobileEffortSheetProps {

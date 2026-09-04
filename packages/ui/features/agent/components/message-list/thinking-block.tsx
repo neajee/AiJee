@@ -12,7 +12,7 @@ import Animated, {
 import { Colors, Fonts } from "@/constants/theme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { AnimatedCollapse } from "./animated-collapse";
-import { formatDuration } from "./turns";
+import { formatDuration } from "../../utils/turns";
 
 interface ThinkingBlockProps {
   text: string;

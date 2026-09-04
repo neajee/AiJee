@@ -2,8 +2,8 @@ import { useRef, useEffect } from 'react';
 import { Animated, Pressable, ScrollView, StyleSheet, Text } from 'react-native';
 
 import { Fonts } from '@/constants/theme';
-import { SlashCommand } from './constants';
-import { usePromptTheme } from './use-theme-colors';
+import { SlashCommand } from '../../utils/prompt-input';
+import { usePromptTheme } from '@/components/surface-theme/use-prompt-theme';
 
 interface SlashCommandDropdownProps {
   commands: SlashCommand[];

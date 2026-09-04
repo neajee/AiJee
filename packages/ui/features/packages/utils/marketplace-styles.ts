@@ -1,0 +1,303 @@
+import { Platform, StyleSheet } from 'react-native';
+import { Fonts } from '@/constants/theme';
+import { CARD_MIN_WIDTH } from './marketplace-constants';
+
+export const styles = StyleSheet.create({
+  page: {
+    flex: 1,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+    minHeight: 52,
+    paddingVertical: 8,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  headerCopy: {
+    flex: 1,
+    gap: 2,
+  },
+  title: {
+    fontFamily: Fonts.sansSemiBold,
+  },
+  subtitle: {
+    fontFamily: Fonts.sans,
+  },
+  scroll: {
+    flex: 1,
+  },
+  segmented: {
+    flexDirection: 'row',
+    gap: 2,
+    padding: 2,
+  },
+  segment: {
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: 'transparent',
+  },
+  search: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    height: 34,
+    paddingHorizontal: 10,
+    borderWidth: StyleSheet.hairlineWidth,
+  },
+  searchInput: {
+    flex: 1,
+    height: '100%',
+    fontFamily: Fonts.sans,
+    ...(Platform.OS === 'web' ? { outlineStyle: 'none' as any } : null),
+  },
+  chips: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+  },
+  chip: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 6,
+    borderWidth: StyleSheet.hairlineWidth,
+  },
+  centered: {
+    paddingVertical: 32,
+    alignItems: 'center',
+  },
+  emptyText: {
+    fontFamily: Fonts.sans,
+    paddingVertical: 8,
+  },
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    alignItems: 'stretch',
+  },
+  card: {
+    flexGrow: 1,
+    minWidth: CARD_MIN_WIDTH,
+    maxWidth: 560,
+    minHeight: 132,
+    gap: 10,
+    borderWidth: StyleSheet.hairlineWidth,
+  },
+  cardTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  cardName: {
+    flex: 1,
+    fontFamily: Fonts.sansMedium,
+  },
+  version: {
+    fontSize: 11,
+    fontFamily: Fonts.mono,
+  },
+  cardDesc: {
+    fontFamily: Fonts.sans,
+    lineHeight: 18,
+  },
+  cardBottom: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 8,
+  },
+  meta: {
+    fontSize: 11,
+    fontFamily: Fonts.sans,
+  },
+  installedHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
+  installedActions: { flexDirection: 'row', gap: 8 },
+  operationMessage: {
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    fontSize: 12,
+    fontFamily: Fonts.sans,
+    borderWidth: StyleSheet.hairlineWidth,
+  },
+  installedGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 12,
+    alignItems: 'stretch',
+  },
+  installedCard: {
+    flexGrow: 1,
+    minWidth: CARD_MIN_WIDTH,
+    minHeight: 112,
+    justifyContent: 'space-between',
+    gap: 14,
+    borderWidth: StyleSheet.hairlineWidth,
+  },
+  installedCardTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  installedIcon: {
+    width: 32,
+    height: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: StyleSheet.hairlineWidth,
+  },
+  installedCopy: {
+    flex: 1,
+    gap: 3,
+    minWidth: 0,
+  },
+  installedName: {
+    fontFamily: Fonts.sansMedium,
+  },
+  installedFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 2,
+    alignSelf: 'stretch',
+    paddingTop: 8,
+    borderTopWidth: StyleSheet.hairlineWidth,
+  },
+  installedAction: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingHorizontal: 7,
+    paddingVertical: 5,
+    borderRadius: 5,
+  },
+  backdropWrap: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  backdrop: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  dialog: {
+    maxWidth: '100%',
+    borderWidth: StyleSheet.hairlineWidth,
+    overflow: 'hidden',
+    boxShadow: '0px 12px 32px rgba(0, 0, 0, 0.22)',
+    elevation: 12,
+  },
+  dialogInner: {
+    flex: 1,
+  },
+  dialogHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 12,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  dialogTitleCol: {
+    flex: 1,
+    gap: 3,
+  },
+  dialogTitle: {
+    fontFamily: Fonts.sansSemiBold,
+  },
+  iconButton: {
+    width: 26,
+    height: 26,
+    borderRadius: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  input: {
+    height: 32,
+    paddingHorizontal: 10,
+    fontSize: 13,
+    fontFamily: Fonts.mono,
+    borderWidth: StyleSheet.hairlineWidth,
+    ...(Platform.OS === 'web' ? { outlineStyle: 'none' as any } : null),
+  },
+  notice: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 7,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+  },
+  commandBlock: {
+    padding: 10,
+    borderWidth: StyleSheet.hairlineWidth,
+  },
+  commandText: {
+    fontSize: 12,
+    lineHeight: 17,
+    fontFamily: Fonts.mono,
+  },
+  readme: {
+    padding: 10,
+    maxHeight: 220,
+    maxWidth: '100%',
+    overflow: 'hidden',
+    borderWidth: StyleSheet.hairlineWidth,
+  },
+  readmeText: {
+    fontSize: 12,
+    lineHeight: 18,
+    fontFamily: Fonts.mono,
+  },
+  dialogFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+    borderTopWidth: StyleSheet.hairlineWidth,
+  },
+  linkButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingHorizontal: 8,
+    paddingVertical: 6,
+    borderRadius: 6,
+  },
+  button: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 5,
+    minHeight: 32,
+    paddingHorizontal: 14,
+    borderWidth: StyleSheet.hairlineWidth,
+  },
+  confirmLayer: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  confirmCard: {
+    width: '100%',
+    maxWidth: 380,
+    gap: 12,
+    padding: 16,
+    borderWidth: StyleSheet.hairlineWidth,
+  },
+  confirmHead: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  confirmActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 8,
+  },
+});

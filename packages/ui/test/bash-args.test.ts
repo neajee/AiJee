@@ -4,7 +4,7 @@ import {
   parseToolArguments,
   isToolActive,
   truncateOutput,
-} from "../features/agent/components/message-list/utils.ts";
+} from "../features/agent/utils/message-list.ts";
 import type { ToolCallInfo } from "../features/agent/types.ts";
 
 test("parses a heredoc command whose body has unescaped quotes", () => {

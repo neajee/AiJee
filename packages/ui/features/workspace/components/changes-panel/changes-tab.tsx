@@ -5,7 +5,7 @@ import { Plus, Minus, Undo2, Check } from "lucide-react-native";
 import { Fonts } from "@/constants/theme";
 import { FileRow } from "./file-row";
 import { IconButton } from "./icon-button";
-import { useChangesTheme } from "./use-theme-colors";
+import { useChangesTheme } from "../../hooks/use-changes-theme";
 
 interface FileEntry {
   path: string;

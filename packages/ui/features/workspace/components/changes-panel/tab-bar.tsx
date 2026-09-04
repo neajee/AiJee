@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { Fonts } from "@/constants/theme";
-import { useChangesTheme } from "./use-theme-colors";
+import { useChangesTheme } from "../../hooks/use-changes-theme";
 
 export interface TabItem {
   key: string;

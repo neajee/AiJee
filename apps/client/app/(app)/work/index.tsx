@@ -13,11 +13,11 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Fonts } from "@/constants/theme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
-import { useResponsiveLayout } from "@/features/navigation/hooks/use-responsive-layout";
+import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
 import { PromptInput } from "@/features/workspace/components/prompt-input";
 import { WorkspaceHero } from "@/features/workspace/components/workspace-hero";
-import { attachmentsToImages } from "@/features/workspace/components/prompt-input/attachment-images";
-import type { Attachment } from "@/features/workspace/components/prompt-input/constants";
+import { attachmentsToImages } from "@/features/workspace/utils/prompt-input-attachments";
+import type { Attachment } from "@/features/workspace/utils/prompt-input";
 import { requestBrowserNotificationPermission } from "@/features/agent/browser-notifications";
 import { usePiClient } from "@aijee/client-sdk";
 

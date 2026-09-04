@@ -1,0 +1,145 @@
+import { StyleSheet } from 'react-native';
+import { Fonts } from '@/constants/theme';
+
+export const AVATAR_SIZE = 48;
+
+export const styles = StyleSheet.create({
+  root: {
+    ...StyleSheet.absoluteFillObject,
+    zIndex: 100,
+  },
+  overlay: {
+    ...StyleSheet.absoluteFillObject,
+  },
+  sheet: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    borderTopLeftRadius: 14,
+    borderTopRightRadius: 14,
+  },
+  handleBar: {
+    alignItems: 'center',
+    paddingTop: 10,
+    paddingBottom: 6,
+  },
+  handle: {
+    width: 36,
+    height: 4,
+    borderRadius: 2,
+  },
+  workspaceStrip: {
+    paddingVertical: 12,
+    marginHorizontal: 12,
+    borderRadius: 10,
+  },
+  workspaceScrollContent: {
+    paddingHorizontal: 12,
+    gap: 16,
+  },
+  workspaceItem: {
+    alignItems: 'center',
+    width: 58,
+  },
+  avatarOuter: {
+    width: AVATAR_SIZE,
+    height: AVATAR_SIZE,
+    borderRadius: AVATAR_SIZE / 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderColor: 'transparent',
+    borderWidth: 2,
+    position: 'relative',
+  },
+  avatarInner: {
+    width: AVATAR_SIZE - 8,
+    height: AVATAR_SIZE - 8,
+    borderRadius: (AVATAR_SIZE - 8) / 2,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatarInitial: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontFamily: Fonts.sansSemiBold,
+  },
+  workspaceDot: {
+    position: 'absolute',
+    top: 1,
+    right: 1,
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  workspaceLabel: {
+    fontSize: 11,
+    fontFamily: Fonts.sans,
+    marginTop: 4,
+    textAlign: 'center',
+  },
+  pager: { flex: 1 },
+  page: { flex: 1 },
+  pageContent: { flex: 1 },
+  sessionsHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingTop: 14,
+    paddingBottom: 6,
+  },
+  sessionsTitle: {
+    fontSize: 15,
+    fontFamily: Fonts.sansSemiBold,
+    flex: 1,
+  },
+  iconButton: { padding: 6 },
+  actions: { paddingHorizontal: 16, paddingBottom: 10 },
+  newSessionButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    height: 36,
+    borderRadius: 8,
+  },
+  newSessionText: { fontSize: 14, fontFamily: Fonts.sansMedium },
+  sessionList: { flex: 1 },
+  sessionListContent: { paddingHorizontal: 12, gap: 2 },
+  sessionItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    borderRadius: 8,
+  },
+  sessionTitle: { fontSize: 14, fontFamily: Fonts.sans, flex: 1 },
+  emptyText: {
+    fontSize: 13,
+    fontFamily: Fonts.sans,
+    textAlign: 'center',
+    marginTop: 24,
+  },
+  loadMoreButton: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 36,
+    borderRadius: 8,
+    marginTop: 8,
+  },
+  loadMoreText: { fontSize: 13, fontFamily: Fonts.sansMedium },
+  sheetFooter: {
+    borderTopWidth: 1,
+    marginTop: 4,
+    paddingTop: 8,
+    paddingHorizontal: 20,
+  },
+  footerItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    paddingVertical: 10,
+  },
+  footerLabel: { fontSize: 14, fontFamily: Fonts.sans },
+});

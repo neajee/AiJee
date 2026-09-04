@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { buildListItems } from "../features/agent/components/message-list/turns.ts";
+import { buildListItems } from "../features/agent/utils/turns.ts";
 import type { ChatMessage } from "../features/agent/types.ts";
 
 function assistant(partial: Partial<ChatMessage>): ChatMessage {

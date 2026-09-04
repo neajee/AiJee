@@ -5,7 +5,7 @@ import { Fonts } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useServersStore } from "@/features/servers/store";
 import { ServersSection } from "@/features/servers/components/servers-section";
-import { useSettingsPalette } from "@/features/settings/components/settings-list";
+import { useSettingsPalette } from "@/components/settings-surface";
 
 /**
  * The standalone connections screen.

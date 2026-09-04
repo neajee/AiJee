@@ -9,7 +9,7 @@ import {
 } from 'lucide-react-native';
 
 import { AgentModesSection } from './components/agent-modes-section';
-import { CustomModelsSection } from './components/custom-models-section';
+import { CustomModelsSection } from './components/custom-models-section/index';
 import { ServersSection } from '../servers/components/servers-section';
 import {
   AboutPanel,

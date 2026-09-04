@@ -12,7 +12,7 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
 import { Colors, Fonts } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
-import { TasksPanelContent } from './tasks-panel-content';
+import { TasksPanelContent } from './tasks-panel/content';
 
 const SHEET_HEIGHT = 480;
 const TIMING_CONFIG = { duration: 280, easing: Easing.out(Easing.cubic) };

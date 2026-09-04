@@ -10,7 +10,7 @@ import {
   TOOLBAR_MODE_TOGGLE_HEIGHT,
   TOOLBAR_VERTICAL_PADDING,
   TOOLBAR_WRAP_OFFSET,
-} from "./toolbar";
+} from "../../utils/toolbar-styles";
 
 export function ToolbarSkeleton({
   isDark,

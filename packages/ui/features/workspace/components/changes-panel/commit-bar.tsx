@@ -9,7 +9,7 @@ import {
 import { Send } from "lucide-react-native";
 
 import { Fonts } from "@/constants/theme";
-import { useChangesTheme } from "./use-theme-colors";
+import { useChangesTheme } from "../../hooks/use-changes-theme";
 
 export function CommitBar({
   stagedCount,

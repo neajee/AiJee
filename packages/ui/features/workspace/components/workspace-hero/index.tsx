@@ -5,7 +5,7 @@ import { Fonts } from "@/constants/theme";
 import { AiJeeLogo } from "@/components/aijee-logo";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
-import { useResponsiveLayout } from "@/features/navigation/hooks/use-responsive-layout";
+import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
 
 const GREETINGS = [
   "What are we building?",

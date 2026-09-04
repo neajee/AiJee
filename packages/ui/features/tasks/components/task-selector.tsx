@@ -5,7 +5,7 @@ import { Play, Square, ChevronDown } from 'lucide-react-native';
 import { Fonts } from '@/constants/theme';
 import { useTasksStore } from '../store';
 import { useWorkspaceStore } from '@/features/workspace/store';
-import { TasksDropdown } from './tasks-panel';
+import { TasksDropdown } from './tasks-panel/index';
 
 export function TaskSelector({
   placement = 'below',

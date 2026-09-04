@@ -3,7 +3,7 @@ import { StyleSheet, Text, View } from "react-native";
 import { Colors, Fonts } from "@/constants/theme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import type { ToolCallInfo } from "../../../types";
-import { parseToolArguments } from "../utils";
+import { parseToolArguments } from "../../../utils/message-list";
 
 interface DownloadToolCallProps {
   tc: ToolCallInfo;

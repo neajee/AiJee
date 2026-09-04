@@ -10,20 +10,20 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import { useResponsiveLayout } from "@/features/navigation/hooks/use-responsive-layout";
+import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
 import { PromptInput } from "@/features/workspace/components/prompt-input";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { MessageList } from "@/features/agent/components/message-list";
 import { ChatShimmer } from "@/features/agent/components/message-list/chat-shimmer";
-import { ExtensionUiDialog } from "@/features/agent/components/extension-ui-dialog";
+import { ExtensionUiDialog } from "@/features/agent/components/extension-ui-dialog/index";
 import { useAgentSession, useChatSessions, useConnection } from "@aijee/client-sdk";
 import type { ImageContent } from "@aijee/client-sdk";
 import { requestBrowserNotificationPermission } from "@/features/agent/browser-notifications";
 import type { PendingExtensionUiRequest as LegacyPendingUiRequest } from "@/features/agent/extension-ui";
 import type { ChatMessage } from "@/features/agent/types";
-import type { Attachment } from "@/features/workspace/components/prompt-input/constants";
-import { attachmentsToImages } from "@/features/workspace/components/prompt-input/attachment-images";
+import type { Attachment } from "@/features/workspace/utils/prompt-input";
+import { attachmentsToImages } from "@/features/workspace/utils/prompt-input-attachments";
 
 export default function WorkSessionScreen() {
   const { sessionId, sessionFile: sessionFileParam } = useLocalSearchParams<{

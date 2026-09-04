@@ -3,9 +3,9 @@ import { Animated, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, Vi
 import { Check, X } from 'lucide-react-native';
 
 import { Fonts } from '@/constants/theme';
-import { matchesModelSearch } from './model-search';
-import { usePromptTheme } from './use-theme-colors';
-import { ProviderIcon } from './provider-icons';
+import { matchesModelSearch } from '../../utils/prompt-input-search';
+import { usePromptTheme } from '@/components/surface-theme/use-prompt-theme';
+import { ProviderIcon } from '@/components/provider-icons';
 import type { AgentConfigHandle } from '@aijee/client-sdk';
 
 interface MobileModelSheetProps {
