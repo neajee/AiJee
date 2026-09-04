@@ -3,7 +3,7 @@ import { createReadStream } from "node:fs";
 import { fileURLToPath } from "node:url";
 
 const listenPort = Number(process.env.AIJEE_WEB_PORT ?? 8081);
-const listenHost = process.env.AIJEE_WEB_HOST ?? process.env.AIJEE_HOST ?? "127.0.0.1";
+const listenHost = process.env.AIJEE_WEB_HOST ?? process.env.AIJEE_HOST ?? "0.0.0.0";
 const apiPort = Number(process.env.AIJEE_API_PORT ?? 10088);
 const expoPort = Number(process.env.AIJEE_EXPO_PORT ?? 8082);
 
