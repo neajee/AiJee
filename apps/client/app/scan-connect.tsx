@@ -1,1 +1,1 @@
-export { default } from './mobile-preview-scan-connect';
+export { default } from '../mobile/screens/scan-connect-web';
