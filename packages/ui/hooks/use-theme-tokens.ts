@@ -10,6 +10,9 @@ export function useThemeTokens(): ThemeTokens {
   const accent = useAppSettingsStore((s) => s.accentPreset);
   return useMemo(() => {
     syncLegacyColors(preset, scheme, accent);
-    return getThemeTokens(preset, scheme, accent);
+    const tokens = getThemeTokens(preset, scheme, accent);
+    return process.env.EXPO_OS === 'web'
+      ? tokens
+      : { ...tokens, surfaceRaised: '#333333', surface: '#333333' };
   }, [accent, preset, scheme]);
 }

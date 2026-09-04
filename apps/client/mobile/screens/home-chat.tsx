@@ -7,14 +7,24 @@ import { useWorkspaceSessions } from '@aijee/client-sdk';
 import { Fonts } from '@/constants/theme';
 import { useThemeTokens } from '@/hooks/use-theme-tokens';
 import { useWorkspaceStore } from '@/features/workspace/store';
+import { useAuthStore } from '@/features/auth/store';
+import { useServersStore } from '@/features/servers/store';
 import WorkspaceListScreen from './workspace-list';
 
 export default function HomeChatScreen() {
   const router = useRouter();
   const colors = useThemeTokens();
+  const authLoaded = useAuthStore((state) => state.loaded);
+  const serversLoaded = useServersStore((state) => state.loaded);
+  const activeServerId = useAuthStore((state) => state.activeServerId);
+  const activeServer = useServersStore((state) => state.servers.find((item) => item.id === activeServerId));
   const workspace = useWorkspaceStore((state) => state.workspaces[0]);
   const sessionsState = useWorkspaceSessions(workspace?.id ?? '');
   const session = sessionsState.sessions[0];
+
+  useEffect(() => {
+    if (authLoaded && serversLoaded && !activeServer) router.replace('/servers');
+  }, [activeServer, authLoaded, router, serversLoaded]);
 
   useEffect(() => {
     if (workspace && session) {
@@ -25,6 +35,9 @@ export default function HomeChatScreen() {
     }
   }, [router, session, workspace]);
 
+  if (authLoaded && serversLoaded && !activeServer) {
+    return null;
+  }
   if (!workspace || (!session && !sessionsState.isLoading)) {
     return <WorkspaceListScreen />;
   }
