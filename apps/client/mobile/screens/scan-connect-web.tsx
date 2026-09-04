@@ -14,7 +14,7 @@ export default function ScanConnectWebScreen() {
   const insets = useSafeAreaInsets();
   const colors = useThemeTokens();
   const onClose = useCallback(() => router.replace('/mobile-preview' as never), [router]);
-  const controller = useQrScannerController({ visible: true, onClose });
+  const controller = useQrScannerController({ baseUrl: typeof window !== 'undefined' ? window.location.origin : undefined, visible: true, onClose });
   const { manualUrl, error, handleManualUrlChange, handleManualSubmit } = controller;
 
   return <View style={[styles.screen, { backgroundColor: colors.background }]}>
