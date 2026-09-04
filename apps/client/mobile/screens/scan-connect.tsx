@@ -1,8 +1,8 @@
 import { type ReactNode, useCallback } from 'react';
-import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet } from 'react-native';
+import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, TextInput } from 'react-native';
 import { useRouter } from 'expo-router';
 import { AlertCircle, ArrowLeft, Camera, Check, ChevronRight, Link2, QrCode, Wifi } from 'lucide-react-native';
-import { Input, Spinner, Text, View } from 'tamagui';
+import { Spinner, Text, View } from 'tamagui';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Fonts } from '@/constants/theme';
@@ -96,7 +96,7 @@ export default function ScanConnectScreen() {
                 <Text style={[styles.sectionLabel, { color: colors.textTertiary }]}>或使用连接地址</Text>
                 <View style={[styles.manualCard, { backgroundColor: colors.surfaceRaised, borderColor: colors.borderStrong }]}>
                   <Link2 color={colors.textTertiary} size={18} strokeWidth={1.8} />
-                  <Input
+                  <TextInput
                     autoCapitalize="none"
                     autoCorrect={false}
                     onChangeText={handleManualUrlChange}
