@@ -10,7 +10,7 @@ import {
 } from '../utils/parse-connect-url';
 import type { QrScannerProps, QrScannerControllerState, QrScannerStep } from '../components/qr-scanner/types';
 
-export function useQrScannerController({ visible, onClose }: Pick<QrScannerProps, 'visible' | 'onClose'>): QrScannerControllerState {
+export function useQrScannerController({ visible, onClose, baseUrl }: Pick<QrScannerProps, 'visible' | 'onClose'> & { baseUrl?: string }): QrScannerControllerState {
   const [scanned, setScanned] = useState(false);
   const [connectParams, setConnectParams] = useState<ConnectParams | null>(null);
   const [manualUrl, setManualUrl] = useState('');
@@ -31,7 +31,7 @@ export function useQrScannerController({ visible, onClose }: Pick<QrScannerProps
   }, [onClose, reset]);
 
   const doPair = useCallback(async (params: ConnectParams, ip: string) => {
-    const address = buildServerAddress(ip, params.port);
+    const address = baseUrl ?? buildServerAddress(ip, params.port);
     const serverId = params.serverId ?? Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
     const existingServer = useServersStore.getState().servers.find((server) => server.id === serverId);
     setStep('pairing');
@@ -61,7 +61,7 @@ export function useQrScannerController({ visible, onClose }: Pick<QrScannerProps
       setStep('error');
       setError(result.error ?? 'Pairing failed');
     }
-  }, [onClose, reset]);
+  }, [baseUrl, onClose, reset]);
 
   const handleScanned = useCallback((data: string) => {
     const params = parseConnectUrl(data);
