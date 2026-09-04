@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 
 import { useAuthStore } from '@/features/auth/store';
 import { useServersStore } from '@/features/servers/store';
+import { useWorkspaceStore } from '@/features/workspace/store';
 import {
   buildServerAddress,
   parseConnectUrl,
@@ -52,6 +53,7 @@ export function useQrScannerController({ visible, onClose }: Pick<QrScannerProps
           name: existingServer?.name || params.hostname || ip,
           address,
         });
+        await useWorkspaceStore.getState().fetchWorkspaces(serverId);
         reset();
         onClose();
       }, 800);
