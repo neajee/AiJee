@@ -1,5 +1,4 @@
 import { HAIRLINE_WIDTH } from "@/constants/layout";
-import { Platform } from 'react-native';
 import { Fonts } from '@/constants/theme';
 
 export const styles = {
@@ -34,7 +33,7 @@ export const styles = {
   composerStack: {
     position: "relative",
     overflow: "visible",
-    zIndex: Platform.OS === "android" ? 8 : 10,
+    zIndex: process.env.EXPO_OS === "android" ? 8 : 10,
   },
   attachmentNotice: {
     fontFamily: Fonts.sans,
@@ -50,7 +49,7 @@ export const styles = {
     borderTopRightRadius: 12,
     borderWidth: 0.633,
     position: "relative",
-    zIndex: Platform.OS === "android" ? 5 : 8,
+    zIndex: process.env.EXPO_OS === "android" ? 5 : 8,
   },
   input: {
     paddingLeft: 16, paddingRight: 16,
@@ -166,10 +165,10 @@ export const styles = {
   bottomControlsWrap: {
     overflow: "visible",
     position: "relative",
-    zIndex: Platform.OS === "android" ? 4 : 7,
+    zIndex: process.env.EXPO_OS === "android" ? 4 : 7,
   },
   bottomControlsWrapElevated: {
-    zIndex: Platform.OS === "android" ? 12 : 12,
+    zIndex: process.env.EXPO_OS === "android" ? 12 : 12,
   },
   bottomControlsHidden: {
     opacity: 0,

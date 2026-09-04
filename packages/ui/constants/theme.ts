@@ -1,5 +1,3 @@
-import { Platform } from 'react-native';
-
 import type { AccentPreset, ThemePreset } from '@/features/settings/store';
 import { TAMAGUI_COLOR_TOKENS, TAMAGUI_DARK_COLOR_TOKENS } from './theme-static';
 
@@ -112,8 +110,7 @@ export const WorkspaceColors = [
   '#B5A07A',
 ];
 
-export const Fonts = Platform.select({
-  ios: {
+const IOS_FONTS = {
     sans: 'DMSans-Regular',
     sansItalic: 'DMSans-Regular',
     sansMedium: 'DMSans-Medium',
@@ -123,8 +120,9 @@ export const Fonts = Platform.select({
     serif: 'ui-serif',
     rounded: 'ui-rounded',
     mono: 'monospace',
-  },
-  default: {
+} as const;
+
+const NATIVE_FONTS = {
     sans: 'DMSans-Regular',
     sansItalic: 'DMSans-Regular',
     sansMedium: 'DMSans-Medium',
@@ -134,8 +132,9 @@ export const Fonts = Platform.select({
     serif: 'serif',
     rounded: 'DMSans-Regular',
     mono: 'monospace',
-  },
-  web: {
+} as const;
+
+const WEB_FONTS = {
     sans: "'DM Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
     sansItalic: "'DM Sans', system-ui, sans-serif",
     sansMedium: "'DM Sans', system-ui, sans-serif",
@@ -145,5 +144,10 @@ export const Fonts = Platform.select({
     serif: "Georgia, 'Times New Roman', serif",
     rounded: "'DM Sans', system-ui, sans-serif",
     mono: "'JetBrains Mono', SFMono-Regular, Menlo, Monaco, Consolas, monospace",
-  },
-});
+} as const;
+
+export const Fonts = process.env.EXPO_OS === 'ios'
+  ? IOS_FONTS
+  : process.env.EXPO_OS === 'web'
+    ? WEB_FONTS
+    : NATIVE_FONTS;

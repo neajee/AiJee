@@ -1,6 +1,6 @@
 import { ScrollView, Spinner, Text, View } from 'tamagui';
 import { useCallback, useEffect, useState } from 'react';
-import { Keyboard, Modal, Platform, Pressable, useWindowDimensions } from 'react-native';
+import { Keyboard, Modal, Pressable, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, {
   Easing,
@@ -59,7 +59,7 @@ export function ServerFormSheet({
   }, [initial, overlayOpacity, translateY, visible]);
 
   useEffect(() => {
-    if (Platform.OS === 'web' || Platform.OS === 'android') {
+    if (process.env.EXPO_OS === 'web' || process.env.EXPO_OS === 'android') {
       setKeyboardHeight(0);
       return;
     }

@@ -1,5 +1,4 @@
 import type { ComponentType } from "react";
-import {  Platform  } from 'react-native';
 
 export interface QrScannerScanPanelProps {
   visible: boolean;
@@ -21,7 +20,7 @@ const nativeModule = require("./scan-panel.native") as NativeScanPanelModule;
 const webModule = require("./scan-panel.web") as WebScanPanelModule;
 
 export function QrScannerScanPanel(props: QrScannerScanPanelProps) {
-  if (Platform.OS === "web") {
+  if (process.env.EXPO_OS === "web") {
     const WebScanPanel = webModule.QrScannerScanPanel;
     return <WebScanPanel textMuted={props.textMuted} />;
   }

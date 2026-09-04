@@ -18,7 +18,7 @@ import {
 // ─── Shared theme helper ──────────────────────────────────────
 
 /**
- * Density follows the viewport rather than `Platform.OS`, so mobile web gets
+ * Density follows the viewport rather than `process.env.EXPO_OS`, so mobile web gets
  * the same roomy layout as the native builds. `isNative` remains an override.
  */
 export function useColors(isDark: boolean, isNative?: boolean) {

@@ -1,6 +1,5 @@
 import { ScrollView } from 'tamagui';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import Animated, {
   Easing,
@@ -140,6 +139,6 @@ export function useWorkspaceSheetController({ visible, onClose }: WorkspaceSheet
     panGesture,
     sheetStyle,
     overlayStyle,
-    isWeb: Platform.OS === 'web',
+    isWeb: process.env.EXPO_OS === 'web',
   };
 }

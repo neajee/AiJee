@@ -1,7 +1,7 @@
 import { Spinner, Text, View } from 'tamagui';
 import { useState } from "react";
 import {
-  Platform, Pressable } from "react-native";
+  Pressable } from "react-native";
 
 import { Fonts } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -50,7 +50,7 @@ export function FileRow({
 }) {
   const colorScheme = useColorScheme() ?? "light";
   const isDark = colorScheme === "dark";
-  const isWeb = Platform.OS === "web";
+  const isWeb = process.env.EXPO_OS === "web";
   const selectedBg = isDark ? "#1e1e1e" : "#E8E8E8";
 
   const slash = path.lastIndexOf("/");

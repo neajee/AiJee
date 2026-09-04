@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import {  Platform  } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 
 const STORAGE_KEY = 'servers_list';
@@ -24,7 +23,7 @@ interface ServersState {
 
 async function readFromStore(): Promise<Server[]> {
   try {
-    if (Platform.OS === 'web') {
+    if (process.env.EXPO_OS === 'web') {
       const raw = localStorage.getItem(STORAGE_KEY);
       return raw ? JSON.parse(raw) : [];
     }
@@ -38,7 +37,7 @@ async function readFromStore(): Promise<Server[]> {
 async function writeToStore(servers: Server[]) {
   try {
     const json = JSON.stringify(servers);
-    if (Platform.OS === 'web') {
+    if (process.env.EXPO_OS === 'web') {
       localStorage.setItem(STORAGE_KEY, json);
     } else {
       await SecureStore.setItemAsync(STORAGE_KEY, json);

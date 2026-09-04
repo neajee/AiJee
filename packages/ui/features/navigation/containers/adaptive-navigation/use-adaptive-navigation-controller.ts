@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated, Platform } from 'react-native';
+import { Animated } from 'react-native';
 import { usePathname } from 'expo-router';
 
 import { useResponsiveLayout } from '../../hooks/use-responsive-layout';
@@ -136,6 +136,6 @@ export function useAdaptiveNavigationController() {
     openFiles,
     openGit,
     openPreview,
-    isWeb: Platform.OS === 'web',
+    isWeb: process.env.EXPO_OS === 'web',
   };
 }

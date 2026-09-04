@@ -1,6 +1,6 @@
 import { Spinner, Text, View } from 'tamagui';
 import { useCallback, useEffect, useState, type ComponentType } from "react";
-import { Platform, Pressable } from 'react-native';
+import { Pressable } from 'react-native';
 import { AlertCircle, CheckCircle2 } from "lucide-react-native";
 import { sdk, unwrapApiData, type PackageStatus } from "@aijee/client-sdk";
 import { useSettingsMetrics, useSettingsPalette } from "@/components/settings-surface";
@@ -8,7 +8,7 @@ import { pkgStyles } from "../utils/package-styles";
 
 const { status2: getPackageStatus, update: updatePackage, install: installPackage } = sdk;
 export const PLATFORM_LABEL =
-  Platform.OS === 'ios' ? 'iOS' : Platform.OS === 'android' ? 'Android' : 'Web';
+  process.env.EXPO_OS === 'ios' ? 'iOS' : process.env.EXPO_OS === 'android' ? 'Android' : 'Web';
 
 /** Agent package status plus the install/update action. */
 export function useAgentPackage() {

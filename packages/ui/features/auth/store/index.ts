@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { Platform } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 
 import {
@@ -159,7 +158,7 @@ function extractErrorMessage(error: unknown, fallback: string) {
 
 async function readStore(): Promise<StoredAuthState> {
   try {
-    if (Platform.OS === 'web') {
+    if (process.env.EXPO_OS === 'web') {
       const rawTokens = localStorage.getItem(TOKENS_KEY);
       const activeServerId = localStorage.getItem(ACTIVE_SERVER_KEY);
       const normalized = normalizeStoredSessions(
@@ -194,7 +193,7 @@ async function readStore(): Promise<StoredAuthState> {
 async function writeTokens(tokens: Record<string, AuthSessionBundle>) {
   try {
     const json = JSON.stringify(tokens);
-    if (Platform.OS === 'web') {
+    if (process.env.EXPO_OS === 'web') {
       localStorage.setItem(TOKENS_KEY, json);
     } else {
       await SecureStore.setItemAsync(TOKENS_KEY, json);
@@ -204,7 +203,7 @@ async function writeTokens(tokens: Record<string, AuthSessionBundle>) {
 
 async function writeActiveServerId(serverId: string | null) {
   try {
-    if (Platform.OS === 'web') {
+    if (process.env.EXPO_OS === 'web') {
       if (serverId) localStorage.setItem(ACTIVE_SERVER_KEY, serverId);
       else localStorage.removeItem(ACTIVE_SERVER_KEY);
     } else {

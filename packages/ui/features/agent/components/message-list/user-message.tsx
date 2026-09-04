@@ -1,6 +1,6 @@
 import { Image, Input, ScrollView, Text, View } from 'tamagui';
 import { memo, useEffect, useMemo, useState } from "react";
-import { Platform, Pressable } from "react-native";
+import { Pressable } from "react-native";
 import { Check, ChevronDown, Pencil, X } from "lucide-react-native";
 import { Colors, Fonts } from "@/constants/theme";
 import { HAIRLINE_WIDTH } from "@/constants/layout";
@@ -47,7 +47,7 @@ export const UserMessage = memo(function UserMessage({
 
   useEffect(() => setExpanded(false), [message.id, message.text]);
   useEffect(() => {
-    if (Platform.OS !== "web") return;
+    if (process.env.EXPO_OS !== "web") return;
     const collapse = () => setExpanded(false);
     window.addEventListener("blur", collapse);
     return () => window.removeEventListener("blur", collapse);

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import {  Alert, Platform  } from 'react-native';
+import {  Alert  } from 'react-native';
 import { useRouter } from "expo-router";
 import QRCode from "qrcode";
 import { useOptionalPiClient } from "@aijee/client-sdk";
@@ -52,7 +52,7 @@ export function useServersController() {
         removeServer(server.id);
         logoutFromServer(server.id);
       };
-      if (Platform.OS === "web") {
+      if (process.env.EXPO_OS === "web") {
         if (window.confirm(`移除「${server.name}」？`)) doDelete();
       } else {
         Alert.alert("移除服务器", `移除「${server.name}」？`, [

@@ -1,5 +1,5 @@
 import { memo, useState, type ComponentType, type ReactNode } from 'react';
-import { Platform, Pressable, Switch } from 'react-native';
+import { Pressable, Switch } from 'react-native';
 import { Text as TamaguiText, View as TamaguiView } from 'tamagui';
 import { Fonts } from '@/constants/theme';
 import { useSettingsMetrics } from './metrics';
@@ -35,6 +35,6 @@ export function SettingsRow({ icon, label, description, right, onPress, isLast, 
 export function SettingsSwitch({ value, onValueChange, accessibilityLabel }: { value: boolean; onValueChange: (value: boolean) => void; accessibilityLabel?: string }) {
   const m = useSettingsMetrics();
   const p = useSettingsPalette();
-  const control = <Switch value={value} onValueChange={onValueChange} accessibilityLabel={accessibilityLabel} trackColor={{ false: p.isDark ? '#3A3A3C' : '#E4E4E7', true: p.success }} thumbColor={Platform.OS === 'android' ? '#FFFFFF' : undefined} />;
+  const control = <Switch value={value} onValueChange={onValueChange} accessibilityLabel={accessibilityLabel} trackColor={{ false: p.isDark ? '#3A3A3C' : '#E4E4E7', true: p.success }} thumbColor={process.env.EXPO_OS === 'android' ? '#FFFFFF' : undefined} />;
   return m.switchScale === 1 ? control : <TamaguiView style={{ transform: [{ scale: m.switchScale }] }}>{control}</TamaguiView>;
 }

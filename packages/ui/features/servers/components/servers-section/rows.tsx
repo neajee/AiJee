@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Animated, Platform, Pressable } from 'react-native';
+import { Animated, Pressable } from 'react-native';
 import { Spinner, Text, View } from "tamagui";
 import { MoreHorizontal, Pencil, QrCode, X, Trash2 } from "lucide-react-native";
 import { Fonts } from "@/constants/theme";
@@ -108,7 +108,7 @@ export function ServerRow({
         accessibilityRole="button"
         accessibilityLabel={`管理 ${server.name}`}
         hitSlop={8}
-        style={({ pressed, hovered: moreHovered, focused }: any) => [styles.moreAction, (hovered || pressed || moreHovered || focused || Platform.OS !== 'web') && { opacity: 1 }, (pressed || moreHovered || focused) && { backgroundColor: p.pressed }, focused && { outlineWidth: 2, outlineColor: p.accent, outlineOffset: 2 } as any]}
+        style={({ pressed, hovered: moreHovered, focused }: any) => [styles.moreAction, (hovered || pressed || moreHovered || focused || process.env.EXPO_OS !== 'web') && { opacity: 1 }, (pressed || moreHovered || focused) && { backgroundColor: p.pressed }, focused && { outlineWidth: 2, outlineColor: p.accent, outlineOffset: 2 } as any]}
       >
         <MoreHorizontal size={20} color={p.textSecondary} strokeWidth={1.8} />
       </Pressable>

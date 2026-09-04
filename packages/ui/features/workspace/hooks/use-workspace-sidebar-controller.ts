@@ -3,7 +3,6 @@ import {
   Animated,
   Easing,
   PanResponder,
-  Platform,
   useWindowDimensions,
 } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
@@ -32,7 +31,7 @@ import type { WorkspaceSidebarProps } from '../components/workspace-sidebar/type
 async function loadStoredWidth(scope: string) {
   const key = scopedKey(SIDEBAR_WIDTH_KEY, scope);
   try {
-    if (Platform.OS === 'web') {
+    if (process.env.EXPO_OS === 'web') {
       if (typeof localStorage === 'undefined') return null;
       return parseStoredWidth(localStorage.getItem(key));
     }
@@ -45,7 +44,7 @@ async function loadStoredWidth(scope: string) {
 async function saveStoredWidth(width: number, scope: string) {
   const key = scopedKey(SIDEBAR_WIDTH_KEY, scope);
   try {
-    if (Platform.OS === 'web') {
+    if (process.env.EXPO_OS === 'web') {
       if (typeof localStorage === 'undefined') return;
       localStorage.setItem(key, String(clampWidth(width)));
       return;
@@ -57,7 +56,7 @@ async function saveStoredWidth(width: number, scope: string) {
 async function loadStoredCollapsed(scope: string): Promise<boolean | null> {
   const key = scopedKey(SIDEBAR_COLLAPSED_KEY, scope);
   try {
-    const value = Platform.OS === 'web'
+    const value = process.env.EXPO_OS === 'web'
       ? typeof localStorage === 'undefined' ? null : localStorage.getItem(key)
       : await SecureStore.getItemAsync(key);
     if (value === 'true') return true;
@@ -71,7 +70,7 @@ async function loadStoredCollapsed(scope: string): Promise<boolean | null> {
 async function saveStoredCollapsed(collapsed: boolean, scope: string) {
   const key = scopedKey(SIDEBAR_COLLAPSED_KEY, scope);
   try {
-    if (Platform.OS === 'web') {
+    if (process.env.EXPO_OS === 'web') {
       if (typeof localStorage === 'undefined') return;
       localStorage.setItem(key, String(collapsed));
       return;
@@ -199,7 +198,7 @@ export function useWorkspaceSidebarController({
         panelStartRef.current = panelWidthRef.current;
         isResizingRef.current = true;
         setIsResizing(true);
-        if (Platform.OS === 'web') {
+        if (process.env.EXPO_OS === 'web') {
           document.body.style.cursor = 'col-resize';
           document.body.style.userSelect = 'none';
         }
@@ -214,7 +213,7 @@ export function useWorkspaceSidebarController({
         isResizingRef.current = false;
         setIsResizing(false);
         persistWidth(panelWidthRef.current);
-        if (Platform.OS === 'web') {
+        if (process.env.EXPO_OS === 'web') {
           document.body.style.cursor = '';
           document.body.style.userSelect = '';
         }
@@ -223,7 +222,7 @@ export function useWorkspaceSidebarController({
         isResizingRef.current = false;
         setIsResizing(false);
         persistWidth(panelWidthRef.current);
-        if (Platform.OS === 'web') {
+        if (process.env.EXPO_OS === 'web') {
           document.body.style.cursor = '';
           document.body.style.userSelect = '';
         }
@@ -232,7 +231,7 @@ export function useWorkspaceSidebarController({
   ).current;
 
   const seamActive = isSeamHovered || isResizing;
-  const webSeamHoverProps = Platform.OS === 'web'
+  const webSeamHoverProps = process.env.EXPO_OS === 'web'
     ? {
         onMouseEnter: () => setIsSeamHovered(true),
         onMouseLeave: () => setIsSeamHovered(false),
@@ -271,7 +270,7 @@ export function useWorkspaceSidebarController({
     webSeamHoverProps,
     toggleCollapsed,
     openPane,
-    isDesktopShell: Platform.OS === 'web' && typeof navigator !== 'undefined' && navigator.userAgent.includes('AiJeeDesktop/'),
+    isDesktopShell: process.env.EXPO_OS === 'web' && typeof navigator !== 'undefined' && navigator.userAgent.includes('AiJeeDesktop/'),
     widthAnim,
   };
 }

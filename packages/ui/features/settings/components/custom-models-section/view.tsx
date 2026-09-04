@@ -1,5 +1,5 @@
 import { Input, Text, View } from 'tamagui';
-import { Linking, Platform, Pressable } from 'react-native';
+import { Linking, Pressable } from 'react-native';
 import { ChevronDown, ChevronUp, KeyRound, LogIn, LogOut, Plus, X } from "lucide-react-native";
 import type { BuiltinProvider } from "@aijee/client-sdk";
 import { useCustomModelsStore } from "../../store/custom-models";

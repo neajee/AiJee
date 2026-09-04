@@ -1,4 +1,4 @@
-import { Alert, Platform } from "react-native";
+import { Alert } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import { File as ExpoFile, Paths } from "expo-file-system";
 import type { ApiClient } from "@aijee/client-sdk";
@@ -83,7 +83,7 @@ function updateSnapshot(
 function createFormData(asset: DocumentPicker.DocumentPickerAsset): FormData {
   const formData = new FormData();
 
-  if (Platform.OS === "web") {
+  if (process.env.EXPO_OS === "web") {
     if (asset.file) {
       formData.append("files", asset.file);
       return formData;
@@ -203,7 +203,7 @@ export async function downloadFile(
   const result = await api.fsDownload(filePath);
   const resolvedName = fileName ?? result.fileName;
 
-  if (Platform.OS === "web") {
+  if (process.env.EXPO_OS === "web") {
     downloadFileWeb(result.data, resolvedName, result.contentType);
     return;
   }

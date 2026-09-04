@@ -1,10 +1,9 @@
-import {  Platform  } from 'react-native';
 import type { Server } from './store';
 
 export type BootstrapTarget = { kind: 'local'; server: Server } | { kind: 'remote' };
 
 export async function getBootstrapTarget(): Promise<BootstrapTarget> {
-  if (Platform.OS !== 'web' || typeof window === 'undefined') {
+  if (process.env.EXPO_OS !== 'web' || typeof window === 'undefined') {
     console.info('[aijee/bootstrap] remote: native runtime has no local server');
     return { kind: 'remote' };
   }

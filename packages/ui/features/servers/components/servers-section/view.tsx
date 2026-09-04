@@ -1,4 +1,4 @@
-import { Modal, Platform, Pressable } from 'react-native';
+import { Modal, Pressable } from 'react-native';
 import { Image, Spinner, Text, View } from "tamagui";
 import { Copy, Pencil, Plus, QrCode, RefreshCw, Trash2, X } from "lucide-react-native";
 import * as Clipboard from "expo-clipboard";

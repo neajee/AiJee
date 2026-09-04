@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, Platform } from 'react-native';
+import { Animated } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useWorkspaceStore } from '@/features/workspace/store';
 import { useServersStore, type Server } from '@/features/servers/store';
@@ -52,7 +52,7 @@ export function useComposerContextController() {
 
   // Web has no backdrop press, so close on any click outside the bar.
   useEffect(() => {
-    if (!open || Platform.OS !== "web") return;
+    if (!open || process.env.EXPO_OS !== "web") return;
     const handler = (e: MouseEvent) => {
       const target = e.target as HTMLElement | null;
       if (!target?.closest?.("[data-composer-context]")) setOpen(null);

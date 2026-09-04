@@ -1,13 +1,12 @@
-import { Platform } from 'react-native';
 import { Fonts } from '@/constants/theme';
 
 export const TOOLBAR_WRAP_OFFSET = 10;
 export const TOOLBAR_HORIZONTAL_MARGIN = 6;
 export const TOOLBAR_BORDER_WIDTH = 0.633;
 export const TOOLBAR_CORNER_RADIUS = 12;
-export const TOOLBAR_VERTICAL_PADDING = Platform.OS === 'web' ? 7 : 9;
-export const TOOLBAR_CONTROL_HEIGHT = Platform.OS === 'web' ? 26 : 30;
-export const TOOLBAR_ANDROID_MARGIN_TOP = Platform.OS === 'android' ? -4 : 0;
+export const TOOLBAR_VERTICAL_PADDING = process.env.EXPO_OS === 'web' ? 7 : 9;
+export const TOOLBAR_CONTROL_HEIGHT = process.env.EXPO_OS === 'web' ? 26 : 30;
+export const TOOLBAR_ANDROID_MARGIN_TOP = process.env.EXPO_OS === 'android' ? -4 : 0;
 
 export const TOOLBAR_MODE_TOGGLE_HEIGHT = TOOLBAR_CONTROL_HEIGHT + 2 + 2 * TOOLBAR_BORDER_WIDTH;
 
@@ -41,7 +40,7 @@ export const styles = {
     borderBottomRightRadius: TOOLBAR_CORNER_RADIUS,
     gap: 2,
     marginTop: TOOLBAR_ANDROID_MARGIN_TOP,
-    zIndex: Platform.OS === 'android' ? 1 : 5,
+    zIndex: process.env.EXPO_OS === 'android' ? 1 : 5,
   },
   toolbarError: {
     justifyContent: 'center',

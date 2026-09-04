@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Platform, useWindowDimensions } from 'react-native';
+import { useWindowDimensions } from 'react-native';
 
 import { useGitStatus, useNestedRepos } from '@aijee/client-sdk';
 import { remotesToLinks, type RemoteLink } from '@/features/workspace/utils/git-remote-url';
@@ -29,7 +29,7 @@ export function useWorkspaceContextMenuController({
   ];
 
   useEffect(() => {
-    if (!visible || Platform.OS !== 'web') return;
+    if (!visible || process.env.EXPO_OS !== 'web') return;
     const handler = (event: Event) => {
       event.preventDefault();
       onClose();

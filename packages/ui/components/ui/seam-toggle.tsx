@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Animated, Easing, Platform, Pressable } from "react-native";
+import { Animated, Easing, Pressable } from "react-native";
 import { ChevronLeft, ChevronRight } from "lucide-react-native";
 
 import { Colors } from "@/constants/theme";
@@ -50,7 +50,7 @@ export function SeamToggle({
   const colorScheme = useColorScheme() ?? "light";
   const colors = useThemeTokens();
   const isDark = colorScheme === "dark";
-  const isWeb = Platform.OS === "web";
+  const isWeb = process.env.EXPO_OS === "web";
 
   const [active, setActive] = useState(!isWeb);
   const anim = useRef(new Animated.Value(isWeb ? 0 : 1)).current;

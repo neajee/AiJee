@@ -1,5 +1,5 @@
 import { Spinner, Text, View } from 'tamagui';
-import { Animated, Platform, Pressable } from 'react-native';
+import { Animated, Pressable } from 'react-native';
 import { styles } from './styles';
 import type { ConnectionStatusBannerViewProps } from './types';
 

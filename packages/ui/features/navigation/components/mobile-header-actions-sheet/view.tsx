@@ -1,5 +1,5 @@
 import { Text, View } from 'tamagui';
-import { Platform, Pressable } from 'react-native';
+import { Pressable } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { GestureDetector } from 'react-native-gesture-handler';
 import { ABSOLUTE_FILL_STYLE } from '@/constants/layout';
@@ -23,8 +23,8 @@ export function MobileHeaderActionsSheetView({
 }: MobileHeaderActionsSheetViewProps) {
   return (
     <View
-      {...(Platform.OS !== 'web' ? { pointerEvents: visible ? 'auto' : 'none' } : {})}
-      style={[styles.root, Platform.OS === 'web' && ({ pointerEvents: visible ? 'auto' : 'none' } as any)]}
+      {...(process.env.EXPO_OS !== 'web' ? { pointerEvents: visible ? 'auto' : 'none' } : {})}
+      style={[styles.root, process.env.EXPO_OS === 'web' && ({ pointerEvents: visible ? 'auto' : 'none' } as any)]}
     >
       <Animated.View style={[styles.overlay, { backgroundColor: overlayColor }, overlayStyle]}>
         <Pressable style={ABSOLUTE_FILL_STYLE} onPress={onDismiss} />

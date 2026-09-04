@@ -1,7 +1,7 @@
 import { ScrollView, Text, View } from 'tamagui';
 import { useEffect, useRef, useCallback, useState } from 'react';
 import {
-  PanResponder, Platform, Pressable } from 'react-native';
+  PanResponder, Pressable } from 'react-native';
 import { X, Circle, Minus, Maximize2 } from 'lucide-react-native';
 
 import { Colors, Fonts } from '@/constants/theme';
@@ -42,7 +42,7 @@ export function TaskOutputPanel() {
       onMoveShouldSetPanResponder: () => true,
       onPanResponderGrant: () => {
         startHeightRef.current = useTasksStore.getState().outputPanelHeight;
-        if (Platform.OS === 'web') {
+        if (process.env.EXPO_OS === 'web') {
           document.body.style.cursor = 'row-resize';
           document.body.style.userSelect = 'none';
         }
@@ -52,13 +52,13 @@ export function TaskOutputPanel() {
         setOutputPanelHeight(newHeight);
       },
       onPanResponderRelease: () => {
-        if (Platform.OS === 'web') {
+        if (process.env.EXPO_OS === 'web') {
           document.body.style.cursor = '';
           document.body.style.userSelect = '';
         }
       },
       onPanResponderTerminate: () => {
-        if (Platform.OS === 'web') {
+        if (process.env.EXPO_OS === 'web') {
           document.body.style.cursor = '';
           document.body.style.userSelect = '';
         }

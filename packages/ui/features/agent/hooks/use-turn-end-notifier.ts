@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef } from "react";
-import { Platform } from "react-native";
 import { usePathname } from "expo-router";
 import { usePiClient, useTurnEnd, type TurnEndEvent } from "@aijee/client-sdk";
 
@@ -114,7 +113,7 @@ function workspaceName(workspaceId: string | null): string | null {
  * build doesn't configure, so mobile falls back to the in-app badges.
  */
 function notify(title: string, body: string, tag: string) {
-  if (Platform.OS !== "web") return;
+  if (process.env.EXPO_OS !== "web") return;
   const NotificationApi = (globalThis as any).Notification as
     | (new (title: string, options?: unknown) => { onclick: unknown })
     | undefined;
@@ -137,7 +136,7 @@ function notify(title: string, body: string, tag: string) {
 
 /** A short two-note blip, so no audio asset has to ship with the app. */
 function chime() {
-  if (Platform.OS !== "web") return;
+  if (process.env.EXPO_OS !== "web") return;
   const AudioCtor =
     (globalThis as any).AudioContext ?? (globalThis as any).webkitAudioContext;
   if (!AudioCtor) return;

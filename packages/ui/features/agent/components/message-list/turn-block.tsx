@@ -1,6 +1,6 @@
 import { Spinner, Text, View } from 'tamagui';
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
-import { Platform, Pressable } from "react-native";
+import { Pressable } from "react-native";
 import Animated, { Easing, FadeIn, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import { ChevronRight, GitFork } from "lucide-react-native";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
@@ -116,7 +116,7 @@ export const TurnBlock = memo(function TurnBlock({
 
   return (
     <View
-      {...(Platform.OS === "web"
+      {...(process.env.EXPO_OS === "web"
         ? {
             onPointerEnter: () => setHovered(true),
             onPointerLeave: () => setHovered(false),

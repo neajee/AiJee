@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { FlatList, KeyboardAvoidingView, Platform, TextInput, type NativeSyntheticEvent, type TextInputKeyPressEventData } from "react-native";
+import { FlatList, KeyboardAvoidingView, TextInput, type NativeSyntheticEvent, type TextInputKeyPressEventData } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Colors, WorkspaceColors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";

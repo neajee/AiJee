@@ -1,7 +1,6 @@
 import { Text, View } from 'tamagui';
 import { useEffect } from 'react';
-import {
-  Platform, Pressable } from 'react-native';
+import { Pressable } from 'react-native';
 import { X } from 'lucide-react-native';
 
 import { Colors, Fonts } from '@/constants/theme';
@@ -29,7 +28,7 @@ export function TasksDropdown({ placement = "below" }: TasksDropdownProps) {
   const setPanelOpen = useTasksStore((s) => s.setPanelOpen);
 
   useEffect(() => {
-    if (Platform.OS !== 'web') return;
+    if (process.env.EXPO_OS !== 'web') return;
     const handler = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       if (!target.closest('[data-tasks-panel]')) {
@@ -73,10 +72,9 @@ const styles = {
     borderWidth: 0.633,
     zIndex: 1000,
     overflow: 'hidden',
-    ...Platform.select({
-      web: { boxShadow: '0 8px 24px rgba(0,0,0,0.2)' },
-      default: { elevation: 16 },
-    }),
+    ...(process.env.EXPO_OS === 'web'
+      ? { boxShadow: '0 8px 24px rgba(0,0,0,0.2)' }
+      : { elevation: 16 }),
   } as any,
   panelBelow: {
     top: 30,

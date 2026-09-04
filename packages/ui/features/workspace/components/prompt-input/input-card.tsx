@@ -1,5 +1,5 @@
 import { Input, Text, View } from 'tamagui';
-import { Animated, Platform, Pressable } from 'react-native';
+import { Animated, Pressable } from 'react-native';
 import { ArrowUp, Mic, Plus, Square } from 'lucide-react-native';
 import { formatAgentModeLabel } from '@/features/agent/mode';
 import { Toolbar } from './toolbar/index';
@@ -40,11 +40,11 @@ export function InputCard({
           borderTopLeftRadius: (showCommands && !shouldOverlaySlashCommands) || stackedAbove ? 0 : 12,
           borderTopRightRadius: (showCommands && !shouldOverlaySlashCommands) || stackedAbove ? 0 : 12,
           marginBottom: toolbarOverlap,
-          ...(entryDone ? Platform.OS === 'web' ? {
+          ...(entryDone ? process.env.EXPO_OS === 'web' ? {
             boxShadow: isFocused ? '0px 2px 6px rgba(0, 0, 0, 0.08)' : '0px 0px 0px rgba(0, 0, 0, 0)',
             transitionProperty: 'box-shadow', transitionDuration: '180ms', transitionTimingFunction: 'ease',
           } : {
-            boxShadow: isFocused ? `0px ${Platform.OS === 'ios' ? 2 : 3}px ${Platform.OS === 'ios' ? 5 : 8}px rgba(0, 0, 0, ${Platform.OS === 'ios' ? 0.07 : 0.1})` : '0px 0px 0px rgba(0, 0, 0, 0)',
+            boxShadow: isFocused ? `0px ${process.env.EXPO_OS === 'ios' ? 2 : 3}px ${process.env.EXPO_OS === 'ios' ? 5 : 8}px rgba(0, 0, 0, ${process.env.EXPO_OS === 'ios' ? 0.07 : 0.1})` : '0px 0px 0px rgba(0, 0, 0, 0)',
             elevation: isFocused ? 2 : 0,
           } : {}),
         } as any,
@@ -59,7 +59,7 @@ export function InputCard({
         editable={!inputDisabled}
         multiline
         numberOfLines={lineCount}
-        {...(Platform.OS === 'web' ? ({ rows: lineCount } as any) : {})}
+        {...(process.env.EXPO_OS === 'web' ? ({ rows: lineCount } as any) : {})}
         value={text}
         onChangeText={handleTextChange}
         onKeyPress={handleKeyPress}
@@ -69,7 +69,7 @@ export function InputCard({
         accessibilityHint="Press Enter to send, Shift+Enter for a new line, and type / for commands."
       />
       <View style={styles.actionRow}>
-        {Platform.OS === 'web' && <input ref={fileInputRef as any} type="file" multiple accept="image/*,.pdf,.txt,.md,.json,.csv,.js,.ts,.tsx,.jsx,.py,.go,.rs,.java,.c,.cpp,.h" onChange={handleWebFileChange as any} style={{ display: 'none' }} />}
+        {process.env.EXPO_OS === 'web' && <input ref={fileInputRef as any} type="file" multiple accept="image/*,.pdf,.txt,.md,.json,.csv,.js,.ts,.tsx,.jsx,.py,.go,.rs,.java,.c,.cpp,.h" onChange={handleWebFileChange as any} style={{ display: 'none' }} />}
         <Pressable style={styles.attachButton} onPress={handleFilePick} disabled={inputDisabled} accessibilityRole="button" accessibilityLabel="Attach file"><Plus size={18} color={theme.textMuted} strokeWidth={1.8} /></Pressable>
         {isListening ? <Pressable style={styles.micWaveRow} onPress={handleMicPress} accessibilityRole="button" accessibilityLabel="Stop recording"><Square size={12} color="#EF4444" strokeWidth={2} fill="#EF4444" /><WaveformBars audioLevel={audioLevel} /></Pressable> : <Pressable style={styles.micButton} onPress={handleMicPress} disabled={inputDisabled} accessibilityRole="button" accessibilityLabel="Start voice input"><Mic size={16} color={theme.textMuted} strokeWidth={1.8} /></Pressable>}
         <View style={{ flex: 1 }} />

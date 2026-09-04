@@ -1,6 +1,6 @@
 import { Image, View } from 'tamagui';
 import { memo, useCallback, useState } from "react";
-import { Pressable, Modal, Platform } from "react-native";
+import { Pressable, Modal } from "react-native";
 import type { ToolResultImage } from "../../../types";
 
 interface ToolResultImagesProps {
@@ -79,7 +79,7 @@ const styles = {
   thumb: {
     width: 320,
     height: 200,
-    ...(Platform.OS === "web" ? { maxWidth: "100%" as const } : {}),
+    ...(process.env.EXPO_OS === "web" ? { maxWidth: "100%" as const } : {}),
   },
   overlay: {
     flex: 1,

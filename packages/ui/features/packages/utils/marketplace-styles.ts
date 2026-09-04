@@ -1,5 +1,4 @@
 import { HAIRLINE_WIDTH, ABSOLUTE_FILL_STYLE } from "@/constants/layout";
-import { Platform } from 'react-native';
 import { Fonts } from '@/constants/theme';
 import { CARD_MIN_WIDTH } from './marketplace-constants';
 
@@ -54,7 +53,7 @@ export const styles = {
     flex: 1,
     height: '100%',
     fontFamily: Fonts.sans,
-    ...(Platform.OS === 'web' ? { outlineStyle: 'none' as any } : null),
+    ...(process.env.EXPO_OS === 'web' ? { outlineStyle: 'none' as any } : null),
   },
   chips: {
     flexDirection: 'row',
@@ -224,7 +223,7 @@ export const styles = {
     fontSize: 13,
     fontFamily: Fonts.mono,
     borderWidth: HAIRLINE_WIDTH,
-    ...(Platform.OS === 'web' ? { outlineStyle: 'none' as any } : null),
+    ...(process.env.EXPO_OS === 'web' ? { outlineStyle: 'none' as any } : null),
   },
   notice: {
     flexDirection: 'row',

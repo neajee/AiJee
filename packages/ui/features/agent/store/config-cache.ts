@@ -1,4 +1,3 @@
-import { Platform } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import { create } from "zustand";
 import type { AgentStateData, ModelInfo } from "@aijee/client-sdk";
@@ -39,7 +38,7 @@ interface AgentConfigCacheState extends PersistedShape {
 async function readFromStore(): Promise<Partial<PersistedShape>> {
   try {
     const raw =
-      Platform.OS === "web"
+      process.env.EXPO_OS === "web"
         ? localStorage.getItem(STORAGE_KEY)
         : await SecureStore.getItemAsync(STORAGE_KEY);
     return raw ? (JSON.parse(raw) as PersistedShape) : {};
@@ -57,7 +56,7 @@ function scheduleWrite(shape: PersistedShape) {
     void (async () => {
       try {
         const json = JSON.stringify(shape);
-        if (Platform.OS === "web") {
+        if (process.env.EXPO_OS === "web") {
           localStorage.setItem(STORAGE_KEY, json);
         } else {
           await SecureStore.setItemAsync(STORAGE_KEY, json);

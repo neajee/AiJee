@@ -1,5 +1,5 @@
 import { ScrollView, Text, View } from 'tamagui';
-import { KeyboardAvoidingView, Modal, Platform, Pressable } from 'react-native';
+import { KeyboardAvoidingView, Modal, Pressable } from 'react-native';
 import { X } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -27,7 +27,7 @@ export function EditWorkspaceDialog({ visible, workspace, onClose }: EditWorkspa
   if (!isWideScreen) {
     return (
       <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior={process.env.EXPO_OS === 'ios' ? 'padding' : undefined}>
           <Pressable style={styles.sheetOverlay} onPress={onClose}>
             <Pressable
               style={[styles.sheetContainer, { backgroundColor: isDark ? '#1e1e1e' : '#FFFFFF', paddingBottom: insets.bottom + 20 }]}

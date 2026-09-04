@@ -1,6 +1,6 @@
 import { ScrollView, Text, View } from 'tamagui';
 import { useCallback, useEffect, useRef } from 'react';
-import { Platform, Pressable } from 'react-native';
+import { Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, {
   Easing,
@@ -103,12 +103,12 @@ export function TaskOutputSheet({ visible, onClose }: TaskOutputSheetProps) {
 
   return (
     <View
-      {...(Platform.OS !== 'web'
+      {...(process.env.EXPO_OS !== 'web'
         ? { pointerEvents: visible ? ('auto' as const) : ('none' as const) }
         : {})}
       style={[
         styles.root,
-        Platform.OS === 'web' && ({ pointerEvents: visible ? 'auto' : 'none' } as any),
+        process.env.EXPO_OS === 'web' && ({ pointerEvents: visible ? 'auto' : 'none' } as any),
       ]}
     >
       <Animated.View

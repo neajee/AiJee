@@ -1,5 +1,5 @@
 import { ScrollView, Spinner, Text, View } from 'tamagui';
-import { Platform, Pressable } from 'react-native';
+import { Pressable } from 'react-native';
 import { ChevronDown, ChevronUp, GitCompare } from 'lucide-react-native';
 
 import { FileTree } from '../file-tree';
@@ -55,8 +55,8 @@ export function ChangesPanel({ renderExtraTab, ...props }: ChangesPanelProps = {
       ) : (
         <View style={styles.tabPanels}>
           <View
-            {...(Platform.OS !== 'web' ? { pointerEvents: currentTab === 'files' ? ('auto' as const) : ('none' as const) } : {})}
-            style={[styles.tabPanel, currentTab !== 'files' && styles.tabPanelHidden, Platform.OS === 'web' && ({ pointerEvents: currentTab === 'files' ? 'auto' : 'none' } as any)]}
+            {...(process.env.EXPO_OS !== 'web' ? { pointerEvents: currentTab === 'files' ? ('auto' as const) : ('none' as const) } : {})}
+            style={[styles.tabPanel, currentTab !== 'files' && styles.tabPanelHidden, process.env.EXPO_OS === 'web' && ({ pointerEvents: currentTab === 'files' ? 'auto' : 'none' } as any)]}
           >
             {cwd ? (
               <FileTree rootPath={cwd} viewingFile={viewingFile} onViewFile={setViewingFile} expandedDirs={expandedDirs} onToggleDir={handleToggleDir} />
@@ -64,8 +64,8 @@ export function ChangesPanel({ renderExtraTab, ...props }: ChangesPanelProps = {
           </View>
           {isGitRepo && (
             <View
-              {...(Platform.OS !== 'web' ? { pointerEvents: currentTab === 'git' ? ('auto' as const) : ('none' as const) } : {})}
-              style={[styles.tabPanel, currentTab !== 'git' && styles.tabPanelHidden, Platform.OS === 'web' && ({ pointerEvents: currentTab === 'git' ? 'auto' : 'none' } as any)]}
+              {...(process.env.EXPO_OS !== 'web' ? { pointerEvents: currentTab === 'git' ? ('auto' as const) : ('none' as const) } : {})}
+              style={[styles.tabPanel, currentTab !== 'git' && styles.tabPanelHidden, process.env.EXPO_OS === 'web' && ({ pointerEvents: currentTab === 'git' ? 'auto' : 'none' } as any)]}
             >
               <View style={[styles.changesSection, { borderBottomColor: dividerColor }]}>
                 <Pressable

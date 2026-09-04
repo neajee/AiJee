@@ -1,5 +1,4 @@
 import { useCallback, useMemo, useState } from "react";
-import { Platform } from "react-native";
 import { usePathname, useRouter } from "expo-router";
 import { useStreamingSessions } from "@aijee/client-sdk";
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -70,7 +69,7 @@ export function useProjectSidebarController() {
     router.navigate((selectedWorkspaceId ? `/workspace/${selectedWorkspaceId}` : "/work") as any);
   }, [selectedWorkspaceId, router]);
   const handleContextMenu = useCallback((workspace: Workspace, event: any) => {
-    if (Platform.OS !== "web") return;
+    if (process.env.EXPO_OS !== "web") return;
     event.preventDefault?.();
     const nativeEvent = event.nativeEvent ?? event;
     setContextMenu({ visible: true, x: nativeEvent.clientX ?? nativeEvent.pageX ?? 0, y: nativeEvent.clientY ?? nativeEvent.pageY ?? 0, workspace });

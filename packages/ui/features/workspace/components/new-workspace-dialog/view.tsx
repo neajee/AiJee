@@ -1,5 +1,5 @@
 import { Input, ScrollView, Spinner, Text, View } from 'tamagui';
-import { FlatList, KeyboardAvoidingView, Modal, Platform, Pressable } from "react-native";
+import { FlatList, KeyboardAvoidingView, Modal, Pressable } from "react-native";
 import { File, Folder } from "lucide-react-native";
 import type { PathCompletion } from "@aijee/client-sdk";
 import type { NewWorkspaceController } from "../../hooks/use-new-workspace-controller";
@@ -193,7 +193,7 @@ export function NewWorkspaceDialogView({ controller }: { controller: NewWorkspac
       >
         <KeyboardAvoidingView
           style={{ flex: 1 }}
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+          behavior={process.env.EXPO_OS === 'ios' ? 'padding' : undefined}
         >
           <Pressable style={styles.sheetOverlay} onPress={onClose}>
             <Pressable

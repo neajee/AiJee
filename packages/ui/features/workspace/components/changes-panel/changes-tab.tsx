@@ -1,6 +1,6 @@
 import { Text, View } from 'tamagui';
 import { useCallback, useMemo } from "react";
-import { Alert, Platform } from "react-native";
+import { Alert } from "react-native";
 import { Plus, Minus, Undo2, Check } from "lucide-react-native";
 
 import { Fonts } from "@/constants/theme";
@@ -60,7 +60,7 @@ export function ChangesTab({
   const confirmDiscard = useCallback(
     (paths: string[]) => {
       const msg = `Discard changes to ${paths.length} file${paths.length !== 1 ? "s" : ""}? This cannot be undone.`;
-      if (Platform.OS === "web") {
+      if (process.env.EXPO_OS === "web") {
         if (window.confirm(msg)) onDiscard(paths);
       } else {
         Alert.alert("Discard Changes", msg, [

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import {  Linking, Platform  } from 'react-native';
+import {  Linking  } from 'react-native';
 import { useBuiltinProviders, type BuiltinProvider } from "@aijee/client-sdk";
 import { useCustomModelsStore } from "../store/custom-models";
 
@@ -51,7 +51,7 @@ export function useCustomModelsController() {
     provider.auth_source === 'stored credential' || provider.auth_source === 'OAuth';
 
   const beginOAuth = useCallback(async (providerId: string) => {
-    const popup = Platform.OS === 'web' && typeof window !== 'undefined' ? window.open('', '_blank') : null;
+    const popup = process.env.EXPO_OS === 'web' && typeof window !== 'undefined' ? window.open('', '_blank') : null;
     setOauthProviderId(providerId);
     setOauthLoginId(null);
     setOauthUrl(null);

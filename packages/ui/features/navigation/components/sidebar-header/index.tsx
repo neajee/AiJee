@@ -1,6 +1,6 @@
 import { View } from 'tamagui';
 import { useEffect, useState } from "react";
-import { Platform, Pressable } from "react-native";
+import { Pressable } from "react-native";
 import { Search } from "lucide-react-native";
 
 import { Colors } from "@/constants/theme";
@@ -22,7 +22,7 @@ export function SidebarHeader() {
   const [paletteVisible, setPaletteVisible] = useState(false);
 
   useEffect(() => {
-    if (Platform.OS !== "web") return;
+    if (process.env.EXPO_OS !== "web") return;
     const handler = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "p") {
         e.preventDefault();

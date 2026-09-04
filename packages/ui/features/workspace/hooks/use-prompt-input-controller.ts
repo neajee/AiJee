@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
-import { Animated, Keyboard, LayoutAnimation, NativeSyntheticEvent, Platform, TextInput, TextInputKeyPressEventData } from 'react-native';
+import { Animated, Keyboard, LayoutAnimation, NativeSyntheticEvent, TextInput, TextInputKeyPressEventData } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
 import { File as ExpoFile } from 'expo-file-system';
 import { useQuery } from '@tanstack/react-query';
@@ -144,8 +144,8 @@ export function usePromptInputController({
   const inlineToolbar = isWideScreen;
   const toolbarHiddenKeepLayout = !isWideScreen && !!mobileSheet;
   const toolbarCollapsed = !isWideScreen && hideBottomForKeyboard;
-  const toolbarOverlap = inlineToolbar ? 0 : Platform.OS === "web" ? -4 : -1;
-  const shouldOverlaySlashCommands = Platform.OS === "web" || isWideScreen;
+  const toolbarOverlap = inlineToolbar ? 0 : process.env.EXPO_OS === "web" ? -4 : -1;
+  const shouldOverlaySlashCommands = process.env.EXPO_OS === "web" || isWideScreen;
   const closeMobileSheet = useCallback(() => {
     LayoutAnimation.configureNext(
       LayoutAnimation.create(200, LayoutAnimation.Types.easeInEaseOut, LayoutAnimation.Properties.opacity),
@@ -155,9 +155,9 @@ export function usePromptInputController({
 
   // --- Keyboard ---
   useEffect(() => {
-    if (Platform.OS === "web") return;
-    const showEvent = Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
-    const hideEvent = Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
+    if (process.env.EXPO_OS === "web") return;
+    const showEvent = process.env.EXPO_OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
+    const hideEvent = process.env.EXPO_OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
     const showSub = Keyboard.addListener(showEvent, (e) => {
       const duration = (e as any).duration ?? 250;
       LayoutAnimation.configureNext(
@@ -251,7 +251,7 @@ export function usePromptInputController({
   const lineCount = Math.min(Math.max(text.split("\n").length, MIN_LINES), MAX_LINES);
 
   useEffect(() => {
-    if (Platform.OS !== "web") return;
+    if (process.env.EXPO_OS !== "web") return;
     const el = inputRef.current as any;
     const textarea = el?.querySelector?.("textarea") ?? el;
     if (textarea && textarea.tagName === "TEXTAREA") {
@@ -278,7 +278,7 @@ export function usePromptInputController({
   }, [dropdownAnim, showCommands]);
 
   useEffect(() => {
-    if (Platform.OS !== "web" || inputDisabled) return;
+    if (process.env.EXPO_OS !== "web" || inputDisabled) return;
     const handler = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement)?.tagName;
       if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
@@ -392,7 +392,7 @@ export function usePromptInputController({
 
   const handleFilePick = useCallback(async () => {
     if (inputDisabled) return;
-    if (Platform.OS === "web") { fileInputRef.current?.click(); return; }
+    if (process.env.EXPO_OS === "web") { fileInputRef.current?.click(); return; }
     const result = await DocumentPicker.getDocumentAsync({ multiple: true, copyToCacheDirectory: true });
     if (!result.canceled && result.assets) {
       for (const asset of result.assets) {
@@ -436,7 +436,7 @@ export function usePromptInputController({
 
   // --- Paste handler for images (web only) ---
   const handlePaste = useCallback((e: any) => {
-    if (Platform.OS !== "web") return;
+    if (process.env.EXPO_OS !== "web") return;
 
     // Native ClipboardEvent exposes data on e.clipboardData directly;
     // React synthetic events expose it via e.nativeEvent.clipboardData.
@@ -472,7 +472,7 @@ export function usePromptInputController({
 
   // Register paste event listener on web
   useEffect(() => {
-    if (Platform.OS !== "web" || inputDisabled) return;
+    if (process.env.EXPO_OS !== "web" || inputDisabled) return;
     const textarea = inputRef.current as any;
     const el = textarea?.querySelector?.("textarea") ?? textarea;
     if (!el) return;
@@ -505,7 +505,7 @@ export function usePromptInputController({
       return;
     }
 
-    if (Platform.OS === "web" && key === "Enter" && !isShiftEnter) {
+    if (process.env.EXPO_OS === "web" && key === "Enter" && !isShiftEnter) {
       if (isImeComposing) return;
       e.preventDefault?.();
       handleSubmit();

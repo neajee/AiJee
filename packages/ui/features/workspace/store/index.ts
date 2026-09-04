@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { Platform } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import type { Workspace } from '../types';
 import type { Workspace as ApiWorkspace } from '@aijee/client-sdk';
@@ -29,7 +28,7 @@ function serverPinnedKey(serverId: string) {
 
 async function readStorageItem(key: string): Promise<string | null> {
   try {
-    if (Platform.OS === 'web') {
+    if (process.env.EXPO_OS === 'web') {
       return localStorage.getItem(key);
     }
     return await SecureStore.getItemAsync(key);
@@ -40,7 +39,7 @@ async function readStorageItem(key: string): Promise<string | null> {
 
 async function writeStorageItem(key: string, value: string | null) {
   try {
-    if (Platform.OS === 'web') {
+    if (process.env.EXPO_OS === 'web') {
       if (value) localStorage.setItem(key, value);
       else localStorage.removeItem(key);
     } else {

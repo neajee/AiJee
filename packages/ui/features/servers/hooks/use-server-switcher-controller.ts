@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useState } from 'react';
-import {  Platform  } from 'react-native';
 import { useRouter } from 'expo-router';
 
 import { useAuthStore } from '@/features/auth/store';
@@ -18,7 +17,7 @@ export function useServerSwitcherController() {
   const switchServer = useWorkspaceStore((s) => s.switchServer);
 
   useEffect(() => {
-    if (!popoverVisible || Platform.OS !== 'web') return;
+    if (!popoverVisible || process.env.EXPO_OS !== 'web') return;
     const handler = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
       if (!target.closest('[data-server-popover]')) setPopoverVisible(false);

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated, Platform, useWindowDimensions } from 'react-native';
+import { Animated, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useConnection } from '@aijee/client-sdk';
 import type { ConnectionStatusBannerViewProps } from '../components/connection-status-banner/types';
@@ -15,7 +15,7 @@ export function useConnectionStatusController(): ConnectionStatusBannerViewProps
   const [mounted, setMounted] = useState(visible);
   const [now, setNow] = useState(() => Date.now());
   const heightAnim = useRef(new Animated.Value(0)).current;
-  const bottomPad = Platform.OS === 'web' ? 0 : Math.max(insets.bottom, 6);
+  const bottomPad = process.env.EXPO_OS === 'web' ? 0 : Math.max(insets.bottom, 6);
   const isCompact = width < 420;
   const stripHeight = (isCompact ? 84 : 54) + bottomPad;
 

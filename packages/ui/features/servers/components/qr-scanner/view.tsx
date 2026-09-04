@@ -1,4 +1,4 @@
-import { Modal, Platform, Pressable } from 'react-native';
+import { Modal, Pressable } from 'react-native';
 import { Input, Spinner, Text, View } from 'tamagui';
 import { AlertCircle, Check, Wifi, X } from 'lucide-react-native';
 
@@ -155,7 +155,7 @@ export function QrScanner({ visible, onClose }: QrScannerProps) {
           />
           <View style={styles.manualSection}>
             <Text style={[styles.manualLabel, { color: textMuted }]}>
-              {Platform.OS === 'web' ? 'Paste connect URL' : 'Or paste URL manually'}
+              {process.env.EXPO_OS === 'web' ? 'Paste connect URL' : 'Or paste URL manually'}
             </Text>
             <View style={styles.manualRow}>
               <Input

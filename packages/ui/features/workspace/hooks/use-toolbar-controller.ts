@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  Animated, NativeSyntheticEvent, Platform, TextInput, TextInputKeyPressEventData,
+  Animated, NativeSyntheticEvent, TextInput, TextInputKeyPressEventData,
   type ScrollView as RNScrollView,
   type View as RNView,
 } from 'react-native';
@@ -82,7 +82,7 @@ export function useToolbarController({
   }, [activeDropdown, onDropdownOpenChange]);
 
   useEffect(() => {
-    if (Platform.OS !== 'web' || !activeDropdown) return;
+    if (process.env.EXPO_OS !== 'web' || !activeDropdown) return;
     const closeOnOutsidePointer = (event: PointerEvent) => {
       const element = toolbarRef.current as unknown as { contains?: (node: EventTarget | null) => boolean } | null;
       if (!element?.contains?.(event.target)) setActiveDropdown(null);

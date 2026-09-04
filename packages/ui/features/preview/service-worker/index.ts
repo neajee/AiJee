@@ -1,5 +1,4 @@
 import { useEffect, useRef } from "react";
-import { Platform } from "react-native";
 
 import { useAuthStore } from "@/features/auth/store";
 
@@ -11,7 +10,7 @@ let swRegistered = false;
 let swBridgeBound = false;
 
 function bindPreviewServiceWorkerBridge() {
-  if (Platform.OS !== "web") return;
+  if (process.env.EXPO_OS !== "web") return;
   if (typeof navigator === "undefined" || !("serviceWorker" in navigator)) return;
   if (swBridgeBound) return;
   swBridgeBound = true;
@@ -50,7 +49,7 @@ function bindPreviewServiceWorkerBridge() {
 }
 
 export async function registerPreviewServiceWorker(): Promise<void> {
-  if (Platform.OS !== "web") return;
+  if (process.env.EXPO_OS !== "web") return;
   if (typeof navigator === "undefined" || !("serviceWorker" in navigator)) return;
   bindPreviewServiceWorkerBridge();
   if (swRegistered) return;
@@ -85,7 +84,7 @@ export function buildPreviewSrc(params: {
 }
 
 export async function updatePreviewToken(accessToken: string) {
-  if (Platform.OS !== "web") return;
+  if (process.env.EXPO_OS !== "web") return;
   if (typeof navigator === "undefined" || !("serviceWorker" in navigator)) return;
 
   const controller =
@@ -98,7 +97,7 @@ export function usePreviewServiceWorker() {
   const started = useRef(false);
 
   useEffect(() => {
-    if (Platform.OS !== "web" || started.current) return;
+    if (process.env.EXPO_OS !== "web" || started.current) return;
     started.current = true;
     registerPreviewServiceWorker();
   }, []);
@@ -106,7 +105,7 @@ export function usePreviewServiceWorker() {
 
 export function usePreviewTokenSync(accessToken?: string) {
   useEffect(() => {
-    if (Platform.OS !== "web" || !accessToken) return;
+    if (process.env.EXPO_OS !== "web" || !accessToken) return;
     void updatePreviewToken(accessToken);
   }, [accessToken]);
 }

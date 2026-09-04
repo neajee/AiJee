@@ -1,5 +1,4 @@
 import { HAIRLINE_WIDTH } from "@/constants/layout";
-import { Platform } from 'react-native';
 import { Fonts } from '@/constants/theme';
 
 export const styles = {
@@ -9,7 +8,7 @@ export const styles = {
     alignSelf: "center",
     width: "100%",
     overflow: "visible",
-    zIndex: Platform.OS === "android" ? 9 : 11,
+    zIndex: process.env.EXPO_OS === "android" ? 9 : 11,
   },
   bar: {
     flexDirection: "row",

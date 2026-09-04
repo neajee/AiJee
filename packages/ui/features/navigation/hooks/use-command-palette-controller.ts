@@ -1,6 +1,6 @@
 import { ScrollView, View } from 'tamagui';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, Platform, TextInput, type ScrollView as RNScrollView, type View as RNView } from 'react-native';
+import { Animated, TextInput, type ScrollView as RNScrollView, type View as RNView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { MessageSquare } from 'lucide-react-native';
 
@@ -119,7 +119,7 @@ export function useCommandPaletteController({ visible, onClose }: CommandPalette
   }, [overlayAnim, scaleAnim, visible]);
 
   useEffect(() => {
-    if (Platform.OS !== 'web') return;
+    if (process.env.EXPO_OS !== 'web') return;
     const handler = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key === 'p') {
         event.preventDefault();

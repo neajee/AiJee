@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Platform } from 'react-native';
 import { useAudioRecorder, useAudioRecorderState, RecordingPresets, AudioModule, setAudioModeAsync } from 'expo-audio';
 import { useSpeechSettingsStore } from '../store';
 
@@ -121,7 +120,7 @@ export function useSpeechRecognition(
 
   // Convert native metering (dBFS: -160 to 0) to 0-1 range
   useEffect(() => {
-    if (Platform.OS === 'web' || !isListening) return;
+    if (process.env.EXPO_OS === 'web' || !isListening) return;
     const db = recorderState.metering ?? -160;
     // Map -60..0 dBFS to 0..1 (below -60 is effectively silence)
     const normalized = Math.max(0, Math.min(1, (db + 60) / 60));
@@ -129,7 +128,7 @@ export function useSpeechRecognition(
   }, [recorderState.metering, isListening]);
 
   const startMetering = useCallback((stream: MediaStream) => {
-    if (Platform.OS !== 'web') return;
+    if (process.env.EXPO_OS !== 'web') return;
     try {
       const ctx = audioContextRef.current ?? new AudioContext();
       if (!audioContextRef.current) audioContextRef.current = ctx;
@@ -525,7 +524,7 @@ export function useSpeechRecognition(
     return () => {
       mountedRef.current = false;
       releaseWebResources();
-      if (Platform.OS !== 'web') {
+      if (process.env.EXPO_OS !== 'web') {
         void nativeRecorder.stop().catch(() => {});
         void setAudioModeAsync({ allowsRecording: false }).catch(() => {});
       }
@@ -534,7 +533,7 @@ export function useSpeechRecognition(
 
   // --- Public interface ---
   const start = useCallback(async () => {
-    if (Platform.OS === 'web') {
+    if (process.env.EXPO_OS === 'web') {
       releaseWebResources();
       setAudioLevel(0);
       if (mode === 'builtin') {
@@ -560,7 +559,7 @@ export function useSpeechRecognition(
       streamRef.current.getTracks().forEach((t) => t.stop());
       streamRef.current = null;
     }
-    if (Platform.OS === 'web') {
+    if (process.env.EXPO_OS === 'web') {
       if (mode === 'builtin' && webRecognitionRef.current) {
         releaseWebResources();
         setIsListening(false);

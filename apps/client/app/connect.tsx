@@ -1,7 +1,7 @@
 import { Spinner, Text, View } from 'tamagui';
 import { useEffect, useRef, useState } from "react";
 import {
-  Platform, Pressable } from "react-native";
+  Pressable } from "react-native";
 import { useRouter } from "expo-router";
 
 import { Fonts } from "@/constants/theme";
@@ -18,7 +18,7 @@ import {
 type ConnectStatus = "loading" | "pairing" | "done" | "error";
 
 function resolveBaseUrl(params: ConnectParams) {
-  if (Platform.OS === "web" && typeof window !== "undefined") {
+  if (process.env.EXPO_OS === "web" && typeof window !== "undefined") {
     const { hostname, origin, port, protocol } = window.location;
     if (port === params.port) {
       return origin;
@@ -50,7 +50,7 @@ export default function DirectConnectScreen() {
   const [error, setError] = useState<string | null>(null);
   const attemptedRef = useRef(false);
   const connectParamsRef = useRef<ConnectParams | null>(
-    Platform.OS === "web" && typeof window !== "undefined"
+    process.env.EXPO_OS === "web" && typeof window !== "undefined"
       ? parseConnectUrl(window.location.href)
       : null,
   );

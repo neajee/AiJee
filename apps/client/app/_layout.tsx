@@ -1,5 +1,4 @@
 import React, { useEffect, useRef } from "react";
-import { Platform } from "react-native";
 import {
   DarkTheme,
   DefaultTheme,
@@ -66,7 +65,7 @@ export default function RootLayout() {
   const bootstrapAttempted = useRef(false);
 
   useEffect(() => {
-    if (Platform.OS !== 'web' || typeof document === 'undefined') return;
+    if (process.env.EXPO_OS !== 'web' || typeof document === 'undefined') return;
     const root = document.documentElement;
     const css = {
       '--aijee-background': themeTokens.background,
@@ -92,7 +91,7 @@ export default function RootLayout() {
   }, [codeFontSize, colorScheme, themePreset, themeTokens, uiFontSize]);
 
   useEffect(() => {
-    if (Platform.OS !== 'web' || typeof document === 'undefined' || document.getElementById('aijee-web-rn-defaults')) return;
+    if (process.env.EXPO_OS !== 'web' || typeof document === 'undefined' || document.getElementById('aijee-web-rn-defaults')) return;
     const style = document.createElement('style');
     style.id = 'aijee-web-rn-defaults';
     style.textContent = 'button { text-align: left; }';
@@ -100,7 +99,7 @@ export default function RootLayout() {
   }, []);
 
   useEffect(() => {
-    if (Platform.OS !== 'web' || typeof window === 'undefined') return;
+    if (process.env.EXPO_OS !== 'web' || typeof window === 'undefined') return;
     const expoPort = process.env.EXPO_PUBLIC_AIJEE_EXPO_PORT ?? '8082';
     const webPort = process.env.EXPO_PUBLIC_AIJEE_WEB_PORT ?? '8081';
     if (!['127.0.0.1', 'localhost'].includes(window.location.hostname) || window.location.port !== expoPort) return;
@@ -123,7 +122,7 @@ export default function RootLayout() {
     if (!authLoaded || !serversLoaded || bootstrapAttempted.current) return;
     bootstrapAttempted.current = true;
     void (async () => {
-      const code = Platform.OS === 'web' && typeof window !== 'undefined' ? new URL(window.location.href).searchParams.get('k') : null;
+      const code = process.env.EXPO_OS === 'web' && typeof window !== 'undefined' ? new URL(window.location.href).searchParams.get('k') : null;
       if (code && typeof window !== 'undefined') {
         const address = window.location.origin;
         window.history.replaceState({}, '', window.location.pathname || '/');

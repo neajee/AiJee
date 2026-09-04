@@ -1,9 +1,8 @@
-import { Platform } from "react-native";
 
 let notificationPermissionRequest: Promise<string> | null = null;
 
 export function requestBrowserNotificationPermission() {
-  if (Platform.OS !== "web") {
+  if (process.env.EXPO_OS !== "web") {
     return null;
   }
 
@@ -38,7 +37,7 @@ export function requestBrowserNotificationPermission() {
 }
 
 export function browserWindowHasAttention() {
-  if (Platform.OS !== "web") {
+  if (process.env.EXPO_OS !== "web") {
     return false;
   }
 

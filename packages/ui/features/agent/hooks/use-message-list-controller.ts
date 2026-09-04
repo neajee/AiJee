@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { FlatList, Platform, type NativeScrollEvent, type NativeSyntheticEvent } from "react-native";
+import { FlatList, type NativeScrollEvent, type NativeSyntheticEvent } from "react-native";
 import { useAgentSession } from "@aijee/client-sdk";
 import type { ChatMessage } from "../types";
 import { buildListItems, reconcileItems, type ListItem } from "../utils/turns";

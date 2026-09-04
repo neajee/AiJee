@@ -1,4 +1,4 @@
-import { Platform, type ViewStyle, type StyleProp } from "react-native";
+import { type ViewStyle, type StyleProp } from "react-native";
 import { View as TamaguiView } from "tamagui";
 
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
@@ -34,7 +34,7 @@ export function Select<T extends string = string>({
   const border = tokens.borderStrong;
   const mutedColor = tokens.textTertiary;
 
-  if (Platform.OS === "web") {
+  if (process.env.EXPO_OS === "web") {
     return (
       <TamaguiView style={[wrapperStyle, style]}>
         <select
