@@ -1,8 +1,8 @@
 import { type ReactNode, useCallback } from 'react';
-import { KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, TextInput } from 'react-native';
+import { ActivityIndicator, KeyboardAvoidingView, Pressable, ScrollView, StyleSheet, TextInput } from 'react-native';
 import { useRouter } from 'expo-router';
 import { AlertCircle, ArrowLeft, Camera, Check, ChevronRight, Link2, QrCode, Wifi } from 'lucide-react-native';
-import { Spinner, Text, View } from 'tamagui';
+import { Text, View } from 'tamagui';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Fonts } from '@/constants/theme';
@@ -140,7 +140,7 @@ export default function ScanConnectScreen() {
             <StatusCard
               colors={colors}
               description="正在完成安全授权，请稍候。"
-              icon={<Spinner color={colors.accent} size="large" />}
+              icon={<ActivityIndicator color={colors.accent} size="large" />}
               primaryLabel="取消"
               onPrimaryPress={handleClose}
               title="正在连接"
