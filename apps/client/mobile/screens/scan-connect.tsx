@@ -78,13 +78,20 @@ export default function ScanConnectScreen() {
                   </View>
                 </View>
                 <View style={[styles.scanner, { borderColor: colors.borderStrong }]}>
-                  <QrScannerScanPanel
-                    visible
-                    scanned={scanned}
-                    isDark={isDark}
-                    textMuted={colors.textSecondary}
-                    onBarcodeData={handleBarCodeScanned}
-                  />
+                  {process.env.EXPO_OS === 'web' ? (
+                    <View style={styles.webScannerPlaceholder}>
+                      <QrCode color={colors.textTertiary} size={36} strokeWidth={1.2} />
+                      <Text style={[styles.permissionText, { color: colors.textSecondary }]}>网页预览请粘贴连接地址，真机可直接扫描二维码。</Text>
+                    </View>
+                  ) : (
+                    <QrScannerScanPanel
+                      visible
+                      scanned={scanned}
+                      isDark={isDark}
+                      textMuted={colors.textSecondary}
+                      onBarcodeData={handleBarCodeScanned}
+                    />
+                  )}
                 </View>
                 <View style={styles.tip}>
                   <Camera color={colors.textTertiary} size={16} strokeWidth={1.8} />
@@ -288,6 +295,8 @@ const styles = StyleSheet.create({
   heroTitle: { fontFamily: Fonts.sansSemiBold, fontSize: 17 },
   heroDescription: { fontFamily: Fonts.sans, fontSize: 13, lineHeight: 18 },
   scanner: { height: mobileLayout.cameraHeight, overflow: 'hidden', borderWidth: 1, borderRadius: 18, backgroundColor: '#0A0A0B' },
+  webScannerPlaceholder: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 12, paddingHorizontal: 28 },
+  permissionText: { fontFamily: Fonts.sans, fontSize: 13, lineHeight: 19, textAlign: 'center' },
   tip: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7 },
   tipText: { fontFamily: Fonts.sans, fontSize: 12 },
   manualSection: { gap: 10 },
