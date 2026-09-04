@@ -54,6 +54,10 @@ export const styles = {
     flex: 1,
     fontSize: 13,
     fontFamily: Fonts.sans,
+    backgroundColor: 'transparent',
+    borderWidth: 0,
+    borderColor: 'transparent',
+    borderRadius: 0,
     outlineStyle: 'none',
   } as any,
   pathPreview: {

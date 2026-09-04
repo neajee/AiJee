@@ -22,6 +22,7 @@ export function NewWorkspaceDialogView({ controller }: { controller: NewWorkspac
           <Input
             ref={pathRef}
             style={[styles.input, { color: textPrimary }]}
+            focusStyle={{ outlineWidth: 0, borderWidth: 0, borderColor: 'transparent', boxShadow: 'none' } as any}
             value={path}
             onChangeText={handlePathChange}
             onKeyPress={handlePathKeyPress}
@@ -137,6 +138,7 @@ export function NewWorkspaceDialogView({ controller }: { controller: NewWorkspac
           <Input
             ref={nameRef}
             style={[styles.input, styles.nameInput, { color: textPrimary }]}
+            focusStyle={{ outlineWidth: 0, borderWidth: 0, borderColor: 'transparent', boxShadow: 'none' } as any}
             value={name}
             onChangeText={handleNameChange}
             onKeyPress={handleNameKeyPress}

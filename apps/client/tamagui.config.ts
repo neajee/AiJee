@@ -23,6 +23,17 @@ export default createTamagui({
   },
   defaultProps: {
     Text: { textAlign: 'left' },
+    Input: {
+      backgroundColor: 'transparent',
+      borderWidth: 0,
+      borderColor: 'transparent',
+      focusStyle: {
+        outlineWidth: 0,
+        borderWidth: 0,
+        borderColor: 'transparent',
+        boxShadow: 'none',
+      },
+    },
   },
   shorthands: {
     bg: 'backgroundColor',
