@@ -73,6 +73,33 @@ api-contract/openapi.yaml
 
 `packages/aijee`与手写客户端`protocol`目录已删除；发布入口统一为`apps/server`的`aijee`包。
 
+### UI Feature组件拆分规范
+
+#### 策略一：大组件目录化，不向平铺转移
+
+扁平`components/`是碎片化根源。巨型组件拆出的子件就近归入组件自己的目录；`message-list`是现有示范：
+
+```text
+features/<feature>/components/<MajorComponent>/
+├── index.tsx        # 编排层：只做状态 + 组装，目标 <200 行
+├── <sub-view>.tsx   # 表现层：纯 props 渲染
+└── types.ts         # 局部类型
+```
+
+#### 策略二：逻辑与视图分离（`.ts`/`.tsx`分家）
+
+巨型文件提取出的非渲染逻辑不进入`components/`，按类型归位：
+
+- `reducers.ts`或纯函数 → `store/`或`utils/`
+- hooks → `hooks/`
+- 风格常量（如`custom-models-styles`） → `utils/`
+
+#### 策略三：共享判定
+
+- 单个组件内部使用 → 就近放入组件子目录
+- feature内多个组件复用 → 放在`components/`平铺层
+- 跨feature复用 → 提升到公共层，禁止复制
+
 运行时状态保存在`~/.aijee/`：工作区、模式、会话索引和任务日志均可在重启后恢复；会话激活时才由`SessionRegistry`按其磁盘session file重建。文件、Git和任务cwd必须位于已配置工作区内。
 
 ## Rust后端处置
