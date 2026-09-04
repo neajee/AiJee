@@ -700,9 +700,7 @@ export type UpdateWorkspaceRequest = {
 
 export type VersionResponse = {
     name: string;
-    /**
-     * Whether the server has desktop/remote mode enabled (Linux only).
-     */
+    /** Whether the server process is running in remote mode. */
     remote: boolean;
     server_id: string;
     version: string;

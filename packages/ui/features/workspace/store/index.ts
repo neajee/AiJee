@@ -8,7 +8,6 @@ const { list2: list, create: apiCreate, delete2: apiDelete } = sdk;
 import { WorkspaceColors } from '@/constants/theme';
 import { useTasksStore } from '@/features/tasks/store';
 import { usePreviewStore } from '@/features/preview/store';
-import { useDesktopStore } from '@/features/desktop/store';
 
 const SELECTED_WORKSPACE_KEY = 'selected_workspace_id';
 const LAST_SESSION_KEY = 'last_session_by_workspace';
@@ -411,7 +410,6 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
     });
     useTasksStore.getState().resetServerState();
     usePreviewStore.getState().resetServerState();
-    useDesktopStore.getState().resetServerState();
 
     const [restoredId, restoredSessionMap, restoredPinned] = await Promise.all([
       readSelectedId(serverId),

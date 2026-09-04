@@ -1,7 +1,7 @@
 import { SessionRegistry } from "./sessions/registry.ts";
 import type { CreateSessionInput, SessionDescriptor } from "@aijee/engine";
 
-/** Product-level Pi SDK runtime. HTTP/desktop launchers use this singleton. */
+/** Product-level Pi SDK runtime shared by HTTP and Electron launchers. */
 export class AiJeeRuntime {
   readonly sessions: SessionRegistry;
 

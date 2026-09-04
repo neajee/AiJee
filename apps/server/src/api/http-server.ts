@@ -1114,7 +1114,7 @@ export class AiJeeHttpServer {
     const url = new URL(request.url ?? "/", "http://localhost");
     const sessionMatch = /^\/api\/ws\/stream\/([^/]+)$/.exec(url.pathname);
     const isPreview = url.pathname === "/api/preview/ws";
-    const isGlobal = url.pathname === "/api/ws/stream" || url.pathname === "/api/desktop/ws";
+    const isGlobal = url.pathname === "/api/ws/stream";
     if (!isGlobal && !isPreview && !sessionMatch) { socket.destroy(); return; }
     const authorization = request.headers.authorization ?? (url.searchParams.get("token") ? `Bearer ${url.searchParams.get("token")}` : undefined);
     if (!this.auth || (!this.auth.initialized() && !this.localMode) || !(this.localMode && this.isLocalRequest(request)) && !this.auth.validate(authorization, typeof request.headers.cookie === "string" ? request.headers.cookie : undefined)) { socket.destroy(); return; }

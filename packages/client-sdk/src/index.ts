@@ -4,4 +4,3 @@ export * from "./hooks";
 export * from "./utils";
 export { client } from "./runtime-config";
 export * as sdk from "./generated/sdk.gen";
-export * as vnc from "./vnc";

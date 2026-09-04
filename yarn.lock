@@ -27,10 +27,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@aijee/client-sdk@workspace:packages/client-sdk"
   dependencies:
-    "@assemblyscript/loader": "npm:^0.28.10"
     "@hey-api/client-fetch": "npm:^0.11.0"
     "@hey-api/openapi-ts": "npm:^0.73.0"
-    fflate: "npm:^0.8.2"
     rxjs: "npm:^7.8.1"
     typescript: "npm:~5.8.0"
   peerDependencies:
@@ -153,13 +151,6 @@ __metadata:
   bin:
     anthropic-ai-sdk: bin/cli
   checksum: 10c0/aa9fb1b3d0ae47f492ee7a94b76d341ac7c5486b222a9426b4815b07a65a0b6f502430b0250ff5bf2201a0cdae725a5d4f1f7a4aaa075e9fb32cc2ac10d70241
-  languageName: node
-  linkType: hard
-
-"@assemblyscript/loader@npm:^0.28.10":
-  version: 0.28.10
-  resolution: "@assemblyscript/loader@npm:0.28.10"
-  checksum: 10c0/f1f2aa4061a3ae077878cdebc8f6cb17c1d9de1f6f9848073bba4a45644f7e81ef0eb63b06f0e19fb41203978b978d86ca391b9cd139c39ff1fec77d57c4d9d4
   languageName: node
   linkType: hard
 
@@ -7999,13 +7990,6 @@ __metadata:
     node-domexception: "npm:^1.0.0"
     web-streams-polyfill: "npm:^3.0.3"
   checksum: 10c0/60054bf47bfa10fb0ba6cb7742acec2f37c1f56344f79a70bb8b1c48d77675927c720ff3191fa546410a0442c998d27ab05e9144c32d530d8a52fbe68f843b69
-  languageName: node
-  linkType: hard
-
-"fflate@npm:^0.8.2":
-  version: 0.8.2
-  resolution: "fflate@npm:0.8.2"
-  checksum: 10c0/03448d630c0a583abea594835a9fdb2aaf7d67787055a761515bf4ed862913cfd693b4c4ffd5c3f3b355a70cf1e19033e9ae5aedcca103188aaff91b8bd6e293
   languageName: node
   linkType: hard
 

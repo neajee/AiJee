@@ -49,8 +49,6 @@ interface AuthState {
   tokens: Record<string, AuthSessionBundle>;
   activeServerId: string | null;
   loaded: boolean;
-  /** Whether the active server has desktop/remote mode enabled (Linux only). */
-  remote: boolean;
 
   load: () => Promise<void>;
   authorizeWithCode: (baseUrl: string, code: string, serverId: string, name?: string) => Promise<{ success: boolean; error?: string }>;
@@ -388,7 +386,6 @@ export const useAuthStore = create<AuthState>((set, get) => {
     tokens: {},
     activeServerId: null,
     loaded: false,
-    remote: false,
 
     load: async () => {
       const { tokens, activeServerId, migrated } = await readStore();
@@ -448,7 +445,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
       await removeServerSession(serverId);
       if (get().activeServerId === serverId) {
         clearScheduledRefresh();
-        set({ activeServerId: null, remote: false });
+        set({ activeServerId: null });
         await writeActiveServerId(null);
       }
     },
@@ -490,7 +487,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
         return false;
       }
 
-      set({ activeServerId: server.id, remote: false });
+      set({ activeServerId: server.id });
       await writeActiveServerId(server.id);
       syncRefreshSchedule(server.id);
       return true;
