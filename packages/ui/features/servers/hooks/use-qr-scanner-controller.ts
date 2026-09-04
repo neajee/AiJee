@@ -47,15 +47,17 @@ export function useQrScannerController({ visible, onClose, baseUrl }: Pick<QrSca
       .authorizeWithCode(address, params.code, serverId, params.hostname || ip);
     if (result.success) {
       setStep('done');
-      setTimeout(async () => {
-        await useServersStore.getState().addServer({
-          id: serverId,
-          name: existingServer?.name || params.hostname || ip,
-          address,
-        });
-        await useWorkspaceStore.getState().fetchWorkspaces(serverId);
+      setTimeout(() => {
         reset();
         onClose();
+        void (async () => {
+          await useServersStore.getState().addServer({
+            id: serverId,
+            name: existingServer?.name || params.hostname || ip,
+            address,
+          });
+          await useWorkspaceStore.getState().fetchWorkspaces(serverId);
+        })();
       }, 800);
     } else {
       setStep('error');
