@@ -1,4 +1,5 @@
-import { Pressable, Text, View } from 'react-native';
+import { Text, View } from 'tamagui';
+import { Pressable } from 'react-native';
 import { Circle, Play, RotateCcw, Square, Trash2 } from 'lucide-react-native';
 import type { TaskDefinition, TaskInfo } from '@aijee/client-sdk';
 import { styles } from './styles';

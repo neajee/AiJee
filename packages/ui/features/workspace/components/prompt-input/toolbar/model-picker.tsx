@@ -1,4 +1,5 @@
-import { Animated, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { Input, ScrollView, Text, View } from 'tamagui';
+import { Animated, Pressable } from 'react-native';
 import { Check, ChevronDown } from 'lucide-react-native';
 import { ProviderIcon } from '@/components/provider-icons';
 import { styles } from '../../../utils/toolbar-styles';
@@ -15,9 +16,9 @@ export function ModelPicker({ theme, inline, isWideScreen, onOpenMobileSheet, cu
         <ChevronDown size={14} color={theme.textMuted} strokeWidth={1.8} />
       </Pressable>
       {isWideScreen && activeDropdown === 'model' && (
-        <Animated.View accessibilityRole="menu" accessibilityLabel="Model selection" style={[styles.popover, inline ? { left: undefined, right: 0 } : null, { backgroundColor: theme.dropdownBg, borderColor: theme.dropdownBorder, opacity: toolbarDropdownAnim, transform: [{ translateY: toolbarDropdownAnim.interpolate({ inputRange: [0, 1], outputRange: [4, 0] }) }] }]}>
+        <Animated.View accessibilityRole="menu" accessibilityLabel="Model selection" style={[styles.popover, inline ? { left: 'auto', right: 0 } : null, { backgroundColor: theme.dropdownBg, borderColor: theme.dropdownBorder, opacity: toolbarDropdownAnim, transform: [{ translateY: toolbarDropdownAnim.interpolate({ inputRange: [0, 1], outputRange: [4, 0] }) }] }]}>
           <View style={[styles.searchWrap, { borderBottomColor: theme.dropdownBorder }]}>
-            <TextInput ref={modelSearchRef} placeholder="Search models..." placeholderTextColor={theme.textMuted} style={[styles.searchInput, { color: theme.textPrimary }]} value={modelSearch} onChangeText={(value) => { setModelSearch(value); setPopoverIndex(0); }} onKeyPress={handleSearchKeyPress} accessibilityLabel="Search models" />
+            <Input ref={modelSearchRef} placeholder="Search models..." placeholderTextColor={theme.textMuted} style={[styles.searchInput, { color: theme.textPrimary }]} value={modelSearch} onChangeText={(value) => { setModelSearch(value); setPopoverIndex(0); }} onKeyPress={handleSearchKeyPress} accessibilityLabel="Search models" />
           </View>
           <ScrollView ref={modelScrollRef} style={styles.popoverScroll} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
             {providers.length === 0 && <Text style={[styles.noResults, { color: theme.textMuted }]}>{hasModels ? 'No models found' : 'Loading models…'}</Text>}

@@ -1,4 +1,5 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'tamagui';
+import { Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Colors } from '@/constants/theme';
@@ -56,7 +57,7 @@ export function MobileWorkspaceTrigger({ onPress }: MobileWorkspaceTriggerProps)
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   wrapper: {
     position: 'absolute',
     left: 16,
@@ -66,8 +67,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 10,
+    paddingTop: 8, paddingBottom: 8,
+    paddingLeft: 10, paddingRight: 10,
     borderRadius: 20,
     borderWidth: 1,
     boxShadow: '0px 2px 8px rgba(0, 0, 0, 0.08)',
@@ -95,4 +96,4 @@ const styles = StyleSheet.create({
     height: 6,
     borderRadius: 3,
   },
-});
+} as const;

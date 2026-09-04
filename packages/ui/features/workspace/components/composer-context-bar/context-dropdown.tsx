@@ -1,5 +1,6 @@
+import { ScrollView, Spinner, Text, View } from 'tamagui';
 import type { ReactNode } from 'react';
-import { ActivityIndicator, Animated, Pressable, ScrollView, Text, View } from 'react-native';
+import { Animated, Pressable } from 'react-native';
 import { Check, ChevronDown, FolderGit2, GitBranch, Globe, Plus } from 'lucide-react-native';
 import { usePromptTheme } from '@/components/surface-theme/use-prompt-theme';
 import type { GitBranch as GitBranchInfo } from '@aijee/client-sdk';
@@ -73,7 +74,7 @@ export function ContextDropdown({
               const active = server.id === activeServerId;
               return <Pressable key={server.id} onPress={() => void onSelectServer(server)} accessibilityRole="menuitem" accessibilityState={{ selected: active }} style={({ pressed, hovered }: any) => [styles.item, (pressed || hovered) && { backgroundColor: theme.hoverBg }]}>
                 <View style={styles.itemMain}><Globe size={13} color={active ? theme.accentColor : theme.textMuted} strokeWidth={1.8} /><View style={styles.itemLabels}><Text style={[styles.itemText, { color: active ? theme.accentColor : theme.textPrimary }]} numberOfLines={1}>{server.name}</Text><Text style={[styles.itemSub, { color: theme.textMuted }]} numberOfLines={1}>{server.address}</Text></View></View>
-                {busy === server.id ? <ActivityIndicator size="small" color={theme.textMuted} /> : active && <Check size={13} color={theme.accentColor} strokeWidth={2} />}
+                {busy === server.id ? <Spinner size="small" color={theme.textMuted} /> : active && <Check size={13} color={theme.accentColor} strokeWidth={2} />}
               </Pressable>;
             })}
           </ScrollView>
@@ -82,7 +83,7 @@ export function ContextDropdown({
       {isGitRepo && <View style={styles.anchor}>
         {renderControl('branch', <GitBranch size={13} color={theme.textMuted} strokeWidth={1.8} />, currentBranch ?? '—', `Branch: ${currentBranch ?? 'unknown'}. Press to change.`)}
         {open === 'branch' && <Animated.View accessibilityRole="menu" accessibilityLabel="Branch selection" style={popoverStyle}>
-          {branchesLoading && !branches ? <View style={styles.loadingRow}><ActivityIndicator size="small" color={theme.textMuted} /></View> : localBranches.length === 0 ? <Text style={[styles.emptyText, { color: theme.textMuted }]}>No branches found</Text> : <><ScrollView style={styles.popoverScroll} showsVerticalScrollIndicator={false}>{localBranches.map((branch) => <Pressable key={branch.name} onPress={() => void onSelectBranch(branch)} accessibilityRole="menuitem" accessibilityState={{ selected: branch.is_current }} style={({ pressed, hovered }: any) => [styles.item, (pressed || hovered) && { backgroundColor: theme.hoverBg }]}><View style={styles.itemMain}><GitBranch size={13} color={branch.is_current ? theme.accentColor : theme.textMuted} strokeWidth={1.8} /><Text style={[styles.itemText, { color: branch.is_current ? theme.accentColor : theme.textPrimary }]} numberOfLines={1}>{branch.name}</Text></View>{busy === branch.name ? <ActivityIndicator size="small" color={theme.textMuted} /> : branch.is_current && <Check size={13} color={theme.accentColor} strokeWidth={2} />}</Pressable>)}</ScrollView><Pressable onPress={onAddBranch} style={({ pressed, hovered }: any) => [styles.createBranchAction, { borderTopColor: theme.dropdownBorder }, (pressed || hovered) && { backgroundColor: theme.hoverBg }]}><Plus size={13} color={theme.textMuted} strokeWidth={1.8} /><Text style={[styles.createBranchText, { color: theme.textSecondary }]}>新建分支</Text></Pressable></>}</Animated.View>}
+          {branchesLoading && !branches ? <View style={styles.loadingRow}><Spinner size="small" color={theme.textMuted} /></View> : localBranches.length === 0 ? <Text style={[styles.emptyText, { color: theme.textMuted }]}>No branches found</Text> : <><ScrollView style={styles.popoverScroll} showsVerticalScrollIndicator={false}>{localBranches.map((branch) => <Pressable key={branch.name} onPress={() => void onSelectBranch(branch)} accessibilityRole="menuitem" accessibilityState={{ selected: branch.is_current }} style={({ pressed, hovered }: any) => [styles.item, (pressed || hovered) && { backgroundColor: theme.hoverBg }]}><View style={styles.itemMain}><GitBranch size={13} color={branch.is_current ? theme.accentColor : theme.textMuted} strokeWidth={1.8} /><Text style={[styles.itemText, { color: branch.is_current ? theme.accentColor : theme.textPrimary }]} numberOfLines={1}>{branch.name}</Text></View>{busy === branch.name ? <Spinner size="small" color={theme.textMuted} /> : branch.is_current && <Check size={13} color={theme.accentColor} strokeWidth={2} />}</Pressable>)}</ScrollView><Pressable onPress={onAddBranch} style={({ pressed, hovered }: any) => [styles.createBranchAction, { borderTopColor: theme.dropdownBorder }, (pressed || hovered) && { backgroundColor: theme.hoverBg }]}><Plus size={13} color={theme.textMuted} strokeWidth={1.8} /><Text style={[styles.createBranchText, { color: theme.textSecondary }]}>新建分支</Text></Pressable></>}</Animated.View>}
       </View>}
     </View>
   );

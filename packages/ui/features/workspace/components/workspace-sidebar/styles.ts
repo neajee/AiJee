@@ -1,11 +1,10 @@
-import { StyleSheet } from 'react-native';
 import {
   COLLAPSED_WIDTH,
   SEAM_BAR_WIDTH,
   SEAM_HIT_WIDTH,
 } from '../../utils/workspace-sidebar';
 
-export const styles = StyleSheet.create({
+export const styles = {
   container: {
     borderLeftWidth: 0.633,
     flexDirection: 'row',
@@ -45,4 +44,4 @@ export const styles = StyleSheet.create({
     height: 40,
     zIndex: 30,
   },
-});
+} as const;

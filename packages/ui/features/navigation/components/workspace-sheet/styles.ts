@@ -1,15 +1,15 @@
-import { StyleSheet } from 'react-native';
+import { ABSOLUTE_FILL_STYLE } from "@/constants/layout";
 import { Fonts } from '@/constants/theme';
 
 export const AVATAR_SIZE = 48;
 
-export const styles = StyleSheet.create({
+export const styles = {
   root: {
-    ...StyleSheet.absoluteFillObject,
+    ...ABSOLUTE_FILL_STYLE,
     zIndex: 100,
   },
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...ABSOLUTE_FILL_STYLE,
   },
   sheet: {
     position: 'absolute',
@@ -30,12 +30,12 @@ export const styles = StyleSheet.create({
     borderRadius: 2,
   },
   workspaceStrip: {
-    paddingVertical: 12,
-    marginHorizontal: 12,
+    paddingTop: 12, paddingBottom: 12,
+    marginLeft: 12, marginRight: 12,
     borderRadius: 10,
   },
   workspaceScrollContent: {
-    paddingHorizontal: 12,
+    paddingLeft: 12, paddingRight: 12,
     gap: 16,
   },
   workspaceItem: {
@@ -84,7 +84,7 @@ export const styles = StyleSheet.create({
   sessionsHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingLeft: 20, paddingRight: 20,
     paddingTop: 14,
     paddingBottom: 6,
   },
@@ -94,7 +94,7 @@ export const styles = StyleSheet.create({
     flex: 1,
   },
   iconButton: { padding: 6 },
-  actions: { paddingHorizontal: 16, paddingBottom: 10 },
+  actions: { paddingLeft: 16, paddingRight: 16, paddingBottom: 10 },
   newSessionButton: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -105,13 +105,13 @@ export const styles = StyleSheet.create({
   },
   newSessionText: { fontSize: 14, fontFamily: Fonts.sansMedium },
   sessionList: { flex: 1 },
-  sessionListContent: { paddingHorizontal: 12, gap: 2 },
+  sessionListContent: { paddingLeft: 12, paddingRight: 12, gap: 2 },
   sessionItem: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    paddingHorizontal: 10,
-    paddingVertical: 10,
+    paddingLeft: 10, paddingRight: 10,
+    paddingTop: 10, paddingBottom: 10,
     borderRadius: 8,
   },
   sessionTitle: { fontSize: 14, fontFamily: Fonts.sans, flex: 1 },
@@ -133,13 +133,13 @@ export const styles = StyleSheet.create({
     borderTopWidth: 1,
     marginTop: 4,
     paddingTop: 8,
-    paddingHorizontal: 20,
+    paddingLeft: 20, paddingRight: 20,
   },
   footerItem: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    paddingVertical: 10,
+    paddingTop: 10, paddingBottom: 10,
   },
   footerLabel: { fontSize: 14, fontFamily: Fonts.sans },
-});
+} as const;

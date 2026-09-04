@@ -1,5 +1,6 @@
+import { Text, View } from 'tamagui';
 import { memo, useCallback } from 'react';
-import { Animated, Modal, Pressable, Text, View, useWindowDimensions } from 'react-native';
+import { Animated, Modal, Pressable, useWindowDimensions } from 'react-native';
 import { Maximize2, X } from 'lucide-react-native';
 
 import { useThemeTokens } from '@/hooks/use-theme-tokens';

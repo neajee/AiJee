@@ -1,7 +1,6 @@
-import { StyleSheet } from 'react-native';
 import { Fonts } from '@/constants/theme';
 
-export const styles = StyleSheet.create({
+export const styles = {
   container: {
     borderTopWidth: 0.633,
     flexShrink: 0,
@@ -14,8 +13,8 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingLeft: 12, paddingRight: 12,
+    paddingTop: 6, paddingBottom: 6,
   },
   dragHandle: {
     height: 8,
@@ -32,8 +31,8 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
+    paddingLeft: 12, paddingRight: 12,
+    paddingTop: 4, paddingBottom: 4,
     borderBottomWidth: 0.633,
   },
   headerLeft: {
@@ -74,4 +73,4 @@ export const styles = StyleSheet.create({
     fontFamily: Fonts.mono,
     lineHeight: 16,
   },
-});
+} as const;

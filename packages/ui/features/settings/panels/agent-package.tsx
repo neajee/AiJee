@@ -1,5 +1,6 @@
+import { Spinner, Text, View } from 'tamagui';
 import { useCallback, useEffect, useState, type ComponentType } from "react";
-import { ActivityIndicator, Platform, Pressable, Text, View } from "react-native";
+import { Platform, Pressable } from 'react-native';
 import { AlertCircle, CheckCircle2 } from "lucide-react-native";
 import { sdk, unwrapApiData, type PackageStatus } from "@aijee/client-sdk";
 import { useSettingsMetrics, useSettingsPalette } from "@/components/settings-surface";
@@ -106,7 +107,7 @@ export function AgentActionButton({
       ]}
     >
       {updating ? (
-        <ActivityIndicator size="small" color={p.onAccent} />
+        <Spinner size="small" color={p.onAccent} />
       ) : (
         <>
           <Icon size={13} color={p.onAccent} strokeWidth={2.2} />
@@ -134,7 +135,7 @@ export function AgentBanner({ text, ok }: { text: string; ok: boolean }) {
     <View
       style={[
         pkgStyles.messageBanner,
-        { marginHorizontal: m.gutter, backgroundColor: tint },
+        { marginLeft: m.gutter, marginRight: m.gutter, backgroundColor: tint },
       ]}
     >
       {ok ? (

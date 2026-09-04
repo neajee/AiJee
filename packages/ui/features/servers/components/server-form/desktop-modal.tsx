@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Modal, Pressable, Text, View } from 'react-native';
+import { Modal, Pressable } from 'react-native';
+import { Spinner, Text, View } from 'tamagui';
 import { X } from 'lucide-react-native';
 
 import { ServerFormFields } from './fields';
@@ -79,7 +80,7 @@ export function ServerFormDesktopModal({
               disabled={!canSave}
             >
               {loading ? (
-                <ActivityIndicator size="small" color="#fff" />
+                <Spinner size="small" color="#fff" />
               ) : (
                 <Text style={[formStyles.btnText, { color: '#fff' }]}>
                   {initial ? 'Save' : 'Add & Connect'}

@@ -1,5 +1,6 @@
+import { View } from 'tamagui';
 import { useCallback, useEffect } from "react";
-import { Platform, Pressable, StyleSheet, View } from "react-native";
+import { Platform, Pressable } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Animated, {
   Easing,
@@ -11,6 +12,7 @@ import Animated, {
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 
 import { Colors } from "@/constants/theme";
+import { ABSOLUTE_FILL_STYLE } from "@/constants/layout";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { ChangesPanel } from "@/features/workspace/components/changes-panel";
@@ -97,7 +99,7 @@ export function MobileChangesSheet({
           overlayStyle,
         ]}
       >
-        <Pressable style={StyleSheet.absoluteFill} onPress={dismiss} />
+        <Pressable style={ABSOLUTE_FILL_STYLE} onPress={dismiss} />
       </Animated.View>
 
       <Animated.View
@@ -131,13 +133,13 @@ export function MobileChangesSheet({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   root: {
-    ...StyleSheet.absoluteFillObject,
+    ...ABSOLUTE_FILL_STYLE,
     zIndex: 100,
   },
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...ABSOLUTE_FILL_STYLE,
   },
   sheet: {
     position: "absolute",
@@ -161,4 +163,4 @@ const styles = StyleSheet.create({
     flex: 1,
     overflow: "hidden",
   },
-});
+} as const;

@@ -1,5 +1,6 @@
+import { View } from 'tamagui';
 import type { ReactNode } from 'react';
-import { Animated, Platform, View } from 'react-native';
+import { Animated, Platform } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ConnectionStatusBanner } from '@/features/agent/components/connection-status-banner';

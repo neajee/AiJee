@@ -1,4 +1,5 @@
-import { View } from 'react-native';
+import { View } from 'tamagui';
+
 import { usePromptTheme } from '@/components/surface-theme/use-prompt-theme';
 import { NewWorkspaceDialog } from '@/features/workspace/components/new-workspace-dialog';
 import { useComposerContextController } from '../../hooks/use-composer-context-controller';

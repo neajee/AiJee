@@ -1,7 +1,9 @@
+import { Image, Input, ScrollView, Text, View } from 'tamagui';
 import { memo, useEffect, useMemo, useState } from "react";
-import { Image, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Platform, Pressable } from "react-native";
 import { Check, ChevronDown, Pencil, X } from "lucide-react-native";
 import { Colors, Fonts } from "@/constants/theme";
+import { HAIRLINE_WIDTH } from "@/constants/layout";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import type { ChatMessage } from "../../types";
 
@@ -73,7 +75,7 @@ export const UserMessage = memo(function UserMessage({
         )}
         {editing ? (
           <>
-            <TextInput
+            <Input
               autoFocus
               multiline
               value={editText}
@@ -122,15 +124,15 @@ export const UserMessage = memo(function UserMessage({
   );
 });
 
-const styles = StyleSheet.create({
+const styles = {
   container: {
     alignItems: "flex-end",
-    paddingHorizontal: 16,
-    paddingVertical: 4,
+    paddingLeft: 16, paddingRight: 16,
+    paddingTop: 4, paddingBottom: 4,
   },
   bubble: {
-    paddingHorizontal: 14,
-    paddingVertical: 10,
+    paddingLeft: 14, paddingRight: 14,
+    paddingTop: 10, paddingBottom: 10,
     maxWidth: "85%",
   },
   images: {
@@ -151,8 +153,8 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.sans,
   },
   disclosureRow: { flexDirection: "row", alignItems: "center", gap: 9, marginTop: 10 },
-  disclosureLine: { height: StyleSheet.hairlineWidth, flex: 1 },
-  disclosure: { flexDirection: "row", alignItems: "center", gap: 4, minHeight: 24, paddingHorizontal: 2 },
+  disclosureLine: { height: HAIRLINE_WIDTH, flex: 1 },
+  disclosure: { flexDirection: "row", alignItems: "center", gap: 4, minHeight: 24, paddingLeft: 2 , paddingRight: 2 },
   disclosurePressed: { opacity: 0.68 },
   disclosureText: { fontSize: 12, fontFamily: Fonts.sansMedium },
   disclosureIconExpanded: { transform: [{ rotate: "180deg" }] },
@@ -160,10 +162,10 @@ const styles = StyleSheet.create({
     minWidth: 220,
     minHeight: 64,
     maxHeight: 180,
-    borderWidth: StyleSheet.hairlineWidth,
+    borderWidth: HAIRLINE_WIDTH,
     borderRadius: 8,
-    paddingHorizontal: 9,
-    paddingVertical: 7,
+    paddingLeft: 9, paddingRight: 9,
+    paddingTop: 7, paddingBottom: 7,
     fontSize: 14,
     lineHeight: 20,
     fontFamily: Fonts.sans,
@@ -171,4 +173,4 @@ const styles = StyleSheet.create({
   editActions: { flexDirection: "row", justifyContent: "flex-end", gap: 6, marginTop: 6 },
   editButton: { width: 26, height: 26, borderRadius: 6, alignItems: "center", justifyContent: "center" },
   editTrigger: { marginTop: 2, padding: 5, opacity: 0.75 },
-});
+} as const;

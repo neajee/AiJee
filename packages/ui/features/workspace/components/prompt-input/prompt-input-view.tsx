@@ -1,5 +1,6 @@
+import { Text, View } from 'tamagui';
 import type { ChangeEvent, RefObject } from 'react';
-import { Animated, NativeSyntheticEvent, Pressable, Text, TextInput, TextInputKeyPressEventData, View } from 'react-native';
+import { Animated, NativeSyntheticEvent, Pressable, TextInput, TextInputKeyPressEventData } from 'react-native';
 
 import { formatAgentModeLabel, type AgentMode } from '@/features/agent/mode';
 import { useCachedAgentConfig } from '@/features/agent/hooks/use-cached-agent-config';

@@ -1,12 +1,6 @@
+import { Text, View } from 'tamagui';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import {
-  AppState,
-  Platform,
-  Pressable,
-  Text,
-  View,
-  type AppStateStatus,
-} from 'react-native';
+import { AppState, Platform, Pressable, type AppStateStatus } from 'react-native';
 import { Redirect, Slot, usePathname, useRouter } from 'expo-router';
 
 import { Fonts } from '@/constants/theme';
@@ -63,8 +57,8 @@ function StartupScreen({
         style={{
           width: '100%',
           maxWidth: 420,
-          paddingHorizontal: 24,
-          paddingVertical: 28,
+          paddingLeft: 24, paddingRight: 24,
+          paddingTop: 28, paddingBottom: 28,
           borderRadius: 24,
           borderWidth: 1,
           backgroundColor: colors.surface,
@@ -99,8 +93,8 @@ function StartupScreen({
             style={({ pressed }) => ({
               marginTop: 24,
               borderRadius: 999,
-              paddingHorizontal: 18,
-              paddingVertical: 14,
+              paddingLeft: 18, paddingRight: 18,
+              paddingTop: 14, paddingBottom: 14,
               alignItems: 'center',
               backgroundColor: colors.accent,
               opacity: pressed ? 0.75 : 1,
@@ -124,8 +118,8 @@ function StartupScreen({
             style={({ pressed }) => ({
               marginTop: 12,
               borderRadius: 999,
-              paddingHorizontal: 18,
-              paddingVertical: 14,
+              paddingLeft: 18, paddingRight: 18,
+              paddingTop: 14, paddingBottom: 14,
               alignItems: 'center',
               borderWidth: 1,
               borderColor: colors.borderStrong,
@@ -153,11 +147,11 @@ function UnconnectedNotice({ onAddDevice }: { onAddDevice: () => void }) {
 
   return (
     <View style={{ flex: 1, padding: 16, backgroundColor: colors.background }}>
-      <View style={{ alignSelf: 'center', width: '100%', maxWidth: 760, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 16, paddingHorizontal: 18, paddingVertical: 14, borderRadius: 12, backgroundColor: colors.surfaceRaised }}>
+      <View style={{ alignSelf: 'center', width: '100%', maxWidth: 760, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 16, paddingLeft: 18, paddingRight: 18, paddingTop: 14, paddingBottom: 14, borderRadius: 12, backgroundColor: colors.surfaceRaised }}>
         <Text style={{ flex: 1, fontFamily: Fonts.sans, fontSize: 14, color: colors.text }}>
           未连接 AiJee 设备。连接后即可同步工作区与会话。
         </Text>
-        <Pressable onPress={onAddDevice} style={({ pressed }) => ({ borderRadius: 8, paddingHorizontal: 14, paddingVertical: 9, backgroundColor: colors.accent, opacity: pressed ? 0.7 : 1 })}>
+        <Pressable onPress={onAddDevice} style={({ pressed }) => ({ borderRadius: 8, paddingLeft: 14, paddingRight: 14, paddingTop: 9, paddingBottom: 9, backgroundColor: colors.accent, opacity: pressed ? 0.7 : 1 })}>
           <Text style={{ fontFamily: Fonts.sansSemiBold, fontSize: 14, color: colors.onAccent }}>添加设备</Text>
         </Pressable>
       </View>

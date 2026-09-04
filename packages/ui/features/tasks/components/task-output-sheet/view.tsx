@@ -1,5 +1,6 @@
+import { ScrollView, Text, View } from 'tamagui';
 import { useCallback, useEffect, useRef } from 'react';
-import { Platform, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, {
   Easing,
@@ -12,6 +13,7 @@ import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { Circle, X } from 'lucide-react-native';
 
 import { Colors, Fonts } from '@/constants/theme';
+import { ABSOLUTE_FILL_STYLE } from '@/constants/layout';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useTaskOutputData } from '../../hooks/use-task-output-data';
 import { styles } from './styles';
@@ -112,7 +114,7 @@ export function TaskOutputSheet({ visible, onClose }: TaskOutputSheetProps) {
       <Animated.View
         style={[styles.overlay, { backgroundColor: colors.overlay }, overlayStyle]}
       >
-        <Pressable style={StyleSheet.absoluteFill} onPress={dismiss} />
+        <Pressable style={ABSOLUTE_FILL_STYLE} onPress={dismiss} />
       </Animated.View>
 
       <Animated.View

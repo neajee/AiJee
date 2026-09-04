@@ -1,5 +1,6 @@
+import { ScrollView, Text } from 'tamagui';
 import { useRef, useEffect } from 'react';
-import { Animated, Pressable, ScrollView, StyleSheet, Text } from 'react-native';
+import { Animated, Pressable } from 'react-native';
 
 import { Fonts } from '@/constants/theme';
 import { SlashCommand } from '../../utils/prompt-input';
@@ -88,7 +89,7 @@ export function SlashCommandDropdown({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   container: {
     borderWidth: 0.633,
     overflow: 'hidden',
@@ -115,7 +116,7 @@ const styles = StyleSheet.create({
   item: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
+    paddingLeft: 16, paddingRight: 16,
     height: 36,
     gap: 12,
   },
@@ -129,4 +130,4 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.sans,
     flex: 1,
   },
-});
+} as const;

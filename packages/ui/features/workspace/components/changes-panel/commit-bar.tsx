@@ -1,11 +1,7 @@
+import { Input, Spinner, View } from 'tamagui';
 import { useRef } from "react";
-import {
-  ActivityIndicator,
-  Pressable,
-  StyleSheet,
-  TextInput,
-  View,
-} from "react-native";
+import { Pressable } from "react-native";
+import type { TextInput as RNTextInput } from "react-native";
 import { Send } from "lucide-react-native";
 
 import { Fonts } from "@/constants/theme";
@@ -26,7 +22,7 @@ export function CommitBar({
 }) {
   const { isDark, textPrimary, textMuted, dividerColor, inputBg, inputBorder, sendColor } =
     useChangesTheme();
-  const commitInputRef = useRef<TextInput>(null);
+  const commitInputRef = useRef<RNTextInput>(null);
 
   return (
     <View style={[styles.commitBar, { borderTopColor: dividerColor }]}>
@@ -36,7 +32,7 @@ export function CommitBar({
           { backgroundColor: inputBg, borderColor: inputBorder },
         ]}
       >
-        <TextInput
+        <Input
           ref={commitInputRef}
           style={[styles.commitTextarea, { color: textPrimary }]}
           value={commitMsg}
@@ -50,7 +46,7 @@ export function CommitBar({
         />
         <View style={styles.commitActions}>
           {isCommitting ? (
-            <ActivityIndicator size="small" />
+            <Spinner size="small" />
           ) : (
             <Pressable
               onPress={onCommit}
@@ -88,10 +84,10 @@ export function CommitBar({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   commitBar: {
-    paddingHorizontal: 10,
-    paddingVertical: 8,
+    paddingLeft: 10, paddingRight: 10,
+    paddingTop: 8, paddingBottom: 8,
     borderTopWidth: 0.633,
   },
   commitInputBox: {
@@ -102,7 +98,7 @@ const styles = StyleSheet.create({
   commitTextarea: {
     fontSize: 13,
     fontFamily: Fonts.sans,
-    paddingHorizontal: 10,
+    paddingLeft: 10, paddingRight: 10,
     paddingTop: 8,
     paddingBottom: 4,
     minHeight: 64,
@@ -112,7 +108,7 @@ const styles = StyleSheet.create({
   commitActions: {
     flexDirection: "row",
     justifyContent: "flex-end",
-    paddingHorizontal: 8,
+    paddingLeft: 8, paddingRight: 8,
     paddingBottom: 6,
   },
   commitSendButton: {
@@ -122,4 +118,4 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-});
+} as const;

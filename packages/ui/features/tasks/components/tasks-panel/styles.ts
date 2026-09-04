@@ -1,7 +1,6 @@
-import { StyleSheet } from 'react-native';
 import { Fonts } from '@/constants/theme';
 
-export const styles = StyleSheet.create({
+export const styles = {
   list: {
     flex: 1,
   },
@@ -12,8 +11,8 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingLeft: 12, paddingRight: 12,
+    paddingTop: 8, paddingBottom: 8,
   },
   sectionTitle: {
     fontSize: 10,
@@ -25,8 +24,8 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingLeft: 12, paddingRight: 12,
+    paddingTop: 8, paddingBottom: 8,
   },
   taskRowInfo: {
     flex: 1,
@@ -56,8 +55,8 @@ export const styles = StyleSheet.create({
   },
   sourceBadge: {
     borderRadius: 3,
-    paddingHorizontal: 4,
-    paddingVertical: 1,
+    paddingLeft: 4, paddingRight: 4,
+    paddingTop: 1, paddingBottom: 1,
     alignSelf: 'flex-start',
   },
   sourceBadgeText: {
@@ -70,8 +69,8 @@ export const styles = StyleSheet.create({
   groupBadge: {
     borderWidth: 0.633,
     borderRadius: 4,
-    paddingHorizontal: 4,
-    paddingVertical: 1,
+    paddingLeft: 4, paddingRight: 4,
+    paddingTop: 1, paddingBottom: 1,
   },
   groupBadgeText: {
     fontSize: 9,
@@ -90,4 +89,4 @@ export const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 18,
   },
-});
+} as const;

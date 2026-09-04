@@ -1,4 +1,5 @@
-import { Pressable, Text, View } from 'react-native';
+import { Text, View } from 'tamagui';
+import { Pressable } from 'react-native';
 import { RotateCw } from 'lucide-react-native';
 
 import { TaskSelector } from '@/features/tasks/components/task-selector';

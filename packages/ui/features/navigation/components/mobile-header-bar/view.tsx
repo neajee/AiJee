@@ -1,5 +1,6 @@
+import { Text, View } from 'tamagui';
 import { Ellipsis, FolderOpen } from 'lucide-react-native';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable } from 'react-native';
 
 import { MobileHeaderActionsSheet } from '@/features/navigation/components/mobile-header-actions-sheet';
 import { useMobileHeaderController } from '../../hooks/use-mobile-header-controller';

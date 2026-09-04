@@ -1,13 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import {
-  ActivityIndicator,
-  AppState,
-  Linking,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { AppState, Linking, Pressable } from 'react-native';
+import { Spinner, Text, View } from "tamagui";
 import { CameraView, type CameraMountError, useCameraPermissions } from "expo-camera";
 import { QrCode } from "lucide-react-native";
 
@@ -66,7 +59,7 @@ export function QrScannerScanPanel({
   if (!permission) {
     return (
       <View style={styles.loadingWrap}>
-        <ActivityIndicator size="small" color={textMuted} />
+        <Spinner size="small" color={textMuted} />
       </View>
     );
   }
@@ -127,7 +120,7 @@ export function QrScannerScanPanel({
       />
       {!cameraReady && !mountError && (
         <View style={styles.loadingOverlay}>
-          <ActivityIndicator size="small" color="#fff" />
+          <Spinner size="small" color="#fff" />
           <Text style={styles.loadingText}>Starting camera...</Text>
         </View>
       )}
@@ -149,7 +142,7 @@ export function QrScannerScanPanel({
 const CORNER_SIZE = 24;
 const CORNER_WIDTH = 3;
 
-const styles = StyleSheet.create({
+const styles = {
   loadingWrap: {
     height: 200,
     alignItems: "center",
@@ -165,7 +158,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   loadingOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
     alignItems: "center",
     justifyContent: "center",
     gap: 10,
@@ -177,7 +174,11 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.sans,
   },
   viewfinder: {
-    ...StyleSheet.absoluteFillObject,
+    position: "absolute",
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -227,8 +228,8 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   permissionBtn: {
-    paddingHorizontal: 20,
-    paddingVertical: 10,
+    paddingLeft: 20, paddingRight: 20,
+    paddingTop: 10, paddingBottom: 10,
     borderRadius: 6,
     marginTop: 4,
   },
@@ -236,4 +237,4 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: Fonts.sansSemiBold,
   },
-});
+} as const;

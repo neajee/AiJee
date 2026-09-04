@@ -1,7 +1,6 @@
-import { StyleSheet } from 'react-native';
 import { Fonts } from '@/constants/theme';
 
-export const styles = StyleSheet.create({
+export const styles = {
   overlay: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24 },
   card: {
     width: '100%',
@@ -13,7 +12,7 @@ export const styles = StyleSheet.create({
   },
   scannerCard: { maxWidth: 440 },
   cardHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  cardTitle: { fontSize: 17, fontFamily: Fonts.sansSemiBold },
+  cardTitle: { fontSize: 17, fontFamily: Fonts.sansSemiBold, textAlign: 'left' },
   cardSubtitle: { fontSize: 14, fontFamily: Fonts.sans, lineHeight: 20 },
   closeBtn: {
     width: 28,
@@ -28,6 +27,7 @@ export const styles = StyleSheet.create({
     fontFamily: Fonts.sansMedium,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
+    textAlign: 'left',
   },
   manualRow: { flexDirection: 'row', gap: 8 },
   manualInput: {
@@ -35,21 +35,21 @@ export const styles = StyleSheet.create({
     height: 40,
     borderRadius: 6,
     borderWidth: 0.633,
-    paddingHorizontal: 12,
+    paddingLeft: 12, paddingRight: 12,
     fontSize: 14,
     fontFamily: Fonts.sans,
   },
   manualBtn: {
-    paddingHorizontal: 16,
+    paddingLeft: 16, paddingRight: 16,
     height: 40,
     borderRadius: 6,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  manualBtnText: { fontSize: 13, fontFamily: Fonts.sansSemiBold },
-  errorText: { fontSize: 13, fontFamily: Fonts.sans },
-  statusCenter: { alignItems: 'center', paddingVertical: 24, gap: 12 },
-  statusTitle: { fontSize: 17, fontFamily: Fonts.sansSemiBold, marginTop: 4 },
+  manualBtnText: { fontSize: 13, fontFamily: Fonts.sansSemiBold, textAlign: 'left' },
+  errorText: { fontSize: 13, fontFamily: Fonts.sans, textAlign: 'left' },
+  statusCenter: { alignItems: 'center', paddingTop: 24, paddingBottom: 24, gap: 12 },
+  statusTitle: { fontSize: 17, fontFamily: Fonts.sansSemiBold, marginTop: 4, textAlign: 'center' },
   statusDesc: { fontSize: 14, fontFamily: Fonts.sans, textAlign: 'center', lineHeight: 20 },
   successCircle: {
     width: 56,
@@ -67,7 +67,7 @@ export const styles = StyleSheet.create({
   },
   errorActions: { gap: 8 },
   retryBtn: { height: 44, borderRadius: 8, alignItems: 'center', justifyContent: 'center' },
-  retryBtnText: { fontSize: 15, fontFamily: Fonts.sansSemiBold },
+  retryBtnText: { fontSize: 15, fontFamily: Fonts.sansSemiBold, textAlign: 'left' },
   cancelBtn: {
     height: 44,
     borderRadius: 8,
@@ -75,18 +75,18 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  cancelBtnText: { fontSize: 15, fontFamily: Fonts.sansSemiBold },
+  cancelBtnText: { fontSize: 15, fontFamily: Fonts.sansSemiBold, textAlign: 'left' },
   ipList: { gap: 4 },
   ipRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
+    paddingLeft: 14, paddingRight: 14,
+    paddingTop: 12, paddingBottom: 12,
     borderRadius: 8,
     borderWidth: 0.633,
   },
   ipInfo: { flex: 1 },
-  ipText: { fontSize: 14, fontFamily: Fonts.sansMedium },
-  ipPort: { fontSize: 12, fontFamily: Fonts.sans, marginTop: 1 },
-});
+  ipText: { fontSize: 14, fontFamily: Fonts.sansMedium, textAlign: 'left' },
+  ipPort: { fontSize: 12, fontFamily: Fonts.sans, marginTop: 1, textAlign: 'left' },
+} as const;

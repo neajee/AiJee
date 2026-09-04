@@ -1,5 +1,6 @@
+import { Text, View } from 'tamagui';
 import { useCallback, useEffect } from 'react';
-import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, {
   Easing,
@@ -11,6 +12,7 @@ import Animated, {
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
 import { Colors, Fonts } from '@/constants/theme';
+import { ABSOLUTE_FILL_STYLE } from '@/constants/layout';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { TasksPanelContent } from './tasks-panel/content';
 
@@ -86,7 +88,7 @@ export function TasksSheet({ visible, onClose }: TasksSheetProps) {
       <Animated.View
         style={[styles.overlay, { backgroundColor: colors.overlay }, overlayStyle]}
       >
-        <Pressable style={StyleSheet.absoluteFill} onPress={dismiss} />
+        <Pressable style={ABSOLUTE_FILL_STYLE} onPress={dismiss} />
       </Animated.View>
 
       <Animated.View
@@ -115,13 +117,13 @@ export function TasksSheet({ visible, onClose }: TasksSheetProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   root: {
-    ...StyleSheet.absoluteFillObject,
+    ...ABSOLUTE_FILL_STYLE,
     zIndex: 100,
   },
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...ABSOLUTE_FILL_STYLE,
   },
   sheet: {
     position: 'absolute',
@@ -147,11 +149,11 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontFamily: Fonts.sansSemiBold,
     fontWeight: '600',
-    paddingHorizontal: 16,
+    paddingLeft: 16, paddingRight: 16,
     paddingBottom: 8,
   },
   content: {
     flex: 1,
     overflow: 'hidden',
   },
-});
+} as const;

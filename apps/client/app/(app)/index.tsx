@@ -1,4 +1,5 @@
-import { View } from "react-native";
+import { View } from 'tamagui';
+
 import { Redirect } from "expo-router";
 
 import { useServersStore } from "@/features/servers/store";

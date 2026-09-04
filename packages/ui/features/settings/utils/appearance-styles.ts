@@ -1,6 +1,6 @@
-import { StyleSheet } from "react-native";
+import { HAIRLINE_WIDTH } from "@/constants/layout";
 
-export const pickerStyles = StyleSheet.create({
+export const pickerStyles = {
   group: {
     flexDirection: 'row',
     gap: 2,
@@ -17,7 +17,7 @@ export const pickerStyles = StyleSheet.create({
   item: {
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: StyleSheet.hairlineWidth,
+    borderWidth: HAIRLINE_WIDTH,
     borderColor: 'transparent',
   },
   wideItem: {
@@ -27,4 +27,4 @@ export const pickerStyles = StyleSheet.create({
     gap: 7,
     borderRadius: 7,
   },
-});
+} as const;

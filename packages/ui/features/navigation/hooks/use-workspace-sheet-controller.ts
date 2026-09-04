@@ -1,5 +1,6 @@
+import { ScrollView } from 'tamagui';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Platform, ScrollView } from 'react-native';
+import { Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import Animated, {
   Easing,

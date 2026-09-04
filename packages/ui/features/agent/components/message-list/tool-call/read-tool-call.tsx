@@ -1,5 +1,6 @@
+import { View } from 'tamagui';
 import { memo, useCallback, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Text } from "tamagui";
 import { Colors, Fonts } from "@/constants/theme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import type { ToolCallInfo } from "../../../types";
@@ -55,11 +56,11 @@ export const ReadToolCall = memo(function ReadToolCall({
   );
 });
 
-const styles = StyleSheet.create({
+const styles = {
   fileName: {
     fontSize: 12,
     fontFamily: Fonts.sansMedium,
     fontWeight: "500",
     flexShrink: 1,
   },
-});
+} as const;

@@ -1,30 +1,29 @@
-import { StyleSheet } from "react-native";
 import { Fonts } from "@/constants/theme";
 
-export const styles = StyleSheet.create({
+export const styles = {
   content: { width: '100%' },
   // Heading lines up with the card edge, the same way ModelSection titles do.
   sectionHeading: { gap: 6 },
-  sectionTitle: { fontSize: 13, fontFamily: Fonts.sansMedium },
-  sectionCaption: { fontSize: 12, fontFamily: Fonts.sans, opacity: 0.5, marginTop: 4 },
-  serverCard: { borderWidth: StyleSheet.hairlineWidth, borderRadius: 8, overflow: 'hidden' },
+  sectionTitle: { fontSize: 13, fontFamily: Fonts.sansMedium, textAlign: 'left' },
+  sectionCaption: { fontSize: 12, fontFamily: Fonts.sans, opacity: 0.5, marginTop: 4, textAlign: 'left' },
+  serverCard: { borderWidth: 0.5, borderRadius: 8, overflow: 'hidden' },
   serverRowWrap: { minHeight: 56, flexDirection: 'row', alignItems: 'center', position: 'relative' },
   activeRail: { width: 2, alignSelf: 'stretch' },
-  serverRow: { flex: 1, minWidth: 0, alignSelf: 'stretch', flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 12 },
+  serverRow: { flex: 1, minWidth: 0, alignSelf: 'stretch', flexDirection: 'row', alignItems: 'center', gap: 12, paddingLeft: 12 , paddingRight: 12 },
   statusLine: { minWidth: 0 },
   statusDot: { width: 7, height: 7, borderRadius: 4, marginRight: -4 },
   // Aligned with the model list's divider (12 padding + 30 tile + 12 gap).
-  rowDivider: { position: 'absolute', left: 54, right: 0, bottom: 0, height: StyleSheet.hairlineWidth },
+  rowDivider: { position: 'absolute', left: 54, right: 0, bottom: 0, height: 0.5 },
   qrAction: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 8 },
   moreAction: { width: 40, height: 40, alignItems: 'center', justifyContent: 'center', borderRadius: 8, marginLeft: 12, marginRight: 12, opacity: 0, transitionProperty: 'opacity, background-color', transitionDuration: '120ms' } as any,
   menuBackdrop: { flex: 1 },
-  menuSheet: { width: 220, borderWidth: StyleSheet.hairlineWidth, borderRadius: 10, paddingVertical: 4, position: 'absolute', boxShadow: '0 6px 18px rgba(0,0,0,.16)' } as any,
-  menuAction: { minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 12 },
-  menuActionText: { fontSize: 13, fontFamily: Fonts.sansMedium },
-  menuDivider: { height: StyleSheet.hairlineWidth, marginVertical: 4 },
-  footerAction: { minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 12 },
-  footerActionText: { fontSize: 13, fontFamily: Fonts.sansMedium, opacity: 0.7 },
-  footerDivider: { position: 'absolute', top: 0, left: 12, right: 0, height: StyleSheet.hairlineWidth },
+  menuSheet: { width: 220, borderWidth: 0.5, borderRadius: 10, paddingTop: 4, paddingBottom: 4, position: 'absolute', boxShadow: '0 6px 18px rgba(0,0,0,.16)' } as any,
+  menuAction: { minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: 10, paddingLeft: 12 , paddingRight: 12 },
+  menuActionText: { fontSize: 13, fontFamily: Fonts.sansMedium, textAlign: 'left' },
+  menuDivider: { height: 0.5, marginTop: 4 , marginBottom: 4 },
+  footerAction: { minHeight: 44, flexDirection: 'row', alignItems: 'center', gap: 10, paddingLeft: 12 , paddingRight: 12 },
+  footerActionText: { fontSize: 13, fontFamily: Fonts.sansMedium, opacity: 0.7, textAlign: 'left' },
+  footerDivider: { position: 'absolute', top: 0, left: 12, right: 0, height: 0.5 },
   welcome: {
     flex: 1,
     alignItems: "center",
@@ -47,6 +46,7 @@ export const styles = StyleSheet.create({
     fontSize: 22,
     lineHeight: 30,
     fontFamily: Fonts.sansMedium,
+    textAlign: 'left',
     marginBottom: 8,
   },
   welcomeDesc: {
@@ -65,7 +65,7 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     gap: 7,
     height: 40,
-    paddingHorizontal: 16,
+    paddingLeft: 16, paddingRight: 16,
     borderRadius: 10,
   },
   welcomeButtonText: {
@@ -90,6 +90,7 @@ export const styles = StyleSheet.create({
   codeTitle: {
     fontSize: 17,
     fontFamily: Fonts.sansMedium,
+    textAlign: 'left',
   },
   codeHeader: {
     width: "100%",
@@ -100,15 +101,17 @@ export const styles = StyleSheet.create({
   codeImage: {
     width: 240,
     height: 240,
-    marginVertical: 6,
+    marginTop: 6, marginBottom: 6,
   },
   codeLabel: {
     fontSize: 12,
     fontFamily: Fonts.sans,
+    textAlign: 'left',
   },
   codeValue: {
     fontSize: 18,
     fontFamily: Fonts.mono,
+    textAlign: 'left',
     letterSpacing: 1,
   },
   codeRow: {
@@ -122,6 +125,6 @@ export const styles = StyleSheet.create({
     padding: 4,
   },
   closeCodeButton: {
-    paddingVertical: 4,
+    paddingTop: 4, paddingBottom: 4,
   },
-});
+} as const;

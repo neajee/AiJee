@@ -1,5 +1,6 @@
+import { View } from 'tamagui';
 import { memo } from "react";
-import { Text, View } from "react-native";
+import { Text } from "tamagui";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { basename, relativePath, type TurnFileChange } from "../../utils/message-list";
 import { styles } from "./styles";

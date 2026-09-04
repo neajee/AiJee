@@ -1,4 +1,5 @@
-import { ActivityIndicator, Image, Modal, Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import { Modal, Platform, Pressable } from 'react-native';
+import { Image, Spinner, Text, View } from "tamagui";
 import { Copy, Pencil, Plus, QrCode, RefreshCw, Trash2, X } from "lucide-react-native";
 import * as Clipboard from "expo-clipboard";
 import { Fonts } from "@/constants/theme";
@@ -67,7 +68,7 @@ export function ServersView({ controller, isDark, variant }: { controller: Serve
               onPress={() => setQrVisible(true)}
               style={({ pressed }) => [
                 styles.welcomeButton,
-                { borderWidth: StyleSheet.hairlineWidth, borderColor: p.border },
+                { borderWidth: 0.5, borderColor: p.border },
                 pressed && { opacity: 0.7 },
               ]}
             >
@@ -111,8 +112,8 @@ export function ServersView({ controller, isDark, variant }: { controller: Serve
         {servers.length === 0 ? (
           <View
             style={{
-              paddingHorizontal: m.gutter,
-              paddingVertical: m.rowPaddingV + 4,
+              paddingLeft: m.gutter, paddingRight: m.gutter,
+              paddingTop: m.rowPaddingV + 4, paddingBottom: m.rowPaddingV + 4,
             }}
           >
             <Text
@@ -224,7 +225,7 @@ export function ServersView({ controller, isDark, variant }: { controller: Serve
                 style={styles.copyUrlButton}
               >
                 {refreshingCode ? (
-                  <ActivityIndicator size="small" color={p.text} />
+                  <Spinner size="small" color={p.text} />
                 ) : (
                   <RefreshCw size={18} color={p.text} />
                 )}

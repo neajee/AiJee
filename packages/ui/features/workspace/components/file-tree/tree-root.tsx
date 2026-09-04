@@ -1,4 +1,4 @@
-import { ActivityIndicator, ScrollView, Text } from 'react-native';
+import { ScrollView, Spinner, Text } from 'tamagui';
 import { useFileList, type FsEntry } from '@aijee/client-sdk';
 import { applyFilter } from '../../utils/file-tree';
 import type { FileTreeNodeProps } from './types';
@@ -25,7 +25,7 @@ export function FileTreeRoot({
   const { entries, isLoading, error } = useFileList(rootPath);
 
   if (isLoading) {
-    return <ActivityIndicator style={{ marginTop: 32 }} />;
+    return <Spinner style={{ marginTop: 32 }} />;
   }
 
   if (error) {

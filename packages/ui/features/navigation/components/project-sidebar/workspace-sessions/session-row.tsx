@@ -1,5 +1,6 @@
+import { Input, Spinner, Text, View } from 'tamagui';
 import { useCallback, useEffect, useState } from 'react';
-import { ActivityIndicator, Alert, Pressable, Text, TextInput, View } from 'react-native';
+import { Alert, Pressable } from 'react-native';
 import { Archive as ArchiveIcon, Pencil } from 'lucide-react-native';
 import { Fonts } from '@/constants/theme';
 import { useThemeTokens } from '@/hooks/use-theme-tokens';
@@ -52,10 +53,10 @@ export function SessionRow({ session, isSelected, hasUnread, onPress, onRename, 
   const status = <View style={styles.sessionLead}>{isWorking ? <SessionActivityIndicator sessionId={session.id} color={colors.textSecondary} idlePlaceholder={false} /> : hasUnread ? <View style={[styles.dot, { backgroundColor: isDark ? '#3FB950' : '#1A7F37' }]} /> : null}</View>;
   return (
     <View style={[styles.sessionRow, isSelected ? { backgroundColor: selectedBg } : hovered && { backgroundColor: hoverBg }]} onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)}>
-      {editing ? <View style={styles.sessionMain}>{status}<TextInput autoFocus selectTextOnFocus underlineColorAndroid="transparent" value={draft} onChangeText={setDraft} onSubmitEditing={() => void commitRename()} onKeyPress={(event) => { if (event.nativeEvent.key === 'Escape') setEditing(false); }} editable={busy !== 'rename'} maxLength={200} selectionColor={colors.tint} style={[styles.sessionInput, { color: colors.text, fontFamily: Fonts.sansMedium }]} /></View> : <Pressable onPress={onPress} style={({ pressed }) => [styles.sessionMain, pressed && { opacity: 0.7 }]}>{status}<Text style={[styles.sessionLabel, { color: isSelected ? colors.text : colors.textSecondary, fontFamily: isSelected ? Fonts.sansMedium : Fonts.sans }]} numberOfLines={1}>{title}</Text></Pressable>}
+      {editing ? <View style={styles.sessionMain}>{status}<Input autoFocus selectTextOnFocus underlineColorAndroid="transparent" value={draft} onChangeText={setDraft} onSubmitEditing={() => void commitRename()} onKeyPress={(event) => { if (event.nativeEvent.key === 'Escape') setEditing(false); }} editable={busy !== 'rename'} maxLength={200} selectionColor={colors.tint} style={[styles.sessionInput, { color: colors.text, fontFamily: Fonts.sansMedium }]} /></View> : <Pressable onPress={onPress} style={({ pressed }) => [styles.sessionMain, pressed && { opacity: 0.7 }]}>{status}<Text style={[styles.sessionLabel, { color: isSelected ? colors.text : colors.textSecondary, fontFamily: isSelected ? Fonts.sansMedium : Fonts.sans }]} numberOfLines={1}>{title}</Text></Pressable>}
       {showActions && !editing && <View style={styles.sessionActions}>
         <RowAction label="重命名对话" onPress={() => setEditing(true)} isDark={isDark}><Pencil size={11} color={colors.textTertiary} strokeWidth={1.8} /></RowAction>
-        <RowAction label="归档对话" onPress={() => void handleArchive()} isDark={isDark}>{busy === 'archive' ? <ActivityIndicator size={10} color={colors.textTertiary} /> : <ArchiveIcon size={11} color={colors.textTertiary} strokeWidth={1.8} />}</RowAction>
+        <RowAction label="归档对话" onPress={() => void handleArchive()} isDark={isDark}>{busy === 'archive' ? <Spinner size="small" color={colors.textTertiary} style={{ width: 10, height: 10 }} /> : <ArchiveIcon size={11} color={colors.textTertiary} strokeWidth={1.8} />}</RowAction>
       </View>}
     </View>
   );

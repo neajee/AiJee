@@ -1,10 +1,5 @@
+import { ScrollView, Spinner, Text, View } from 'tamagui';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import {
-  ActivityIndicator,
-  ScrollView,
-  Text,
-  View,
-} from 'react-native';
 
 import { usePiClient } from '@aijee/client-sdk';
 import type { MarketplacePackage } from '@aijee/client-sdk';
@@ -105,7 +100,7 @@ export function PackageMarketplace() {
 
   return (
     <View style={[styles.page, { backgroundColor: p.bg }]}>
-      <View style={[styles.header, { paddingHorizontal: gutter, borderBottomColor: p.separator }]}>
+      <View style={[styles.header, { paddingLeft: gutter, paddingRight: gutter, borderBottomColor: p.separator }]}>
         <View style={styles.headerCopy}>
           <Text style={[styles.title, { color: p.text, fontSize: m.titleSize - 4 }]}>
             插件广场
@@ -152,7 +147,7 @@ export function PackageMarketplace() {
 
           {loading ? (
             <View style={styles.centered}>
-              <ActivityIndicator size="small" color={p.textTertiary} />
+              <Spinner size="small" color={p.textTertiary} />
             </View>
           ) : items.length === 0 ? (
             <Text style={[styles.emptyText, { color: p.textTertiary, fontSize: m.descSize }]}>

@@ -1,7 +1,6 @@
-import { StyleSheet } from 'react-native';
 import { Fonts } from '@/constants/theme';
 
-export const styles = StyleSheet.create({
+export const styles = {
   strip: {
     backgroundColor: '#C73D32',
     overflow: 'hidden',
@@ -12,13 +11,13 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 12,
-    paddingHorizontal: 16,
+    paddingLeft: 16, paddingRight: 16,
   },
   contentCompact: {
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'stretch',
-    paddingVertical: 10,
+    paddingTop: 10, paddingBottom: 10,
   },
   text: {
     color: '#FFFFFF',
@@ -29,7 +28,7 @@ export const styles = StyleSheet.create({
   },
   retryButton: {
     minHeight: 32,
-    paddingHorizontal: 14,
+    paddingLeft: 14, paddingRight: 14,
     borderRadius: 999,
     alignItems: 'center',
     justifyContent: 'center',
@@ -59,4 +58,4 @@ export const styles = StyleSheet.create({
     fontSize: 12,
     letterSpacing: 0.2,
   },
-});
+} as const;

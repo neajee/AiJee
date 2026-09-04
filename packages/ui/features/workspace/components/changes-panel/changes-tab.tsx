@@ -1,5 +1,6 @@
+import { Text, View } from 'tamagui';
 import { useCallback, useMemo } from "react";
-import { Alert, Platform, StyleSheet, Text, View } from "react-native";
+import { Alert, Platform } from "react-native";
 import { Plus, Minus, Undo2, Check } from "lucide-react-native";
 
 import { Fonts } from "@/constants/theme";
@@ -212,7 +213,7 @@ function FileList({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   cleanState: {
     alignItems: "center",
     justifyContent: "center",
@@ -228,4 +229,4 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     gap: 2,
   },
-});
+} as const;

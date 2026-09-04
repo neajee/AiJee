@@ -1,6 +1,7 @@
+import { ScrollView, Text, View } from 'tamagui';
 import { Layers } from 'lucide-react-native';
 import { AppModal } from '@/components/ui';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable } from 'react-native';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useModePickerController } from '../../hooks/use-mode-picker-controller';
 import { ModeOption } from './mode-option';

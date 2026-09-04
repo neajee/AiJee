@@ -1,5 +1,6 @@
+import { Text, View } from 'tamagui';
 import { memo, useCallback, useMemo, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView } from "tamagui";
 import { Colors, Fonts } from "@/constants/theme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { useAppSettingsStore } from "@/features/settings/store";
@@ -138,7 +139,7 @@ export const SubagentToolCall = memo(function SubagentToolCall({
   );
 });
 
-const styles = StyleSheet.create({
+const styles = {
   headerText: {
     flex: 1,
     minWidth: 0,
@@ -192,4 +193,4 @@ const styles = StyleSheet.create({
   markdownWrap: {
     minWidth: 0,
   },
-});
+} as const;

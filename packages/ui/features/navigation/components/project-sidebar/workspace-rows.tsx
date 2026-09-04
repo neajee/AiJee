@@ -1,5 +1,6 @@
+import { Text, View } from 'tamagui';
 import { useCallback, useRef, useState, type ReactNode } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, type View as RNView } from "react-native";
 import { Folder, MoreHorizontal, SquarePen } from "lucide-react-native";
 import { Fonts } from "@/constants/theme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
@@ -36,7 +37,7 @@ export function WorkspaceRow({
   const colors = useThemeTokens();
   const [hovered, setHovered] = useState(false);
   const hoverBg = isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.035)";
-  const moreRef = useRef<View>(null);
+  const moreRef = useRef<RNView>(null);
   // Hovering swaps the status dot for the actions; both never fit at once.
   const showActions = hovered;
 

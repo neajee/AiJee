@@ -1,9 +1,9 @@
-import { StyleSheet } from 'react-native';
+import { ABSOLUTE_FILL_STYLE } from "@/constants/layout";
 import { SEAM_TOGGLE_HEIGHT, SEAM_TOGGLE_WIDTH } from '@/components/ui/seam-toggle';
 
 export const HOVER_ZONE_WIDTH = 12;
 
-export const styles = StyleSheet.create({
+export const styles = {
   wideContainer: { flex: 1 },
   bodyRow: { flex: 1, flexDirection: 'row' },
   narrowContainer: { flex: 1 },
@@ -11,7 +11,7 @@ export const styles = StyleSheet.create({
   content: { flex: 1, overflow: 'hidden' },
   contentInner: { flex: 1 },
   mobileContent: { flex: 1 },
-  overlay: { ...StyleSheet.absoluteFillObject, zIndex: 10 },
+  overlay: { ...ABSOLUTE_FILL_STYLE, zIndex: 10 },
   hoverZone: {
     position: 'absolute',
     top: 0,
@@ -36,4 +36,4 @@ export const styles = StyleSheet.create({
     height: SEAM_TOGGLE_HEIGHT,
     zIndex: 30,
   },
-});
+} as const;

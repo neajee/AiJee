@@ -1,5 +1,6 @@
+import { ScrollView, Text, View } from 'tamagui';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { Pressable, ScrollView, Text, View, StyleSheet } from 'react-native';
+import { Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Plus } from 'lucide-react-native';
 import Animated from 'react-native-reanimated';
@@ -7,6 +8,7 @@ import { GestureDetector } from 'react-native-gesture-handler';
 import PagerView from 'react-native-pager-view';
 
 import { Fonts } from '@/constants/theme';
+import { ABSOLUTE_FILL_STYLE } from '@/constants/layout';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useThemeTokens } from '@/hooks/use-theme-tokens';
 import { NewWorkspaceDialog } from '@/features/workspace/components/new-workspace-dialog';
@@ -52,7 +54,7 @@ export function WorkspaceSheet({ visible, onClose }: WorkspaceSheetProps) {
       style={[styles.root, isWeb && ({ pointerEvents: visible ? 'auto' : 'none' } as any)]}
     >
       <Animated.View style={[styles.overlay, { backgroundColor: colors.overlay }, overlayStyle]}>
-        <Pressable style={StyleSheet.absoluteFill} onPress={dismiss} />
+        <Pressable style={ABSOLUTE_FILL_STYLE} onPress={dismiss} />
       </Animated.View>
 
       <Animated.View

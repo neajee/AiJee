@@ -1,5 +1,6 @@
+import { ScrollView, View } from 'tamagui';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, Platform, ScrollView, TextInput, View } from 'react-native';
+import { Animated, Platform, TextInput, type ScrollView as RNScrollView, type View as RNView } from 'react-native';
 import { useRouter } from 'expo-router';
 import { MessageSquare } from 'lucide-react-native';
 
@@ -20,9 +21,9 @@ export function useCommandPaletteController({ visible, onClose }: CommandPalette
   const [sessions, setSessions] = useState<WorkspaceSession[]>([]);
   const [sessionsLoading, setSessionsLoading] = useState(false);
   const inputRef = useRef<TextInput>(null);
-  const scrollRef = useRef<ScrollView>(null);
-  const itemRefs = useRef<Record<number, View | null>>({});
-  const scrollContentRef = useRef<View>(null);
+  const scrollRef = useRef<RNScrollView>(null);
+  const itemRefs = useRef<Record<number, RNView | null>>({});
+  const scrollContentRef = useRef<RNView>(null);
   const overlayAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.96)).current;
   const workspaces = useWorkspaceStore((s) => s.workspaces);

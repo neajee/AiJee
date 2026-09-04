@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { StyleSheet, View } from "react-native";
+import { View } from "tamagui";
 
 import type { PreviewTarget } from "@/features/preview/store";
 import { buildPreviewUrl } from "@/features/preview/utils";
@@ -30,11 +30,11 @@ export function BrowserPreview({ serverUrl, sessionId, target }: BrowserPreviewP
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   container: {
     flex: 1,
   },
-});
+} as const;
 
 const iframeStyle = {
   width: "100%",

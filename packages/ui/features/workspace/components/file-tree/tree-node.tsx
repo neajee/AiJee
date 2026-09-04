@@ -1,5 +1,6 @@
+import { Spinner, Text, View } from 'tamagui';
 import { useCallback } from 'react';
-import { ActivityIndicator, Pressable, Text, View } from 'react-native';
+import { Pressable } from 'react-native';
 import { ChevronDown, ChevronRight } from 'lucide-react-native';
 import { useFileList, type FsEntry } from '@aijee/client-sdk';
 import { Colors } from '@/constants/theme';
@@ -129,10 +130,10 @@ function ExpandedDir({
       <View
         style={{
           paddingLeft: NODE_INDENT + depth * NODE_STEP,
-          paddingVertical: 4,
+          paddingTop: 4, paddingBottom: 4,
         }}
       >
-        <ActivityIndicator size="small" />
+        <Spinner size="small" />
       </View>
     );
   }

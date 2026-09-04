@@ -1,11 +1,11 @@
-import { StyleSheet } from "react-native";
+import { HAIRLINE_WIDTH } from "@/constants/layout";
 import { Fonts } from "@/constants/theme";
 
 export const SUMMARY_BLOCKS = 5;
 export const SUMMARY_SCROLL_AFTER = 8;
 export const SUMMARY_ROW_HEIGHT = 22;
 
-export const styles = StyleSheet.create({
+export const styles = {
   root: { flex: 1 },
   list: { flex: 1 },
   content: {
@@ -15,9 +15,9 @@ export const styles = StyleSheet.create({
     alignSelf: "center",
     width: "100%",
   },
-  itemWrap: { paddingVertical: 2 },
+  itemWrap: { paddingTop: 2 , paddingBottom: 2 },
   turnToolbar: {
-    paddingHorizontal: 16,
+    paddingLeft: 16, paddingRight: 16,
     paddingTop: 6,
     flexDirection: "row",
     alignItems: "center",
@@ -30,20 +30,20 @@ export const styles = StyleSheet.create({
     left: 16,
     right: 16,
     bottom: 12,
-    borderWidth: StyleSheet.hairlineWidth,
+    borderWidth: HAIRLINE_WIDTH,
     borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
+    paddingLeft: 10, paddingRight: 10,
+    paddingTop: 8, paddingBottom: 8,
     zIndex: 30,
   },
   actionErrorText: { fontSize: 12, lineHeight: 18, fontFamily: Fonts.sans },
   summaryWrap: {
-    paddingHorizontal: 16,
+    paddingLeft: 16, paddingRight: 16,
     paddingTop: 10,
   },
   summaryHeader: {
-    paddingHorizontal: 10,
-    paddingVertical: 3,
+    paddingLeft: 10, paddingRight: 10,
+    paddingTop: 3, paddingBottom: 3,
   },
   summaryTitle: {
     fontSize: 12,
@@ -54,12 +54,12 @@ export const styles = StyleSheet.create({
     flex: 1,
   },
   summaryList: {
-    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopWidth: HAIRLINE_WIDTH,
     maxHeight: SUMMARY_ROW_HEIGHT * SUMMARY_SCROLL_AFTER + 12,
   },
   summaryListContent: {
-    paddingHorizontal: 10,
-    paddingVertical: 6,
+    paddingLeft: 10, paddingRight: 10,
+    paddingTop: 6, paddingBottom: 6,
   },
   fileRow: {
     flexDirection: "row",
@@ -113,19 +113,19 @@ export const styles = StyleSheet.create({
   dividerWrap: {
     flexDirection: "row",
     alignItems: "center",
-    paddingVertical: 10,
-    paddingHorizontal: 16,
+    paddingTop: 10, paddingBottom: 10,
+    paddingLeft: 16, paddingRight: 16,
   },
   dividerCenter: {
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
-    paddingHorizontal: 8,
+    paddingLeft: 8, paddingRight: 8,
     flexShrink: 1,
   },
   dividerLine: {
     flex: 1,
-    height: StyleSheet.hairlineWidth,
+    height: HAIRLINE_WIDTH,
     opacity: 0.6,
   },
   dividerText: {
@@ -149,7 +149,7 @@ export const styles = StyleSheet.create({
     paddingRight: 16,
     paddingTop: 2,
     paddingBottom: 10,
-    borderLeftWidth: StyleSheet.hairlineWidth,
+    borderLeftWidth: HAIRLINE_WIDTH,
     gap: 12,
   },
   activityGroup: {
@@ -177,8 +177,8 @@ export const styles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 18,
     fontFamily: Fonts.sans,
-    paddingHorizontal: 16,
-    paddingVertical: 2,
+    paddingLeft: 16, paddingRight: 16,
+    paddingTop: 2, paddingBottom: 2,
   },
   historyLoaderWrap: {
     minHeight: 28,
@@ -186,13 +186,13 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
   },
   historyLoader: {
-    paddingVertical: 8,
+    paddingTop: 8, paddingBottom: 8,
     alignItems: "center",
     justifyContent: "center",
   },
   loadMoreBtn: {
-    paddingVertical: 10,
-    paddingHorizontal: 16,
+    paddingTop: 10, paddingBottom: 10,
+    paddingLeft: 16, paddingRight: 16,
     alignItems: "center",
   },
   loadMoreText: {
@@ -218,4 +218,4 @@ export const styles = StyleSheet.create({
     shadowRadius: 3,
     elevation: 2,
   },
-});
+} as const;

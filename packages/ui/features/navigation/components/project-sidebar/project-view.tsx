@@ -1,5 +1,6 @@
+import { ScrollView, Text, View } from 'tamagui';
 import { useCallback } from "react";
-import { Modal, Pressable, ScrollView, Text, View } from "react-native";
+import { Modal, Pressable } from "react-native";
 import { PackageOpen, Plus, Settings, SquarePen } from "lucide-react-native";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { NewWorkspaceDialog } from "@/features/workspace/components/new-workspace-dialog";

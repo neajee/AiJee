@@ -91,7 +91,7 @@ function createStyles(colors: {
       color: colors.textStrong,
     },
     paragraph: {
-      paddingVertical: 4,
+      paddingTop: 4, paddingBottom: 4,
     },
     strong: {
       fontSize: 14,
@@ -126,7 +126,6 @@ function createStyles(colors: {
       fontSize: codeFontSize,
       lineHeight: 20,
       color: colors.codeText,
-      backgroundColor: colors.code,
     },
     code: {
       backgroundColor: colors.code,
@@ -148,7 +147,7 @@ function createStyles(colors: {
       color: colors.text,
     },
     hr: {
-      marginVertical: 8,
+      marginTop: 8, marginBottom: 8,
       height: 1,
       backgroundColor: colors.border,
     },
@@ -160,8 +159,8 @@ function createStyles(colors: {
       borderBottomColor: colors.border,
     },
     tableCell: {
-      paddingVertical: 4,
-      paddingHorizontal: 8,
+      paddingTop: 4, paddingBottom: 4,
+      paddingLeft: 8, paddingRight: 8,
     },
   };
 }

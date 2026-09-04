@@ -1,5 +1,6 @@
+import { View } from 'tamagui';
 import { useCallback, useRef, useState } from 'react';
-import { Animated, Easing, View, useWindowDimensions } from 'react-native';
+import { Animated, Easing, useWindowDimensions, type View as RNView } from 'react-native';
 
 import type { ToolCallInfo } from '../types';
 import { basename, isToolActive, parseToolArguments } from '../utils/message-list';
@@ -24,7 +25,7 @@ export function useEditToolCallController(tc: ToolCallInfo) {
   const [expanded, setExpanded] = useState(false);
   const [fullscreenOpen, setFullscreenOpen] = useState(false);
   const [heroRect, setHeroRect] = useState({ x: 16, y: 120, width: Math.max(240, width - 32), height: 220 });
-  const previewRef = useRef<View | null>(null);
+  const previewRef = useRef<RNView | null>(null);
   const heroProgress = useRef(new Animated.Value(0)).current;
   const parsed = parseToolArguments(tc.arguments);
   const filePath = (parsed.path as string) || '';

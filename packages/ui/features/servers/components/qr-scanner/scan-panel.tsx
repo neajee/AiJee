@@ -1,5 +1,5 @@
 import type { ComponentType } from "react";
-import { Platform } from "react-native";
+import {  Platform  } from 'react-native';
 
 export interface QrScannerScanPanelProps {
   visible: boolean;

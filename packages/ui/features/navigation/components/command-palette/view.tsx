@@ -1,6 +1,8 @@
-import { ActivityIndicator, Animated, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Input, ScrollView, Spinner, Text, View } from 'tamagui';
+import { Animated, Modal, Pressable } from 'react-native';
 import { Search } from 'lucide-react-native';
 
+import { ABSOLUTE_FILL_STYLE } from '@/constants/layout';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useThemeTokens } from '@/hooks/use-theme-tokens';
 import { useCommandPaletteController } from '../../hooks/use-command-palette-controller';
@@ -53,7 +55,7 @@ export function CommandPalette({ visible, onClose }: CommandPaletteProps) {
         >
           <View style={[styles.searchRow, { borderBottomColor: borderColor }]}>
             <Search size={16} color={textMuted} strokeWidth={2} />
-            <TextInput
+            <Input
               ref={inputRef}
               style={[styles.searchInput, { color: textPrimary }]}
               value={search}
@@ -75,7 +77,7 @@ export function CommandPalette({ visible, onClose }: CommandPaletteProps) {
             <View ref={scrollContentRef}>
               {sessionsLoading ? (
                 <View style={styles.emptyState}>
-                  <ActivityIndicator size="small" color={textMuted} />
+                  <Spinner size="small" color={textMuted} />
                 </View>
               ) : sections.length === 0 ? (
                 <View style={styles.emptyState}>
@@ -132,7 +134,7 @@ export function CommandPalette({ visible, onClose }: CommandPaletteProps) {
 function AnimatedOverlay({ animation, onPress }: { animation: import('react-native').Animated.Value; onPress: () => void }) {
   return (
     <Animated.View style={[styles.overlay, { opacity: animation }]}>
-      <Pressable style={StyleSheet.absoluteFill} onPress={onPress} />
+      <Pressable style={ABSOLUTE_FILL_STYLE} onPress={onPress} />
     </Animated.View>
   );
 }

@@ -1,4 +1,5 @@
-import { Pressable, StyleSheet, View } from 'react-native';
+import { View } from 'tamagui';
+import { Pressable } from 'react-native';
 import { Plus } from 'lucide-react-native';
 
 import { Colors } from '@/constants/theme';
@@ -39,7 +40,7 @@ export function AddWorkspaceButton({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   wrapper: {
     alignItems: 'center',
     justifyContent: 'center',
@@ -59,4 +60,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-});
+} as const;

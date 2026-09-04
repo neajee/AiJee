@@ -1,5 +1,6 @@
+import { ScrollView, Text, View } from 'tamagui';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Linking, Pressable, ScrollView, Text, View, useWindowDimensions } from 'react-native';
+import { Linking, Pressable, useWindowDimensions } from 'react-native';
 import { Download, ExternalLink, X } from 'lucide-react-native';
 import { usePiClient } from '@aijee/client-sdk';
 import type { MarketplacePackage } from '@aijee/client-sdk';

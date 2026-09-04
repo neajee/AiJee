@@ -1,4 +1,5 @@
-import { Text, View } from 'react-native';
+import { Text, View } from 'tamagui';
+
 import { ProviderIcon as LobeProviderIcon } from '@lobehub/icons-rn';
 import { ProviderIcon } from '@/components/provider-icons';
 import { providerPageStyles } from '../../utils/custom-models-styles';

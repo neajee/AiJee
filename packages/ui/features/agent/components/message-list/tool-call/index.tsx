@@ -1,5 +1,5 @@
 import { memo, useMemo } from 'react';
-import { View } from 'react-native';
+import { View } from 'tamagui';
 import type { ToolCallInfo } from '../../../types';
 import { BashToolCall } from './bash-tool-call';
 import { ReadToolCall } from './read-tool-call';

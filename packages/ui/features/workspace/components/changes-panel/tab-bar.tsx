@@ -1,5 +1,6 @@
+import { Text, View } from 'tamagui';
 import type { ReactNode } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable } from "react-native";
 
 import { Fonts } from "@/constants/theme";
 import { useChangesTheme } from "../../hooks/use-changes-theme";
@@ -90,7 +91,7 @@ export function TabBar({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   tabBar: {
     flexDirection: "row",
     alignItems: "stretch",
@@ -103,7 +104,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 5,
-    paddingHorizontal: 8,
+    paddingLeft: 8, paddingRight: 8,
     borderRadius: 5,
   },
   tabText: {
@@ -128,4 +129,4 @@ const styles = StyleSheet.create({
     flexShrink: 0,
     minWidth: 12,
   },
-});
+} as const;

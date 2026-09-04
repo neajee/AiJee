@@ -1,8 +1,10 @@
-import { ActivityIndicator, FlatList, KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Input, ScrollView, Spinner, Text, View } from 'tamagui';
+import { FlatList, KeyboardAvoidingView, Modal, Platform, Pressable } from "react-native";
 import { File, Folder } from "lucide-react-native";
 import type { PathCompletion } from "@aijee/client-sdk";
 import type { NewWorkspaceController } from "../../hooks/use-new-workspace-controller";
 import { styles } from "../../utils/new-workspace-dialog-styles";
+import { ABSOLUTE_FILL_STYLE } from '@/constants/layout';
 
 export function NewWorkspaceDialogView({ controller }: { controller: NewWorkspaceController }) {
   const {
@@ -17,7 +19,7 @@ export function NewWorkspaceDialogView({ controller }: { controller: NewWorkspac
         <Text style={[styles.label, { color: textMuted }]}>项目路径</Text>
         <View style={[styles.inputRow, { backgroundColor: inputBg, borderColor: inputBorder }]}>
           <Folder size={16} color={textMuted} strokeWidth={1.8} />
-          <TextInput
+          <Input
             ref={pathRef}
             style={[styles.input, { color: textPrimary }]}
             value={path}
@@ -38,7 +40,7 @@ export function NewWorkspaceDialogView({ controller }: { controller: NewWorkspac
             } : undefined}
           />
           {loadingSuggestions && (
-            <ActivityIndicator size="small" color={textMuted} />
+            <Spinner size="small" color={textMuted} />
           )}
         </View>
 
@@ -132,7 +134,7 @@ export function NewWorkspaceDialogView({ controller }: { controller: NewWorkspac
       <View style={styles.field}>
         <Text style={[styles.label, { color: textMuted }]}>项目名称</Text>
         <View style={[styles.inputRow, { backgroundColor: inputBg, borderColor: inputBorder }]}>
-          <TextInput
+          <Input
             ref={nameRef}
             style={[styles.input, styles.nameInput, { color: textPrimary }]}
             value={name}
@@ -236,7 +238,7 @@ export function NewWorkspaceDialogView({ controller }: { controller: NewWorkspac
         >
           {showSuggestions && (
             <Pressable
-              style={[StyleSheet.absoluteFill, { zIndex: 5 }]}
+              style={[ABSOLUTE_FILL_STYLE, { zIndex: 5 }]}
               onPress={dismissSuggestions}
             />
           )}

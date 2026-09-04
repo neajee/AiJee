@@ -1,4 +1,5 @@
-import { Pressable, Text, View } from 'react-native';
+import { Text, View } from 'tamagui';
+import { Pressable } from 'react-native';
 import { useColors } from '../../hooks/use-custom-models-theme';
 import { API_TYPES } from './constants';
 

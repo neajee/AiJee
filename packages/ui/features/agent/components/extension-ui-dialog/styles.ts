@@ -1,9 +1,8 @@
-import { StyleSheet } from "react-native";
 import { Fonts } from "@/constants/theme";
 
-export const styles = StyleSheet.create({
+export const styles = {
   wrapper: {
-    paddingHorizontal: 12,
+    paddingLeft: 12, paddingRight: 12,
     maxWidth: 1080,
     alignSelf: "center",
     width: "100%",
@@ -21,7 +20,7 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "flex-start",
     gap: 12,
-    paddingHorizontal: 16,
+    paddingLeft: 16, paddingRight: 16,
     paddingTop: 14,
     paddingBottom: 10,
     borderBottomWidth: 0.633,
@@ -59,7 +58,7 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
-    paddingHorizontal: 16,
+    paddingLeft: 16, paddingRight: 16,
     height: 40,
   },
   optionText: {
@@ -74,8 +73,8 @@ export const styles = StyleSheet.create({
     minHeight: 44,
     borderWidth: 0.633,
     borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingLeft: 12, paddingRight: 12,
+    paddingTop: 10, paddingBottom: 10,
     fontSize: 14,
     fontFamily: Fonts.sans,
   },
@@ -83,8 +82,8 @@ export const styles = StyleSheet.create({
     minHeight: 180,
     borderWidth: 0.633,
     borderRadius: 10,
-    paddingHorizontal: 12,
-    paddingVertical: 10,
+    paddingLeft: 12, paddingRight: 12,
+    paddingTop: 10, paddingBottom: 10,
     fontSize: 14,
     lineHeight: 20,
     fontFamily: Fonts.mono,
@@ -106,7 +105,7 @@ export const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 12,
+    paddingLeft: 12, paddingRight: 12,
   },
   secondaryButtonText: {
     fontSize: 13,
@@ -120,14 +119,14 @@ export const styles = StyleSheet.create({
     justifyContent: "center",
     flexDirection: "row",
     gap: 8,
-    paddingHorizontal: 12,
+    paddingLeft: 12, paddingRight: 12,
   },
   primaryButtonText: {
     fontSize: 13,
     fontFamily: Fonts.sansMedium,
   },
   errorWrap: {
-    paddingHorizontal: 12,
+    paddingLeft: 12, paddingRight: 12,
     paddingBottom: 12,
   },
   errorText: {
@@ -135,4 +134,4 @@ export const styles = StyleSheet.create({
     lineHeight: 16,
     fontFamily: Fonts.sans,
   },
-});
+} as const;

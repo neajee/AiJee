@@ -1,5 +1,6 @@
+import { Text, View } from 'tamagui';
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable } from "react-native";
 import Svg, { Circle as SvgCircle } from "react-native-svg";
 
 import { Fonts } from "@/constants/theme";
@@ -84,7 +85,7 @@ export function ContextUsageRing({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   wrap: {
     justifyContent: "center",
     alignSelf: "center",
@@ -99,8 +100,8 @@ const styles = StyleSheet.create({
     right: -8,
     borderRadius: 8,
     borderWidth: 0.633,
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingLeft: 12, paddingRight: 12,
+    paddingTop: 8, paddingBottom: 8,
     minWidth: 150,
     gap: 2,
     shadowColor: "#000",
@@ -119,4 +120,4 @@ const styles = StyleSheet.create({
     fontSize: 11,
     fontFamily: Fonts.sans,
   },
-});
+} as const;

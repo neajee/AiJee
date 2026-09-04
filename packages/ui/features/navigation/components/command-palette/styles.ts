@@ -1,9 +1,9 @@
-import { StyleSheet } from 'react-native';
+import { ABSOLUTE_FILL_STYLE } from "@/constants/layout";
 import { Fonts } from '@/constants/theme';
 
-export const styles = StyleSheet.create({
+export const styles = {
   root: { flex: 1, alignItems: 'center', paddingTop: 80 },
-  overlay: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.35)' },
+  overlay: { ...ABSOLUTE_FILL_STYLE, backgroundColor: 'rgba(0,0,0,0.35)' },
   palette: {
     width: '90%',
     maxWidth: 560,
@@ -17,7 +17,7 @@ export const styles = StyleSheet.create({
   searchRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
+    paddingLeft: 16, paddingRight: 16,
     height: 48,
     gap: 10,
     borderBottomWidth: 0.633,
@@ -29,15 +29,15 @@ export const styles = StyleSheet.create({
     fontFamily: Fonts.sansMedium,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
-    paddingHorizontal: 16,
+    paddingLeft: 16, paddingRight: 16,
     paddingTop: 12,
     paddingBottom: 4,
   },
-  item: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 16, paddingVertical: 10, gap: 10 },
+  item: { flexDirection: 'row', alignItems: 'center', paddingLeft: 16, paddingRight: 16, paddingTop: 10, paddingBottom: 10, gap: 10 },
   itemText: { flex: 1 },
   itemLabel: { fontSize: 13, fontFamily: Fonts.sans },
   itemDesc: { fontSize: 11, fontFamily: Fonts.sans, marginTop: 1 },
   enterHint: { fontSize: 14, fontFamily: Fonts.mono },
-  emptyState: { paddingVertical: 24, alignItems: 'center' },
+  emptyState: { paddingTop: 24, paddingBottom: 24, alignItems: 'center' },
   emptyText: { fontSize: 13, fontFamily: Fonts.sans },
-});
+} as const;

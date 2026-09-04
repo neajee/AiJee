@@ -1,5 +1,6 @@
+import { Text, View } from 'tamagui';
 import { memo, useCallback, useEffect, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable } from "react-native";
 import * as Clipboard from "expo-clipboard";
 import { Copy } from "lucide-react-native";
 import Animated, {
@@ -124,17 +125,17 @@ export const MessageToolbar = memo(function MessageToolbar({
 });
 
 
-const styles = StyleSheet.create({
+const styles = {
   container: {
-    paddingHorizontal: 16,
-    paddingVertical: 4,
+    paddingLeft: 16, paddingRight: 16,
+    paddingTop: 4, paddingBottom: 4,
     gap: 12,
   },
   textBlock: {},
   errorBlock: {
     borderRadius: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
+    paddingLeft: 10, paddingRight: 10,
+    paddingTop: 6, paddingBottom: 6,
   },
   errorText: {
     fontSize: 12,
@@ -162,4 +163,4 @@ const styles = StyleSheet.create({
     position: "relative",
     zIndex: 20,
   },
-});
+} as const;

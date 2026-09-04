@@ -1,5 +1,6 @@
+import { Text, View } from 'tamagui';
 import { memo, useCallback, useEffect, useRef, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable } from "react-native";
 import * as Clipboard from "expo-clipboard";
 import { Check, Copy } from "lucide-react-native";
 import { Colors, Fonts } from "@/constants/theme";
@@ -83,9 +84,9 @@ export const MarkdownCodeBlock = memo(function MarkdownCodeBlock({
   );
 });
 
-const styles = StyleSheet.create({
+const styles = {
   container: {
-    marginVertical: 6,
+    marginTop: 6, marginBottom: 6,
     borderRadius: 8,
     borderWidth: 0.5,
     overflow: "hidden",
@@ -114,6 +115,6 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   body: {
-    paddingVertical: 8,
+    paddingTop: 8, paddingBottom: 8,
   },
-});
+} as const;

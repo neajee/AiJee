@@ -82,10 +82,6 @@ function getParserClass(): ParserConstructor {
   return CachedParserClass;
 }
 
-// Mirrors react-native-marked's internal style builder so we avoid importing
-// private module paths for styles.
-import { StyleSheet } from "react-native";
-
 const THEME_COLORS = {
   light: {
     background: "#ffffff",
@@ -105,6 +101,10 @@ const THEME_COLORS = {
 
 const DEFAULT_SPACING = { xs: 2, s: 4, m: 8, l: 12 } as const;
 
+function flattenStyle<T extends object>(values: Array<T | null | undefined>): T {
+  return Object.assign({}, ...values.filter((value): value is T => value != null));
+}
+
 function buildStyles(
   userStyles: useMarkdownHookOptions["styles"],
   colorScheme: useMarkdownHookOptions["colorScheme"],
@@ -117,22 +117,22 @@ function buildStyles(
   const fontRegular = { fontSize: 16, lineHeight: 24, color: mdColors.text };
   const fontHeading = { fontWeight: "500" as const, color: mdColors.text };
 
-  return StyleSheet.create({
-    em: StyleSheet.flatten([fontRegular, { fontStyle: "italic" as const }, userStyles?.em]) ?? {},
-    strong: StyleSheet.flatten([fontRegular, { fontWeight: "600" as const }, userStyles?.strong]) ?? {},
-    strikethrough: StyleSheet.flatten([
+  return {
+    em: flattenStyle([fontRegular, { fontStyle: "italic" as const }, userStyles?.em]),
+    strong: flattenStyle([fontRegular, { fontWeight: "600" as const }, userStyles?.strong]),
+    strikethrough: flattenStyle([
       fontRegular,
       { textDecorationLine: "line-through" as const, textDecorationStyle: "solid" as const },
       userStyles?.strikethrough,
-    ]) ?? {},
-    text: StyleSheet.flatten([fontRegular, userStyles?.text]) ?? {},
-    paragraph: StyleSheet.flatten([{ paddingVertical: mdSpacing.m }, userStyles?.paragraph]) ?? {},
-    link: StyleSheet.flatten([
+    ]),
+    text: flattenStyle([fontRegular, userStyles?.text]),
+    paragraph: flattenStyle([{ paddingTop: mdSpacing.m , paddingBottom: mdSpacing.m }, userStyles?.paragraph]),
+    link: flattenStyle([
       fontRegular,
       { fontStyle: "italic" as const, color: mdColors.link },
       userStyles?.link,
-    ]) ?? {},
-    blockquote: StyleSheet.flatten([
+    ]),
+    blockquote: flattenStyle([
       {
         borderLeftColor: mdColors.border,
         paddingLeft: mdSpacing.l,
@@ -140,60 +140,60 @@ function buildStyles(
         opacity: 0.8,
       },
       userStyles?.blockquote,
-    ]) ?? {},
-    h1: StyleSheet.flatten([
+    ]),
+    h1: flattenStyle([
       fontHeading,
       {
         fontSize: 32, lineHeight: 40, fontWeight: "600" as const,
-        marginVertical: mdSpacing.m, letterSpacing: 0,
+        marginTop: mdSpacing.m, marginBottom: mdSpacing.m, letterSpacing: 0,
         paddingBottom: mdSpacing.s, borderBottomColor: mdColors.border, borderBottomWidth: 1,
       },
       userStyles?.h1,
-    ]) ?? {},
-    h2: StyleSheet.flatten([
+    ]),
+    h2: flattenStyle([
       fontHeading,
       {
-        fontSize: 28, lineHeight: 36, marginVertical: mdSpacing.m,
+        fontSize: 28, lineHeight: 36, marginTop: mdSpacing.m, marginBottom: mdSpacing.m,
         paddingBottom: mdSpacing.s, borderBottomColor: mdColors.border, borderBottomWidth: 1,
       },
       userStyles?.h2,
-    ]) ?? {},
-    h3: StyleSheet.flatten([
+    ]),
+    h3: flattenStyle([
       fontHeading,
-      { fontSize: 24, lineHeight: 32, marginVertical: mdSpacing.s },
+      { fontSize: 24, lineHeight: 32, marginTop: mdSpacing.s , marginBottom: mdSpacing.s },
       userStyles?.h3,
-    ]) ?? {},
-    h4: StyleSheet.flatten([
+    ]),
+    h4: flattenStyle([
       fontHeading,
-      { fontSize: 22, lineHeight: 28, marginVertical: mdSpacing.s },
+      { fontSize: 22, lineHeight: 28, marginTop: mdSpacing.s , marginBottom: mdSpacing.s },
       userStyles?.h4,
-    ]) ?? {},
-    h5: StyleSheet.flatten([fontRegular, fontHeading, { marginVertical: mdSpacing.xs }, userStyles?.h5]) ?? {},
-    h6: StyleSheet.flatten([
+    ]),
+    h5: flattenStyle([fontRegular, fontHeading, { marginTop: mdSpacing.xs , marginBottom: mdSpacing.xs }, userStyles?.h5]),
+    h6: flattenStyle([
       fontHeading,
-      { fontSize: 14, lineHeight: 20, marginVertical: mdSpacing.xs },
+      { fontSize: 14, lineHeight: 20, marginTop: mdSpacing.xs , marginBottom: mdSpacing.xs },
       userStyles?.h6,
-    ]) ?? {},
-    codespan: StyleSheet.flatten([
+    ]),
+    codespan: flattenStyle([
       fontRegular,
-      { fontStyle: "italic" as const, backgroundColor: mdColors.code, fontWeight: "300" as const },
+      { fontStyle: "italic" as const, fontWeight: "300" as const },
       userStyles?.codespan,
-    ]) ?? {},
-    code: StyleSheet.flatten([
+    ]),
+    code: flattenStyle([
       { padding: mdSpacing.l, backgroundColor: mdColors.code, minWidth: "100%" as const },
       userStyles?.code,
-    ]) ?? {},
-    hr: StyleSheet.flatten([
-      { borderBottomWidth: 1, borderBottomColor: mdColors.border, marginVertical: mdSpacing.s },
+    ]),
+    hr: flattenStyle([
+      { borderBottomWidth: 1, borderBottomColor: mdColors.border, marginTop: mdSpacing.s , marginBottom: mdSpacing.s },
       userStyles?.hr,
-    ]) ?? {},
-    list: StyleSheet.flatten([userStyles?.list]) ?? {},
-    li: StyleSheet.flatten([fontRegular, { flexShrink: 1 }, userStyles?.li]) ?? {},
-    image: StyleSheet.flatten([{ resizeMode: "cover" as const }, userStyles?.image]) ?? {},
-    table: StyleSheet.flatten([{ borderWidth: 1, borderColor: mdColors.border }, userStyles?.table]) ?? {},
-    tableRow: StyleSheet.flatten([{ flexDirection: "row" as const }, userStyles?.tableRow]) ?? {},
-    tableCell: StyleSheet.flatten([{ padding: mdSpacing.s }, userStyles?.tableCell]) ?? {},
-  });
+    ]),
+    list: flattenStyle([userStyles?.list]),
+    li: flattenStyle([fontRegular, { flexShrink: 1 }, userStyles?.li]),
+    image: flattenStyle([{ resizeMode: "cover" as const }, userStyles?.image]),
+    table: flattenStyle([{ borderWidth: 1, borderColor: mdColors.border }, userStyles?.table]),
+    tableRow: flattenStyle([{ flexDirection: "row" as const }, userStyles?.tableRow]),
+    tableCell: flattenStyle([{ padding: mdSpacing.s }, userStyles?.tableCell]),
+  } as const;
 }
 
 const STREAMING_THROTTLE_MS = 100;
@@ -278,9 +278,9 @@ export function useStableMarkdown(
   const Parser = getParserClass();
 
   const elements = useMemo(() => {
-    const blockCodeTextStyle = StyleSheet.flatten([
-      styles.text,
-      styles.codespan,
+    const blockCodeTextStyle = flattenStyle([
+      styles.text as TextStyle,
+      styles.codespan as TextStyle,
       {
         fontStyle: "normal" as const,
         fontWeight: "400" as const,

@@ -1,5 +1,6 @@
+import { Text, View } from 'tamagui';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Text, View } from 'react-native';
+import { Spinner } from 'tamagui';
 
 import { useWorkspaceStore } from '@/features/workspace/store';
 import { useWorkspaceSessions as useSessions } from '@aijee/client-sdk';
@@ -24,7 +25,7 @@ export function WorkspaceSessions({ workspaceId, selectedSessionId, onSelect, on
   useEffect(() => {
     if (forcedOpen) setShowAll(true);
   }, [forcedOpen]);
-  if (isLoading) return <ActivityIndicator size="small" style={styles.sessionLoading} />;
+  if (isLoading) return <Spinner size="small" style={styles.sessionLoading} />;
   if (sessions.length === 0) return <Text style={[styles.sessionEmpty, { color: colors.textTertiary }]}>暂无对话</Text>;
   const expanded = showAll || forcedOpen;
   const visible = expanded ? sessions : sessions.slice(0, SESSION_PREVIEW_COUNT);

@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { View } from "react-native";
+import { View } from "tamagui";
 
 interface DiffSidebarProps {
   messages: unknown[];

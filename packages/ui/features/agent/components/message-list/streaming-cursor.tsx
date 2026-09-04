@@ -1,5 +1,5 @@
 import { memo, useEffect } from "react";
-import { StyleSheet, View } from "react-native";
+import { View } from "tamagui";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -79,12 +79,12 @@ export const StreamingCursor = memo(function StreamingCursor({
   );
 });
 
-const styles = StyleSheet.create({
+const styles = {
   container: {
     flexDirection: "row",
     alignItems: "center",
     gap: 3,
-    paddingVertical: 4,
-    paddingHorizontal: 2,
+    paddingTop: 4, paddingBottom: 4,
+    paddingLeft: 2, paddingRight: 2,
   },
-});
+} as const;

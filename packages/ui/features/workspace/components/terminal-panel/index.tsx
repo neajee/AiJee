@@ -1,4 +1,5 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'tamagui';
+import { Pressable } from 'react-native';
 import { X, Plus } from 'lucide-react-native';
 
 import { Fonts } from '@/constants/theme';
@@ -57,7 +58,7 @@ export function TerminalPanel() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   container: {
     height: 240,
     borderTopWidth: 0.633,
@@ -67,7 +68,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'stretch',
     borderBottomWidth: 0.633,
-    paddingHorizontal: 24,
+    paddingLeft: 24, paddingRight: 24,
   },
   tabBarLeft: {
     flexDirection: 'row',
@@ -78,7 +79,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    paddingHorizontal: 4,
+    paddingLeft: 4, paddingRight: 4,
     borderBottomWidth: 1.9,
     marginBottom: -0.633,
   },
@@ -100,11 +101,11 @@ const styles = StyleSheet.create({
   },
   terminalContent: {
     flex: 1,
-    paddingHorizontal: 24,
+    paddingLeft: 24, paddingRight: 24,
     paddingTop: 12,
   },
   terminalLine: {
     fontSize: 13,
     lineHeight: 20,
   },
-});
+} as const;

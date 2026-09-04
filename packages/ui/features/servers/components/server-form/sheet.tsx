@@ -1,16 +1,6 @@
+import { ScrollView, Spinner, Text, View } from 'tamagui';
 import { useCallback, useEffect, useState } from 'react';
-import {
-  ActivityIndicator,
-  Keyboard,
-  Modal,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-  useWindowDimensions,
-} from 'react-native';
+import { Keyboard, Modal, Platform, Pressable, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Animated, {
   Easing,
@@ -22,6 +12,7 @@ import Animated, {
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 
 import { Colors } from '@/constants/theme';
+import { ABSOLUTE_FILL_STYLE } from '@/constants/layout';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { ServerFormFields } from './fields';
 import { formStyles, SHEET_HEIGHT, sheetStyles } from './styles';
@@ -118,7 +109,7 @@ export function ServerFormSheet({
     >
       <View style={sheetStyles.root}>
         <Animated.View style={[sheetStyles.overlay, { backgroundColor: colors.overlay }, overlayStyle]}>
-          <Pressable style={StyleSheet.absoluteFill} onPress={loading ? undefined : dismiss} />
+          <Pressable style={ABSOLUTE_FILL_STYLE} onPress={loading ? undefined : dismiss} />
         </Animated.View>
         <View style={[sheetStyles.keyboardAvoider, { paddingBottom: keyboardInset }]}>
           <GestureDetector gesture={panGesture}>
@@ -170,7 +161,7 @@ export function ServerFormSheet({
                   disabled={!canSave}
                 >
                   {loading ? (
-                    <ActivityIndicator size="small" color={isDark ? '#1a1a1a' : '#fff'} />
+                    <Spinner size="small" color={isDark ? '#1a1a1a' : '#fff'} />
                   ) : (
                     <Text
                       style={[

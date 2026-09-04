@@ -1,5 +1,6 @@
+import { Text } from 'tamagui';
 import { useState } from 'react';
-import { Pressable, Text } from 'react-native';
+import { Pressable } from 'react-native';
 import { useThemeTokens } from '@/hooks/use-theme-tokens';
 import { styles } from '../styles';
 

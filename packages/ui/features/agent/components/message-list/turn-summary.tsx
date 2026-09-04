@@ -1,5 +1,6 @@
+import { Text, View } from 'tamagui';
 import { memo, useCallback, useMemo, useState } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { ScrollView } from "tamagui";
 import { useWorkspaceStore } from "@/features/workspace/store";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import type { TurnFileStats } from "../../types";

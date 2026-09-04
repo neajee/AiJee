@@ -1,4 +1,5 @@
-import { View } from "react-native";
+import { View } from 'tamagui';
+
 import type { DiffTab } from "./context";
 
 interface DiffTabBarProps {

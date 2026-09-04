@@ -19,6 +19,7 @@ import {
 import "react-native-reanimated";
 
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import { TamaguiProvider } from "tamagui";
 
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
@@ -26,6 +27,7 @@ import { useAppSettingsStore } from "@/features/settings/store";
 import { useAuthStore } from "@/features/auth/store";
 import { useServersStore } from "@/features/servers/store";
 import { getBootstrapTarget } from "@/features/servers/bootstrap";
+import tamaguiConfig from "../tamagui.config";
 
 
 SplashScreen.preventAutoHideAsync();
@@ -86,7 +88,16 @@ export default function RootLayout() {
     document.body.style.backgroundColor = themeTokens.background;
     document.body.style.color = themeTokens.text;
     document.body.style.fontSize = `${uiFontSize}px`;
+    document.body.style.fontFamily = themeTokens.uiFont;
   }, [codeFontSize, colorScheme, themePreset, themeTokens, uiFontSize]);
+
+  useEffect(() => {
+    if (Platform.OS !== 'web' || typeof document === 'undefined' || document.getElementById('aijee-web-rn-defaults')) return;
+    const style = document.createElement('style');
+    style.id = 'aijee-web-rn-defaults';
+    style.textContent = 'button { text-align: left; }';
+    document.head.appendChild(style);
+  }, []);
 
   useEffect(() => {
     if (Platform.OS !== 'web' || typeof window === 'undefined') return;
@@ -157,28 +168,33 @@ export default function RootLayout() {
   return (
     <QueryClientProvider client={queryClient}>
       <SafeAreaProvider style={{ flex: 1 }}>
-        <ThemeProvider
-          value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+        <TamaguiProvider
+          config={tamaguiConfig}
+          defaultTheme={colorScheme === "dark" ? "dark" : "light"}
         >
-          <Head>
-            <title>AiJee</title>
-          </Head>
-          <Stack>
-            <Stack.Screen
-              name="(app)"
-              options={{ headerShown: false, animation: "none" }}
-            />
-            <Stack.Screen
-              name="connect"
-              options={{ headerShown: false, animation: "none" }}
-            />
-            <Stack.Screen
-              name="modal"
-              options={{ presentation: "modal", title: "Modal" }}
-            />
-          </Stack>
-          <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
-        </ThemeProvider>
+          <ThemeProvider
+            value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+          >
+            <Head>
+              <title>AiJee</title>
+            </Head>
+            <Stack>
+              <Stack.Screen
+                name="(app)"
+                options={{ headerShown: false, animation: "none" }}
+              />
+              <Stack.Screen
+                name="connect"
+                options={{ headerShown: false, animation: "none" }}
+              />
+              <Stack.Screen
+                name="modal"
+                options={{ presentation: "modal", title: "Modal" }}
+              />
+            </Stack>
+            <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
+          </ThemeProvider>
+        </TamaguiProvider>
       </SafeAreaProvider>
     </QueryClientProvider>
   );

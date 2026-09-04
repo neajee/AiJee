@@ -1,5 +1,6 @@
+import { Input, Text, View } from 'tamagui';
 import { useState } from 'react';
-import { Pressable, Text, TextInput, View } from 'react-native';
+import { Pressable } from 'react-native';
 import { FolderOpen, Search, X } from 'lucide-react-native';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -43,7 +44,7 @@ export function FileTree({
           ]}
         >
           <Search size={13} color={textMuted} strokeWidth={2} />
-          <TextInput
+          <Input
             value={query}
             onChangeText={setQuery}
             placeholder="Filter files…"

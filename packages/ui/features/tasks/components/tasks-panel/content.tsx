@@ -1,10 +1,7 @@
+import { ScrollView, Text, View } from 'tamagui';
 import { useCallback, useEffect, useState } from 'react';
 import {
-  Pressable,
-  ScrollView,
-  Text,
-  View,
-} from 'react-native';
+  Pressable } from 'react-native';
 import { ChevronDown, ChevronRight } from 'lucide-react-native';
 
 import { Colors } from '@/constants/theme';

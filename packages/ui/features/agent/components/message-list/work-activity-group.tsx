@@ -1,5 +1,6 @@
+import { View } from 'tamagui';
 import { memo, useEffect, useMemo, useState } from "react";
-import { Text, View } from "react-native";
+import { Text } from "tamagui";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { formatTurnAction, summarizeTurnActions, type WorkStep } from "../../utils/turns";
 import { isToolActive } from "../../utils/message-list";

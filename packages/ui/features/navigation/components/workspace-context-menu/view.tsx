@@ -1,7 +1,9 @@
-import { Linking, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Text, View } from 'tamagui';
+import { Linking, Modal, Pressable } from 'react-native';
 import { ExternalLink, Github, Gitlab, Pencil, Pin, PinOff, SquarePen, Trash2 } from 'lucide-react-native';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
+import { ABSOLUTE_FILL_STYLE } from '@/constants/layout';
 import { useThemeTokens } from '@/hooks/use-theme-tokens';
 import { useWorkspaceContextMenuController, MENU_WIDTH } from '../../hooks/use-workspace-context-menu-controller';
 import { styles } from './styles';
@@ -22,7 +24,7 @@ export function WorkspaceContextMenu(props: WorkspaceContextMenuProps) {
   const separator = <View style={[styles.separator, { backgroundColor: menuBorder }]} />;
   return (
     <Modal visible transparent animationType="none" onRequestClose={props.onClose} statusBarTranslucent>
-      <Pressable style={StyleSheet.absoluteFill} onPress={props.onClose} accessibilityLabel="关闭菜单" />
+      <Pressable style={ABSOLUTE_FILL_STYLE} onPress={props.onClose} accessibilityLabel="关闭菜单" />
       <View style={[styles.menu, { top, left, backgroundColor: menuBg, borderColor: menuBorder }]}>
         {props.onNewSession && (
           <MenuItem icon={SquarePen} label="新对话" color={textPrimary} hoverBg={hoverBg} onPress={() => { props.onClose(); props.onNewSession?.(); }} />

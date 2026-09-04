@@ -1,4 +1,4 @@
-import { Platform } from 'react-native';
+import {  Platform  } from 'react-native';
 import type { Server } from './store';
 
 export type BootstrapTarget = { kind: 'local'; server: Server } | { kind: 'remote' };

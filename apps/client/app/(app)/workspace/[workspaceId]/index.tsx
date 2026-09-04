@@ -1,14 +1,7 @@
+import { Spinner, Text, View } from 'tamagui';
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  ActivityIndicator,
-  Animated,
-  Keyboard,
-  Platform,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Animated, Keyboard, Platform } from 'react-native';
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Fonts } from "@/constants/theme";
@@ -166,7 +159,7 @@ export default function WorkspaceScreen() {
           <View style={styles.centerStack}>
             {sending ? (
               <View style={styles.sendingContainer}>
-                <ActivityIndicator size="small" color={colors.textSecondary} />
+                <Spinner size="small" color={colors.textSecondary} />
                 <Text style={[styles.sendingText, { color: colors.textSecondary }]}>
                   Starting session…
                 </Text>
@@ -201,11 +194,11 @@ export default function WorkspaceScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   container: { flex: 1 },
   upperRow: { flex: 1, flexDirection: "row" },
   editorColumn: { flex: 1 },
   centerStack: { flex: 1, justifyContent: "center", gap: 20 },
-  sendingContainer: { alignItems: "center", justifyContent: "center", gap: 12, paddingVertical: 24 },
+  sendingContainer: { alignItems: "center", justifyContent: "center", gap: 12, paddingTop: 24 , paddingBottom: 24 },
   sendingText: { fontSize: 14, fontFamily: Fonts.sansMedium },
-});
+} as const;

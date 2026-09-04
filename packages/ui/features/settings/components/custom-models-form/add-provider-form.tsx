@@ -1,5 +1,6 @@
+import { Text, View } from 'tamagui';
 import { useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable } from 'react-native';
 import { useColors } from '../../hooks/use-custom-models-theme';
 import { ApiTypeSelector } from './api-type-selector';
 import { Field } from './field';

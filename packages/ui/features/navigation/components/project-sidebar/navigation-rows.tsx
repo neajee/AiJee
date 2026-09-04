@@ -1,5 +1,6 @@
+import { Text, View } from 'tamagui';
 import { useState, type ReactNode } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable } from "react-native";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { styles } from "./styles";
 export function SectionHeader({

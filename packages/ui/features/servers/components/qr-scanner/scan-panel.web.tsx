@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Text, View } from "tamagui";
 import { QrCode } from "lucide-react-native";
 
 import { Fonts } from "@/constants/theme";
@@ -19,7 +19,7 @@ export function QrScannerScanPanel({ textMuted }: QrScannerScanPanelProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   permissionWrap: {
     height: 200,
     alignItems: "center",
@@ -31,4 +31,4 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.sans,
     textAlign: "center",
   },
-});
+} as const;

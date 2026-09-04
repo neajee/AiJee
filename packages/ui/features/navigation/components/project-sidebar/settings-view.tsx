@@ -1,6 +1,6 @@
+import { ScrollView, Text, View } from 'tamagui';
 import { usePathname, useRouter } from "expo-router";
 import { ChevronLeft } from "lucide-react-native";
-import { ScrollView, Text, View } from "react-native";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { useWorkspaceStore } from "@/features/workspace/store";

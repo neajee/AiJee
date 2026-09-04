@@ -1,4 +1,5 @@
-import { ActivityIndicator, Modal, Platform, Pressable, Text, TextInput, View } from 'react-native';
+import { Modal, Platform, Pressable } from 'react-native';
+import { Input, Spinner, Text, View } from 'tamagui';
 import { AlertCircle, Check, Wifi, X } from 'lucide-react-native';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -36,7 +37,7 @@ export function QrScanner({ visible, onClose }: QrScannerProps) {
         <Pressable style={[styles.overlay, { backgroundColor: overlayBg }]} onPress={handleClose} accessibilityLabel="关闭配对弹窗">
           <Pressable style={[styles.card, { backgroundColor: cardBg, borderColor }]} onPress={(event) => event.stopPropagation()}>
             <View style={styles.statusCenter}>
-              <ActivityIndicator size="large" color={textPrimary} />
+              <Spinner size="large" color={textPrimary} />
               <Text style={[styles.statusTitle, { color: textPrimary }]}>Connecting to AiJee</Text>
               <Text style={[styles.statusDesc, { color: textMuted }]}>Completing secure pairing…</Text>
             </View>
@@ -157,7 +158,7 @@ export function QrScanner({ visible, onClose }: QrScannerProps) {
               {Platform.OS === 'web' ? 'Paste connect URL' : 'Or paste URL manually'}
             </Text>
             <View style={styles.manualRow}>
-              <TextInput
+              <Input
                 style={[styles.manualInput, { backgroundColor: inputBg, color: textPrimary, borderColor }]}
                 value={manualUrl}
                 onChangeText={handleManualUrlChange}

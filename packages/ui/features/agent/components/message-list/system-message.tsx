@@ -1,6 +1,8 @@
+import { Text, View } from 'tamagui';
 import { memo, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable } from "react-native";
 import { Colors, Fonts } from "@/constants/theme";
+import { HAIRLINE_WIDTH } from "@/constants/layout";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import type { ChatMessage } from "../../types";
 import { AssistantMarkdown } from "./assistant-markdown";
@@ -57,16 +59,16 @@ export const SystemMessage = memo(function SystemMessage({
   );
 });
 
-const styles = StyleSheet.create({
+const styles = {
   container: {
     alignItems: "center",
-    paddingVertical: 6,
-    paddingHorizontal: 16,
+    paddingTop: 6, paddingBottom: 6,
+    paddingLeft: 16, paddingRight: 16,
   },
   pill: {
     borderRadius: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
+    paddingLeft: 12, paddingRight: 12,
+    paddingTop: 4, paddingBottom: 4,
     maxWidth: "80%",
   },
   text: {
@@ -78,15 +80,15 @@ const styles = StyleSheet.create({
     flexWrap: "wrap",
     alignItems: "center",
     gap: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingLeft: 16, paddingRight: 16,
+    paddingTop: 12, paddingBottom: 12,
   },
   divider: {
     flex: 1,
-    height: StyleSheet.hairlineWidth,
+    height: HAIRLINE_WIDTH,
   },
   compactionTrigger: {
-    paddingVertical: 2,
+    paddingTop: 2, paddingBottom: 2,
   },
   compactionLabel: {
     fontSize: 11,
@@ -94,7 +96,7 @@ const styles = StyleSheet.create({
   },
   summary: {
     width: "100%",
-    paddingHorizontal: 12,
+    paddingLeft: 12, paddingRight: 12,
     paddingTop: 6,
   },
-});
+} as const;

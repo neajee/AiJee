@@ -1,5 +1,6 @@
+import { Text, View } from 'tamagui';
 import { memo, useEffect, useRef, useState } from 'react';
-import { Animated, Pressable, Text, View } from 'react-native';
+import { Animated, Pressable } from 'react-native';
 import { useThemeTokens } from '@/hooks/use-theme-tokens';
 import type { ToolCallInfo } from '../../../types';
 import { isToolActive } from '../../../utils/message-list';

@@ -1,7 +1,6 @@
-import { StyleSheet } from "react-native";
 import { Fonts } from "@/constants/theme";
 
-export const styles = StyleSheet.create({
+export const styles = {
   container: {
     borderRadius: 6,
     borderWidth: 0.5,
@@ -21,7 +20,7 @@ export const styles = StyleSheet.create({
     width: 40,
     alignItems: "flex-end",
     paddingRight: 8,
-    paddingVertical: 1,
+    paddingTop: 1, paddingBottom: 1,
     borderRightWidth: 0.5,
   },
   lineNo: {
@@ -33,16 +32,13 @@ export const styles = StyleSheet.create({
     fontSize: 13,
     lineHeight: 20,
     fontFamily: Fonts.mono,
-    paddingHorizontal: 8,
-    paddingVertical: 1,
+    paddingLeft: 8, paddingRight: 8,
+    paddingTop: 1, paddingBottom: 1,
   },
   lineTextNoGutter: {
     paddingLeft: 10,
   },
   lineTextBare: {
-    // paddingLeft must be set explicitly: an edge-specific padding from an
-    // earlier style in the array would otherwise win over paddingHorizontal.
-    paddingHorizontal: 12,
-    paddingLeft: 12,
+    paddingLeft: 12, paddingRight: 12,
   },
-});
+} as const;

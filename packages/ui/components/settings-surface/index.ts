@@ -9,5 +9,5 @@ import { useSettingsMetrics } from './metrics';
 
 export function useSettingsContentStyle(bottomInset: number) {
   const m = useSettingsMetrics();
-  return useMemo(() => ({ paddingHorizontal: m.gutter, paddingTop: m.gutter / 2, paddingBottom: bottomInset + 32, gap: m.groupGap, width: '100%' as const, maxWidth: m.contentMaxWidth, alignSelf: 'center' as const }), [bottomInset, m]);
+  return useMemo(() => ({ paddingLeft: m.gutter, paddingRight: m.gutter, paddingTop: m.gutter / 2, paddingBottom: bottomInset + 32, gap: m.groupGap, width: '100%' as const, maxWidth: m.contentMaxWidth, alignSelf: 'center' as const }), [bottomInset, m]);
 }

@@ -1,4 +1,5 @@
-import { ActivityIndicator, Pressable, Text, View } from 'react-native';
+import { Spinner, Text, View } from 'tamagui';
+import { Pressable } from 'react-native';
 import { X } from 'lucide-react-native';
 import { useFileRead } from '@aijee/client-sdk';
 import { CodePreview } from '@/features/agent/components/message-list/code-preview';
@@ -76,7 +77,7 @@ export function FileViewer({
 
       {/* Scrollable content */}
       {isLoading ? (
-        <ActivityIndicator style={{ marginTop: 32 }} />
+        <Spinner style={{ marginTop: 32 }} />
       ) : fileError ? (
         <View style={styles.viewerMessageWrap}>
           <Text style={[styles.emptyText, { color: textMuted }]}>

@@ -1,13 +1,13 @@
-import { StyleSheet } from 'react-native';
+import { ABSOLUTE_FILL_STYLE } from "@/constants/layout";
 import { Fonts } from '@/constants/theme';
 
-export const styles = StyleSheet.create({
+export const styles = {
   root: {
-    ...StyleSheet.absoluteFillObject,
+    ...ABSOLUTE_FILL_STYLE,
     zIndex: 100,
   },
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...ABSOLUTE_FILL_STYLE,
   },
   sheet: {
     position: 'absolute',
@@ -31,7 +31,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
+    paddingLeft: 16, paddingRight: 16,
     paddingBottom: 8,
     borderBottomWidth: 0.633,
   },
@@ -68,4 +68,4 @@ export const styles = StyleSheet.create({
     fontFamily: Fonts.mono,
     lineHeight: 18,
   },
-});
+} as const;

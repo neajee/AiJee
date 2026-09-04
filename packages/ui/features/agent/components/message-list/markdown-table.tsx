@@ -1,13 +1,9 @@
-import {
-  cloneElement,
-  isValidElement,
-  memo,
-  type ReactElement,
-  type ReactNode,
-} from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { Text, View } from 'tamagui';
+import { cloneElement, isValidElement, memo, type ReactElement, type ReactNode, } from "react";
+import { ScrollView } from "tamagui";
 
 import { Colors } from "@/constants/theme";
+import { HAIRLINE_WIDTH } from "@/constants/layout";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 
 /**
@@ -86,7 +82,7 @@ export const MarkdownTable = memo(function MarkdownTable({
               style={[
                 styles.cell,
                 cellStyle,
-                index > 0 && { borderLeftWidth: StyleSheet.hairlineWidth, borderLeftColor: colors.border },
+                index > 0 && { borderLeftWidth: HAIRLINE_WIDTH, borderLeftColor: colors.border },
               ]}
             >
               {/* Header cells arrive as inline nodes; wrapping in Text keeps the
@@ -104,7 +100,7 @@ export const MarkdownTable = memo(function MarkdownTable({
           key={rowIndex}
           style={[
             styles.row,
-            { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.border },
+            { borderTopWidth: HAIRLINE_WIDTH, borderTopColor: colors.border },
           ]}
         >
           {row.map((cell, cellIndex) => (
@@ -114,7 +110,7 @@ export const MarkdownTable = memo(function MarkdownTable({
                 styles.cell,
                 cellStyle,
                 cellIndex > 0 && {
-                  borderLeftWidth: StyleSheet.hairlineWidth,
+                  borderLeftWidth: HAIRLINE_WIDTH,
                   borderLeftColor: colors.border,
                 },
               ]}
@@ -141,16 +137,16 @@ export const MarkdownTable = memo(function MarkdownTable({
   );
 });
 
-const styles = StyleSheet.create({
+const styles = {
   wrap: {
-    marginVertical: 6,
+    marginTop: 6, marginBottom: 6,
   },
   scrollContent: {
     // Lets a narrow table still fill the column when scrolling is on.
     minWidth: "100%",
   },
   table: {
-    borderWidth: StyleSheet.hairlineWidth,
+    borderWidth: HAIRLINE_WIDTH,
     borderRadius: 6,
     overflow: "hidden",
   },
@@ -159,8 +155,8 @@ const styles = StyleSheet.create({
     alignItems: "stretch",
   },
   cell: {
-    paddingHorizontal: 10,
-    paddingVertical: 7,
+    paddingLeft: 10, paddingRight: 10,
+    paddingTop: 7, paddingBottom: 7,
     justifyContent: "center",
   },
   headerText: {
@@ -172,4 +168,4 @@ const styles = StyleSheet.create({
     maxWidth: "100%",
     alignSelf: "flex-start",
   },
-});
+} as const;

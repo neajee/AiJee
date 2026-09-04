@@ -1,4 +1,5 @@
-import { StyleSheet, Text, type TextProps } from 'react-native';
+import { Text as TamaguiText } from 'tamagui';
+import { type TextProps } from 'react-native';
 
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Fonts } from '@/constants/theme';
@@ -19,14 +20,10 @@ export function ThemedText({
   const color = useThemeColor({ light: lightColor, dark: darkColor }, 'text');
 
   return (
-    <Text
+    <TamaguiText
       style={[
         { color },
-        type === 'default' ? styles.default : undefined,
-        type === 'title' ? styles.title : undefined,
-        type === 'defaultSemiBold' ? styles.defaultSemiBold : undefined,
-        type === 'subtitle' ? styles.subtitle : undefined,
-        type === 'link' ? styles.link : undefined,
+        typeStyles[type],
         style,
       ]}
       {...rest}
@@ -34,30 +31,35 @@ export function ThemedText({
   );
 }
 
-const styles = StyleSheet.create({
+const typeStyles = {
   default: {
     fontSize: 16,
     lineHeight: 24,
     fontFamily: Fonts.sans,
+    textAlign: 'left',
   },
   defaultSemiBold: {
     fontSize: 16,
     lineHeight: 24,
     fontFamily: Fonts.sansSemiBold,
+    textAlign: 'left',
   },
   title: {
     fontSize: 32,
     fontFamily: Fonts.sansBold,
     lineHeight: 32,
+    textAlign: 'left',
   },
   subtitle: {
     fontSize: 20,
     fontFamily: Fonts.sansBold,
+    textAlign: 'left',
   },
   link: {
     lineHeight: 30,
     fontSize: 16,
     fontFamily: Fonts.sans,
     color: '#0a7ea4',
+    textAlign: 'left',
   },
-});
+} as const;

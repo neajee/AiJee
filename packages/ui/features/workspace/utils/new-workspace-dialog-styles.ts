@@ -1,7 +1,7 @@
-import { StyleSheet } from "react-native";
+import { HAIRLINE_WIDTH } from "@/constants/layout";
 import { Fonts } from "@/constants/theme";
 
-export const styles = StyleSheet.create({
+export const styles = {
   // Desktop dialog
   overlay: {
     flex: 1,
@@ -14,7 +14,7 @@ export const styles = StyleSheet.create({
     width: '100%',
     maxWidth: 560,
     borderRadius: 12,
-    borderWidth: StyleSheet.hairlineWidth,
+    borderWidth: HAIRLINE_WIDTH,
     padding: 20,
     boxShadow: '0px 12px 32px rgba(0, 0, 0, 0.24)',
     elevation: 10,
@@ -48,7 +48,7 @@ export const styles = StyleSheet.create({
     height: 38,
     borderRadius: 7,
     borderWidth: 0.633,
-    paddingHorizontal: 12,
+    paddingLeft: 12, paddingRight: 12,
   },
   input: {
     flex: 1,
@@ -61,7 +61,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 6,
     marginTop: 6,
-    paddingHorizontal: 2,
+    paddingLeft: 2, paddingRight: 2,
   },
   pathPreviewLabel: { fontSize: 11, fontFamily: Fonts.sansMedium },
   pathPreviewValue: { flex: 1, fontSize: 11, fontFamily: Fonts.mono },
@@ -105,7 +105,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
-    paddingHorizontal: 12,
+    paddingLeft: 12, paddingRight: 12,
     height: 40,
   },
   suggestionText: {
@@ -123,7 +123,7 @@ export const styles = StyleSheet.create({
   },
   cancelButton: {
     height: 32,
-    paddingHorizontal: 13,
+    paddingLeft: 13, paddingRight: 13,
     borderRadius: 7,
     borderWidth: 0.633,
     alignItems: 'center',
@@ -135,7 +135,7 @@ export const styles = StyleSheet.create({
   },
   createButton: {
     height: 32,
-    paddingHorizontal: 13,
+    paddingLeft: 13, paddingRight: 13,
     borderRadius: 7,
     alignItems: 'center',
     justifyContent: 'center',
@@ -169,14 +169,14 @@ export const styles = StyleSheet.create({
   sheetTitle: {
     fontSize: 17,
     fontFamily: Fonts.sansSemiBold,
-    paddingHorizontal: 20,
+    paddingLeft: 20, paddingRight: 20,
     paddingBottom: 16,
   },
   sheetBody: {
     maxHeight: 360,
   },
   sheetBodyContent: {
-    paddingHorizontal: 20,
+    paddingLeft: 20, paddingRight: 20,
     paddingBottom: 4,
   },
-});
+} as const;

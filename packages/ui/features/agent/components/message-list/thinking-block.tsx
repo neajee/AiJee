@@ -1,5 +1,6 @@
+import { Text, View } from 'tamagui';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable } from "react-native";
 import { Brain, ChevronRight } from "lucide-react-native";
 import Animated, {
   Easing,
@@ -155,12 +156,12 @@ export const ThinkingBlock = memo(function ThinkingBlock({
   );
 });
 
-const styles = StyleSheet.create({
+const styles = {
   header: {
     flexDirection: "row",
     alignItems: "center",
     gap: 5,
-    paddingVertical: 4,
+    paddingTop: 4, paddingBottom: 4,
   },
   label: {
     fontSize: 12,
@@ -182,4 +183,4 @@ const styles = StyleSheet.create({
     paddingTop: 2,
     paddingBottom: 6,
   },
-});
+} as const;

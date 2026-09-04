@@ -1,4 +1,4 @@
-import { Text, TextInput, View } from 'react-native';
+import { Input, Text, View } from 'tamagui';
 import { formStyles } from './styles';
 
 interface ServerFormFieldsProps {
@@ -27,7 +27,7 @@ export function ServerFormFields({
     <View style={formStyles.fields}>
       <View style={formStyles.field}>
         <Text style={[formStyles.label, { color: textMuted }]}>Name</Text>
-        <TextInput
+        <Input
           style={[formStyles.input, { backgroundColor: inputBg, color: textPrimary, borderColor }]}
           value={name}
           onChangeText={setName}
@@ -38,7 +38,7 @@ export function ServerFormFields({
       </View>
       <View style={formStyles.field}>
         <Text style={[formStyles.label, { color: textMuted }]}>Address</Text>
-        <TextInput
+        <Input
           style={[formStyles.input, { backgroundColor: inputBg, color: textPrimary, borderColor }]}
           value={address}
           onChangeText={setAddress}

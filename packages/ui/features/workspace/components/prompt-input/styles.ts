@@ -1,9 +1,10 @@
-import { Platform, StyleSheet } from 'react-native';
+import { HAIRLINE_WIDTH } from "@/constants/layout";
+import { Platform } from 'react-native';
 import { Fonts } from '@/constants/theme';
 
-export const styles = StyleSheet.create({
+export const styles = {
   wrapper: {
-    paddingHorizontal: 12,
+    paddingLeft: 12, paddingRight: 12,
     paddingBottom: 12,
     maxWidth: 1080,
     alignSelf: "center",
@@ -11,8 +12,8 @@ export const styles = StyleSheet.create({
     overflow: "visible",
   },
   sendError: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingLeft: 12, paddingRight: 12,
+    paddingTop: 8, paddingBottom: 8,
     borderRadius: 8,
     marginBottom: 6,
   },
@@ -21,8 +22,8 @@ export const styles = StyleSheet.create({
     fontFamily: Fonts.sans,
   },
   speechError: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    paddingLeft: 12, paddingRight: 12,
+    paddingTop: 8, paddingBottom: 8,
     borderRadius: 8,
     marginBottom: 6,
   },
@@ -39,7 +40,7 @@ export const styles = StyleSheet.create({
     fontFamily: Fonts.sans,
     fontSize: 11,
     lineHeight: 15,
-    paddingHorizontal: 4,
+    paddingLeft: 4, paddingRight: 4,
     paddingBottom: 4,
   },
   card: {
@@ -52,11 +53,15 @@ export const styles = StyleSheet.create({
     zIndex: Platform.OS === "android" ? 5 : 8,
   },
   input: {
-    paddingHorizontal: 16,
+    paddingLeft: 16, paddingRight: 16,
     paddingTop: 14,
     paddingBottom: 8,
     fontSize: 15,
     fontFamily: Fonts.sans,
+    backgroundColor: "transparent",
+    borderWidth: 0,
+    borderColor: "transparent",
+    borderRadius: 0,
     outlineStyle: "none" as never,
   },
   actionRow: {
@@ -64,7 +69,7 @@ export const styles = StyleSheet.create({
     // Centred: the row now mixes 32px round buttons with the shorter model
     // control, and bottom alignment would leave the text sitting low.
     alignItems: "center",
-    paddingHorizontal: 10,
+    paddingLeft: 10, paddingRight: 10,
     paddingBottom: 10,
   },
   attachButton: {
@@ -86,7 +91,7 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     gap: 6,
     height: 32,
-    paddingHorizontal: 4,
+    paddingLeft: 4, paddingRight: 4,
   },
   sendButton: {
     width: 32,
@@ -104,7 +109,7 @@ export const styles = StyleSheet.create({
     height: 32,
     borderRadius: 999,
     borderWidth: 0.633,
-    paddingHorizontal: 14,
+    paddingLeft: 14, paddingRight: 14,
     alignItems: "center",
     justifyContent: "center",
   },
@@ -113,7 +118,7 @@ export const styles = StyleSheet.create({
     fontFamily: Fonts.sansMedium,
   },
   queuePanel: {
-    borderWidth: StyleSheet.hairlineWidth,
+    borderWidth: HAIRLINE_WIDTH,
     borderRadius: 10,
     marginBottom: 8,
     padding: 8,
@@ -176,4 +181,4 @@ export const styles = StyleSheet.create({
     opacity: 0,
     pointerEvents: "none" as const,
   },
-});
+} as const;

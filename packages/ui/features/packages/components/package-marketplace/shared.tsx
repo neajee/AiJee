@@ -1,4 +1,5 @@
-import { ActivityIndicator, Pressable, Text, View } from 'react-native';
+import { Spinner, Text, View } from 'tamagui';
+import { Pressable } from 'react-native';
 import { ShieldAlert } from 'lucide-react-native';
 import { Fonts } from '@/constants/theme';
 import { useSettingsMetrics, useSettingsPalette } from '@/components/settings-surface';
@@ -54,7 +55,7 @@ export function PrimaryButton({
       ]}
     >
       {busy ? (
-        <ActivityIndicator size="small" color={p.onAccent} />
+        <Spinner size="small" color={p.onAccent} />
       ) : (
         <>
           {Icon ? <Icon size={13} color={p.onAccent} strokeWidth={2.2} /> : null}

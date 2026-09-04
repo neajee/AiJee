@@ -1,4 +1,5 @@
-import { Animated, Platform, Pressable, Text, TextInput, View } from 'react-native';
+import { Input, Text, View } from 'tamagui';
+import { Animated, Platform, Pressable } from 'react-native';
 import { ArrowUp, Mic, Plus, Square } from 'lucide-react-native';
 import { formatAgentModeLabel } from '@/features/agent/mode';
 import { Toolbar } from './toolbar/index';
@@ -49,11 +50,12 @@ export function InputCard({
         } as any,
       ]}
     >
-      <TextInput
+      <Input
         ref={inputRef}
         placeholder="Ask anything..."
         placeholderTextColor={theme.textMuted}
         style={[styles.input, { color: theme.textPrimary }, sendDisabled && !canComposeWhileDisabled && { opacity: 0.5 }]}
+        focusStyle={{ outlineWidth: 0, borderWidth: 0, borderColor: 'transparent', boxShadow: 'none' } as any}
         editable={!inputDisabled}
         multiline
         numberOfLines={lineCount}

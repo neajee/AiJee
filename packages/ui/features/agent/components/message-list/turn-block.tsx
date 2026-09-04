@@ -1,5 +1,6 @@
+import { Spinner, Text, View } from 'tamagui';
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
-import { ActivityIndicator, Platform, Pressable, Text, View } from "react-native";
+import { Platform, Pressable } from "react-native";
 import Animated, { Easing, FadeIn, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 import { ChevronRight, GitFork } from "lucide-react-native";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
@@ -174,7 +175,7 @@ export const TurnBlock = memo(function TurnBlock({
               style={styles.actionButton}
             >
               {forkingEntryId === forkEntryId ? (
-                <ActivityIndicator size={12} color={colors.textTertiary} />
+                <Spinner size="small" color={colors.textTertiary} style={{ width: 12, height: 12 }} />
               ) : (
                 <GitFork size={14} color={colors.textTertiary} strokeWidth={1.8} />
               )}

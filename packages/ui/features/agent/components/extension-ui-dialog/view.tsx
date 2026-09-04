@@ -1,4 +1,5 @@
-import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { Input, ScrollView, Spinner, Text, View } from 'tamagui';
+import { Pressable } from "react-native";
 import { Check, Circle, CircleDot, X } from "lucide-react-native";
 import { styles } from "./styles";
 import type { ExtensionUiController } from "../../hooks/use-extension-ui-controller";
@@ -142,7 +143,7 @@ export function ExtensionUiView({ controller }: { controller: ExtensionUiControl
 
         {request.method === "input" && (
           <View style={styles.actionArea}>
-            <TextInput
+            <Input
               value={draft}
               onChangeText={setDraft}
               placeholder={request.placeholder ?? "Type your response"}
@@ -166,7 +167,7 @@ export function ExtensionUiView({ controller }: { controller: ExtensionUiControl
 
         {request.method === "editor" && (
           <View style={styles.actionArea}>
-            <TextInput
+            <Input
               value={draft}
               onChangeText={setDraft}
               placeholder="Edit the text"
@@ -228,7 +229,7 @@ export function ExtensionUiView({ controller }: { controller: ExtensionUiControl
               ]}
             >
               {mutation.isPending ? (
-                <ActivityIndicator
+                <Spinner
                   size="small"
                   color={theme.colors.background}
                 />

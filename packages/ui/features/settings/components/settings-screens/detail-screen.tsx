@@ -1,5 +1,6 @@
 import { type ReactNode } from 'react';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable } from 'react-native';
+import { ScrollView, Text, View } from 'tamagui';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ChevronLeft } from 'lucide-react-native';
 import {
@@ -51,14 +52,14 @@ function SettingsDesktopSection({ section, isDark }: { section: SettingsSection;
 
   return (
     <View style={desktopStyles.detail}>
-      <View style={[desktopStyles.detailHeader, { borderBottomColor: palette.separator, paddingHorizontal: inset }]}>
+      <View style={[desktopStyles.detailHeader, { borderBottomColor: palette.separator, paddingLeft: inset , paddingRight: inset }]}>
         <View style={desktopStyles.detailHeaderCopy}>
           <Text style={[desktopStyles.detailTitle, { color: palette.text }]}>{section.title}</Text>
         </View>
       </View>
       <ScrollView
         style={desktopStyles.detailScroll}
-        contentContainerStyle={{ paddingHorizontal: inset, paddingTop: metrics.groupGap, paddingBottom: 32, gap: metrics.groupGap }}
+        contentContainerStyle={{ paddingLeft: inset, paddingRight: inset, paddingTop: metrics.groupGap, paddingBottom: 32, gap: metrics.groupGap }}
         showsVerticalScrollIndicator={false}
       >
         <SettingsHeadingProvider visible={false}>
@@ -78,7 +79,7 @@ function SettingsDetailChrome({ title, onBack, children }: { title: string; onBa
   return (
     <View style={[styles.screen, { backgroundColor: palette.bg }]}>
       <View style={[styles.navBar, { borderBottomColor: palette.separator }]}>
-        <View style={[styles.navBarInner, { paddingHorizontal: metrics.gutter - 6, maxWidth: metrics.contentMaxWidth, minHeight: metrics.rowMinHeight + 4 }]}>
+        <View style={[styles.navBarInner, { paddingLeft: metrics.gutter - 6, paddingRight: metrics.gutter - 6, maxWidth: metrics.contentMaxWidth, minHeight: metrics.rowMinHeight + 4 }]}>
           <Pressable
             onPress={onBack}
             accessibilityRole="button"

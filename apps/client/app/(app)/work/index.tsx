@@ -1,13 +1,6 @@
+import { Spinner, Text, View } from 'tamagui';
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  ActivityIndicator,
-  Animated,
-  Keyboard,
-  Platform,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Animated, Keyboard, Platform } from 'react-native';
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -110,7 +103,7 @@ export default function WorkIndex() {
         <View style={styles.centerStack}>
           {sending ? (
             <View style={styles.sendingContainer}>
-              <ActivityIndicator size="small" color={colors.textSecondary} />
+              <Spinner size="small" color={colors.textSecondary} />
               <Text style={[styles.sendingText, { color: colors.textSecondary }]}>
                 Starting Work…
               </Text>
@@ -131,10 +124,10 @@ export default function WorkIndex() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   container: { flex: 1 },
   editorColumn: { flex: 1 },
   centerStack: { flex: 1, justifyContent: "center", gap: 20 },
-  sendingContainer: { alignItems: "center", justifyContent: "center", gap: 12, paddingVertical: 24 },
+  sendingContainer: { alignItems: "center", justifyContent: "center", gap: 12, paddingTop: 24 , paddingBottom: 24 },
   sendingText: { fontSize: 14, fontFamily: Fonts.sansMedium },
-});
+} as const;

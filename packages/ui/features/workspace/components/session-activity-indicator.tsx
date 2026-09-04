@@ -1,5 +1,6 @@
+import { View } from 'tamagui';
 import { useEffect, useRef } from "react";
-import { Animated, StyleSheet, View } from "react-native";
+import { Animated } from "react-native";
 import { Minus } from "lucide-react-native";
 
 import { useAgentSession } from "@aijee/client-sdk";
@@ -99,7 +100,7 @@ export function SessionActivityIndicator({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   row: {
     width: 16,
     height: 14,
@@ -113,4 +114,4 @@ const styles = StyleSheet.create({
     height: DOT_SIZE,
     borderRadius: DOT_SIZE / 2,
   },
-});
+} as const;

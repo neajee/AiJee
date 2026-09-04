@@ -1,5 +1,6 @@
+import { Text, View } from 'tamagui';
 import { useEffect } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable } from 'react-native';
 import { Play, Square, ChevronDown } from 'lucide-react-native';
 
 import { Fonts } from '@/constants/theme';
@@ -96,7 +97,7 @@ export function MobileTaskSelector({ color, bgColor, onPress, onOutputPress }: M
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   selector: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -123,4 +124,4 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     maxWidth: 80,
   },
-});
+} as const;

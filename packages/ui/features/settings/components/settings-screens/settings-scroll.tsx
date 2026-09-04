@@ -1,5 +1,5 @@
 import { type ReactNode } from 'react';
-import { ScrollView, View } from 'react-native';
+import { ScrollView, View } from 'tamagui';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
   useSettingsContentStyle,
@@ -18,17 +18,19 @@ export function SettingsScroll({ children }: { children: ReactNode }) {
     <View style={[styles.screen, { backgroundColor: palette.bg }]}>
       <ScrollView
         style={styles.scroll}
-        contentContainerStyle={[
-          contentStyle,
-          !phone && {
-            maxWidth: '100%',
-            gap: 0,
-            paddingHorizontal: 0,
-            paddingTop: 0,
-            paddingBottom: 0,
-            flexGrow: 1,
-          },
-        ]}
+        contentContainerStyle={
+          phone
+            ? contentStyle
+            : {
+                ...contentStyle,
+                maxWidth: '100%',
+                gap: 0,
+                paddingLeft: 0, paddingRight: 0,
+                paddingTop: 0,
+                paddingBottom: 0,
+                flexGrow: 1,
+              }
+        }
         showsVerticalScrollIndicator={false}
       >
         {children}

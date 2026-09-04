@@ -1,5 +1,7 @@
+import { Text, View } from 'tamagui';
 import { useState } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable } from 'react-native';
+import { HAIRLINE_WIDTH } from '@/constants/layout';
 import { ChevronDown, ChevronUp } from "lucide-react-native";
 import { useSettingsPalette } from "@/components/settings-surface";
 import { formatReleaseShort, formatReleaseTime, type VersionInfo } from "../utils/about";
@@ -56,7 +58,7 @@ export function ReleaseRow({
         )}
       </Pressable>
       {open ? (
-        <View style={[aboutStyles.releaseBody, { borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: p.separator }]}>
+        <View style={[aboutStyles.releaseBody, { borderTopWidth: HAIRLINE_WIDTH, borderTopColor: p.separator }]}>
           {(['feature', 'fix', 'other'] as const).map((type) => {
             const items = notes.filter((note) => note.type === type);
             if (!items.length) return null;

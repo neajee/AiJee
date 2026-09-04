@@ -1,5 +1,5 @@
+import { Spinner, View } from 'tamagui';
 import { memo, useEffect } from "react";
-import { ActivityIndicator, View } from "react-native";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -24,7 +24,7 @@ export const ToolStatusDot = memo(function ToolStatusDot({
   if (status === "running") {
     return (
       <View style={{ width: size + 6, height: size + 6, alignItems: "center", justifyContent: "center" }}>
-        <ActivityIndicator size={size + 4} color="#999" />
+        <Spinner size="small" color="#999" style={{ width: size + 4, height: size + 4 }} />
       </View>
     );
   }

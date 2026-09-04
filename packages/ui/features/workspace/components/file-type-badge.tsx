@@ -1,4 +1,5 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Text, View } from 'tamagui';
+
 
 import { Fonts } from "@/constants/theme";
 
@@ -61,7 +62,7 @@ export function FileTypeBadge({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   badge: {
     width: 22,
     alignItems: "center",
@@ -73,4 +74,4 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.mono,
     letterSpacing: -0.3,
   },
-});
+} as const;

@@ -1,4 +1,5 @@
-import { Pressable, Text, View } from 'react-native';
+import { Text, View } from 'tamagui';
+import { Pressable } from 'react-native';
 import { providerPageStyles } from '../../utils/custom-models-styles';
 import { ProviderMark } from './provider-mark';
 import type { ProviderRowProps } from './types';

@@ -1,5 +1,6 @@
+import { Input, ScrollView, Spinner, Text, View } from 'tamagui';
 import { memo } from "react";
-import { ActivityIndicator, Pressable, ScrollView, Text, TextInput, View } from "react-native";
+import { Pressable } from "react-native";
 import { Plus } from "lucide-react-native";
 
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -49,7 +50,7 @@ function PreviewPanelComponent({ sessionId }: PreviewPanelProps) {
           Add a port to preview a running app.
         </Text>
         <View style={styles.addPortRow}>
-          <TextInput
+          <Input
             style={[
               styles.portInput,
               {
@@ -158,7 +159,7 @@ function PreviewPanelComponent({ sessionId }: PreviewPanelProps) {
           })}
           {showPortInput ? (
             <View style={styles.inlinePortRow}>
-              <TextInput
+              <Input
                 autoFocus
                 style={[
                   styles.inlinePortInput,
@@ -203,7 +204,7 @@ function PreviewPanelComponent({ sessionId }: PreviewPanelProps) {
           />
         ) : (
           <View style={styles.loadingState}>
-            <ActivityIndicator size="small" />
+            <Spinner size="small" />
           </View>
         )}
       </View>

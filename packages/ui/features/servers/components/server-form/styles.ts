@@ -1,11 +1,10 @@
-import { StyleSheet } from 'react-native';
 import { Fonts } from '@/constants/theme';
 
 export const SHEET_HEIGHT = 520;
 
-export const sheetStyles = StyleSheet.create({
+export const sheetStyles = {
   root: { flex: 1 },
-  overlay: { ...StyleSheet.absoluteFillObject },
+  overlay: { position: 'absolute', top: 0, right: 0, bottom: 0, left: 0 },
   keyboardAvoider: { flex: 1, justifyContent: 'flex-end' },
   sheet: {
     width: '100%',
@@ -15,14 +14,14 @@ export const sheetStyles = StyleSheet.create({
   },
   handleBar: { alignItems: 'center', paddingTop: 10, paddingBottom: 6 },
   handle: { width: 36, height: 4, borderRadius: 2 },
-  sheetHeader: { paddingHorizontal: 20, paddingBottom: 12 },
-  sheetTitle: { fontSize: 15, fontFamily: Fonts.sansSemiBold },
-  sheetContent: { paddingHorizontal: 20, gap: 20, paddingBottom: 8 },
+  sheetHeader: { paddingLeft: 20, paddingRight: 20, paddingBottom: 12 },
+  sheetTitle: { fontSize: 15, fontFamily: Fonts.sansSemiBold, textAlign: 'left' },
+  sheetContent: { paddingLeft: 20, paddingRight: 20, gap: 20, paddingBottom: 8 },
   sheetSaveBtn: { alignItems: 'center', justifyContent: 'center', height: 44, borderRadius: 8 },
-  sheetSaveBtnText: { fontSize: 15, fontFamily: Fonts.sansSemiBold },
-});
+  sheetSaveBtnText: { fontSize: 15, fontFamily: Fonts.sansSemiBold, textAlign: 'left' },
+} as const;
 
-export const formStyles = StyleSheet.create({
+export const formStyles = {
   overlay: {
     flex: 1,
     justifyContent: 'center',
@@ -38,7 +37,7 @@ export const formStyles = StyleSheet.create({
     gap: 20,
   },
   header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  title: { fontSize: 17, fontFamily: Fonts.sansSemiBold },
+  title: { fontSize: 17, fontFamily: Fonts.sansSemiBold, textAlign: 'left' },
   closeBtn: {
     width: 28,
     height: 28,
@@ -58,13 +57,13 @@ export const formStyles = StyleSheet.create({
     height: 40,
     borderRadius: 6,
     borderWidth: 0.633,
-    paddingHorizontal: 12,
+    paddingLeft: 12, paddingRight: 12,
     fontSize: 14,
     fontFamily: Fonts.sans,
   },
   actions: { flexDirection: 'row', justifyContent: 'flex-end', gap: 8 },
-  btn: { paddingHorizontal: 18, paddingVertical: 9, borderRadius: 6, borderWidth: 0.633 },
+  btn: { paddingLeft: 18, paddingRight: 18, paddingTop: 9, paddingBottom: 9, borderRadius: 6, borderWidth: 0.633 },
   btnPrimary: { backgroundColor: '#1a1a1a', borderColor: '#1a1a1a' },
-  btnText: { fontSize: 13, fontFamily: Fonts.sansSemiBold },
-  errorText: { fontSize: 13, fontFamily: Fonts.sans },
-});
+  btnText: { fontSize: 13, fontFamily: Fonts.sansSemiBold, textAlign: 'left' },
+  errorText: { fontSize: 13, fontFamily: Fonts.sans, textAlign: 'left' },
+} as const;

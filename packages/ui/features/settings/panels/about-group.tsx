@@ -1,5 +1,6 @@
+import { Text, View } from 'tamagui';
 import type { ReactNode } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { HAIRLINE_WIDTH } from '@/constants/layout';
 import { useSettingsMetrics, useSettingsPalette } from "@/components/settings-surface";
 import { aboutStyles } from "../utils/about-styles";
 /** Group header that survives the SettingsHeadingProvider suppression. */
@@ -13,7 +14,7 @@ export function AboutGroup({ title, children }: { title: string; children: React
         style={{
           backgroundColor: p.card,
           borderRadius: m.cardRadius,
-          borderWidth: StyleSheet.hairlineWidth,
+          borderWidth: HAIRLINE_WIDTH,
           borderColor: p.separator,
           overflow: 'hidden',
         }}

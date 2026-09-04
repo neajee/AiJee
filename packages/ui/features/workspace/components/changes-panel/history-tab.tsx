@@ -1,5 +1,6 @@
+import { ScrollView, Spinner, Text, View } from 'tamagui';
 import { useMemo } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable } from 'react-native';
 import { ChevronDown, ChevronUp, History } from 'lucide-react-native';
 
 import { timeAgo } from '../../utils/changes-panel';
@@ -45,6 +46,6 @@ export function LogSection({ entries, isLoading, isOpen, onToggle }: { entries: 
       <History size={12} color={textMuted} strokeWidth={2} /><Text style={[styles.logHeaderText, { color: textPrimary }]}>Log</Text><View style={{ flex: 1 }} />
       {isOpen ? <ChevronDown size={13} color={textMuted} strokeWidth={2} /> : <ChevronUp size={13} color={textMuted} strokeWidth={2} />}
     </Pressable>
-    {isOpen && <ScrollView style={styles.logBody} contentContainerStyle={styles.logBodyContent} showsVerticalScrollIndicator={false}>{isLoading ? <ActivityIndicator style={{ marginVertical: 16 }} size="small" /> : <HistoryTab entries={entries} />}</ScrollView>}
+    {isOpen && <ScrollView style={styles.logBody} contentContainerStyle={styles.logBodyContent} showsVerticalScrollIndicator={false}>{isLoading ? <Spinner style={{ marginTop: 16 , marginBottom: 16 }} size="small" /> : <HistoryTab entries={entries} />}</ScrollView>}
   </View>;
 }

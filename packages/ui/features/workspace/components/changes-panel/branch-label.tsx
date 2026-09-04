@@ -1,4 +1,5 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Text, View } from 'tamagui';
+
 import { GitBranch, ArrowUp, ArrowDown } from "lucide-react-native";
 
 import { Fonts } from "@/constants/theme";
@@ -47,7 +48,7 @@ export function BranchLabel({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   wrap: {
     flexDirection: "row",
     alignItems: "center",
@@ -68,4 +69,4 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontFamily: Fonts.mono,
   },
-});
+} as const;

@@ -1,12 +1,8 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  Animated,
-  NativeSyntheticEvent,
-  Platform,
-  ScrollView,
-  TextInput,
-  TextInputKeyPressEventData,
-  View,
+  Animated, NativeSyntheticEvent, Platform, TextInput, TextInputKeyPressEventData,
+  type ScrollView as RNScrollView,
+  type View as RNView,
 } from 'react-native';
 
 import { buildThinkingLevelOptions, thinkingLevelLabel, type FlatModel, type ThinkingPreference } from '../utils/prompt-input';
@@ -38,9 +34,9 @@ export function useToolbarController({
 }: ToolbarProps): ToolbarController {
   const theme = usePromptTheme();
   const appMode = useAppMode();
-  const modelScrollRef = useRef<ScrollView | null>(null);
+  const modelScrollRef = useRef<RNScrollView | null>(null);
   const modelSearchRef = useRef<TextInput | null>(null);
-  const toolbarRef = useRef<View | null>(null);
+  const toolbarRef = useRef<RNView | null>(null);
   const models = config.models;
   const agentState = config.state;
   const configError = config.error;

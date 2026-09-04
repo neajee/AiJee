@@ -1,5 +1,5 @@
+import { Text, View } from 'tamagui';
 import { useCallback, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
 
 import { Colors, Fonts } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -68,7 +68,7 @@ export function FilesPanel() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   container: {
     flex: 1,
   },
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    paddingHorizontal: 12,
+    paddingLeft: 12, paddingRight: 12,
     height: 36,
     borderBottomWidth: 0.633,
   },
@@ -95,4 +95,4 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginTop: 32,
   },
-});
+} as const;

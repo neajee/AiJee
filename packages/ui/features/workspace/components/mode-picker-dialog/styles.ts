@@ -1,7 +1,6 @@
-import { StyleSheet } from 'react-native';
 import { Fonts } from '@/constants/theme';
 
-export const styles = StyleSheet.create({
+export const styles = {
   dialog: { width: '100%', maxWidth: 420, borderRadius: 14, borderWidth: 0.633, padding: 20, gap: 12, maxHeight: '80%' },
   header: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   title: { fontSize: 17, fontFamily: Fonts.sansSemiBold },
@@ -15,6 +14,6 @@ export const styles = StyleSheet.create({
   optionDesc: { fontSize: 12, fontFamily: Fonts.sans },
   optionDetail: { fontSize: 11, fontFamily: Fonts.mono },
   footer: { flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: 4 },
-  btn: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 8, borderWidth: 0.633 },
+  btn: { paddingLeft: 16, paddingRight: 16, paddingTop: 8, paddingBottom: 8, borderRadius: 8, borderWidth: 0.633 },
   btnText: { fontSize: 13, fontFamily: Fonts.sansMedium },
-});
+} as const;

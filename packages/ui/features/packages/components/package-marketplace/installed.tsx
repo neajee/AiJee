@@ -1,4 +1,5 @@
-import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
+import { ScrollView, Spinner, Text, View } from 'tamagui';
+import { Pressable } from 'react-native';
 import { usePiClient } from '@aijee/client-sdk';
 import { Fonts } from '@/constants/theme';
 import { useSettingsMetrics, useSettingsPalette } from '@/components/settings-surface';
@@ -44,7 +45,7 @@ export function InstalledView({
       {error ? <Notice text={error} tone="error" /> : null}
 
       {loading ? (
-        <View style={styles.centered}><ActivityIndicator size="small" color={p.textTertiary} /></View>
+        <View style={styles.centered}><Spinner size="small" color={p.textTertiary} /></View>
       ) : output === '暂无已安装插件' ? (
         <Text style={[styles.emptyText, { color: p.textTertiary, fontSize: m.descSize }]}>暂无已安装插件。</Text>
       ) : (

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { View } from "tamagui";
 
 import type { PreviewTarget } from "@/features/preview/store";
 import { buildPreviewUrl } from "@/features/preview/utils";
@@ -43,5 +43,5 @@ export function BrowserPreviewDesktop({ serverUrl, accessToken, sessionId, targe
   </View>;
 }
 
-const styles = StyleSheet.create({ container: { flex: 1, backgroundColor: "#111", alignItems: "center", justifyContent: "center" }, image: { flex: 1 } });
+const styles = { container: { flex: 1, backgroundColor: "#111", alignItems: "center", justifyContent: "center" }, image: { flex: 1 } } as const;
 const imageStyle = { width: "100%", height: "100%", objectFit: "contain", outline: "none" } as React.CSSProperties;

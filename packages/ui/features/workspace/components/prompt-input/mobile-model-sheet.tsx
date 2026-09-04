@@ -1,8 +1,10 @@
+import { Input, ScrollView, Text, View } from 'tamagui';
 import { memo, useRef, useState, useEffect } from 'react';
-import { Animated, Modal, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Animated, Modal, Pressable, TextInput } from 'react-native';
 import { Check, X } from 'lucide-react-native';
 
 import { Fonts } from '@/constants/theme';
+import { ABSOLUTE_FILL_STYLE } from '@/constants/layout';
 import { matchesModelSearch } from '../../utils/prompt-input-search';
 import { usePromptTheme } from '@/components/surface-theme/use-prompt-theme';
 import { ProviderIcon } from '@/components/provider-icons';
@@ -94,7 +96,7 @@ function MobileModelSheetComponent({
     >
       <View style={styles.modalRoot}>
         <Animated.View style={[styles.overlay, { opacity: overlayAnim }]}>
-          <Pressable style={StyleSheet.absoluteFill} onPress={handleClose} />
+          <Pressable style={ABSOLUTE_FILL_STYLE} onPress={handleClose} />
         </Animated.View>
         <Animated.View
           style={[
@@ -109,7 +111,7 @@ function MobileModelSheetComponent({
             Select Model
           </Text>
           <View style={[styles.searchRow, { backgroundColor: theme.cardBg, borderColor: theme.cardBorder }]}>
-            <TextInput
+            <Input
               ref={searchRef}
               style={[styles.searchInput, { color: theme.textPrimary }]}
               value={search}
@@ -164,13 +166,13 @@ function MobileModelSheetComponent({
 
 export const MobileModelSheet = memo(MobileModelSheetComponent);
 
-const styles = StyleSheet.create({
+const styles = {
   modalRoot: {
     flex: 1,
     justifyContent: 'flex-end',
   },
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...ABSOLUTE_FILL_STYLE,
     backgroundColor: 'rgba(0,0,0,0.4)',
   },
   container: {
@@ -192,18 +194,18 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 15,
     fontFamily: Fonts.sansSemiBold,
-    paddingHorizontal: 20,
+    paddingLeft: 20, paddingRight: 20,
     paddingBottom: 12,
   },
   searchRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginHorizontal: 20,
+    marginLeft: 20, marginRight: 20,
     marginBottom: 12,
     height: 40,
     borderRadius: 8,
     borderWidth: 0.633,
-    paddingHorizontal: 12,
+    paddingLeft: 12, paddingRight: 12,
     gap: 8,
   },
   searchInput: {
@@ -220,7 +222,7 @@ const styles = StyleSheet.create({
     fontFamily: Fonts.sansMedium,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
-    paddingHorizontal: 20,
+    paddingLeft: 20, paddingRight: 20,
     paddingTop: 12,
     paddingBottom: 4,
   },
@@ -228,8 +230,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 14,
+    paddingLeft: 20, paddingRight: 20,
+    paddingTop: 14, paddingBottom: 14,
   },
   modelRow: {
     flexDirection: 'row',
@@ -240,4 +242,4 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: Fonts.sans,
   },
-});
+} as const;

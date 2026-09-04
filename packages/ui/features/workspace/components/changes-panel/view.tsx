@@ -1,4 +1,5 @@
-import { ActivityIndicator, Platform, Pressable, ScrollView, Text, View } from 'react-native';
+import { ScrollView, Spinner, Text, View } from 'tamagui';
+import { Platform, Pressable } from 'react-native';
 import { ChevronDown, ChevronUp, GitCompare } from 'lucide-react-native';
 
 import { FileTree } from '../file-tree';
@@ -83,7 +84,7 @@ export function ChangesPanel({ renderExtraTab, ...props }: ChangesPanelProps = {
                 </Pressable>
                 {changesOpen && (
                   <ScrollView style={styles.gitChanges} contentContainerStyle={styles.contentInner} showsVerticalScrollIndicator={false}>
-                    {isLoading ? <ActivityIndicator style={{ marginTop: 32 }} /> : (
+                    {isLoading ? <Spinner style={{ marginTop: 32 }} /> : (
                       <ChangesTab
                         staged={staged}
                         unstaged={unstaged}

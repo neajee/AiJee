@@ -1,13 +1,7 @@
+import { Spinner, View } from 'tamagui';
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  ActivityIndicator,
-  Animated,
-  Keyboard,
-  Platform,
-  StyleSheet,
-  View,
-} from "react-native";
+import { Animated, Keyboard, Platform } from 'react-native';
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
 import { PromptInput } from "@/features/workspace/components/prompt-input";
@@ -191,7 +185,7 @@ export default function SessionScreen() {
             ) : agentSession.isLoading || (!agentSession.isReady && sessionId) ? (
               Platform.OS === "ios" ? (
                 <View style={styles.emptyCenter}>
-                  <ActivityIndicator size="small" />
+                  <Spinner size="small" />
                 </View>
               ) : (
                 <ChatShimmer />
@@ -237,7 +231,7 @@ export default function SessionScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   container: {
     flex: 1,
   },
@@ -253,4 +247,4 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-});
+} as const;

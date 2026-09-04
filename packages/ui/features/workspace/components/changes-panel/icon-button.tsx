@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet } from "react-native";
+import { Pressable } from "react-native";
 
 export function IconButton({
   onPress,
@@ -36,7 +36,7 @@ export function IconButton({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   iconButton: {
     width: 24,
     height: 24,
@@ -44,4 +44,4 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-});
+} as const;

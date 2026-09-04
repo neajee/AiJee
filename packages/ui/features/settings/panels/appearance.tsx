@@ -1,6 +1,8 @@
+import { Text, View } from 'tamagui';
 import { useEffect, type ComponentType } from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable } from 'react-native';
 import { Monitor, Moon, Sun } from "lucide-react-native";
+import { HAIRLINE_WIDTH } from '@/constants/layout';
 import { Fonts, type AccentPreset, type ThemePreset } from "@/constants/theme";
 import { useAppSettingsStore, type ThemeMode } from "../store";
 import { SettingsGroup, SettingsRow, useSettingsMetrics, useSettingsPhoneLayout, useSettingsPalette } from "@/components/settings-surface";
@@ -70,7 +72,7 @@ function ThemePicker({
                 ? { width: size, height: size, borderRadius: m.tileRadius }
                 : wide
                   ? pickerStyles.wideItem
-                : { borderRadius: m.tileRadius, paddingHorizontal: 10, minHeight: 30 },
+                : { borderRadius: m.tileRadius, paddingLeft: 10, paddingRight: 10, minHeight: 30 },
               active && { backgroundColor: compact ? p.card : p.accent, borderColor: compact ? p.separator : p.accent },
               pressed && { opacity: 0.55 },
             ]}
@@ -162,17 +164,17 @@ export function AppearancePanel() {
 function SizeStepper({ value, onChange, min, max, palette }: { value: number; onChange: (value: number) => void; min: number; max: number; palette: ReturnType<typeof useSettingsPalette> }) {
   return (
     <View style={[appearanceStyles.stepper, { borderColor: palette.border, backgroundColor: palette.tile }]}>
-      <Pressable onPress={() => onChange(Math.max(min, value - 1))} accessibilityLabel="减小字号" style={({ pressed }) => [appearanceStyles.stepButton, { borderRightWidth: StyleSheet.hairlineWidth, borderRightColor: palette.border }, pressed && { backgroundColor: palette.pressed }]}><Text style={{ color: palette.text }}>−</Text></Pressable>
+      <Pressable onPress={() => onChange(Math.max(min, value - 1))} accessibilityLabel="减小字号" style={({ pressed }) => [appearanceStyles.stepButton, { borderRightWidth: HAIRLINE_WIDTH, borderRightColor: palette.border }, pressed && { backgroundColor: palette.pressed }]}><Text style={{ color: palette.text }}>−</Text></Pressable>
       <Text style={[appearanceStyles.stepperValue, { color: palette.text }]}>{value}px</Text>
-      <Pressable onPress={() => onChange(Math.min(max, value + 1))} accessibilityLabel="增大字号" style={({ pressed }) => [appearanceStyles.stepButton, { borderLeftWidth: StyleSheet.hairlineWidth, borderLeftColor: palette.border }, pressed && { backgroundColor: palette.pressed }]}><Text style={{ color: palette.text }}>+</Text></Pressable>
+      <Pressable onPress={() => onChange(Math.min(max, value + 1))} accessibilityLabel="增大字号" style={({ pressed }) => [appearanceStyles.stepButton, { borderLeftWidth: HAIRLINE_WIDTH, borderLeftColor: palette.border }, pressed && { backgroundColor: palette.pressed }]}><Text style={{ color: palette.text }}>+</Text></Pressable>
     </View>
   );
 }
 
-const appearanceStyles = StyleSheet.create({
+const appearanceStyles = {
   themeSelect: { width: 120, maxWidth: '100%' },
   accentSelect: { width: 120, maxWidth: '100%' },
-  stepper: { flexDirection: 'row', alignItems: 'center', borderWidth: StyleSheet.hairlineWidth, borderRadius: 6, overflow: 'hidden' },
+  stepper: { flexDirection: 'row', alignItems: 'center', borderWidth: HAIRLINE_WIDTH, borderRadius: 6, overflow: 'hidden' },
   stepButton: { width: 28, height: 26, alignItems: 'center', justifyContent: 'center' },
   stepperValue: { width: 44, textAlign: 'center', fontFamily: Fonts.mono, fontSize: 11 },
-});
+} as const;

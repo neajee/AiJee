@@ -1,4 +1,5 @@
-import { Text, View } from 'react-native';
+import { Text, View } from 'tamagui';
+
 import { providerPageStyles } from '../../utils/custom-models-styles';
 import type { ModelSectionProps } from './types';
 

@@ -1,12 +1,7 @@
+import { Spinner, Text, View } from 'tamagui';
 import { useCallback } from "react";
 import {
-  ActivityIndicator,
-  FlatList,
-  Pressable,
-  Text,
-  View,
-  type ListRenderItemInfo,
-} from "react-native";
+  FlatList, Pressable, type ListRenderItemInfo } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 import { ArrowDown } from "lucide-react-native";
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -69,7 +64,7 @@ export function MessageListView({ controller }: { controller: MessageListControl
     <View style={styles.historyLoaderWrap}>
       {session.isLoadingOlderMessages ? (
         <Animated.View entering={FadeIn.duration(180)} exiting={FadeOut.duration(180)} style={styles.historyLoader}>
-          <ActivityIndicator size="small" color={colors.textTertiary} />
+          <Spinner size="small" color={colors.textTertiary} />
         </Animated.View>
       ) : session.hasMoreMessages ? (
         <Pressable onPress={handleLoadMore} accessibilityRole="button" accessibilityLabel="Load earlier messages" style={styles.loadMoreBtn}>

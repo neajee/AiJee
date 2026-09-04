@@ -1,5 +1,6 @@
+import { Text, View } from 'tamagui';
 import { useEffect } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable } from 'react-native';
 import { Play, Square, ChevronDown } from 'lucide-react-native';
 
 import { Fonts } from '@/constants/theme';
@@ -94,7 +95,7 @@ export function TaskSelector({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   container: {
     position: 'relative',
   },
@@ -116,7 +117,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    paddingHorizontal: 8,
+    paddingLeft: 8, paddingRight: 8,
     height: 26,
     backgroundColor: 'rgba(128,128,128,0.08)',
   },
@@ -127,4 +128,4 @@ const styles = StyleSheet.create({
     color: '#999',
     maxWidth: 120,
   },
-});
+} as const;

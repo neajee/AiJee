@@ -1,4 +1,5 @@
-import { Platform, StyleSheet, View, type ViewStyle, type StyleProp } from "react-native";
+import { Platform, type ViewStyle, type StyleProp } from "react-native";
+import { View as TamaguiView } from "tamagui";
 
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 
@@ -35,7 +36,7 @@ export function Select<T extends string = string>({
 
   if (Platform.OS === "web") {
     return (
-      <View style={[styles.wrapper, style]}>
+      <TamaguiView style={[wrapperStyle, style]}>
         <select
           value={value}
           disabled={disabled}
@@ -77,36 +78,36 @@ export function Select<T extends string = string>({
             </option>
           ))}
         </select>
-      </View>
+      </TamaguiView>
     );
   }
 
   return (
-    <View style={[styles.wrapper, style]}>
-      <View
+    <TamaguiView style={[wrapperStyle, style]}>
+      <TamaguiView
         style={[
-          styles.nativeTrigger,
+          nativeTriggerStyle,
           { backgroundColor: bg, borderColor: border },
-          disabled && styles.disabled,
+          disabled && disabledStyle,
         ]}
       >
         {/* Native mobile: use Picker from @react-native-picker/picker if needed */}
-      </View>
-    </View>
+      </TamaguiView>
+    </TamaguiView>
   );
 }
 
-const styles = StyleSheet.create({
-  wrapper: {
+const wrapperStyle = {
     position: "relative",
-  },
-  nativeTrigger: {
+  } as const;
+
+const nativeTriggerStyle = {
     borderWidth: 0.633,
     borderRadius: 6,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-  },
-  disabled: {
+    paddingLeft: 10, paddingRight: 10,
+    paddingTop: 8, paddingBottom: 8,
+  } as const;
+
+const disabledStyle = {
     opacity: 0.5,
-  },
-});
+  } as const;

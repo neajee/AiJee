@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { Alert, Platform } from "react-native";
+import {  Alert, Platform  } from 'react-native';
 import { useRouter } from "expo-router";
 import QRCode from "qrcode";
 import { useOptionalPiClient } from "@aijee/client-sdk";

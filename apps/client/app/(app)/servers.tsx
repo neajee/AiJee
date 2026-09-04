@@ -1,4 +1,4 @@
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, Text, View } from 'tamagui';
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Fonts } from "@/constants/theme";
@@ -32,10 +32,10 @@ export default function ServersScreen() {
       ) : (
         <ScrollView
           style={styles.scroll}
-          contentContainerStyle={[
-            styles.content,
-            { paddingBottom: insets.bottom + 24 },
-          ]}
+          contentContainerStyle={{
+            ...styles.content,
+            paddingBottom: insets.bottom + 24,
+          }}
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.inner}>
@@ -53,7 +53,7 @@ export default function ServersScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   safeArea: {
     flex: 1,
   },
@@ -61,7 +61,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   content: {
-    paddingHorizontal: 16,
+    paddingLeft: 16, paddingRight: 16,
     paddingTop: 20,
   },
   inner: {
@@ -81,4 +81,4 @@ const styles = StyleSheet.create({
     marginTop: 2,
     marginBottom: 20,
   },
-});
+} as const;

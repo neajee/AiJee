@@ -1,5 +1,6 @@
+import { View } from 'tamagui';
 import { useEffect, useRef } from "react";
-import { Animated, StyleSheet, View } from "react-native";
+import { Animated } from "react-native";
 
 const BAR_COUNT = 5;
 const BAR_SCALES = [0.6, 0.85, 1, 0.85, 0.6];
@@ -42,7 +43,7 @@ export function WaveformBars({ audioLevel }: { audioLevel: number }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   container: {
     flexDirection: "row",
     alignItems: "center",
@@ -53,4 +54,4 @@ const styles = StyleSheet.create({
     width: 3,
     borderRadius: 1.5,
   },
-});
+} as const;

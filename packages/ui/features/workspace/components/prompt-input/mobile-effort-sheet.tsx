@@ -1,8 +1,10 @@
+import { Text, View } from 'tamagui';
 import { memo, useRef, useEffect, useMemo } from 'react';
-import { Animated, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Animated, Modal, Pressable } from 'react-native';
 import { Check } from 'lucide-react-native';
 
 import { Fonts } from '@/constants/theme';
+import { ABSOLUTE_FILL_STYLE } from '@/constants/layout';
 import { buildThinkingLevelOptions, ThinkingPreference } from '../../utils/prompt-input';
 import { usePromptTheme } from '@/components/surface-theme/use-prompt-theme';
 import type { AgentConfigHandle } from '@aijee/client-sdk';
@@ -70,7 +72,7 @@ function MobileEffortSheetComponent({
     >
       <View style={styles.modalRoot}>
         <Animated.View style={[styles.overlay, { opacity: overlayAnim }]}>
-          <Pressable style={StyleSheet.absoluteFill} onPress={handleClose} />
+          <Pressable style={ABSOLUTE_FILL_STYLE} onPress={handleClose} />
         </Animated.View>
         <Animated.View
           style={[
@@ -110,13 +112,13 @@ function MobileEffortSheetComponent({
 
 export const MobileEffortSheet = memo(MobileEffortSheetComponent);
 
-const styles = StyleSheet.create({
+const styles = {
   modalRoot: {
     flex: 1,
     justifyContent: 'flex-end',
   },
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...ABSOLUTE_FILL_STYLE,
     backgroundColor: 'rgba(0,0,0,0.4)',
   },
   container: {
@@ -138,18 +140,18 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 15,
     fontFamily: Fonts.sansSemiBold,
-    paddingHorizontal: 20,
+    paddingLeft: 20, paddingRight: 20,
     paddingBottom: 12,
   },
   item: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingVertical: 11,
+    paddingLeft: 20, paddingRight: 20,
+    paddingTop: 11, paddingBottom: 11,
   },
   label: {
     fontSize: 13,
     fontFamily: Fonts.sansMedium,
   },
-});
+} as const;

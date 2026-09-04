@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
-import { StyleSheet, View, type LayoutChangeEvent } from "react-native";
+import { View } from "tamagui";
+import type { LayoutChangeEvent } from "react-native";
 import Animated, {
   Easing,
   runOnJS,
@@ -107,11 +108,11 @@ export function AnimatedCollapse({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   container: {
     overflow: "hidden",
   },
   content: {
     width: "100%",
   },
-});
+} as const;

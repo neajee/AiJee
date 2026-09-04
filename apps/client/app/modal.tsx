@@ -1,5 +1,4 @@
 import { Link } from 'expo-router';
-import { StyleSheet } from 'react-native';
 
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
@@ -15,7 +14,7 @@ export default function ModalScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   container: {
     flex: 1,
     alignItems: 'center',
@@ -24,6 +23,6 @@ const styles = StyleSheet.create({
   },
   link: {
     marginTop: 15,
-    paddingVertical: 15,
+    paddingTop: 15, paddingBottom: 15,
   },
-});
+} as const;

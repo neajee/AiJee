@@ -1,4 +1,4 @@
-import { Text, TextInput, View } from 'react-native';
+import { Input, Text, View } from 'tamagui';
 import { Fonts } from '@/constants/theme';
 import { useColors } from '../../hooks/use-custom-models-theme';
 
@@ -26,7 +26,7 @@ export function Field({
       <Text style={[colors.s.field.label, { color: colors.textMuted }]}>
         {label}
       </Text>
-      <TextInput
+      <Input
         style={[
           colors.s.field.input,
           {

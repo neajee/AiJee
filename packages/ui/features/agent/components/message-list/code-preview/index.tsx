@@ -1,5 +1,6 @@
+import { Text, View } from 'tamagui';
 import { memo, useMemo } from 'react';
-import { ScrollView, Text, View } from 'react-native';
+import { ScrollView } from 'tamagui';
 import { useThemeTokens } from '@/hooks/use-theme-tokens';
 import { tokenizeLine } from '../../../utils/code-preview-tokens';
 import { styles } from './styles';

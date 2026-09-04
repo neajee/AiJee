@@ -1,13 +1,12 @@
-import { StyleSheet } from "react-native";
 import { Fonts } from "@/constants/theme";
-export const pkgStyles = StyleSheet.create({
+export const pkgStyles = {
   actionBtn: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     gap: 5,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
+    paddingLeft: 12, paddingRight: 12,
+    paddingTop: 6, paddingBottom: 6,
     borderRadius: 6,
   },
   actionBtnText: {
@@ -28,12 +27,12 @@ export const pkgStyles = StyleSheet.create({
     alignItems: 'center',
     gap: 7,
     marginBottom: 10,
-    paddingHorizontal: 10,
-    paddingVertical: 7,
+    paddingLeft: 10, paddingRight: 10,
+    paddingTop: 7, paddingBottom: 7,
     borderRadius: 6,
   },
   messageText: {
     fontFamily: Fonts.sans,
     flex: 1,
   },
-});
+} as const;

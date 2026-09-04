@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Animated, Easing, Platform, Pressable, StyleSheet } from "react-native";
+import { Animated, Easing, Platform, Pressable } from "react-native";
 import { ChevronLeft, ChevronRight } from "lucide-react-native";
 
 import { Colors } from "@/constants/theme";
@@ -93,12 +93,12 @@ export function SeamToggle({
       {...webHoverProps}
       // The mark is small; the hit area is the whole seam segment plus slop.
       hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-      style={styles.hit}
+      style={hitStyle}
     >
       <Animated.View
         pointerEvents="none"
         style={[
-          styles.mark,
+          markStyle,
           {
             width: anim.interpolate({
               inputRange: [0, 1],
@@ -139,18 +139,17 @@ export function SeamToggle({
   );
 }
 
-const styles = StyleSheet.create({
-  hit: {
+const hitStyle = {
     width: SEAM_TOGGLE_WIDTH,
     height: SEAM_TOGGLE_HEIGHT,
     alignItems: "center",
     justifyContent: "center",
     cursor: "pointer",
-  } as any,
-  mark: {
+  } as any;
+
+const markStyle = {
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 0.633,
     overflow: "hidden",
-  },
-});
+  } as const;

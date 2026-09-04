@@ -1,5 +1,6 @@
+import { View } from 'tamagui';
 import { memo } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Text } from "tamagui";
 import { Colors, Fonts } from "@/constants/theme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import type { ToolCallInfo } from "../../../types";
@@ -35,12 +36,12 @@ export const DownloadToolCall = memo(function DownloadToolCall({
   );
 });
 
-const styles = StyleSheet.create({
+const styles = {
   header: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    paddingVertical: 4,
+    paddingTop: 4, paddingBottom: 4,
   },
   label: {
     fontSize: 12,
@@ -53,4 +54,4 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-});
+} as const;

@@ -1,5 +1,4 @@
 import { useMemo } from "react";
-import { StyleSheet } from "react-native";
 import { WebView } from "react-native-webview";
 
 import type { PreviewTarget } from "@/features/preview/store";
@@ -118,9 +117,9 @@ export function BrowserPreview({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   webview: {
     flex: 1,
     backgroundColor: "transparent",
   },
-});
+} as const;

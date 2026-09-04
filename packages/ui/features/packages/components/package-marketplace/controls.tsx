@@ -1,4 +1,5 @@
-import { Pressable, Text, TextInput, View } from 'react-native';
+import { Input, Text, View } from 'tamagui';
+import { Pressable } from 'react-native';
 import { Search, X } from 'lucide-react-native';
 import type { MarketplacePackage } from '@aijee/client-sdk';
 import { Fonts } from '@/constants/theme';
@@ -80,7 +81,7 @@ export function SearchField({
       ]}
     >
       <Search size={14} color={p.textTertiary} strokeWidth={1.8} />
-      <TextInput
+      <Input
         value={value}
         onChangeText={onChangeText}
         onSubmitEditing={onSubmit}

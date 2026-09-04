@@ -1,5 +1,6 @@
+import { Spinner, Text, View } from 'tamagui';
 import { useCallback, useEffect, useState } from "react";
-import { ActivityIndicator, Linking, Pressable, Text, View } from "react-native";
+import { Linking, Pressable } from 'react-native';
 import { ArrowUpCircle, CheckCircle2, Info, RefreshCw } from "lucide-react-native";
 import { client, unwrapApiData } from "@aijee/client-sdk";
 import { Fonts } from "@/constants/theme";
@@ -104,7 +105,7 @@ export function AboutPanel() {
           <View style={aboutStyles.heroAction}>
             {checkState === 'checking' ? (
               <View style={[aboutStyles.heroBtn, { borderColor: p.separator }]}>
-                <ActivityIndicator size="small" color={p.textTertiary} />
+                <Spinner size="small" color={p.textTertiary} />
                 <Text style={[aboutStyles.heroBtnText, { color: p.textTertiary }]}>检查中…</Text>
               </View>
             ) : checkState === 'error' ? (

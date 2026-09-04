@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
-import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import { type StyleProp, type ViewStyle } from 'react-native';
+import { View as TamaguiView } from 'tamagui';
 import Animated, {
   Easing,
   interpolate,
@@ -52,7 +53,7 @@ function MorphBlock({ index, color, scale }: { index: number; color: string; sca
     };
   });
 
-  return <Animated.View style={[styles.block, { backgroundColor: color }, animatedStyle]} />;
+  return <Animated.View style={[blockStyle, { backgroundColor: color }, animatedStyle]} />;
 }
 
 export default function MorphLoading({ size = 'md', style }: MorphLoadingProps) {
@@ -62,15 +63,17 @@ export default function MorphLoading({ size = 'md', style }: MorphLoadingProps) 
   const color = colorScheme === 'dark' ? '#FFFFFF' : '#000000';
 
   return (
-    <View style={[styles.container, { width: dimension, height: dimension }, style]}>
+    <TamaguiView style={[containerStyle, { width: dimension, height: dimension }, style]}>
       {[0, 1, 2, 3].map((index) => (
         <MorphBlock key={index} index={index} color={color} scale={scale} />
       ))}
-    </View>
+    </TamaguiView>
   );
 }
 
-const styles = StyleSheet.create({
-  container: { alignItems: 'center', justifyContent: 'center' },
-  block: { position: 'absolute', width: 16, height: 16 },
-});
+const containerStyle = {
+  alignItems: 'center' as const,
+  justifyContent: 'center' as const,
+} as const;
+
+const blockStyle = { position: 'absolute', width: 16, height: 16 } as const;

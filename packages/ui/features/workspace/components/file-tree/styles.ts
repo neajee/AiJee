@@ -1,7 +1,6 @@
-import { StyleSheet } from 'react-native';
 import { Fonts } from '@/constants/theme';
 
-export const styles = StyleSheet.create({
+export const styles = {
   treeContainer: {
     flex: 1,
   },
@@ -17,7 +16,7 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: 6,
-    paddingHorizontal: 24,
+    paddingLeft: 24, paddingRight: 24,
   },
   readerEmptyTitle: {
     fontSize: 14,
@@ -35,7 +34,7 @@ export const styles = StyleSheet.create({
     paddingBottom: 12,
   },
   filterRow: {
-    paddingHorizontal: 6,
+    paddingLeft: 6, paddingRight: 6,
     paddingTop: 6,
     paddingBottom: 4,
   },
@@ -44,7 +43,7 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     gap: 6,
     height: 28,
-    paddingHorizontal: 8,
+    paddingLeft: 8, paddingRight: 8,
     borderRadius: 6,
     borderWidth: 0.633,
   },
@@ -53,6 +52,10 @@ export const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: Fonts.sans,
     padding: 0,
+    backgroundColor: "transparent",
+    borderWidth: 0,
+    borderColor: "transparent",
+    borderRadius: 0,
     outlineStyle: "none",
   } as any,
   filterClear: {
@@ -66,7 +69,7 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 5,
-    paddingVertical: 2,
+    paddingTop: 2, paddingBottom: 2,
     paddingRight: 6,
     minHeight: 22,
   },
@@ -92,7 +95,7 @@ export const styles = StyleSheet.create({
   emptyDir: {
     fontSize: 12,
     fontFamily: Fonts.sans,
-    paddingVertical: 4,
+    paddingTop: 4, paddingBottom: 4,
     fontStyle: "italic",
   },
 
@@ -139,6 +142,6 @@ export const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 24,
+    paddingLeft: 24, paddingRight: 24,
   },
-});
+} as const;

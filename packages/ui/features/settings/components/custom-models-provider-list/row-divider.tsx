@@ -1,4 +1,5 @@
-import { View } from 'react-native';
+import { View } from 'tamagui';
+
 import { providerPageStyles } from '../../utils/custom-models-styles';
 import type { RowDividerProps } from './types';
 

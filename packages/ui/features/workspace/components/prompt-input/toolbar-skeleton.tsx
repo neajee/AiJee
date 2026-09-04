@@ -1,5 +1,6 @@
+import { View } from 'tamagui';
 import { useEffect, useRef } from "react";
-import { Animated, StyleSheet, View } from "react-native";
+import { Animated } from "react-native";
 
 import {
   TOOLBAR_ANDROID_MARGIN_TOP,
@@ -73,17 +74,17 @@ export function ToolbarSkeleton({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   wrap: {
     marginTop: -TOOLBAR_WRAP_OFFSET,
     paddingTop: TOOLBAR_WRAP_OFFSET,
-    marginHorizontal: TOOLBAR_HORIZONTAL_MARGIN,
+    marginLeft: TOOLBAR_HORIZONTAL_MARGIN, marginRight: TOOLBAR_HORIZONTAL_MARGIN,
   },
   toolbar: {
     flexDirection: "row",
     alignItems: "center",
-    paddingHorizontal: 4,
-    paddingVertical: TOOLBAR_VERTICAL_PADDING,
+    paddingLeft: 4, paddingRight: 4,
+    paddingTop: TOOLBAR_VERTICAL_PADDING, paddingBottom: TOOLBAR_VERTICAL_PADDING,
     borderWidth: TOOLBAR_BORDER_WIDTH,
     borderTopWidth: 0,
     borderBottomLeftRadius: TOOLBAR_CORNER_RADIUS,
@@ -94,7 +95,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    paddingHorizontal: 4,
+    paddingLeft: 4, paddingRight: 4,
     minHeight: TOOLBAR_MODE_TOGGLE_HEIGHT,
   },
   pill: {
@@ -105,7 +106,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    paddingHorizontal: 4,
+    paddingLeft: 4, paddingRight: 4,
   },
   inlinePill: {
     height: 32,
@@ -117,4 +118,4 @@ const styles = StyleSheet.create({
   pillNarrow: {
     width: 92,
   },
-});
+} as const;

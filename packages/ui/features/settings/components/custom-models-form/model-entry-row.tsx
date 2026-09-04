@@ -1,6 +1,8 @@
+import { Text, View } from 'tamagui';
 import { useEffect, useMemo, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable } from 'react-native';
 import { Cpu, Pencil, Trash2 } from 'lucide-react-native';
+import { HAIRLINE_WIDTH } from '@/constants/layout';
 import { type CustomModelEntry } from '../../store/custom-models';
 import { useColors } from '../../hooks/use-custom-models-theme';
 import { PI_DEFAULTS } from './constants';
@@ -193,7 +195,7 @@ export function ModelEntryRow({
       style={[
         colors.s.model.row,
         !isLast && {
-          borderBottomWidth: StyleSheet.hairlineWidth,
+          borderBottomWidth: HAIRLINE_WIDTH,
           borderBottomColor: colors.separator,
         },
       ]}

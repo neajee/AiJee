@@ -1,5 +1,6 @@
+import { Image, View } from 'tamagui';
 import { memo, useCallback, useState } from "react";
-import { Image, Pressable, StyleSheet, View, Modal, Platform } from "react-native";
+import { Pressable, Modal, Platform } from "react-native";
 import type { ToolResultImage } from "../../../types";
 
 interface ToolResultImagesProps {
@@ -61,7 +62,7 @@ export const ToolResultImages = memo(function ToolResultImages({
   );
 });
 
-const styles = StyleSheet.create({
+const styles = {
   container: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -78,7 +79,7 @@ const styles = StyleSheet.create({
   thumb: {
     width: 320,
     height: 200,
-    ...(Platform.OS === "web" ? { maxWidth: "100%" } : {}),
+    ...(Platform.OS === "web" ? { maxWidth: "100%" as const } : {}),
   },
   overlay: {
     flex: 1,
@@ -96,4 +97,4 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
-});
+} as const;

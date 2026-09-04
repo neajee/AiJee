@@ -1,5 +1,6 @@
 import { Check, ChevronDown, Settings } from 'lucide-react-native';
-import { Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable } from 'react-native';
+import { ScrollView, Text, View } from 'tamagui';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useThemeTokens } from '@/hooks/use-theme-tokens';

@@ -1,5 +1,6 @@
+import { View } from 'tamagui';
 import { memo, type ReactNode } from "react";
-import { Pressable, StyleSheet, View } from "react-native";
+import { Pressable } from "react-native";
 import { ChevronRight } from "lucide-react-native";
 import Animated, {
   Easing,
@@ -8,6 +9,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 import { Colors } from "@/constants/theme";
+import { HAIRLINE_WIDTH } from "@/constants/layout";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { AnimatedCollapse } from "../animated-collapse";
 
@@ -131,12 +133,12 @@ export function ToolSurface({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   header: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    paddingVertical: 4,
+    paddingTop: 4, paddingBottom: 4,
   },
   headerTop: {
     alignItems: "flex-start",
@@ -155,10 +157,10 @@ const styles = StyleSheet.create({
   },
   surface: {
     borderRadius: 6,
-    borderWidth: StyleSheet.hairlineWidth,
+    borderWidth: HAIRLINE_WIDTH,
     overflow: "hidden",
   },
   surfacePadded: {
     padding: 10,
   },
-});
+} as const;

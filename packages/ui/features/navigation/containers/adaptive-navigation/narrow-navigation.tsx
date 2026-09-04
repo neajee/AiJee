@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { View } from 'react-native';
+import { View } from 'tamagui';
 
 import { MobileHeaderBar } from '../../components/mobile-header-bar';
 import { WorkspaceSheet } from '../../components/workspace-sheet';

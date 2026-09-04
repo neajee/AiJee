@@ -1,4 +1,5 @@
-import { Pressable, Text, TextInput, View } from 'react-native';
+import { Input, Text, View } from 'tamagui';
+import { Pressable } from 'react-native';
 import { styles } from './styles';
 import type { EditWorkspaceFormProps } from './types';
 
@@ -24,7 +25,7 @@ export function EditWorkspaceForm({
       <View style={styles.field}>
         <Text style={[styles.label, { color: textMuted }]}>Workspace Name</Text>
         <View style={[styles.inputRow, { backgroundColor: inputBg, borderColor: inputBorder }]}>
-          <TextInput
+          <Input
             ref={nameRef}
             style={[styles.input, { color: textPrimary }]}
             value={name}

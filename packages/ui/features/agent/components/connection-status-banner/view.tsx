@@ -1,11 +1,5 @@
-import {
-  ActivityIndicator,
-  Animated,
-  Platform,
-  Pressable,
-  Text,
-  View,
-} from 'react-native';
+import { Spinner, Text, View } from 'tamagui';
+import { Animated, Platform, Pressable } from 'react-native';
 import { styles } from './styles';
 import type { ConnectionStatusBannerViewProps } from './types';
 
@@ -40,7 +34,7 @@ export function ConnectionStatusBannerView({
         >
           <View style={styles.retryButtonContent}>
             {isAttemptInFlight ? (
-              <ActivityIndicator size="small" color="#A22E26" style={styles.retrySpinner} />
+              <Spinner size="small" color="#A22E26" style={styles.retrySpinner} />
             ) : null}
             <Text style={styles.retryButtonText}>
               {hasConnectionIssue

@@ -1,12 +1,7 @@
+import { Spinner, Text, View } from 'tamagui';
 import { useEffect, useRef, useState } from "react";
 import {
-  ActivityIndicator,
-  Platform,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+  Platform, Pressable } from "react-native";
 import { useRouter } from "expo-router";
 
 import { Fonts } from "@/constants/theme";
@@ -163,7 +158,7 @@ export default function DirectConnectScreen() {
             ]}
           />
         ) : (
-          <ActivityIndicator
+          <Spinner
             size="large"
             color={status === "done" ? colors.success : colors.text}
           />
@@ -198,7 +193,7 @@ export default function DirectConnectScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   screen: {
     flex: 1,
     alignItems: "center",
@@ -210,8 +205,8 @@ const styles = StyleSheet.create({
     maxWidth: 420,
     borderWidth: 1,
     borderRadius: 24,
-    paddingHorizontal: 28,
-    paddingVertical: 32,
+    paddingLeft: 28, paddingRight: 28,
+    paddingTop: 32, paddingBottom: 32,
     alignItems: "center",
   },
   badge: {
@@ -237,8 +232,8 @@ const styles = StyleSheet.create({
     marginTop: 24,
     minWidth: 180,
     borderRadius: 999,
-    paddingHorizontal: 20,
-    paddingVertical: 14,
+    paddingLeft: 20, paddingRight: 20,
+    paddingTop: 14, paddingBottom: 14,
     alignItems: "center",
   },
   buttonText: {
@@ -246,4 +241,4 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     fontFamily: Fonts.sansSemiBold,
   },
-});
+} as const;

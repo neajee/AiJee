@@ -1,5 +1,6 @@
+import { View } from 'tamagui';
 import { useEffect, useState } from "react";
-import { Platform, Pressable, StyleSheet, View } from "react-native";
+import { Platform, Pressable } from "react-native";
 import { Search } from "lucide-react-native";
 
 import { Colors } from "@/constants/theme";
@@ -59,7 +60,7 @@ export function SidebarHeader() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   row: {
     flexDirection: "row",
     alignItems: "center",
@@ -77,4 +78,4 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     cursor: "pointer",
   } as any,
-});
+} as const;

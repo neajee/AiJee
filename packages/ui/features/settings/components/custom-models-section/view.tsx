@@ -1,4 +1,5 @@
-import { Linking, Platform, Pressable, Text, TextInput, View } from "react-native";
+import { Input, Text, View } from 'tamagui';
+import { Linking, Platform, Pressable } from 'react-native';
 import { ChevronDown, ChevronUp, KeyRound, LogIn, LogOut, Plus, X } from "lucide-react-native";
 import type { BuiltinProvider } from "@aijee/client-sdk";
 import { useCustomModelsStore } from "../../store/custom-models";
@@ -58,7 +59,7 @@ export function CustomModelsView({ controller, isDark, isNative }: { controller:
       </View>
       {oauthProviderId === provider.id && oauthMessage ? <Text accessibilityRole="alert" style={[providerPageStyles.rowMeta, { color: colors.textMuted }]}>{oauthMessage}</Text> : null}
       {oauthProviderId === provider.id && oauthUrl ? <Pressable onPress={() => void Linking.openURL(oauthUrl)} accessibilityRole="link"><Text style={[providerPageStyles.linkText, { color: colors.textPrimary }]}>打开授权页</Text></Pressable> : null}
-      {oauthProviderId === provider.id && oauthPrompt && oauthLoginId ? <View style={{ gap: 6 }}><Text style={[providerPageStyles.rowMeta, { color: colors.textMuted }]}>{oauthPrompt.message}</Text><View style={{ flexDirection: 'row', gap: 8 }}><TextInput value={oauthInput} onChangeText={setOauthInput} placeholder="粘贴授权码或回调 URL" placeholderTextColor={colors.textMuted} style={[isNative ? fieldNativeStyles.input : fieldWebStyles.input, { color: colors.textPrimary, borderColor: colors.borderColor, flex: 1 }]} autoCapitalize="none" autoCorrect={false} /><Pressable disabled={!oauthInput.trim()} onPress={() => void resolveOAuth(provider.id, oauthLoginId, oauthPrompt.id, oauthInput.trim()).then(() => setOauthInput(''))} style={[providerPageStyles.secondaryButton, { borderColor: colors.borderColor }, !oauthInput.trim() && { opacity: 0.45 }]}><Text style={[providerPageStyles.linkText, { color: colors.textSecondary }]}>提交</Text></Pressable></View></View> : null}
+      {oauthProviderId === provider.id && oauthPrompt && oauthLoginId ? <View style={{ gap: 6 }}><Text style={[providerPageStyles.rowMeta, { color: colors.textMuted }]}>{oauthPrompt.message}</Text><View style={{ flexDirection: 'row', gap: 8 }}><Input value={oauthInput} onChangeText={setOauthInput} placeholder="粘贴授权码或回调 URL" placeholderTextColor={colors.textMuted} style={[isNative ? fieldNativeStyles.input : fieldWebStyles.input, { color: colors.textPrimary, borderColor: colors.borderColor, flex: 1 }]} autoCapitalize="none" autoCorrect={false} /><Pressable disabled={!oauthInput.trim()} onPress={() => void resolveOAuth(provider.id, oauthLoginId, oauthPrompt.id, oauthInput.trim()).then(() => setOauthInput(''))} style={[providerPageStyles.secondaryButton, { borderColor: colors.borderColor }, !oauthInput.trim() && { opacity: 0.45 }]}><Text style={[providerPageStyles.linkText, { color: colors.textSecondary }]}>提交</Text></Pressable></View></View> : null}
       {provider.configured && !canDisconnect(provider) ? (
         <Text style={[providerPageStyles.rowMeta, { color: colors.textMuted }]}>
           由 {provider.auth_source} 配置；请从启动 AiJee 的环境中移除后重启运行时。
@@ -95,7 +96,7 @@ export function CustomModelsView({ controller, isDark, isNative }: { controller:
         </View>
       ) : null}
 
-      <TextInput
+      <Input
         value={providerSearch}
         onChangeText={setProviderSearch}
         placeholder="搜索模型服务"

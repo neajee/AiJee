@@ -1,4 +1,5 @@
-import { Image, type ImageStyle, type StyleProp } from "react-native";
+import { Image } from "tamagui";
+import type { ImageStyle, StyleProp } from "react-native";
 
 // The adaptive-icon monochrome asset is a 1024² canvas where the mark only
 // occupies the middle ~61% (alpha bbox 200..823). Scaling the box by this

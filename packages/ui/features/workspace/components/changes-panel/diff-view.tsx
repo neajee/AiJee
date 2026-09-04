@@ -1,4 +1,5 @@
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView, Text, View } from 'tamagui';
+
 
 import { Fonts } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -56,13 +57,13 @@ export function DiffView({ diff }: { diff: string }) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   diffScroll: {
     maxHeight: 280,
   },
   diffLine: {
     flexDirection: "row",
-    paddingHorizontal: 8,
+    paddingLeft: 8, paddingRight: 8,
     minHeight: 18,
   },
   diffLineNum: {
@@ -79,4 +80,4 @@ const styles = StyleSheet.create({
     lineHeight: 18,
     flexShrink: 0,
   },
-});
+} as const;

@@ -1,12 +1,6 @@
+import { ScrollView, Spinner, Text, View } from 'tamagui';
 import { type ReactNode } from 'react';
-import {
-  ActivityIndicator,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { Pressable } from 'react-native';
 import { SquarePen, RefreshCw } from 'lucide-react-native';
 
 import { Fonts } from '@/constants/theme';
@@ -80,7 +74,7 @@ export function SessionSheetContent({
             style={({ pressed }) => [styles.iconButton, pressed && { opacity: 0.7 }]}
           >
             {isRefetching ? (
-              <ActivityIndicator size={13} color={textMuted} />
+              <Spinner size={13} color={textMuted} />
             ) : (
               <RefreshCw size={13} color={textMuted} strokeWidth={1.8} />
             )}
@@ -99,7 +93,7 @@ export function SessionSheetContent({
           ]}
         >
           {createPending ? (
-            <ActivityIndicator size={14} color={textPrimary} />
+            <Spinner size={14} color={textPrimary} />
           ) : (
             <SquarePen size={14} color={textPrimary} strokeWidth={1.8} />
           )}
@@ -113,7 +107,7 @@ export function SessionSheetContent({
         showsVerticalScrollIndicator={false}
       >
         {isLoading ? (
-          <ActivityIndicator style={{ marginTop: 24 }} />
+          <Spinner style={{ marginTop: 24 }} />
         ) : sessions.length === 0 ? (
           <Text style={[styles.emptyText, { color: textMuted }]}>{emptyLabel}</Text>
         ) : (
@@ -148,7 +142,7 @@ export function SessionSheetContent({
             ]}
           >
             {isFetchingNextPage ? (
-              <ActivityIndicator size="small" />
+              <Spinner size="small" />
             ) : (
               <Text style={[styles.loadMoreText, { color: textMuted }]}>Load more</Text>
             )}
@@ -161,12 +155,12 @@ export function SessionSheetContent({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   container: {
     flex: 1,
   },
   header: {
-    paddingHorizontal: 20,
+    paddingLeft: 20, paddingRight: 20,
     paddingBottom: 8,
   },
   headerRow: {
@@ -189,7 +183,7 @@ const styles = StyleSheet.create({
     marginTop: 2,
   },
   actions: {
-    paddingHorizontal: 16,
+    paddingLeft: 16, paddingRight: 16,
     paddingBottom: 12,
   },
   newButton: {
@@ -208,15 +202,15 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   listContent: {
-    paddingHorizontal: 12,
+    paddingLeft: 12, paddingRight: 12,
     gap: 2,
   },
   sessionItem: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    paddingHorizontal: 10,
-    paddingVertical: 10,
+    paddingLeft: 10, paddingRight: 10,
+    paddingTop: 10, paddingBottom: 10,
     borderRadius: 8,
   },
   sessionTitle: {
@@ -241,4 +235,4 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontFamily: Fonts.sansMedium,
   },
-});
+} as const;

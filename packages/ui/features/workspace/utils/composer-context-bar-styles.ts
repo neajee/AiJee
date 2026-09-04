@@ -1,9 +1,10 @@
-import { Platform, StyleSheet } from 'react-native';
+import { HAIRLINE_WIDTH } from "@/constants/layout";
+import { Platform } from 'react-native';
 import { Fonts } from '@/constants/theme';
 
-export const styles = StyleSheet.create({
+export const styles = {
   wrapper: {
-    paddingHorizontal: 12,
+    paddingLeft: 12, paddingRight: 12,
     maxWidth: 1080,
     alignSelf: "center",
     width: "100%",
@@ -15,7 +16,7 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     flexWrap: "wrap",
     gap: 2,
-    paddingHorizontal: 2,
+    paddingLeft: 2, paddingRight: 2,
     paddingBottom: 6,
   },
   anchor: {
@@ -27,7 +28,7 @@ export const styles = StyleSheet.create({
     gap: 5,
     height: 26,
     maxWidth: 240,
-    paddingHorizontal: 7,
+    paddingLeft: 7, paddingRight: 7,
     borderRadius: 6,
   },
   controlText: {
@@ -57,8 +58,8 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     gap: 10,
-    paddingHorizontal: 10,
-    paddingVertical: 7,
+    paddingLeft: 10, paddingRight: 10,
+    paddingTop: 7, paddingBottom: 7,
   },
   itemMain: {
     flexDirection: "row",
@@ -87,34 +88,34 @@ export const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 8,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    paddingHorizontal: 10,
-    paddingVertical: 9,
+    borderTopWidth: HAIRLINE_WIDTH,
+    paddingLeft: 10, paddingRight: 10,
+    paddingTop: 9, paddingBottom: 9,
   },
   addProjectText: {
     fontSize: 12,
     fontFamily: Fonts.sansMedium,
   },
-  createBranchAction: { flexDirection: "row", alignItems: "center", gap: 8, borderTopWidth: StyleSheet.hairlineWidth, paddingHorizontal: 10, paddingVertical: 9 },
+  createBranchAction: { flexDirection: "row", alignItems: "center", gap: 8, borderTopWidth: HAIRLINE_WIDTH, paddingLeft: 10, paddingRight: 10, paddingTop: 9 , paddingBottom: 9 },
   createBranchText: { fontSize: 12, fontFamily: Fonts.sansMedium },
   branchOverlay: { flex: 1, alignItems: "center", justifyContent: "center", padding: 24, backgroundColor: "rgba(0,0,0,0.48)" },
-  branchDialog: { width: "100%", maxWidth: 360, borderWidth: StyleSheet.hairlineWidth, borderRadius: 12, padding: 20 },
+  branchDialog: { width: "100%", maxWidth: 360, borderWidth: HAIRLINE_WIDTH, borderRadius: 12, padding: 20 },
   branchTitle: { fontSize: 16, fontFamily: Fonts.sansSemiBold },
   branchHint: { marginTop: 6, fontSize: 12, fontFamily: Fonts.sans },
-  branchInput: { height: 38, marginTop: 16, borderWidth: StyleSheet.hairlineWidth, borderRadius: 7, paddingHorizontal: 10, fontSize: 13, fontFamily: Fonts.mono, outlineStyle: "none" } as any,
+  branchInput: { height: 38, marginTop: 16, borderWidth: HAIRLINE_WIDTH, borderRadius: 7, paddingLeft: 10, paddingRight: 10, fontSize: 13, fontFamily: Fonts.mono, outlineStyle: "none" } as any,
   branchError: { marginTop: 8, fontSize: 12, fontFamily: Fonts.sans },
   branchActions: { flexDirection: "row", justifyContent: "flex-end", gap: 8, marginTop: 18 },
-  branchCancel: { height: 32, borderWidth: StyleSheet.hairlineWidth, borderRadius: 7, paddingHorizontal: 13, justifyContent: "center" },
-  branchCreate: { height: 32, borderRadius: 7, paddingHorizontal: 13, justifyContent: "center" },
+  branchCancel: { height: 32, borderWidth: HAIRLINE_WIDTH, borderRadius: 7, paddingLeft: 13, paddingRight: 13, justifyContent: "center" },
+  branchCreate: { height: 32, borderRadius: 7, paddingLeft: 13, paddingRight: 13, justifyContent: "center" },
   branchCreateText: { fontSize: 12, fontFamily: Fonts.sansMedium },
   loadingRow: {
-    paddingVertical: 16,
+    paddingTop: 16, paddingBottom: 16,
     alignItems: "center",
   },
   emptyText: {
     fontSize: 12,
     fontFamily: Fonts.sans,
-    paddingHorizontal: 12,
-    paddingVertical: 14,
+    paddingLeft: 12, paddingRight: 12,
+    paddingTop: 14, paddingBottom: 14,
   },
-});
+} as const;

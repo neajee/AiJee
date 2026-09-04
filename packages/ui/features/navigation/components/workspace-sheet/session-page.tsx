@@ -1,5 +1,6 @@
+import { ScrollView, Spinner, Text, View } from 'tamagui';
 import { useCallback, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, Text, View } from 'react-native';
+import { Pressable } from 'react-native';
 import { usePathname, useRouter } from 'expo-router';
 import { SquarePen, RefreshCw } from 'lucide-react-native';
 
@@ -51,7 +52,7 @@ export function SessionPage({ workspaceId, onSessionPress, onDismiss }: SessionP
           style={({ pressed }) => [styles.iconButton, pressed && { opacity: 0.7 }]}
         >
           {isRefetching ? (
-            <ActivityIndicator size={13} color={textMuted} />
+            <Spinner size="small" color={textMuted} style={{ width: 13, height: 13 }} />
           ) : (
             <RefreshCw size={13} color={textMuted} strokeWidth={1.8} />
           )}
@@ -69,7 +70,7 @@ export function SessionPage({ workspaceId, onSessionPress, onDismiss }: SessionP
           ]}
         >
           {createPending ? (
-            <ActivityIndicator size={14} color={textPrimary} />
+            <Spinner size="small" color={textPrimary} style={{ width: 14, height: 14 }} />
           ) : (
             <SquarePen size={14} color={textPrimary} strokeWidth={1.8} />
           )}
@@ -84,7 +85,7 @@ export function SessionPage({ workspaceId, onSessionPress, onDismiss }: SessionP
         nestedScrollEnabled
       >
         {isLoading ? (
-          <ActivityIndicator style={{ marginTop: 24 }} />
+          <Spinner style={{ marginTop: 24 }} />
         ) : sessions.length === 0 ? (
           <Text style={[styles.emptyText, { color: textMuted }]}>No sessions yet</Text>
         ) : (
@@ -121,7 +122,7 @@ export function SessionPage({ workspaceId, onSessionPress, onDismiss }: SessionP
             ]}
           >
             {isFetchingNextPage ? (
-              <ActivityIndicator size="small" />
+              <Spinner size="small" />
             ) : (
               <Text style={[styles.loadMoreText, { color: textMuted }]}>Load more</Text>
             )}

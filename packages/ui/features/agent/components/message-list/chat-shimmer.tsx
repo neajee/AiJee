@@ -1,5 +1,6 @@
+import { View } from 'tamagui';
 import { useEffect, useRef } from "react";
-import { Animated, StyleSheet, View } from "react-native";
+import { Animated } from "react-native";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 
 function ShimmerBar({ width, delay = 0 }: { width: `${number}%`; delay?: number }) {
@@ -82,7 +83,7 @@ export function ChatShimmer() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   container: {
     flex: 1,
     justifyContent: "flex-end",
@@ -95,20 +96,20 @@ const styles = StyleSheet.create({
   userRow: {
     flexDirection: "row",
     justifyContent: "flex-end",
-    paddingHorizontal: 16,
-    paddingVertical: 6,
+    paddingLeft: 16, paddingRight: 16,
+    paddingTop: 6, paddingBottom: 6,
   },
   userBubble: {
     width: "40%",
-    paddingHorizontal: 14,
-    paddingVertical: 14,
+    paddingLeft: 14, paddingRight: 14,
+    paddingTop: 14, paddingBottom: 14,
     borderRadius: 16,
     borderTopRightRadius: 4,
   },
   assistantRow: {
     paddingTop: 8,
     paddingBottom: 4,
-    paddingHorizontal: 16,
+    paddingLeft: 16, paddingRight: 16,
   },
   assistantBody: {
     gap: 10,
@@ -117,4 +118,4 @@ const styles = StyleSheet.create({
     height: 14,
     borderRadius: 7,
   },
-});
+} as const;

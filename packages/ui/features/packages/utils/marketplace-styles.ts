@@ -1,8 +1,9 @@
-import { Platform, StyleSheet } from 'react-native';
+import { HAIRLINE_WIDTH, ABSOLUTE_FILL_STYLE } from "@/constants/layout";
+import { Platform } from 'react-native';
 import { Fonts } from '@/constants/theme';
 import { CARD_MIN_WIDTH } from './marketplace-constants';
 
-export const styles = StyleSheet.create({
+export const styles = {
   page: {
     flex: 1,
   },
@@ -12,8 +13,8 @@ export const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: 12,
     minHeight: 52,
-    paddingVertical: 8,
-    borderBottomWidth: StyleSheet.hairlineWidth,
+    paddingTop: 8, paddingBottom: 8,
+    borderBottomWidth: HAIRLINE_WIDTH,
   },
   headerCopy: {
     flex: 1,
@@ -34,11 +35,11 @@ export const styles = StyleSheet.create({
     padding: 2,
   },
   segment: {
-    paddingHorizontal: 12,
-    paddingVertical: 5,
+    paddingLeft: 12, paddingRight: 12,
+    paddingTop: 5, paddingBottom: 5,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: StyleSheet.hairlineWidth,
+    borderWidth: HAIRLINE_WIDTH,
     borderColor: 'transparent',
   },
   search: {
@@ -46,8 +47,8 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
     height: 34,
-    paddingHorizontal: 10,
-    borderWidth: StyleSheet.hairlineWidth,
+    paddingLeft: 10, paddingRight: 10,
+    borderWidth: HAIRLINE_WIDTH,
   },
   searchInput: {
     flex: 1,
@@ -61,18 +62,18 @@ export const styles = StyleSheet.create({
     gap: 6,
   },
   chip: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
+    paddingLeft: 10, paddingRight: 10,
+    paddingTop: 5, paddingBottom: 5,
     borderRadius: 6,
-    borderWidth: StyleSheet.hairlineWidth,
+    borderWidth: HAIRLINE_WIDTH,
   },
   centered: {
-    paddingVertical: 32,
+    paddingTop: 32, paddingBottom: 32,
     alignItems: 'center',
   },
   emptyText: {
     fontFamily: Fonts.sans,
-    paddingVertical: 8,
+    paddingTop: 8, paddingBottom: 8,
   },
   grid: {
     flexDirection: 'row',
@@ -86,7 +87,7 @@ export const styles = StyleSheet.create({
     maxWidth: 560,
     minHeight: 132,
     gap: 10,
-    borderWidth: StyleSheet.hairlineWidth,
+    borderWidth: HAIRLINE_WIDTH,
   },
   cardTop: {
     flexDirection: 'row',
@@ -123,11 +124,11 @@ export const styles = StyleSheet.create({
   },
   installedActions: { flexDirection: 'row', gap: 8 },
   operationMessage: {
-    paddingHorizontal: 10,
-    paddingVertical: 8,
+    paddingLeft: 10, paddingRight: 10,
+    paddingTop: 8, paddingBottom: 8,
     fontSize: 12,
     fontFamily: Fonts.sans,
-    borderWidth: StyleSheet.hairlineWidth,
+    borderWidth: HAIRLINE_WIDTH,
   },
   installedGrid: {
     flexDirection: 'row',
@@ -141,7 +142,7 @@ export const styles = StyleSheet.create({
     minHeight: 112,
     justifyContent: 'space-between',
     gap: 14,
-    borderWidth: StyleSheet.hairlineWidth,
+    borderWidth: HAIRLINE_WIDTH,
   },
   installedCardTop: {
     flexDirection: 'row',
@@ -153,7 +154,7 @@ export const styles = StyleSheet.create({
     height: 32,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: StyleSheet.hairlineWidth,
+    borderWidth: HAIRLINE_WIDTH,
   },
   installedCopy: {
     flex: 1,
@@ -169,14 +170,14 @@ export const styles = StyleSheet.create({
     gap: 2,
     alignSelf: 'stretch',
     paddingTop: 8,
-    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopWidth: HAIRLINE_WIDTH,
   },
   installedAction: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
-    paddingHorizontal: 7,
-    paddingVertical: 5,
+    paddingLeft: 7, paddingRight: 7,
+    paddingTop: 5, paddingBottom: 5,
     borderRadius: 5,
   },
   backdropWrap: {
@@ -185,11 +186,11 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   backdrop: {
-    ...StyleSheet.absoluteFillObject,
+    ...ABSOLUTE_FILL_STYLE,
   },
   dialog: {
     maxWidth: '100%',
-    borderWidth: StyleSheet.hairlineWidth,
+    borderWidth: HAIRLINE_WIDTH,
     overflow: 'hidden',
     boxShadow: '0px 12px 32px rgba(0, 0, 0, 0.22)',
     elevation: 12,
@@ -201,7 +202,7 @@ export const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 12,
-    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomWidth: HAIRLINE_WIDTH,
   },
   dialogTitleCol: {
     flex: 1,
@@ -219,22 +220,22 @@ export const styles = StyleSheet.create({
   },
   input: {
     height: 32,
-    paddingHorizontal: 10,
+    paddingLeft: 10, paddingRight: 10,
     fontSize: 13,
     fontFamily: Fonts.mono,
-    borderWidth: StyleSheet.hairlineWidth,
+    borderWidth: HAIRLINE_WIDTH,
     ...(Platform.OS === 'web' ? { outlineStyle: 'none' as any } : null),
   },
   notice: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: 7,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
+    paddingLeft: 10, paddingRight: 10,
+    paddingTop: 8, paddingBottom: 8,
   },
   commandBlock: {
     padding: 10,
-    borderWidth: StyleSheet.hairlineWidth,
+    borderWidth: HAIRLINE_WIDTH,
   },
   commandText: {
     fontSize: 12,
@@ -246,7 +247,7 @@ export const styles = StyleSheet.create({
     maxHeight: 220,
     maxWidth: '100%',
     overflow: 'hidden',
-    borderWidth: StyleSheet.hairlineWidth,
+    borderWidth: HAIRLINE_WIDTH,
   },
   readmeText: {
     fontSize: 12,
@@ -258,14 +259,14 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: 12,
-    borderTopWidth: StyleSheet.hairlineWidth,
+    borderTopWidth: HAIRLINE_WIDTH,
   },
   linkButton: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
-    paddingHorizontal: 8,
-    paddingVertical: 6,
+    paddingLeft: 8, paddingRight: 8,
+    paddingTop: 6, paddingBottom: 6,
     borderRadius: 6,
   },
   button: {
@@ -274,11 +275,11 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 5,
     minHeight: 32,
-    paddingHorizontal: 14,
-    borderWidth: StyleSheet.hairlineWidth,
+    paddingLeft: 14, paddingRight: 14,
+    borderWidth: HAIRLINE_WIDTH,
   },
   confirmLayer: {
-    ...StyleSheet.absoluteFillObject,
+    ...ABSOLUTE_FILL_STYLE,
     alignItems: 'center',
     justifyContent: 'center',
     padding: 20,
@@ -288,7 +289,7 @@ export const styles = StyleSheet.create({
     maxWidth: 380,
     gap: 12,
     padding: 16,
-    borderWidth: StyleSheet.hairlineWidth,
+    borderWidth: HAIRLINE_WIDTH,
   },
   confirmHead: {
     flexDirection: 'row',
@@ -300,4 +301,4 @@ export const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     gap: 8,
   },
-});
+} as const;

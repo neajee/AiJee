@@ -1,4 +1,5 @@
-import { Modal, Pressable, Text, TextInput, View } from 'react-native';
+import { Input, Text, View } from 'tamagui';
+import { Modal, Pressable } from 'react-native';
 import { usePromptTheme } from '@/components/surface-theme/use-prompt-theme';
 import { styles } from '../../utils/composer-context-bar-styles';
 
@@ -21,7 +22,7 @@ export function BranchDialog({ visible, currentBranch, branchName, busy, error, 
         <Pressable style={[styles.branchDialog, { backgroundColor: theme.dropdownBg, borderColor: theme.dropdownBorder }]} onPress={(event) => event.stopPropagation()}>
           <Text style={[styles.branchTitle, { color: theme.textPrimary }]}>新建分支</Text>
           <Text style={[styles.branchHint, { color: theme.textMuted }]}>将从当前分支 {currentBranch ?? 'HEAD'} 创建并立即切换。</Text>
-          <TextInput
+          <Input
             value={branchName}
             onChangeText={setBranchName}
             onSubmitEditing={onCreate}

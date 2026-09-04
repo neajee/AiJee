@@ -1,12 +1,7 @@
+import { ScrollView, Text, View } from 'tamagui';
 import { useEffect, useRef, useCallback, useState } from 'react';
 import {
-  PanResponder,
-  Platform,
-  Pressable,
-  ScrollView,
-  Text,
-  View,
-} from 'react-native';
+  PanResponder, Platform, Pressable } from 'react-native';
 import { X, Circle, Minus, Maximize2 } from 'lucide-react-native';
 
 import { Colors, Fonts } from '@/constants/theme';

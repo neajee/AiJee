@@ -1,5 +1,6 @@
+import { Text, View } from 'tamagui';
 import { useState } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable } from 'react-native';
 import { Plus } from 'lucide-react-native';
 import { API_TYPES, ApiTypeSelector, Field, ModelEntryRow } from '../custom-models-form';
 import { providerPageStyles } from '../../utils/custom-models-styles';

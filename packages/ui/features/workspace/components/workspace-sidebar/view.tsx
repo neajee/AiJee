@@ -1,5 +1,6 @@
+import { View } from 'tamagui';
 import { Files, GitBranch, Globe2 } from 'lucide-react-native';
-import { Animated, View } from 'react-native';
+import { Animated } from 'react-native';
 
 import {
   SeamToggle,

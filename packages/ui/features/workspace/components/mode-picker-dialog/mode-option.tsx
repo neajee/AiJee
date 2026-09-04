@@ -1,5 +1,6 @@
+import { Text, View } from 'tamagui';
 import { Check, CircleOff, Star } from 'lucide-react-native';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable } from 'react-native';
 import type { AgentMode } from '@aijee/client-sdk';
 import { styles } from './styles';
 

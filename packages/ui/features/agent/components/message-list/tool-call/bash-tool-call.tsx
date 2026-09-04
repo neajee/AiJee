@@ -1,5 +1,6 @@
+import { ScrollView, Text, View } from 'tamagui';
 import { memo, useCallback, useRef, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { type ScrollView as RNScrollView } from "react-native";
 import { Colors, Fonts } from "@/constants/theme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import type { ToolCallInfo } from "../../../types";
@@ -30,7 +31,7 @@ export const BashToolCall = memo(function BashToolCall({
   const toggle = useCallback(() => setExpanded((p) => !p), []);
   // While streaming, the panel tracks the tail of the output so the reader
   // always sees the newest lines; dragging inside the panel stops the chase.
-  const scrollRef = useRef<ScrollView>(null);
+  const scrollRef = useRef<RNScrollView>(null);
   const followTailRef = useRef(true);
   const handleOutputGrowth = useCallback(() => {
     if (expanded && followTailRef.current) {
@@ -105,7 +106,7 @@ export const BashToolCall = memo(function BashToolCall({
   );
 });
 
-const styles = StyleSheet.create({
+const styles = {
   ranLabel: {
     fontSize: 12,
     fontFamily: Fonts.sans,
@@ -129,4 +130,4 @@ const styles = StyleSheet.create({
     fontStyle: "italic",
     marginTop: 6,
   },
-});
+} as const;

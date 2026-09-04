@@ -1,5 +1,5 @@
 import { memo, useEffect, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { View } from "tamagui";
 
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { ChangesPanel } from "@/features/workspace/components/changes-panel";
@@ -56,8 +56,8 @@ function WorkspaceRightPaneComponent({ sessionId }: WorkspaceRightPaneProps) {
 
 export const WorkspaceRightPane = memo(WorkspaceRightPaneComponent);
 
-const styles = StyleSheet.create({
+const styles = {
   container: {
     flex: 1,
   },
-});
+} as const;

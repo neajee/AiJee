@@ -1,6 +1,6 @@
 import { Redirect } from 'expo-router';
 import { ChevronRight } from 'lucide-react-native';
-import { Text } from 'react-native';
+import { Text } from 'tamagui';
 import {
   SettingsGroup,
   SettingsLayoutProvider,
@@ -31,7 +31,7 @@ export function SettingsIndexScreen({
   return (
     <SettingsLayoutProvider phone={phone}>
       <SettingsScroll>
-        <Text style={[styles.title, { fontSize: metrics.titleSize, color: palette.text, paddingVertical: metrics.gutter / 2 }]}>设置</Text>
+        <Text style={[styles.title, { fontSize: metrics.titleSize, color: palette.text, paddingTop: metrics.gutter / 2 , paddingBottom: metrics.gutter / 2 }]}>设置</Text>
         <SettingsGroup>
           {SETTINGS_SECTIONS.map((section, index) => {
             const isLast = index === SETTINGS_SECTIONS.length - 1;

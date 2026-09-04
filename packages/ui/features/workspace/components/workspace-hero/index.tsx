@@ -1,5 +1,6 @@
+import { Text, View } from 'tamagui';
 import { useRef, useEffect, useMemo } from "react";
-import { Animated, StyleSheet, Text, View } from "react-native";
+import { Animated } from "react-native";
 
 import { Fonts } from "@/constants/theme";
 import { AiJeeLogo } from "@/components/aijee-logo";
@@ -160,11 +161,11 @@ export function WorkspaceHero() {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   container: {
     alignItems: "center",
     justifyContent: "center",
-    paddingHorizontal: 24,
+    paddingLeft: 24, paddingRight: 24,
     // The hero and the composer are centred together as one group, so the hero
     // must give up space instead of pushing the composer off screen.
     flexShrink: 1,
@@ -179,4 +180,4 @@ const styles = StyleSheet.create({
     textAlign: "center",
     letterSpacing: -0.3,
   },
-});
+} as const;

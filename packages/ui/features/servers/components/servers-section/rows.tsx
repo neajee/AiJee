@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { ActivityIndicator, Animated, Platform, Pressable, StyleSheet, Text, View } from "react-native";
+import { Animated, Platform, Pressable } from 'react-native';
+import { Spinner, Text, View } from "tamagui";
 import { MoreHorizontal, Pencil, QrCode, X, Trash2 } from "lucide-react-native";
 import { Fonts } from "@/constants/theme";
 import { PiLogo } from "@/components/pi-logo";
@@ -78,16 +79,16 @@ export function ServerRow({
         }}
       >
         {isConnecting ? (
-          <ActivityIndicator size="small" color={p.text} />
+          <Spinner size="small" color={p.text} />
         ) : (
           <PiLogo size={16} color={p.textSecondary} />
         )}
       </View>
 
-      <View style={{ flex: 1, gap: 2 }}>
-        <Text style={{ fontSize: 13, fontFamily: Fonts.sansMedium, color: p.text }} numberOfLines={1}>{server.name}</Text>
+      <View style={{ flex: 1, alignSelf: "stretch", justifyContent: "center", gap: 2 }}>
+        <Text style={{ fontSize: 13, fontFamily: Fonts.sansMedium, color: p.text, textAlign: "left" }} numberOfLines={1}>{server.name}</Text>
         <View style={styles.statusLine}>
-          <Text style={{ fontSize: 12, fontFamily: Fonts.mono, color: p.textTertiary, opacity: 0.55 }} numberOfLines={1}>{status.label}</Text>
+          <Text style={{ fontSize: 12, fontFamily: Fonts.mono, color: p.textTertiary, opacity: 0.55, textAlign: "left" }} numberOfLines={1}>{status.label}</Text>
         </View>
       </View>
       </Pressable>
@@ -125,7 +126,7 @@ export function FooterAction({ icon: Icon, label, onPress, isLast = false, isFir
       accessibilityLabel={label}
       style={({ pressed, hovered }: any) => [
         styles.footerAction,
-        !isLast && { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: p.separator },
+        !isLast && { borderBottomWidth: 0.5, borderBottomColor: p.separator },
         (pressed || hovered) && { backgroundColor: p.pressed },
         isFirst && { position: 'relative' },
       ]}

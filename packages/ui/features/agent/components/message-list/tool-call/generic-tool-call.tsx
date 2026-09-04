@@ -1,5 +1,6 @@
+import { Text, View } from 'tamagui';
 import { memo, useCallback, useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { ScrollView } from "tamagui";
 import { Colors, Fonts } from "@/constants/theme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import type { ToolCallInfo } from "../../../types";
@@ -59,7 +60,7 @@ export const GenericToolCall = memo(function GenericToolCall({
   );
 });
 
-const styles = StyleSheet.create({
+const styles = {
   name: {
     fontSize: 12,
     fontFamily: Fonts.sansMedium,
@@ -74,4 +75,4 @@ const styles = StyleSheet.create({
     lineHeight: 16,
     fontFamily: Fonts.mono,
   },
-});
+} as const;

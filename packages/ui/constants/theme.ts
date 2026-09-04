@@ -1,6 +1,7 @@
 import { Platform } from 'react-native';
 
 import type { AccentPreset, ThemePreset } from '@/features/settings/store';
+import { TAMAGUI_COLOR_TOKENS, TAMAGUI_DARK_COLOR_TOKENS } from './theme-static';
 
 export type { AccentPreset, ThemePreset };
 
@@ -46,8 +47,8 @@ const ACCENTS: Record<AccentPreset, { light: string; dark: string }> = {
 
 const PRESET_COLORS: Record<ThemePreset, { light: Partial<ThemeTokens>; dark: Partial<ThemeTokens> }> = {
   radix: {
-    light: { background: '#FFFFFF', surfaceRaised: '#F7F7F8', surface: '#FFFFFF', text: '#1C1C1C', textSecondary: '#60646C', textTertiary: '#8B8D98', code: '#F1F3F5', codeText: '#24292F' },
-    dark: { background: '#161616', surfaceRaised: '#202020', surface: '#292929', text: '#F2F2F2', textSecondary: '#A1A1AA', textTertiary: '#71717A', code: '#111318', codeText: '#D1D5DB' },
+    light: TAMAGUI_COLOR_TOKENS,
+    dark: TAMAGUI_DARK_COLOR_TOKENS,
   },
   codex: {
     light: { background: '#FFFFFF', surfaceRaised: '#F5F5F5', surface: '#FFFFFF', text: '#1A1C1F', textSecondary: '#5F6368', textTertiary: '#7A8087', code: '#F5F5F5', codeText: '#1A1C1F' },
@@ -75,48 +76,16 @@ export function getThemeTokens(preset: ThemePreset, scheme: 'light' | 'dark', ac
 
 export const Colors = {
   light: {
-    text: '#1A1A1A',
-    textSecondary: '#6B6B6B',
-    textTertiary: '#999999',
-    background: '#FFFFFF',
-    surfaceRaised: '#F6F6F6',
-    surface: '#FFFFFF',
-    tint: '#1A1A1A',
-    icon: '#888888',
-    iconMuted: '#CCCCCC',
-    border: 'rgba(0,0,0,0.07)',
-    borderStrong: 'rgba(0,0,0,0.12)',
-    activeIndicator: '#1A1A1A',
-    tabIconDefault: '#888888',
-    tabIconSelected: '#1A1A1A',
-    success: '#34C759',
-    destructive: '#FF3B30',
-    notificationDot: '#FF9500',
-    overlay: 'rgba(0,0,0,0.3)',
-    sheetBackground: '#FFFFFF',
-    sheetHandle: '#D4D4D4',
+    ...TAMAGUI_COLOR_TOKENS,
+    activeIndicator: TAMAGUI_COLOR_TOKENS.tint,
+    tabIconDefault: TAMAGUI_COLOR_TOKENS.icon,
+    tabIconSelected: TAMAGUI_COLOR_TOKENS.accent,
   },
   dark: {
-    text: '#E8E8E8',
-    textSecondary: '#999999',
-    textTertiary: '#666666',
-    background: '#161616',
-    surfaceRaised: '#1E1E1E',
-    surface: '#242424',
-    tint: '#E8E8E8',
-    icon: '#777777',
-    iconMuted: '#444444',
-    border: 'rgba(255,255,255,0.07)',
-    borderStrong: 'rgba(255,255,255,0.12)',
-    activeIndicator: '#E8E8E8',
-    tabIconDefault: '#777777',
-    tabIconSelected: '#E8E8E8',
-    success: '#30D158',
-    destructive: '#FF453A',
-    notificationDot: '#FF9F0A',
-    overlay: 'rgba(0,0,0,0.5)',
-    sheetBackground: '#1E1E1E',
-    sheetHandle: '#444444',
+    ...TAMAGUI_DARK_COLOR_TOKENS,
+    activeIndicator: TAMAGUI_DARK_COLOR_TOKENS.tint,
+    tabIconDefault: TAMAGUI_DARK_COLOR_TOKENS.icon,
+    tabIconSelected: TAMAGUI_DARK_COLOR_TOKENS.accent,
   },
 };
 

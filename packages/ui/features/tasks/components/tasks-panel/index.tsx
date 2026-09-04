@@ -1,11 +1,7 @@
+import { Text, View } from 'tamagui';
 import { useEffect } from 'react';
 import {
-  Platform,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+  Platform, Pressable } from 'react-native';
 import { X } from 'lucide-react-native';
 
 import { Colors, Fonts } from '@/constants/theme';
@@ -67,7 +63,7 @@ export function TasksDropdown({ placement = "below" }: TasksDropdownProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   panel: {
     position: 'absolute',
     right: 0,
@@ -92,8 +88,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+    paddingLeft: 14, paddingRight: 14,
+    paddingTop: 8, paddingBottom: 8,
     borderBottomWidth: 0.633,
   },
   panelTitle: {
@@ -111,4 +107,4 @@ const styles = StyleSheet.create({
   panelBody: {
     flex: 1,
   },
-});
+} as const;

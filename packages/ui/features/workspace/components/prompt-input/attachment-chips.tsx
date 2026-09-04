@@ -1,4 +1,5 @@
-import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { Image, ScrollView, Text, View } from 'tamagui';
+import { Pressable } from 'react-native';
 import { X, FileText, ImageIcon } from 'lucide-react-native';
 
 import { Fonts } from '@/constants/theme';
@@ -102,9 +103,9 @@ export function AttachmentChips({ attachments, onRemove }: AttachmentChipsProps)
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   container: {
-    paddingHorizontal: 10,
+    paddingLeft: 10, paddingRight: 10,
     marginBottom: 8,
   },
   imageRow: {
@@ -173,4 +174,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-});
+} as const;

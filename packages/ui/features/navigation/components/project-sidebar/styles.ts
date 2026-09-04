@@ -1,8 +1,8 @@
-import { StyleSheet } from "react-native";
+import { HAIRLINE_WIDTH } from "@/constants/layout";
 import { Fonts } from "@/constants/theme";
 import { SESSION_INDENT } from "./constants";
 
-export const styles = StyleSheet.create({
+export const styles = {
   container: {
     flex: 1,
     height: "100%",
@@ -17,7 +17,7 @@ export const styles = StyleSheet.create({
   deleteDialog: {
     width: "100%",
     maxWidth: 360,
-    borderWidth: StyleSheet.hairlineWidth,
+    borderWidth: HAIRLINE_WIDTH,
     borderRadius: 12,
     padding: 20,
     boxShadow: "0px 12px 32px rgba(0, 0, 0, 0.24)",
@@ -45,9 +45,9 @@ export const styles = StyleSheet.create({
   },
   deleteCancel: {
     height: 32,
-    borderWidth: StyleSheet.hairlineWidth,
+    borderWidth: HAIRLINE_WIDTH,
     borderRadius: 7,
-    paddingHorizontal: 13,
+    paddingLeft: 13, paddingRight: 13,
     justifyContent: "center",
   },
   deleteCancelText: {
@@ -57,7 +57,7 @@ export const styles = StyleSheet.create({
   deleteConfirm: {
     height: 32,
     borderRadius: 7,
-    paddingHorizontal: 13,
+    paddingLeft: 13, paddingRight: 13,
     justifyContent: "center",
   },
   deleteConfirmText: {
@@ -70,11 +70,11 @@ export const styles = StyleSheet.create({
     zIndex: 20,
   },
   top: {
-    paddingHorizontal: 8,
+    paddingLeft: 8, paddingRight: 8,
     paddingTop: 8,
   },
   settingsHeader: {
-    paddingHorizontal: 15,
+    paddingLeft: 15, paddingRight: 15,
     paddingTop: 14,
     paddingBottom: 10,
   },
@@ -85,14 +85,14 @@ export const styles = StyleSheet.create({
   },
   settingsContent: {
     gap: 3,
-    paddingHorizontal: 8,
+    paddingLeft: 8, paddingRight: 8,
     paddingBottom: 12,
   },
   scroll: {
     flex: 1,
   },
   scrollContent: {
-    paddingHorizontal: 8,
+    paddingLeft: 8, paddingRight: 8,
     paddingBottom: 12,
   },
   sectionHeader: {
@@ -123,7 +123,7 @@ export const styles = StyleSheet.create({
     alignItems: "center",
     gap: 7,
     height: 29,
-    paddingHorizontal: 7,
+    paddingLeft: 7, paddingRight: 7,
     borderRadius: 6,
   },
   rowMain: {
@@ -200,8 +200,8 @@ export const styles = StyleSheet.create({
     flex: 1,
     minWidth: 0,
     height: 22,
-    paddingHorizontal: 0,
-    paddingVertical: 0,
+    paddingLeft: 0, paddingRight: 0,
+    paddingTop: 0, paddingBottom: 0,
     fontSize: 12.5,
     lineHeight: 18,
   },
@@ -213,14 +213,14 @@ export const styles = StyleSheet.create({
   sessionLoading: {
     alignSelf: "flex-start",
     marginLeft: SESSION_INDENT,
-    marginVertical: 5,
+    marginTop: 5, marginBottom: 5,
   },
   sessionEmpty: {
     fontSize: 12,
     lineHeight: 18,
     fontFamily: Fonts.sans,
     paddingLeft: SESSION_INDENT,
-    paddingVertical: 5,
+    paddingTop: 5, paddingBottom: 5,
   },
   moreRow: {
     height: 24,
@@ -236,12 +236,12 @@ export const styles = StyleSheet.create({
     fontSize: 12.5,
     lineHeight: 18,
     fontFamily: Fonts.sans,
-    paddingHorizontal: 8,
-    paddingVertical: 5,
+    paddingLeft: 8, paddingRight: 8,
+    paddingTop: 5, paddingBottom: 5,
   },
   footer: {
-    borderTopWidth: StyleSheet.hairlineWidth,
-    paddingHorizontal: 8,
-    paddingVertical: 6,
+    borderTopWidth: HAIRLINE_WIDTH,
+    paddingLeft: 8, paddingRight: 8,
+    paddingTop: 6, paddingBottom: 6,
   },
-});
+} as const;

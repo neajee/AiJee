@@ -1,12 +1,7 @@
+import { Spinner, Text, View } from 'tamagui';
 import { useState } from "react";
 import {
-  ActivityIndicator,
-  Platform,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+  Platform, Pressable } from "react-native";
 
 import { Fonts } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -147,7 +142,7 @@ export function FileRow({
           ]}
         >
           {diffLoading ? (
-            <ActivityIndicator style={{ paddingVertical: 12 }} size="small" />
+            <Spinner style={{ paddingTop: 12 , paddingBottom: 12 }} size="small" />
           ) : diffContent ? (
             <DiffView diff={diffContent} />
           ) : (
@@ -161,7 +156,7 @@ export function FileRow({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   fileRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -206,12 +201,12 @@ const styles = StyleSheet.create({
     right: 0,
     top: 0,
     bottom: 0,
-    paddingHorizontal: 8,
+    paddingLeft: 8, paddingRight: 8,
     flexDirection: "row",
     alignItems: "center",
   },
   diffContainer: {
-    marginHorizontal: 8,
+    marginLeft: 8, marginRight: 8,
     marginBottom: 4,
     borderRadius: 6,
     overflow: "hidden",
@@ -221,6 +216,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: Fonts.sans,
     textAlign: "center",
-    paddingVertical: 12,
+    paddingTop: 12, paddingBottom: 12,
   },
-});
+} as const;

@@ -1,6 +1,7 @@
+import { ScrollView, View } from 'tamagui';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { useRouter, usePathname } from 'expo-router';
-import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Colors, WorkspaceColors } from '@/constants/theme';
@@ -111,7 +112,7 @@ function BottomBarIcon({
   );
 }
 
-const styles = StyleSheet.create({
+const styles = {
   bar: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -125,12 +126,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 0,
-    paddingHorizontal: 8,
+    paddingLeft: 8, paddingRight: 8,
   },
   dividerVertical: {
     width: 1,
     height: 28,
-    marginHorizontal: 4,
+    marginLeft: 4, marginRight: 4,
   },
   fixedItems: {
     flexDirection: 'row',
@@ -145,4 +146,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-});
+} as const;
