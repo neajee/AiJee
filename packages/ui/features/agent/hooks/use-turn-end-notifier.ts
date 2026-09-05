@@ -109,8 +109,7 @@ function workspaceName(workspaceId: string | null): string | null {
 }
 
 /**
- * Web only: native push needs expo-notifications plus a project id, which this
- * build doesn't configure, so mobile falls back to the in-app badges.
+ * Notifications render as in-app badges (native push is not configured).
  */
 function notify(title: string, body: string, tag: string) {
   if (process.env.EXPO_OS !== "web") return;

@@ -22,10 +22,9 @@ AiJee/
 │   │   │   ├── storage/           # 配置、历史、任务持久化
 │   │   │   └── telemetry/         # 日志、指标
 │   │   └── package.json
-│   ├── client/                    # Expo Web / iOS / Android
-│   │   ├── app/(app)/             # 仅做平台路由转发
-│   │   ├── mobile/                # iOS/Android薄客户端与新画布
-│   │   └── desktop/               # Web/Electron同簇视图
+│   ├── client/                    # Web客户端与桌面同簇视图
+│   │   ├── app/(app)/             # Web路由入口
+│   │   └── desktop/               # Web/Electron视图
 │   └── desktop/                   # Electron窗口、托盘、更新、Server发现
 │
 ├── packages/
@@ -48,13 +47,9 @@ AiJee/
 
 ### Client平台边界
 
-`apps/client/app/(app)`是唯一路由入口：`.native.tsx`转发到
-`mobile/screens`，普通`.tsx`转发到`desktop/screens`。路由不包含视图，三端
-继续使用同一组URL（包括`/workspace/:id/s/:sid`）。
+`apps/client/app/(app)`是Web路由入口，路由只做转发，继续使用同一组URL（包括`/workspace/:id/s/:sid`）。
 
-`mobile/`只承载移动端页面级视图与轻量组件，可复用`packages/ui`的stores、
-hooks、tokens和通用组件；`desktop/`承载Web/Electron现状视图。两者互不导入，
-共享数据只经过`@aijee/client-sdk`与平台无关feature边界。
+`apps/client`作为Web/桌面Renderer承载Web/Electron视图，通信统一经过`@aijee/client-sdk`。
 
 ## 运行时依赖方向
 
@@ -115,7 +110,7 @@ features/<feature>/components/<MajorComponent>/
 
 ### UI样式体系
 
-Web、iOS与Android统一使用Tamagui作为布局、文本与滚动原语。`apps/client/tamagui.config.ts`是静态配置入口，主题色token由`packages/ui/constants/theme-static.ts`提供；运行时主题预设与字号仍通过`useThemeTokens`注入语义样式。组件样式以Tamagui可消费的静态对象和主题值表达，禁止新增StyleSheet样式工厂。
+Web统一使用Tamagui作为布局、文本与滚动原语。`apps/client/tamagui.config.ts`共用`packages/ui/constants/theme-static.ts`；运行时主题预设与字号仍通过`useThemeTokens`注入语义样式。组件样式以Tamagui可消费的静态对象和主题值表达，禁止新增StyleSheet样式工厂。
 
 运行时状态保存在`~/.aijee/`：工作区、模式、会话索引和任务日志均可在重启后恢复；会话激活时才由`SessionRegistry`按其磁盘session file重建。文件、Git和任务cwd必须位于已配置工作区内。
 
@@ -127,7 +122,7 @@ Rust RPC不再是运行时依赖；Server直接调用Pi SDK。确需原生能力
 
 ## 迁移顺序
 
-已完成：冻结`api-contract` → 建立`engine/core`、`EngineRegistry`与`adapters/pi` → `apps/server`承接Runtime → Web/Mobile合入`apps/client` → 删除Rust RPC与旧适配器。下一步仅增加Codex/OpenCode适配器并复用同一契约。
+已完成：冻结`api-contract` → 建立`engine/core`、`EngineRegistry`与`adapters/pi` → `apps/server`承接Runtime → 移除独立移动端客户端，`apps/client`统一作为Web/桌面Renderer → 删除Rust RPC与旧适配器。下一步仅增加Codex/OpenCode适配器并复用同一契约。
 
 ## 最终验收条件
 

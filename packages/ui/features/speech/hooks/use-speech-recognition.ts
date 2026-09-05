@@ -545,7 +545,7 @@ export function useSpeechRecognition(
       }
     } else {
       if (mode === 'builtin') {
-        setError('Built-in speech not available on mobile. Switch to API mode in Settings.');
+        setError('Built-in speech not available in this browser. Switch to API mode in Settings.');
       } else {
         await startApiNative();
       }

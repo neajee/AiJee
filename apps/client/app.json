@@ -3,33 +3,8 @@
     "name": "AiJee",
     "slug": "aijee",
     "version": "0.1.1",
-    "orientation": "portrait",
     "icon": "../../packages/ui/assets/images/icon.png",
-    "scheme": "aijee",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
-    "ios": {
-      "supportsTablet": true
-    },
-    "android": {
-      "package": "com.anthaathi.pi",
-      "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "../../packages/ui/assets/images/android-icon-foreground.png",
-        "backgroundImage": "../../packages/ui/assets/images/android-icon-background.png",
-        "monochromeImage": "../../packages/ui/assets/images/android-icon-monochrome.png"
-      },
-      "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false,
-      "permissions": [
-        "android.permission.CAMERA",
-        "android.permission.RECORD_AUDIO",
-        "android.permission.MODIFY_AUDIO_SETTINGS",
-        "android.permission.CAMERA",
-        "android.permission.RECORD_AUDIO",
-        "android.permission.MODIFY_AUDIO_SETTINGS"
-      ]
-    },
     "web": {
       "output": "static",
       "favicon": "../../packages/ui/assets/images/favicon.png",
@@ -49,12 +24,6 @@
           }
         }
       ],
-      [
-        "expo-camera",
-        {
-          "cameraPermission": "Allow AiJee to scan computer connection QR codes."
-        }
-      ],
       "expo-font",
       "expo-secure-store",
       "expo-audio"
@@ -64,16 +33,7 @@
       "reactCompiler": true
     },
     "extra": {
-      "router": {},
-      "eas": {
-        "projectId": "17a793ad-32af-42de-9fd8-68710554fc2e"
-      }
-    },
-    "runtimeVersion": {
-      "policy": "appVersion"
-    },
-    "updates": {
-      "url": "https://u.expo.dev/17a793ad-32af-42de-9fd8-68710554fc2e"
+      "router": {}
     }
   }
 }

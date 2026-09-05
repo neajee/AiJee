@@ -2,7 +2,7 @@
 
 ## Project overview
 
-AiJee is a cross-platform (iOS, Android, Web) client and single-package runtime for the pi coding agent.
+AiJee is a Web + Desktop client and single-package runtime for the pi coding agent.
 Built with Expo SDK 54, React Native, expo-router, and an embedded Node Pi SDK runtime.
 
 ## Monorepo structure
@@ -10,15 +10,11 @@ Built with Expo SDK 54, React Native, expo-router, and an embedded Node Pi SDK r
 ```
 AiJee/
 ├── apps/
-│   ├── client/             # Expo Web / Android / iOS entry
+│   ├── client/             # Expo Web entry / Electron renderer
 │   └── desktop/            # Electron platform entry
 ├── apps/client/
 │   ├── app/                # Expo Router thin dispatchers only
-│   │   └── (app)/           # .tsx → desktop, .native.tsx → mobile
-│   ├── mobile/              # Native thin client, Tamagui screens/styles
-│   │   ├── screens/
-│   │   ├── components/
-│   │   └── styles/
+│   │   └── (app)/           # .tsx → desktop screen views
 │   ├── desktop/             # Web + Electron screen ownership
 │   │   ├── screens/
 │   │   └── components/
@@ -39,9 +35,8 @@ AiJee/
 └── public/                 # Expo web source assets
 ```
 
-`mobile/` may consume shared `packages/ui` features but never imports
-`desktop/`; desktop screens follow the inverse boundary. Both platforms use
-the same URL and `packages/client-sdk` data contract.
+`apps/client` renders the Web + Electron screens via `desktop/`. The app uses a
+single URL structure and `packages/client-sdk` data contract.
 
 ## @aijee/client-sdk package
 
@@ -152,8 +147,6 @@ Stores cannot use React hooks. They use raw SDK functions with the global
 ```sh
 yarn start              # Expo dev server
 yarn web                # Web
-yarn android            # Android
-yarn ios                # iOS
 yarn web:build          # Production web export
 yarn runtime:start      # Embedded AiJee runtime
 yarn build:prod         # Both

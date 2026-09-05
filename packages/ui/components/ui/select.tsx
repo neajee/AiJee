@@ -90,9 +90,8 @@ export function Select<T extends string = string>({
           { backgroundColor: bg, borderColor: border },
           disabled && disabledStyle,
         ]}
-      >
-        {/* Native mobile: use Picker from @react-native-picker/picker if needed */}
-      </TamaguiView>
+>
+        </TamaguiView>
     </TamaguiView>
   );
 }

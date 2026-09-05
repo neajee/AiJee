@@ -1,7 +1,6 @@
 import { Spinner, Text, View } from 'tamagui';
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Animated, Keyboard } from 'react-native';
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Fonts } from "@/constants/theme";
@@ -120,35 +119,14 @@ export default function WorkspaceScreen() {
   const clearAlert = useCallback(() => setAlertMessage(null), []);
 
   const editorBg = colors.background;
-  const keyboardPadding = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    if (process.env.EXPO_OS === "web") return;
-    const showEvent = process.env.EXPO_OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
-    const hideEvent = process.env.EXPO_OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
-    const showSub = Keyboard.addListener(showEvent, (e) => {
-      const height = process.env.EXPO_OS === "ios"
-        ? e.endCoordinates.height - insets.bottom
-        : e.endCoordinates.height;
-      Animated.spring(keyboardPadding, {
-        toValue: height, tension: 160, friction: 20, useNativeDriver: false,
-      }).start();
-    });
-    const hideSub = Keyboard.addListener(hideEvent, () => {
-      Animated.spring(keyboardPadding, {
-        toValue: 0, tension: 160, friction: 20, useNativeDriver: false,
-      }).start();
-    });
-    return () => { showSub.remove(); hideSub.remove(); };
-  }, [keyboardPadding, insets.bottom]);
 
   return (
-    <Animated.View
+    <View
       style={[
         styles.container,
         {
           backgroundColor: colors.background,
-          paddingBottom: isWideScreen ? 0 : Animated.add(keyboardPadding, insets.bottom),
+          paddingBottom: isWideScreen ? 0 : insets.bottom,
         },
       ]}
     >
@@ -190,7 +168,7 @@ export default function WorkspaceScreen() {
           </WorkspaceSidebar>
         )}
       </View>
-    </Animated.View>
+    </View>
   );
 }
 

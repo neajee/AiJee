@@ -9,7 +9,7 @@ import type { FlatModel, ThinkingPreference } from '../../../utils/prompt-input'
 export interface ToolbarProps {
   sessionId?: string | null;
   isWideScreen: boolean;
-  onOpenMobileSheet: (type: 'model' | 'effort') => void;
+  onOpenNarrowSheet: (type: 'model' | 'effort') => void;
   onDropdownOpenChange?: (isOpen: boolean) => void;
   inputRef: RefObject<TextInput | null>;
   skeleton?: ReactNode;
@@ -50,7 +50,7 @@ export interface ToolbarController {
   config: AgentConfigHandle;
   skeleton: ReactNode;
   isWideScreen: boolean;
-  onOpenMobileSheet: (type: 'model' | 'effort') => void;
+  onOpenNarrowSheet: (type: 'model' | 'effort') => void;
   onDropdownOpenChange?: (isOpen: boolean) => void;
   inputRef: RefObject<TextInput | null>;
   inline: boolean;

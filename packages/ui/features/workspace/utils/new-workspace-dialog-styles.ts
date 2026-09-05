@@ -149,7 +149,7 @@ export const styles = {
     fontFamily: Fonts.sansMedium,
   },
 
-  // Mobile bottom sheet
+  // Narrow bottom sheet
   sheetOverlay: {
     flex: 1,
     backgroundColor: 'rgba(0,0,0,0.4)',

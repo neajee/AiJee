@@ -1,7 +1,6 @@
-import { Spinner, View } from 'tamagui';
+import { View } from 'tamagui';
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Animated, Keyboard } from 'react-native';
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
 import { PromptInput } from "@/features/workspace/components/prompt-input";
@@ -14,7 +13,7 @@ import { ChatShimmer } from "@/features/agent/components/message-list/chat-shimm
 import { ExtensionUiDialog } from "@/features/agent/components/extension-ui-dialog/index";
 import { DiffPanelProvider } from "@/features/agent/components/diff-panel/context";
 import { DiffSidebar } from "@/features/agent/components/diff-panel";
-import { MobileDiffSheetProvider } from "@/features/agent/hooks/use-mobile-diff-sheet";
+import { NarrowDiffSheetProvider } from "@/features/agent/hooks/use-narrow-diff-sheet";
 import { useAgentSession, useConnection, useWorkspaceSessions as useSessions } from "@aijee/client-sdk";
 import type { ImageContent } from "@aijee/client-sdk";
 import { requestBrowserNotificationPermission } from "@/features/agent/browser-notifications";
@@ -123,52 +122,17 @@ export default function SessionScreen() {
 
   const editorBg = colors.background;
 
-  const keyboardPadding = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    // iOS does not auto-avoid the keyboard, so we animate a bottom padding.
-    // On Android the window resizes (adjustResize) automatically, so adding a
-    // manual padding here would double-count and create a blank gap behind the
-    // keyboard (the reported mobile input layout anomaly). Web is a no-op.
-    if (process.env.EXPO_OS !== "ios") return;
-    const showEvent = "keyboardWillShow";
-    const hideEvent = "keyboardWillHide";
-    const showSub = Keyboard.addListener(showEvent, (e) => {
-      const height = e.endCoordinates.height - insets.bottom;
-      Animated.spring(keyboardPadding, {
-        toValue: height,
-        tension: 160,
-        friction: 20,
-        useNativeDriver: false,
-      }).start();
-    });
-    const hideSub = Keyboard.addListener(hideEvent, () => {
-      Animated.spring(keyboardPadding, {
-        toValue: 0,
-        tension: 160,
-        friction: 20,
-        useNativeDriver: false,
-      }).start();
-    });
-    return () => {
-      showSub.remove();
-      hideSub.remove();
-    };
-  }, [keyboardPadding, insets.bottom]);
-
   const hasMessages = messages.length > 0;
 
   return (
     <DiffPanelProvider messages={messages}>
-      <MobileDiffSheetProvider>
-      <Animated.View
+      <NarrowDiffSheetProvider>
+      <View
         style={[
           styles.container,
           {
           backgroundColor: colors.background,
-            paddingBottom: isWideScreen
-              ? 0
-              : Animated.add(keyboardPadding, insets.bottom),
+            paddingBottom: isWideScreen ? 0 : insets.bottom,
           },
         ]}
       >
@@ -183,13 +147,7 @@ export default function SessionScreen() {
                 }}
               />
             ) : agentSession.isLoading || (!agentSession.isReady && sessionId) ? (
-              process.env.EXPO_OS === "ios" ? (
-                <View style={styles.emptyCenter}>
-                  <Spinner size="small" />
-                </View>
-              ) : (
-                <ChatShimmer />
-              )
+              <ChatShimmer />
             ) : (
               <View style={styles.emptyCenter} />
             )}
@@ -225,8 +183,8 @@ export default function SessionScreen() {
             </>
           )}
         </View>
-      </Animated.View>
-      </MobileDiffSheetProvider>
+</View>
+    </NarrowDiffSheetProvider>
     </DiffPanelProvider>
   );
 }

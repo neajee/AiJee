@@ -4,12 +4,12 @@ import { ChevronDown } from 'lucide-react-native';
 import { styles } from '../../../utils/toolbar-styles';
 import type { ToolbarController } from './types';
 
-type EffortPickerProps = Pick<ToolbarController, 'theme' | 'inline' | 'isWideScreen' | 'onOpenMobileSheet' | 'currentModel' | 'toolbarDisabled' | 'controlHeight' | 'thinkingDisabled' | 'thinkingLabel' | 'thinkingPreference' | 'effortOptions' | 'activeDropdown' | 'toggleDropdown' | 'toolbarDropdownAnim' | 'popoverIndex' | 'handleSelectThinking'>;
+type EffortPickerProps = Pick<ToolbarController, 'theme' | 'inline' | 'isWideScreen' | 'onOpenNarrowSheet' | 'currentModel' | 'toolbarDisabled' | 'controlHeight' | 'thinkingDisabled' | 'thinkingLabel' | 'thinkingPreference' | 'effortOptions' | 'activeDropdown' | 'toggleDropdown' | 'toolbarDropdownAnim' | 'popoverIndex' | 'handleSelectThinking'>;
 
-export function EffortPicker({ theme, inline, isWideScreen, onOpenMobileSheet, currentModel, toolbarDisabled, controlHeight, thinkingDisabled, thinkingLabel, thinkingPreference, effortOptions, activeDropdown, toggleDropdown, toolbarDropdownAnim, popoverIndex, handleSelectThinking }: EffortPickerProps) {
+export function EffortPicker({ theme, inline, isWideScreen, onOpenNarrowSheet, currentModel, toolbarDisabled, controlHeight, thinkingDisabled, thinkingLabel, thinkingPreference, effortOptions, activeDropdown, toggleDropdown, toolbarDropdownAnim, popoverIndex, handleSelectThinking }: EffortPickerProps) {
   return (
     <View style={styles.popoverAnchor}>
-      <Pressable onPress={() => (isWideScreen ? toggleDropdown('effort') : onOpenMobileSheet('effort'))} disabled={toolbarDisabled || thinkingDisabled} accessibilityRole="button" accessibilityLabel={thinkingDisabled ? `Thinking not supported by ${currentModel?.name ?? 'this model'}` : `Thinking: ${thinkingLabel}. Press to change.`} accessibilityState={{ expanded: activeDropdown === 'effort', disabled: toolbarDisabled || thinkingDisabled }} style={({ pressed }) => [styles.button, styles.effortButton, { height: controlHeight }, (pressed || toolbarDisabled || thinkingDisabled) && { opacity: 0.7 }]}>
+      <Pressable onPress={() => (isWideScreen ? toggleDropdown('effort') : onOpenNarrowSheet('effort'))} disabled={toolbarDisabled || thinkingDisabled} accessibilityRole="button" accessibilityLabel={thinkingDisabled ? `Thinking not supported by ${currentModel?.name ?? 'this model'}` : `Thinking: ${thinkingLabel}. Press to change.`} accessibilityState={{ expanded: activeDropdown === 'effort', disabled: toolbarDisabled || thinkingDisabled }} style={({ pressed }) => [styles.button, styles.effortButton, { height: controlHeight }, (pressed || toolbarDisabled || thinkingDisabled) && { opacity: 0.7 }]}>
         <Text style={[styles.buttonText, { color: theme.textSecondary }]}>{thinkingLabel}</Text>
         {!thinkingDisabled && <ChevronDown size={14} color={theme.textMuted} strokeWidth={1.8} />}
       </Pressable>

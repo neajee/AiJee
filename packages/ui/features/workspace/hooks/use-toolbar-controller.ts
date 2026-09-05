@@ -21,7 +21,7 @@ const SHOW_MODE_TOGGLE = false;
 export function useToolbarController({
   sessionId,
   isWideScreen,
-  onOpenMobileSheet,
+  onOpenNarrowSheet,
   onDropdownOpenChange,
   inputRef,
   skeleton = null,
@@ -219,7 +219,7 @@ export function useToolbarController({
     config,
     skeleton,
     isWideScreen,
-    onOpenMobileSheet,
+    onOpenNarrowSheet,
     onDropdownOpenChange,
     inputRef,
     inline,

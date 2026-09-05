@@ -10,7 +10,7 @@ export const styles = {
   narrowSafeArea: { flex: 1 },
   content: { flex: 1, overflow: 'hidden' },
   contentInner: { flex: 1 },
-  mobileContent: { flex: 1 },
+  narrowContent: { flex: 1 },
   overlay: { ...ABSOLUTE_FILL_STYLE, zIndex: 10 },
   hoverZone: {
     position: 'absolute',

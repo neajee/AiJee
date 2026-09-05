@@ -1,7 +1,7 @@
 import { Text, View } from 'tamagui';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AppState, Pressable, type AppStateStatus } from 'react-native';
-import { Redirect, Slot, usePathname, useRouter } from 'expo-router';
+import { Slot, usePathname, useRouter } from 'expo-router';
 
 import { Fonts } from '@/constants/theme';
 import { useThemeTokens } from '@/hooks/use-theme-tokens';
@@ -352,8 +352,6 @@ export default function AppLayout() {
   }
 
   const hasConnection = !!serverAddress && !!accessToken;
-  const showNativePairing = status === 'no-server' && process.env.EXPO_OS !== 'web';
-  if (showNativePairing) return <Redirect href="/servers" />;
 
   return (
     <PiClientProvider key={serverAddress || 'unconnected'} config={hasConnection ? piClientConfig : undefined}>

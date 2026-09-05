@@ -26,7 +26,7 @@ pi install npm:aijee
 ## 架构
 
 ```text
-apps/client + apps/desktop → packages/ui → packages/client-sdk
+apps/client / apps/desktop → packages/ui → packages/client-sdk
 apps/server → packages/engine → Pi SDK
 ```
 
@@ -34,8 +34,7 @@ apps/server → packages/engine → Pi SDK
 
 ```text
 apps/server                      唯一后端、CLI、REST/SSE/WS与运行时
-apps/client/app                  Expo Router平台路由薄壳
-apps/client/mobile               iOS / Android薄客户端与移动端新画布
+apps/client/app                  Web平台路由与桌面视图入口
 apps/client/desktop              Web / Electron同簇视图
 apps/desktop                     Electron 外壳与Server发现
 packages/engine                  统一引擎抽象与适配器
@@ -44,9 +43,7 @@ packages/client-sdk              生成客户端与薄封装
 packages/ui                      跨端组件、状态与数据hooks
 ```
 
-客户端平台路由保持同一URL：native文件转发到`apps/client/mobile`，普通文件
-转发到`apps/client/desktop`。移动端聊天只渲染消息文本、思考/工具/编辑状态
-和轻量输入框，不引入桌面端完整消息树与自适应导航。
+Web与桌面端共享同一URL结构，`apps/client` 作为 Web / 桌面 Renderer。
 
 ## 配置
 
@@ -85,8 +82,6 @@ AIJEE_STATE_PATH=~/.aijee/runtime.json
 ```bash
 yarn install
 yarn web                  # 启动 Web 开发端
-yarn android              # 启动 Android
-yarn ios                  # 启动 iOS
 yarn runtime:check       # 检查 Pi SDK Runtime
 yarn runtime:start       # 启动 Runtime Web 服务
 yarn desktop             # 启动 Desktop Shell
@@ -98,22 +93,10 @@ yarn desktop             # 启动 Desktop Shell
 yarn build:prod
 ```
 
-构建 Android APK：
-
-```bash
-cd apps/client
-eas build --platform android --profile preview --local
-```
-
 ## 截图
 
 <div align="center">
   <img src="docs/screen/web/home.png" width="31%" alt="工作区首页" />
   <img src="docs/screen/web/chat.png" width="31%" alt="代码会话" />
   <img src="docs/screen/web/model.png" width="31%" alt="模型设置" />
-</div>
-
-<div align="center">
-  <img src="docs/screen/phone/chat.png" width="22%" alt="移动端对话" />
-  <img src="docs/screen/phone/model.png" width="22%" alt="移动端模型设置" />
 </div>

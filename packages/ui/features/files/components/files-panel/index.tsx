@@ -7,7 +7,7 @@ import { useWorkspaceStore } from "@/features/workspace/store";
 import { FileTree } from "@/features/workspace/components/file-tree";
 
 /**
- * Standalone files panel — used in the mobile Files sheet.
+ * Standalone files panel — used in the narrow Files sheet.
  * Wraps the FileTree with workspace path and enables actions.
  */
 export function FilesPanel() {

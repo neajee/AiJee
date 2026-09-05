@@ -182,7 +182,7 @@ export function NewWorkspaceDialogView({ controller }: { controller: NewWorkspac
     </>
   );
 
-  // Mobile: bottom sheet
+  // Narrow: bottom sheet
   if (!isWideScreen) {
     return (
       <Modal

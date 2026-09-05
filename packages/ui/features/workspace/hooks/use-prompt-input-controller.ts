@@ -133,7 +133,7 @@ export function usePromptInputController({
   const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [hideBottomForKeyboard, setHideBottomForKeyboard] = useState(false);
   // One sheet now: the model picker carries the thinking level with it.
-  const [mobileSheet, setMobileSheet] = useState<null | 'model' | 'effort'>(null);
+  const [narrowSheet, setNarrowSheet] = useState<null | 'model' | 'effort'>(null);
   const [toolbarPopoverOpen, setToolbarPopoverOpen] = useState(false);
   const [isFocused, setIsFocused] = useState(false);
   const [entryDone, setEntryDone] = useState(false);
@@ -142,15 +142,15 @@ export function usePromptInputController({
   // row, so the composer is a single line; narrow ones keep the separate strip
   // below the card, where there is room for them.
   const inlineToolbar = isWideScreen;
-  const toolbarHiddenKeepLayout = !isWideScreen && !!mobileSheet;
+  const toolbarHiddenKeepLayout = !isWideScreen && !!narrowSheet;
   const toolbarCollapsed = !isWideScreen && hideBottomForKeyboard;
   const toolbarOverlap = inlineToolbar ? 0 : process.env.EXPO_OS === "web" ? -4 : -1;
   const shouldOverlaySlashCommands = process.env.EXPO_OS === "web" || isWideScreen;
-  const closeMobileSheet = useCallback(() => {
+  const closeNarrowSheet = useCallback(() => {
     LayoutAnimation.configureNext(
       LayoutAnimation.create(200, LayoutAnimation.Types.easeInEaseOut, LayoutAnimation.Properties.opacity),
     );
-    setMobileSheet(null);
+    setNarrowSheet(null);
   }, []);
 
   // --- Keyboard ---
@@ -520,8 +520,8 @@ export function usePromptInputController({
     attachments, removeAttachment, attachmentNotice, stackedAbove, toolbarOverlap, entryDone, isFocused,
     lineCount, text, handleTextChange, handleKeyPress, inputDisabled, sendDisabled, canComposeWhileDisabled,
     setIsFocused, handleWebFileChange, handleFilePick, isListening, handleMicPress, audioLevel, inlineToolbar,
-    sessionId, setMobileSheet, setToolbarPopoverOpen, streamedMode, sessionReady, agentConfig, thinkingPreference,
+    sessionId, setNarrowSheet, setToolbarPopoverOpen, streamedMode, sessionReady, agentConfig, thinkingPreference,
     setThinkingPreference, contextUsage, showQueueActions, sendDraft, showAbortButton, handleSubmit, hasDraft,
-    toolbarHiddenKeepLayout, toolbarCollapsed, toolbarPopoverOpen, mobileSheet, closeMobileSheet,
+    toolbarHiddenKeepLayout, toolbarCollapsed, toolbarPopoverOpen, narrowSheet, closeNarrowSheet,
   };
 }

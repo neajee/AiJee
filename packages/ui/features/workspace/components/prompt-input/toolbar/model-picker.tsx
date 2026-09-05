@@ -5,12 +5,12 @@ import { ProviderIcon } from '@/components/provider-icons';
 import { styles } from '../../../utils/toolbar-styles';
 import type { ToolbarController } from './types';
 
-type ModelPickerProps = Pick<ToolbarController, 'theme' | 'inline' | 'isWideScreen' | 'onOpenMobileSheet' | 'currentModel' | 'toolbarDisabled' | 'controlHeight' | 'activeDropdown' | 'toggleDropdown' | 'toolbarDropdownAnim' | 'modelSearchRef' | 'modelScrollRef' | 'modelSearch' | 'setModelSearch' | 'setPopoverIndex' | 'popoverIndex' | 'handleSearchKeyPress' | 'providers' | 'hasModels' | 'flatModels' | 'handleSelectModel'>;
+type ModelPickerProps = Pick<ToolbarController, 'theme' | 'inline' | 'isWideScreen' | 'onOpenNarrowSheet' | 'currentModel' | 'toolbarDisabled' | 'controlHeight' | 'activeDropdown' | 'toggleDropdown' | 'toolbarDropdownAnim' | 'modelSearchRef' | 'modelScrollRef' | 'modelSearch' | 'setModelSearch' | 'setPopoverIndex' | 'popoverIndex' | 'handleSearchKeyPress' | 'providers' | 'hasModels' | 'flatModels' | 'handleSelectModel'>;
 
-export function ModelPicker({ theme, inline, isWideScreen, onOpenMobileSheet, currentModel, toolbarDisabled, controlHeight, activeDropdown, toggleDropdown, toolbarDropdownAnim, modelSearchRef, modelScrollRef, modelSearch, setModelSearch, setPopoverIndex, popoverIndex, handleSearchKeyPress, providers, hasModels, flatModels, handleSelectModel }: ModelPickerProps) {
+export function ModelPicker({ theme, inline, isWideScreen, onOpenNarrowSheet, currentModel, toolbarDisabled, controlHeight, activeDropdown, toggleDropdown, toolbarDropdownAnim, modelSearchRef, modelScrollRef, modelSearch, setModelSearch, setPopoverIndex, popoverIndex, handleSearchKeyPress, providers, hasModels, flatModels, handleSelectModel }: ModelPickerProps) {
   return (
     <View style={styles.popoverAnchor}>
-      <Pressable onPress={() => (isWideScreen ? toggleDropdown('model') : onOpenMobileSheet('model'))} disabled={toolbarDisabled} accessibilityRole="button" accessibilityLabel={`Model: ${currentModel?.name ?? 'Loading'}. Press to change.`} accessibilityState={{ expanded: activeDropdown === 'model', disabled: toolbarDisabled }} style={({ pressed }) => [styles.button, { height: controlHeight }, (pressed || toolbarDisabled) && { opacity: 0.7 }]}>
+      <Pressable onPress={() => (isWideScreen ? toggleDropdown('model') : onOpenNarrowSheet('model'))} disabled={toolbarDisabled} accessibilityRole="button" accessibilityLabel={`Model: ${currentModel?.name ?? 'Loading'}. Press to change.`} accessibilityState={{ expanded: activeDropdown === 'model', disabled: toolbarDisabled }} style={({ pressed }) => [styles.button, { height: controlHeight }, (pressed || toolbarDisabled) && { opacity: 0.7 }]}>
         <ProviderIcon provider={currentModel?.provider ?? ''} size={14} color={theme.textMuted} />
         <Text style={[styles.buttonText, { color: theme.textSecondary }]} numberOfLines={1}>{currentModel?.name ?? '…'}</Text>
         <ChevronDown size={14} color={theme.textMuted} strokeWidth={1.8} />

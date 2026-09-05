@@ -3,11 +3,11 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { View } from 'tamagui';
 
-import { MobileHeaderBar } from '../../components/mobile-header-bar';
+import { NarrowHeaderBar } from '../../components/narrow-header-bar';
 import { WorkspaceSheet } from '../../components/workspace-sheet';
-import { MobileChangesSheet } from '../../components/mobile-changes-sheet';
-import { MobileFilesSheet } from '../../components/mobile-files-sheet';
-import { MobilePreviewSheet } from '../../components/mobile-preview-sheet';
+import { NarrowChangesSheet } from '../../components/narrow-changes-sheet';
+import { NarrowFilesSheet } from '../../components/narrow-files-sheet';
+import { NarrowPreviewSheet } from '../../components/narrow-preview-sheet';
 import { ConnectionStatusBanner } from '@/features/agent/components/connection-status-banner';
 import { TasksSheet } from '@/features/tasks/components/tasks-sheet';
 import { TaskOutputSheet } from '@/features/tasks/components/task-output-sheet';
@@ -43,7 +43,7 @@ export function NarrowNavigation({ children, colors, controller }: { children: R
     <GestureHandlerRootView style={[styles.narrowContainer, { backgroundColor: colors.background }]}>
       <SafeAreaView style={[styles.narrowSafeArea, { backgroundColor: colors.background }]} edges={['top']}>
         {hasServer && (
-          <MobileHeaderBar
+          <NarrowHeaderBar
             onWorkspacePress={() => setSheetVisible(true)}
             onFilesPress={openFiles}
             onGitPress={openGit}
@@ -52,7 +52,7 @@ export function NarrowNavigation({ children, colors, controller }: { children: R
             onTaskOutputPress={() => setTaskOutputSheetVisible(true)}
           />
         )}
-        <View style={styles.mobileContent}>{children}</View>
+        <View style={styles.narrowContent}>{children}</View>
         {hasServer && <ConnectionStatusBanner />}
       </SafeAreaView>
       {hasServer && isCodeMode && (
@@ -60,8 +60,8 @@ export function NarrowNavigation({ children, colors, controller }: { children: R
           <WorkspaceSheet visible={sheetVisible} onClose={() => setSheetVisible(false)} />
           {hasWorkspaces && (
             <>
-              <MobileChangesSheet visible={changesSheetVisible} onClose={() => setChangesSheetVisible(false)} />
-              <MobilePreviewSheet
+              <NarrowChangesSheet visible={changesSheetVisible} onClose={() => setChangesSheetVisible(false)} />
+              <NarrowPreviewSheet
                 visible={previewSheetVisible}
                 onClose={() => setPreviewSheetVisible(false)}
                 sessionId={openSessionId}
@@ -76,7 +76,7 @@ export function NarrowNavigation({ children, colors, controller }: { children: R
           <TaskOutputSheet visible={taskOutputSheetVisible} onClose={() => setTaskOutputSheetVisible(false)} />
         </>
       )}
-      {hasServer && <MobileFilesSheet visible={filesSheetVisible} onClose={() => setFilesSheetVisible(false)} />}
+      {hasServer && <NarrowFilesSheet visible={filesSheetVisible} onClose={() => setFilesSheetVisible(false)} />}
     </GestureHandlerRootView>
   );
 }

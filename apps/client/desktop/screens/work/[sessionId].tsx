@@ -1,7 +1,6 @@
-import { Spinner, View } from 'tamagui';
+import { View } from 'tamagui';
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Animated, Keyboard } from 'react-native';
+import { useCallback, useEffect, useState } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
@@ -79,42 +78,15 @@ export default function WorkSessionScreen() {
 
   const clearAlert = useCallback(() => setAlertMessage(null), []);
   const isDark = colorScheme === "dark";
-  const keyboardPadding = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    if (process.env.EXPO_OS !== "ios") return;
-    const showSub = Keyboard.addListener("keyboardWillShow", (event) => {
-      Animated.spring(keyboardPadding, {
-        toValue: event.endCoordinates.height - insets.bottom,
-        tension: 160,
-        friction: 20,
-        useNativeDriver: false,
-      }).start();
-    });
-    const hideSub = Keyboard.addListener("keyboardWillHide", () => {
-      Animated.spring(keyboardPadding, {
-        toValue: 0,
-        tension: 160,
-        friction: 20,
-        useNativeDriver: false,
-      }).start();
-    });
-    return () => {
-      showSub.remove();
-      hideSub.remove();
-    };
-  }, [insets.bottom, keyboardPadding]);
 
   const hasMessages = messages.length > 0;
   return (
-    <Animated.View
+    <View
       style={[
         styles.container,
         {
           backgroundColor: isDark ? "#121212" : colors.background,
-          paddingBottom: isWideScreen
-            ? 0
-            : Animated.add(keyboardPadding, insets.bottom),
+          paddingBottom: isWideScreen ? 0 : insets.bottom,
         },
       ]}
     >
@@ -128,13 +100,7 @@ export default function WorkSessionScreen() {
             }}
           />
         ) : agentSession.isLoading || (!agentSession.isReady && sessionId) ? (
-          process.env.EXPO_OS === "ios" ? (
-            <View style={styles.emptyCenter}>
-              <Spinner size="small" />
-            </View>
-          ) : (
-            <ChatShimmer />
-          )
+          <ChatShimmer />
         ) : (
           <View style={styles.emptyCenter} />
         )}
@@ -155,7 +121,7 @@ export default function WorkSessionScreen() {
           onClearError={clearAlert}
         />
       </View>
-    </Animated.View>
+    </View>
   );
 }
 

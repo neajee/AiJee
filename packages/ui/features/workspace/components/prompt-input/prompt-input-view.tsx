@@ -8,8 +8,8 @@ import type { ThinkingPreference, Attachment, SlashCommand } from '../../utils/p
 import { Toolbar } from './toolbar/index';
 import { SlashCommandDropdown } from './slash-command-dropdown';
 import { AttachmentChips } from './attachment-chips';
-import { MobileModelSheet } from './mobile-model-sheet';
-import { MobileEffortSheet } from './mobile-effort-sheet';
+import { NarrowModelSheet } from './narrow-model-sheet';
+import { NarrowEffortSheet } from './narrow-effort-sheet';
 import { Square } from 'lucide-react-native';
 import { ToolbarSkeleton } from './toolbar-skeleton';
 import { InputCard } from './input-card';
@@ -65,7 +65,7 @@ export interface PromptInputViewProps {
   audioLevel: number;
   inlineToolbar: boolean;
   sessionId?: string | null;
-  setMobileSheet: (type: 'model' | 'effort') => void;
+  setNarrowSheet: (type: 'model' | 'effort') => void;
   setToolbarPopoverOpen: (open: boolean) => void;
   streamedMode: AgentMode | null | undefined;
   sessionReady: boolean;
@@ -81,8 +81,8 @@ export interface PromptInputViewProps {
   toolbarHiddenKeepLayout: boolean;
   toolbarCollapsed: boolean;
   toolbarPopoverOpen: boolean;
-  mobileSheet: null | 'model' | 'effort';
-  closeMobileSheet: () => void;
+  narrowSheet: null | 'model' | 'effort';
+  closeNarrowSheet: () => void;
 }
 
 export function PromptInputView({
@@ -92,10 +92,10 @@ export function PromptInputView({
   attachments, removeAttachment, attachmentNotice, stackedAbove, toolbarOverlap, entryDone, isFocused,
   lineCount, text, handleTextChange, handleKeyPress, inputDisabled, sendDisabled, canComposeWhileDisabled,
   setIsFocused, handleWebFileChange, handleFilePick, isListening, handleMicPress, audioLevel, inlineToolbar,
-  sessionId, setMobileSheet, setToolbarPopoverOpen, streamedMode,
+  sessionId, setNarrowSheet, setToolbarPopoverOpen, streamedMode,
   sessionReady, agentConfig, thinkingPreference, setThinkingPreference, contextUsage, showQueueActions,
   sendDraft, showAbortButton, handleSubmit, hasDraft, toolbarHiddenKeepLayout, toolbarCollapsed,
-  toolbarPopoverOpen, mobileSheet, closeMobileSheet,
+  toolbarPopoverOpen, narrowSheet, closeNarrowSheet,
 }: PromptInputViewProps) {
   const formatQueueBehaviorLabel = (behavior: QueueBehavior) => behavior === 'followUp' ? 'Follow up' : 'Steer';
 
@@ -222,7 +222,7 @@ export function PromptInputView({
           audioLevel={audioLevel}
           inlineToolbar={inlineToolbar}
           sessionId={sessionId}
-          setMobileSheet={setMobileSheet}
+          setNarrowSheet={setNarrowSheet}
           setToolbarPopoverOpen={setToolbarPopoverOpen}
           streamedMode={streamedMode}
           sessionReady={sessionReady}
@@ -250,7 +250,7 @@ export function PromptInputView({
           <Toolbar
             sessionId={sessionId}
             isWideScreen={isWideScreen}
-            onOpenMobileSheet={(type) => setMobileSheet(type)}
+            onOpenNarrowSheet={(type) => setNarrowSheet(type)}
             onDropdownOpenChange={setToolbarPopoverOpen}
             inputRef={inputRef}
             skeleton={<ToolbarSkeleton isDark={theme.isDark} />}
@@ -267,11 +267,11 @@ export function PromptInputView({
         </View>
       )}
 
-      {sessionReady && mobileSheet === "model" && (
-        <MobileModelSheet visible sessionId={sessionId} onClose={closeMobileSheet} config={agentConfig} />
+      {sessionReady && narrowSheet === "model" && (
+        <NarrowModelSheet visible sessionId={sessionId} onClose={closeNarrowSheet} config={agentConfig} />
       )}
-      {sessionReady && mobileSheet === "effort" && (
-        <MobileEffortSheet visible sessionId={sessionId} onClose={closeMobileSheet} config={agentConfig} thinkingPreference={thinkingPreference} onThinkingPreferenceChange={setThinkingPreference} />
+      {sessionReady && narrowSheet === "effort" && (
+        <NarrowEffortSheet visible sessionId={sessionId} onClose={closeNarrowSheet} config={agentConfig} thinkingPreference={thinkingPreference} onThinkingPreferenceChange={setThinkingPreference} />
       )}
     </Animated.View>
   );

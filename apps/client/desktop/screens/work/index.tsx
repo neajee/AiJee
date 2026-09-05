@@ -1,6 +1,5 @@
 import { Spinner, Text, View } from 'tamagui';
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Animated, Keyboard } from 'react-native';
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -26,7 +25,6 @@ export default function WorkIndex() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const sendingRef = useRef(false);
   const sessionRef = useRef<PendingWorkSession | null>(null);
-  const keyboardPadding = useRef(new Animated.Value(0)).current;
 
   const handleSend = useCallback(async (text: string, attachments: Attachment[]) => {
     if (sendingRef.current) return;
@@ -58,44 +56,15 @@ export default function WorkIndex() {
     }
   }, [client, router]);
 
-  useEffect(() => {
-    if (process.env.EXPO_OS === "web") return;
-    const showEvent = process.env.EXPO_OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
-    const hideEvent = process.env.EXPO_OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
-    const showSub = Keyboard.addListener(showEvent, (event) => {
-      const height = process.env.EXPO_OS === "ios"
-        ? event.endCoordinates.height - insets.bottom
-        : event.endCoordinates.height;
-      Animated.spring(keyboardPadding, {
-        toValue: height,
-        tension: 160,
-        friction: 20,
-        useNativeDriver: false,
-      }).start();
-    });
-    const hideSub = Keyboard.addListener(hideEvent, () => {
-      Animated.spring(keyboardPadding, {
-        toValue: 0,
-        tension: 160,
-        friction: 20,
-        useNativeDriver: false,
-      }).start();
-    });
-    return () => {
-      showSub.remove();
-      hideSub.remove();
-    };
-  }, [insets.bottom, keyboardPadding]);
-
-    const editorBg = colors.background;
+  const editorBg = colors.background;
 
   return (
-    <Animated.View
+    <View
       style={[
         styles.container,
         {
           backgroundColor: colors.background,
-          paddingBottom: isWideScreen ? 0 : Animated.add(keyboardPadding, insets.bottom),
+          paddingBottom: isWideScreen ? 0 : insets.bottom,
         },
       ]}
     >
@@ -120,7 +89,7 @@ export default function WorkIndex() {
           />
         </View>
       </View>
-    </Animated.View>
+    </View>
   );
 }
 
