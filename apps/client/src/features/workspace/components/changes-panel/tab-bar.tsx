@@ -1,10 +1,7 @@
-import { Text, View } from "@/components/dom";
+import { toTailwind } from "@/styles/to-tailwind";
 import type { ReactNode } from "react";
-import { Pressable } from "@/components/dom";
-
 import { Fonts } from "@/constants/theme";
 import { useChangesTheme } from "../../hooks/use-changes-theme";
-
 export interface TabItem {
   key: string;
   label: string;
@@ -24,73 +21,49 @@ export function TabBar({
   items,
   activeKey,
   onSelect,
-  right,
+  right
 }: {
   items: TabItem[];
   activeKey: string;
   onSelect: (key: string) => void;
   right?: ReactNode;
 }) {
-  const { colors, surfaceBg, dividerColor, hoverBg } = useChangesTheme();
-
-  return (
-    <View
-      style={[
-        styles.tabBar,
-        { backgroundColor: surfaceBg, borderBottomColor: dividerColor },
-      ]}
-    >
-      {items.map((item) => {
-        const isActive = activeKey === item.key;
-        return (
-          <Pressable
-            key={item.key}
-            onPress={() => onSelect(item.key)}
-            accessibilityRole="tab"
-            accessibilityState={{ selected: isActive }}
-            style={({ hovered }: any) => [
-              styles.tab,
-              hovered && !isActive && { backgroundColor: hoverBg },
-            ]}
-          >
-            <Text
-              style={[
-                styles.tabText,
-                { color: isActive ? colors.text : colors.textTertiary },
-              ]}
-            >
+  const {
+    colors,
+    surfaceBg,
+    dividerColor,
+    hoverBg
+  } = useChangesTheme();
+  return <div className={toTailwind([styles.tabBar, {
+    backgroundColor: surfaceBg,
+    borderBottomColor: dividerColor
+  }])}>
+      {items.map(item => {
+      const isActive = activeKey === item.key;
+      return <button key={item.key} onClick={() => onSelect(item.key)} role="tab" accessibilityState={{
+        selected: isActive
+      }}>
+            <span className={toTailwind([styles.tabText, {
+          color: isActive ? colors.text : colors.textTertiary
+        }])}>
               {item.label}
-            </Text>
-            {!!item.count && item.count > 0 && (
-              <Text
-                style={[
-                  styles.tabCount,
-                  {
-                    color: isActive ? colors.textSecondary : colors.textTertiary,
-                  },
-                ]}
-              >
+            </span>
+            {!!item.count && item.count > 0 && <span className={toTailwind([styles.tabCount, {
+          color: isActive ? colors.textSecondary : colors.textTertiary
+        }])}>
                 {item.count}
-              </Text>
-            )}
-            {isActive && (
-              <View
-                style={[styles.underline, { backgroundColor: colors.text }]}
-              />
-            )}
-          </Pressable>
-        );
-      })}
-      {!!right && (
-        <>
-          <View style={styles.filler} />
+              </span>}
+            {isActive && <div className={toTailwind([styles.underline, {
+          backgroundColor: colors.text
+        }])} />}
+          </button>;
+    })}
+      {!!right && <>
+          <div className={toTailwind(styles.filler)} />
           {right}
-        </>
-      )}
-    </View>
-  );
+        </>}
+    </div>;
 }
-
 const styles = {
   tabBar: {
     flexDirection: "row",
@@ -98,22 +71,23 @@ const styles = {
     height: 32,
     paddingLeft: 4,
     paddingRight: 8,
-    borderBottomWidth: 0.633,
+    borderBottomWidth: 0.633
   },
   tab: {
     flexDirection: "row",
     alignItems: "center",
     gap: 5,
-    paddingLeft: 8, paddingRight: 8,
-    borderRadius: 5,
+    paddingLeft: 8,
+    paddingRight: 8,
+    borderRadius: 5
   },
   tabText: {
     fontSize: 12,
-    fontFamily: Fonts.sansMedium,
+    fontFamily: Fonts.sansMedium
   },
   tabCount: {
     fontSize: 11,
-    fontFamily: Fonts.mono,
+    fontFamily: Fonts.mono
   },
   underline: {
     position: "absolute",
@@ -122,11 +96,11 @@ const styles = {
     bottom: 0,
     height: 1.5,
     borderTopLeftRadius: 1,
-    borderTopRightRadius: 1,
+    borderTopRightRadius: 1
   },
   filler: {
     flexGrow: 1,
     flexShrink: 0,
-    minWidth: 12,
-  },
+    minWidth: 12
+  }
 } as const;

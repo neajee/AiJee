@@ -1,7 +1,5 @@
-import { Text, View } from "@/components/dom";
-
+import { toTailwind } from "@/styles/to-tailwind";
 import { GitBranch, ArrowUp, ArrowDown } from "lucide-react";
-
 import { Fonts } from "@/constants/theme";
 import { useChangesTheme } from "../../hooks/use-changes-theme";
 
@@ -14,59 +12,58 @@ import { useChangesTheme } from "../../hooks/use-changes-theme";
 export function BranchLabel({
   branch,
   ahead,
-  behind,
+  behind
 }: {
   branch: string;
   ahead: number;
   behind: number;
 }) {
-  const { textSecondary, textMuted } = useChangesTheme();
-
-  return (
-    <View style={styles.wrap}>
+  const {
+    textSecondary,
+    textMuted
+  } = useChangesTheme();
+  return <div className={toTailwind(styles.wrap)}>
       <GitBranch size={12} color={textMuted} strokeWidth={2} />
-      <Text
-        style={[styles.branch, { color: textSecondary }]}
-        numberOfLines={1}
-        {...{ title: branch }}
-      >
+      <span className={toTailwind([styles.branch, {
+      color: textSecondary
+    }])} {...{
+      title: branch
+    }}>
         {branch}
-      </Text>
-      {ahead > 0 && (
-        <View style={styles.badge}>
+      </span>
+      {ahead > 0 && <div className={toTailwind(styles.badge)}>
           <ArrowUp size={9} color={textMuted} strokeWidth={2.5} />
-          <Text style={[styles.badgeText, { color: textMuted }]}>{ahead}</Text>
-        </View>
-      )}
-      {behind > 0 && (
-        <View style={styles.badge}>
+          <span className={toTailwind([styles.badgeText, {
+        color: textMuted
+      }])}>{ahead}</span>
+        </div>}
+      {behind > 0 && <div className={toTailwind(styles.badge)}>
           <ArrowDown size={9} color={textMuted} strokeWidth={2.5} />
-          <Text style={[styles.badgeText, { color: textMuted }]}>{behind}</Text>
-        </View>
-      )}
-    </View>
-  );
+          <span className={toTailwind([styles.badgeText, {
+        color: textMuted
+      }])}>{behind}</span>
+        </div>}
+    </div>;
 }
-
 const styles = {
   wrap: {
     flexDirection: "row",
     alignItems: "center",
     gap: 4,
-    maxWidth: 180,
+    maxWidth: 180
   },
   branch: {
     flexShrink: 1,
     fontSize: 11.5,
-    fontFamily: Fonts.sansMedium,
+    fontFamily: Fonts.sansMedium
   },
   badge: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 1,
+    gap: 1
   },
   badgeText: {
     fontSize: 10,
-    fontFamily: Fonts.mono,
-  },
+    fontFamily: Fonts.mono
+  }
 } as const;

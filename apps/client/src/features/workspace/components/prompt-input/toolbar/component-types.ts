@@ -1,11 +1,10 @@
 import type { ReactNode, RefObject } from 'react';
 import type { AgentConfigHandle, ModelInfo, AgentStateData } from '@aijee/client-sdk';
-import type { Animated, ScrollView, TextInput, View } from "@/components/dom";
-
+import { Animated } from "@/platform/animation";
+import { ScrollView, TextInput, View } from "@/types/dom";
 import type { AgentMode } from '@/features/agent/mode';
 import type { AppMode } from '@/hooks/use-app-mode';
 import type { FlatModel, ThinkingPreference } from '../../../utils/prompt-input';
-
 export interface ToolbarProps {
   sessionId?: string | null;
   isWideScreen: boolean;
@@ -20,15 +19,12 @@ export interface ToolbarProps {
   thinkingPreference?: ThinkingPreference;
   onThinkingPreferenceChange?: (level: ThinkingPreference) => void;
 }
-
 export type DropdownType = null | 'model' | 'effort';
-
 export interface EffortOption {
   level: ThinkingPreference;
   label: string;
   description: string;
 }
-
 export interface ToolbarTheme {
   isDark: boolean;
   toolbarBg: string;
@@ -43,7 +39,6 @@ export interface ToolbarTheme {
   sectionColor: string;
   accentColor: string;
 }
-
 export interface ToolbarController {
   theme: ToolbarTheme;
   appMode: AppMode;
@@ -64,7 +59,10 @@ export interface ToolbarController {
   thinkingLabel: string;
   thinkingPreference: ThinkingPreference;
   effortOptions: EffortOption[];
-  providers: Array<{ name: string; models: ModelInfo[] }>;
+  providers: Array<{
+    name: string;
+    models: ModelInfo[];
+  }>;
   flatModels: FlatModel[];
   activeDropdown: DropdownType;
   modelSearch: string;

@@ -1,6 +1,5 @@
-import { Spinner, Text, View } from "@/components/dom";
+import { toTailwind } from "@/styles/to-tailwind";
 import { useCallback } from 'react';
-import { Pressable } from "@/components/dom";
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useFileList, type FsEntry } from '@aijee/client-sdk';
 import { Colors } from '@/constants/theme';
@@ -10,7 +9,6 @@ import { applyFilter } from '../../utils/file-tree';
 import type { FileTreeNodeProps } from './component-types';
 import { NODE_INDENT, NODE_STEP } from '../../utils/file-tree-constants';
 import { styles } from './style-tokens';
-
 export function FileTreeNode({
   entry,
   depth,
@@ -18,7 +16,7 @@ export function FileTreeNode({
   expandedDirs,
   onToggleDir,
   query,
-  selectedPath,
+  selectedPath
 }: {
   entry: FsEntry;
   depth: number;
@@ -31,7 +29,6 @@ export function FileTreeNode({
   const colorScheme = useColorScheme() ?? "light";
   const colors = Colors[colorScheme];
   const isDark = colorScheme === "dark";
-
   const textPrimary = isDark ? "#fefdfd" : colors.text;
   const textMuted = isDark ? "#cdc8c5" : colors.textTertiary;
   const hoverBg = isDark ? "#252525" : "#E8E8E8";
@@ -39,10 +36,8 @@ export function FileTreeNode({
   // Directories are told apart by the caret and the heavier name alone, so no
   // saturated folder icon competes with the name; files show their kind.
   const iconColor = isDark ? "#6f6b69" : "#B0B0B0";
-
   const expanded = entry.is_dir && expandedDirs.has(entry.path);
   const isSelected = !entry.is_dir && entry.path === selectedPath;
-
   const handlePress = useCallback(() => {
     if (entry.is_dir) {
       onToggleDir(entry.path);
@@ -50,58 +45,24 @@ export function FileTreeNode({
       onFilePress(entry.path);
     }
   }, [entry, onFilePress, onToggleDir]);
-
-  return (
-    <View>
-      <Pressable
-        onPress={handlePress}
-        {...{ title: entry.path }}
-        style={({ pressed, hovered }: any) => [
-          styles.row,
-          { paddingLeft: NODE_INDENT + depth * NODE_STEP },
-          isSelected && { backgroundColor: selectedBg },
-          !isSelected && (pressed || hovered) && { backgroundColor: hoverBg },
-        ]}
-      >
+  return <div>
+      <button onClick={handlePress} {...{
+      title: entry.path
+    }}>
         {/* One glyph slot per row, bolt's: a caret for directories, the file's
             kind for files, so names line up at the same x within a level. */}
-        {entry.is_dir ? (
-          <View style={styles.iconSlot}>
-            {expanded ? (
-              <ChevronDown size={13} color={textMuted} strokeWidth={2} />
-            ) : (
-              <ChevronRight size={13} color={textMuted} strokeWidth={2} />
-            )}
-          </View>
-        ) : (
-          <FileTypeBadge path={entry.path} fallbackColor={iconColor} />
-        )}
-        <Text
-          style={[
-            styles.name,
-            { color: textPrimary },
-            entry.is_dir && styles.dirName,
-          ]}
-          numberOfLines={1}
-        >
+        {entry.is_dir ? <div className={toTailwind(styles.iconSlot)}>
+            {expanded ? <ChevronDown size={13} color={textMuted} strokeWidth={2} /> : <ChevronRight size={13} color={textMuted} strokeWidth={2} />}
+          </div> : <FileTypeBadge path={entry.path} fallbackColor={iconColor} />}
+        <span className={toTailwind([styles.name, {
+        color: textPrimary
+      }, entry.is_dir && styles.dirName])}>
           {entry.name}
-        </Text>
-      </Pressable>
-      {expanded && (
-        <ExpandedDir
-          dirPath={entry.path}
-          depth={depth + 1}
-          onFilePress={onFilePress}
-          expandedDirs={expandedDirs}
-          onToggleDir={onToggleDir}
-          query={query}
-          selectedPath={selectedPath}
-        />
-      )}
-    </View>
-  );
+        </span>
+      </button>
+      {expanded && <ExpandedDir dirPath={entry.path} depth={depth + 1} onFilePress={onFilePress} expandedDirs={expandedDirs} onToggleDir={onToggleDir} query={query} selectedPath={selectedPath} />}
+    </div>;
 }
-
 function ExpandedDir({
   dirPath,
   depth,
@@ -109,7 +70,7 @@ function ExpandedDir({
   expandedDirs,
   onToggleDir,
   query,
-  selectedPath,
+  selectedPath
 }: {
   dirPath: string;
   depth: number;
@@ -122,54 +83,32 @@ function ExpandedDir({
   const colorScheme = useColorScheme() ?? "light";
   const isDark = colorScheme === "dark";
   const textMuted = isDark ? "#cdc8c5" : Colors[colorScheme].textTertiary;
-
-  const { entries, isLoading } = useFileList(dirPath);
-
+  const {
+    entries,
+    isLoading
+  } = useFileList(dirPath);
   if (isLoading) {
-    return (
-      <View
-        style={{
-          paddingLeft: NODE_INDENT + depth * NODE_STEP,
-          paddingTop: 4, paddingBottom: 4,
-        }}
-      >
-        <Spinner size="small" />
-      </View>
-    );
+    return <div className={toTailwind({
+      paddingLeft: NODE_INDENT + depth * NODE_STEP,
+      paddingTop: 4,
+      paddingBottom: 4
+    })}>
+        <span size="small" />
+      </div>;
   }
-
   if (!entries || entries.length === 0) {
-    return (
-      <Text
-        style={[
-          styles.emptyDir,
-          { color: textMuted, paddingLeft: NODE_INDENT + depth * NODE_STEP },
-        ]}
-      >
+    return <span className={toTailwind([styles.emptyDir, {
+      color: textMuted,
+      paddingLeft: NODE_INDENT + depth * NODE_STEP
+    }])}>
         Empty
-      </Text>
-    );
+      </span>;
   }
-
   const sorted = applyFilter(entries, query, expandedDirs).sort((a, b) => {
     if (a.is_dir !== b.is_dir) return a.is_dir ? -1 : 1;
     return a.name.localeCompare(b.name);
   });
-
-  return (
-    <View>
-      {sorted.map((entry) => (
-        <FileTreeNode
-          key={entry.path}
-          entry={entry}
-          depth={depth}
-          onFilePress={onFilePress}
-          expandedDirs={expandedDirs}
-          onToggleDir={onToggleDir}
-          query={query}
-          selectedPath={selectedPath}
-        />
-      ))}
-    </View>
-  );
+  return <div>
+      {sorted.map(entry => <FileTreeNode key={entry.path} entry={entry} depth={depth} onFilePress={onFilePress} expandedDirs={expandedDirs} onToggleDir={onToggleDir} query={query} selectedPath={selectedPath} />)}
+    </div>;
 }

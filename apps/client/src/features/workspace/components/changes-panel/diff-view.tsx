@@ -1,70 +1,55 @@
-import { ScrollView, Text, View } from "@/components/dom";
-
-
+import { toTailwind } from "@/styles/to-tailwind";
 import { Fonts } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
-
-export function DiffView({ diff }: { diff: string }) {
+export function DiffView({
+  diff
+}: {
+  diff: string;
+}) {
   const colorScheme = useColorScheme() ?? "light";
   const isDark = colorScheme === "dark";
-
   const lines = diff.split("\n");
-
-  return (
-    <ScrollView
-      style={styles.diffScroll}
-      nestedScrollEnabled
-      showsVerticalScrollIndicator={false}
-    >
+  return <div className={toTailwind(styles.diffScroll)} nestedScrollEnabled>
       {lines.map((line, i) => {
-        let bg = "transparent";
-        let color = isDark ? "#CCC" : "#333";
-
-        if (line.startsWith("+") && !line.startsWith("+++")) {
-          bg = isDark ? "rgba(38,162,105,0.15)" : "rgba(38,162,105,0.12)";
-          color = isDark ? "#57D9A3" : "#1A7F37";
-        } else if (line.startsWith("-") && !line.startsWith("---")) {
-          bg = isDark ? "rgba(229,72,77,0.15)" : "rgba(229,72,77,0.10)";
-          color = isDark ? "#FF8B8B" : "#CF222E";
-        } else if (line.startsWith("@@")) {
-          color = isDark ? "#6E9ECF" : "#0550AE";
-        } else if (
-          line.startsWith("diff ") ||
-          line.startsWith("index ") ||
-          line.startsWith("---") ||
-          line.startsWith("+++")
-        ) {
-          color = isDark ? "#8B8685" : "#888";
-        }
-
-        return (
-          <View key={i} style={[styles.diffLine, { backgroundColor: bg }]}>
-            <Text
-              style={[
-                styles.diffLineNum,
-                { color: isDark ? "#555" : "#AAA" },
-              ]}
-            >
+      let bg = "transparent";
+      let color = isDark ? "#CCC" : "#333";
+      if (line.startsWith("+") && !line.startsWith("+++")) {
+        bg = isDark ? "rgba(38,162,105,0.15)" : "rgba(38,162,105,0.12)";
+        color = isDark ? "#57D9A3" : "#1A7F37";
+      } else if (line.startsWith("-") && !line.startsWith("---")) {
+        bg = isDark ? "rgba(229,72,77,0.15)" : "rgba(229,72,77,0.10)";
+        color = isDark ? "#FF8B8B" : "#CF222E";
+      } else if (line.startsWith("@@")) {
+        color = isDark ? "#6E9ECF" : "#0550AE";
+      } else if (line.startsWith("diff ") || line.startsWith("index ") || line.startsWith("---") || line.startsWith("+++")) {
+        color = isDark ? "#8B8685" : "#888";
+      }
+      return <div key={i} className={toTailwind([styles.diffLine, {
+        backgroundColor: bg
+      }])}>
+            <span className={toTailwind([styles.diffLineNum, {
+          color: isDark ? "#555" : "#AAA"
+        }])}>
               {i + 1}
-            </Text>
-            <Text style={[styles.diffLineText, { color }]} numberOfLines={1}>
+            </span>
+            <span className={toTailwind([styles.diffLineText, {
+          color
+        }])}>
               {line || " "}
-            </Text>
-          </View>
-        );
-      })}
-    </ScrollView>
-  );
+            </span>
+          </div>;
+    })}
+    </div>;
 }
-
 const styles = {
   diffScroll: {
-    maxHeight: 280,
+    maxHeight: 280
   },
   diffLine: {
     flexDirection: "row",
-    paddingLeft: 8, paddingRight: 8,
-    minHeight: 18,
+    paddingLeft: 8,
+    paddingRight: 8,
+    minHeight: 18
   },
   diffLineNum: {
     width: 32,
@@ -72,12 +57,12 @@ const styles = {
     fontFamily: Fonts.mono,
     textAlign: "right",
     marginRight: 8,
-    lineHeight: 18,
+    lineHeight: 18
   },
   diffLineText: {
     fontSize: 11,
     fontFamily: Fonts.mono,
     lineHeight: 18,
-    flexShrink: 0,
-  },
+    flexShrink: 0
+  }
 } as const;

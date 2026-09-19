@@ -1,10 +1,9 @@
-import { ScrollView, Spinner, Text } from "@/components/dom";
+import { toTailwind } from "@/styles/to-tailwind";
 import { useFileList, type FsEntry } from '@aijee/client-sdk';
 import { applyFilter } from '../../utils/file-tree';
 import type { FileTreeNodeProps } from './component-types';
 import { FileTreeNode } from './tree-node';
 import { styles } from './style-tokens';
-
 export function FileTreeRoot({
   rootPath,
   textMuted,
@@ -12,7 +11,7 @@ export function FileTreeRoot({
   expandedDirs,
   onToggleDir,
   query,
-  selectedPath,
+  selectedPath
 }: {
   rootPath: string;
   textMuted: string;
@@ -22,57 +21,42 @@ export function FileTreeRoot({
   query: string;
   selectedPath: string | null;
 }) {
-  const { entries, isLoading, error } = useFileList(rootPath);
-
+  const {
+    entries,
+    isLoading,
+    error
+  } = useFileList(rootPath);
   if (isLoading) {
-    return <Spinner style={{ marginTop: 32 }} />;
+    return <span className={toTailwind({
+      marginTop: 32
+    })} />;
   }
-
   if (error) {
-    return (
-      <Text style={[styles.emptyText, { color: textMuted }]}>
+    return <span className={toTailwind([styles.emptyText, {
+      color: textMuted
+    }])}>
         Failed to load: {error}
-      </Text>
-    );
+      </span>;
   }
-
   if (!entries || entries.length === 0) {
-    return (
-      <Text style={[styles.emptyText, { color: textMuted }]}>
+    return <span className={toTailwind([styles.emptyText, {
+      color: textMuted
+    }])}>
         Empty directory
-      </Text>
-    );
+      </span>;
   }
-
   const sorted = applyFilter(entries, query, expandedDirs).sort((a, b) => {
     if (a.is_dir !== b.is_dir) return a.is_dir ? -1 : 1;
     return a.name.localeCompare(b.name);
   });
-
   if (query && sorted.length === 0) {
-    return (
-      <Text style={[styles.emptyText, { color: textMuted }]}>No matches</Text>
-    );
+    return <span className={toTailwind([styles.emptyText, {
+      color: textMuted
+    }])}>No matches</span>;
   }
-
-  return (
-    <ScrollView
-      style={{ flex: 1 }}
-      contentContainerStyle={styles.content}
-      showsVerticalScrollIndicator={false}
-    >
-      {sorted.map((entry) => (
-        <FileTreeNode
-          key={entry.path}
-          entry={entry}
-          depth={0}
-          onFilePress={onFilePress}
-          expandedDirs={expandedDirs}
-          onToggleDir={onToggleDir}
-          query={query}
-          selectedPath={selectedPath}
-        />
-      ))}
-    </ScrollView>
-  );
+  return <div className={toTailwind({
+    flex: 1
+  })}>
+      {sorted.map(entry => <FileTreeNode key={entry.path} entry={entry} depth={0} onFilePress={onFilePress} expandedDirs={expandedDirs} onToggleDir={onToggleDir} query={query} selectedPath={selectedPath} />)}
+    </div>;
 }

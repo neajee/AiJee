@@ -1,11 +1,9 @@
-import { Pressable } from "@/components/dom";
-
 export function IconButton({
   onPress,
   title,
   icon,
   disabled,
-  style,
+  style
 }: {
   onPress: () => void;
   title: string;
@@ -13,35 +11,21 @@ export function IconButton({
   disabled?: boolean;
   style?: any;
 }) {
-  return (
-    <Pressable
-      onPress={(e) => {
-        e.stopPropagation?.();
-        if (!disabled) onPress();
-      }}
-      hitSlop={6}
-      disabled={disabled}
-      accessibilityLabel={title}
-      accessibilityRole="button"
-      {...{ title }}
-      style={({ pressed }: any) => [
-        styles.iconButton,
-        pressed && !disabled && { opacity: 0.5 },
-        disabled && { opacity: 0.3 },
-        style,
-      ]}
-    >
+  return <button onClick={e => {
+    e.stopPropagation?.();
+    if (!disabled) onPress();
+  }} hitSlop={6} disabled={disabled} aria-label={title} role="button" {...{
+    title
+  }}>
       {icon}
-    </Pressable>
-  );
+    </button>;
 }
-
 const styles = {
   iconButton: {
     width: 24,
     height: 24,
     borderRadius: 4,
     alignItems: "center",
-    justifyContent: "center",
-  },
+    justifyContent: "center"
+  }
 } as const;

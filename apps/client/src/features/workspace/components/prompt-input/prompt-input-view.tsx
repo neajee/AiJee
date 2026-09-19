@@ -1,7 +1,7 @@
-import { Text, View } from "@/components/dom";
+import { toTailwind } from "@/styles/to-tailwind";
 import type { ChangeEvent, RefObject } from 'react';
-import { Animated, NativeSyntheticEvent, Pressable, TextInput, TextInputKeyPressEventData } from "@/components/dom";
-
+import { Animated } from "@/platform/animation";
+import { NativeSyntheticEvent, TextInputKeyPressEventData } from "@/types/dom";
 import { formatAgentModeLabel, type AgentMode } from '@/features/agent/mode';
 import { useCachedAgentConfig } from '@/features/agent/hooks/use-cached-agent-config';
 import type { ThinkingPreference, Attachment, SlashCommand } from '../../utils/prompt-input';
@@ -15,12 +15,14 @@ import { ToolbarSkeleton } from './toolbar-skeleton';
 import { InputCard } from './input-card';
 import { usePromptTheme } from '@/components/surface-theme/use-prompt-theme';
 import { styles } from './style-tokens';
-
 type QueueBehavior = 'steer' | 'followUp';
 type PromptTheme = ReturnType<typeof usePromptTheme>;
 type AgentConfig = ReturnType<typeof useCachedAgentConfig>;
-type PromptKeyPressEventData = TextInputKeyPressEventData & { shiftKey?: boolean; isComposing?: boolean; keyCode?: number };
-
+type PromptKeyPressEventData = TextInputKeyPressEventData & {
+  shiftKey?: boolean;
+  isComposing?: boolean;
+  keyCode?: number;
+};
 export interface PromptInputViewProps {
   theme: PromptTheme;
   isWideScreen: boolean;
@@ -35,7 +37,10 @@ export interface PromptInputViewProps {
   speechError: string | null;
   clearSpeechError: () => void;
   queuedCount: number;
-  queuedMessages: Array<{ message: string; kind: string }>;
+  queuedMessages: Array<{
+    message: string;
+    kind: string;
+  }>;
   isStreaming: boolean;
   requestAbort: () => Promise<void>;
   showCommands: boolean;
@@ -72,7 +77,10 @@ export interface PromptInputViewProps {
   agentConfig: AgentConfig;
   thinkingPreference: ThinkingPreference;
   setThinkingPreference: (value: ThinkingPreference) => void;
-  contextUsage: { used: number; total: number } | null;
+  contextUsage: {
+    used: number;
+    total: number;
+  } | null;
   showQueueActions: boolean;
   sendDraft: (behavior?: QueueBehavior) => void;
   showAbortButton: boolean;
@@ -84,195 +92,155 @@ export interface PromptInputViewProps {
   narrowSheet: null | 'model' | 'effort';
   closeNarrowSheet: () => void;
 }
-
 export function PromptInputView({
-  theme, isWideScreen, inputRef, fileInputRef, fadeAnim, slideAnim, dropdownAnim, keyboardVisible,
-  errorMessage, onClearError, speechError, clearSpeechError, queuedCount, queuedMessages, isStreaming,
-  requestAbort, showCommands, filteredCommands, slashIndex, shouldOverlaySlashCommands, handleSelectCommand,
-  attachments, removeAttachment, attachmentNotice, stackedAbove, toolbarOverlap, entryDone, isFocused,
-  lineCount, text, handleTextChange, handleKeyPress, inputDisabled, sendDisabled, canComposeWhileDisabled,
-  setIsFocused, handleWebFileChange, handleFilePick, isListening, handleMicPress, audioLevel, inlineToolbar,
-  sessionId, setNarrowSheet, setToolbarPopoverOpen, streamedMode,
-  sessionReady, agentConfig, thinkingPreference, setThinkingPreference, contextUsage, showQueueActions,
-  sendDraft, showAbortButton, handleSubmit, hasDraft, toolbarHiddenKeepLayout, toolbarCollapsed,
-  toolbarPopoverOpen, narrowSheet, closeNarrowSheet,
+  theme,
+  isWideScreen,
+  inputRef,
+  fileInputRef,
+  fadeAnim,
+  slideAnim,
+  dropdownAnim,
+  keyboardVisible,
+  errorMessage,
+  onClearError,
+  speechError,
+  clearSpeechError,
+  queuedCount,
+  queuedMessages,
+  isStreaming,
+  requestAbort,
+  showCommands,
+  filteredCommands,
+  slashIndex,
+  shouldOverlaySlashCommands,
+  handleSelectCommand,
+  attachments,
+  removeAttachment,
+  attachmentNotice,
+  stackedAbove,
+  toolbarOverlap,
+  entryDone,
+  isFocused,
+  lineCount,
+  text,
+  handleTextChange,
+  handleKeyPress,
+  inputDisabled,
+  sendDisabled,
+  canComposeWhileDisabled,
+  setIsFocused,
+  handleWebFileChange,
+  handleFilePick,
+  isListening,
+  handleMicPress,
+  audioLevel,
+  inlineToolbar,
+  sessionId,
+  setNarrowSheet,
+  setToolbarPopoverOpen,
+  streamedMode,
+  sessionReady,
+  agentConfig,
+  thinkingPreference,
+  setThinkingPreference,
+  contextUsage,
+  showQueueActions,
+  sendDraft,
+  showAbortButton,
+  handleSubmit,
+  hasDraft,
+  toolbarHiddenKeepLayout,
+  toolbarCollapsed,
+  toolbarPopoverOpen,
+  narrowSheet,
+  closeNarrowSheet
 }: PromptInputViewProps) {
   const formatQueueBehaviorLabel = (behavior: QueueBehavior) => behavior === 'followUp' ? 'Follow up' : 'Steer';
-
-  return (
-    <Animated.View
-      style={[
-        styles.wrapper,
-        {
-          opacity: fadeAnim,
-          transform: [{ translateY: slideAnim }],
-          paddingBottom: keyboardVisible && !isWideScreen ? 24 : 12,
-        },
-      ]}
-    >
+  return <div className={toTailwind([styles.wrapper, {
+    opacity: fadeAnim,
+    transform: [{
+      translateY: slideAnim
+    }],
+    paddingBottom: keyboardVisible && !isWideScreen ? 24 : 12
+  }])}>
       {/* Send error */}
-      {!!errorMessage && (
-        <Pressable
-          onPress={onClearError}
-          style={[styles.sendError, { backgroundColor: theme.isDark ? "#3a1a1a" : "#FEE2E2" }]}
-        >
-          <Text style={[styles.sendErrorText, { color: theme.isDark ? "#FCA5A5" : "#DC2626" }]}>
+      {!!errorMessage && <button onClick={onClearError} className={toTailwind([styles.sendError, {
+      backgroundColor: theme.isDark ? "#3a1a1a" : "#FEE2E2"
+    }])}>
+          <span className={toTailwind([styles.sendErrorText, {
+        color: theme.isDark ? "#FCA5A5" : "#DC2626"
+      }])}>
             {errorMessage}
-          </Text>
-        </Pressable>
-      )}
+          </span>
+        </button>}
 
       {/* Speech error */}
-      {speechError && (
-        <Pressable
-          onPress={clearSpeechError}
-          style={[styles.speechError, { backgroundColor: theme.isDark ? "#3a1a1a" : "#FEE2E2" }]}
-        >
-          <Text style={[styles.speechErrorText, { color: theme.isDark ? "#FCA5A5" : "#DC2626" }]}>
+      {speechError && <button onClick={clearSpeechError} className={toTailwind([styles.speechError, {
+      backgroundColor: theme.isDark ? "#3a1a1a" : "#FEE2E2"
+    }])}>
+          <span className={toTailwind([styles.speechErrorText, {
+        color: theme.isDark ? "#FCA5A5" : "#DC2626"
+      }])}>
             {speechError}
-          </Text>
-        </Pressable>
-      )}
+          </span>
+        </button>}
 
-      <View style={styles.composerStack}>
-        {queuedCount > 0 && (
-          <View
-            style={[
-              styles.queuePanel,
-              {
-                backgroundColor: theme.isDark ? "#242422" : "#F2F0EB",
-                borderColor: theme.cardBorder,
-              },
-            ]}
-          >
-            <View style={styles.queueHeader}>
-              <Text style={[styles.queueStatus, { color: theme.textMuted }]}>
+      <div className={toTailwind(styles.composerStack)}>
+        {queuedCount > 0 && <div className={toTailwind([styles.queuePanel, {
+        backgroundColor: theme.isDark ? "#242422" : "#F2F0EB",
+        borderColor: theme.cardBorder
+      }])}>
+            <div className={toTailwind(styles.queueHeader)}>
+              <span className={toTailwind([styles.queueStatus, {
+            color: theme.textMuted
+          }])}>
                 {queuedCount} queued message{queuedCount === 1 ? "" : "s"}
-              </Text>
-              <View style={styles.queueHeaderActions}>
-                {isStreaming && (
-                  <Pressable
-                    onPress={() => { void requestAbort(); }}
-                    accessibilityRole="button"
-                    accessibilityLabel="Stop generation"
-                    hitSlop={8}
-                  >
-                    <View style={styles.queueActionRow}>
+              </span>
+              <div className={toTailwind(styles.queueHeaderActions)}>
+                {isStreaming && <button onClick={() => {
+              void requestAbort();
+            }} role="button" aria-label="Stop generation" hitSlop={8}>
+                    <div className={toTailwind(styles.queueActionRow)}>
                       <Square size={10} color={theme.textMuted} strokeWidth={2} fill={theme.textMuted} />
-                      <Text style={[styles.queueActionLabel, { color: theme.textMuted }]}>Stop</Text>
-                    </View>
-                  </Pressable>
-                )}
-              </View>
-            </View>
-            {queuedMessages.map(({ message, kind }, index) => (
-              <View key={`${kind}-${index}`} style={styles.queuedMessageRow}>
-                <Text style={[styles.queuedMessageKind, { color: theme.textMuted }]}>{kind}</Text>
-                <Text style={[styles.queuedMessageText, { color: theme.textSecondary }]} numberOfLines={2}>
+                      <span className={toTailwind([styles.queueActionLabel, {
+                  color: theme.textMuted
+                }])}>Stop</span>
+                    </div>
+                  </button>}
+              </div>
+            </div>
+            {queuedMessages.map(({
+          message,
+          kind
+        }, index) => <div key={`${kind}-${index}`} className={toTailwind(styles.queuedMessageRow)}>
+                <span className={toTailwind([styles.queuedMessageKind, {
+            color: theme.textMuted
+          }])}>{kind}</span>
+                <span className={toTailwind([styles.queuedMessageText, {
+            color: theme.textSecondary
+          }])}>
                   {message}
-                </Text>
-              </View>
-            ))}
-          </View>
-        )}
-        {showCommands && (
-          <SlashCommandDropdown
-            commands={filteredCommands}
-            selectedIndex={slashIndex}
-            dropdownAnim={dropdownAnim}
-            overlay={shouldOverlaySlashCommands}
-            onSelect={handleSelectCommand}
-          />
-        )}
+                </span>
+              </div>)}
+          </div>}
+        {showCommands && <SlashCommandDropdown commands={filteredCommands} selectedIndex={slashIndex} dropdownAnim={dropdownAnim} overlay={shouldOverlaySlashCommands} onSelect={handleSelectCommand} />}
 
         {/* Attachments shown above the input card */}
         <AttachmentChips attachments={attachments} onRemove={removeAttachment} />
-        {attachmentNotice && (
-          <Text
-            accessibilityRole="alert"
-            style={[styles.attachmentNotice, { color: theme.textMuted }]}
-          >
+        {attachmentNotice && <span role="alert" className={toTailwind([styles.attachmentNotice, {
+        color: theme.textMuted
+      }])}>
             {attachmentNotice}
-          </Text>
-        )}
+          </span>}
 
-        <InputCard
-          theme={theme}
-          isWideScreen={isWideScreen}
-          inputRef={inputRef}
-          fileInputRef={fileInputRef}
-          showCommands={showCommands}
-          shouldOverlaySlashCommands={shouldOverlaySlashCommands}
-          stackedAbove={stackedAbove}
-          toolbarOverlap={toolbarOverlap}
-          entryDone={entryDone}
-          isFocused={isFocused}
-          lineCount={lineCount}
-          text={text}
-          handleTextChange={handleTextChange}
-          handleKeyPress={handleKeyPress}
-          inputDisabled={inputDisabled}
-          sendDisabled={sendDisabled}
-          canComposeWhileDisabled={canComposeWhileDisabled}
-          setIsFocused={setIsFocused}
-          handleWebFileChange={handleWebFileChange}
-          handleFilePick={handleFilePick}
-          isListening={isListening}
-          handleMicPress={handleMicPress}
-          audioLevel={audioLevel}
-          inlineToolbar={inlineToolbar}
-          sessionId={sessionId}
-          setNarrowSheet={setNarrowSheet}
-          setToolbarPopoverOpen={setToolbarPopoverOpen}
-          streamedMode={streamedMode}
-          sessionReady={sessionReady}
-          agentConfig={agentConfig}
-          thinkingPreference={thinkingPreference}
-          setThinkingPreference={setThinkingPreference}
-          contextUsage={contextUsage}
-          showQueueActions={showQueueActions}
-          sendDraft={sendDraft}
-          showAbortButton={showAbortButton}
-          handleSubmit={handleSubmit}
-          hasDraft={hasDraft}
-        />
-      </View>
+        <InputCard theme={theme} isWideScreen={isWideScreen} inputRef={inputRef} fileInputRef={fileInputRef} showCommands={showCommands} shouldOverlaySlashCommands={shouldOverlaySlashCommands} stackedAbove={stackedAbove} toolbarOverlap={toolbarOverlap} entryDone={entryDone} isFocused={isFocused} lineCount={lineCount} text={text} handleTextChange={handleTextChange} handleKeyPress={handleKeyPress} inputDisabled={inputDisabled} sendDisabled={sendDisabled} canComposeWhileDisabled={canComposeWhileDisabled} setIsFocused={setIsFocused} handleWebFileChange={handleWebFileChange} handleFilePick={handleFilePick} isListening={isListening} handleMicPress={handleMicPress} audioLevel={audioLevel} inlineToolbar={inlineToolbar} sessionId={sessionId} setNarrowSheet={setNarrowSheet} setToolbarPopoverOpen={setToolbarPopoverOpen} streamedMode={streamedMode} sessionReady={sessionReady} agentConfig={agentConfig} thinkingPreference={thinkingPreference} setThinkingPreference={setThinkingPreference} contextUsage={contextUsage} showQueueActions={showQueueActions} sendDraft={sendDraft} showAbortButton={showAbortButton} handleSubmit={handleSubmit} hasDraft={hasDraft} />
+      </div>
 
-      {!inlineToolbar && (
-        <View
-          style={[
-            styles.bottomControlsWrap,
-            toolbarPopoverOpen && styles.bottomControlsWrapElevated,
-            toolbarHiddenKeepLayout && styles.bottomControlsHidden,
-            toolbarCollapsed && styles.bottomControlsCollapsed,
-          ]}
-        >
-          <Toolbar
-            sessionId={sessionId}
-            isWideScreen={isWideScreen}
-            onOpenNarrowSheet={(type) => setNarrowSheet(type)}
-            onDropdownOpenChange={setToolbarPopoverOpen}
-            inputRef={inputRef}
-            skeleton={<ToolbarSkeleton isDark={theme.isDark} />}
-            modeLabel={
-              sessionId && sessionReady && streamedMode
-                ? formatAgentModeLabel(streamedMode)
-                : null
-            }
-            ready={!!sessionReady && !!sessionId}
-            config={agentConfig}
-            thinkingPreference={thinkingPreference}
-            onThinkingPreferenceChange={setThinkingPreference}
-          />
-        </View>
-      )}
+      {!inlineToolbar && <div className={toTailwind([styles.bottomControlsWrap, toolbarPopoverOpen && styles.bottomControlsWrapElevated, toolbarHiddenKeepLayout && styles.bottomControlsHidden, toolbarCollapsed && styles.bottomControlsCollapsed])}>
+          <Toolbar sessionId={sessionId} isWideScreen={isWideScreen} onOpenNarrowSheet={type => setNarrowSheet(type)} onDropdownOpenChange={setToolbarPopoverOpen} inputRef={inputRef} skeleton={<ToolbarSkeleton isDark={theme.isDark} />} modeLabel={sessionId && sessionReady && streamedMode ? formatAgentModeLabel(streamedMode) : null} ready={!!sessionReady && !!sessionId} config={agentConfig} thinkingPreference={thinkingPreference} onThinkingPreferenceChange={setThinkingPreference} />
+        </div>}
 
-      {sessionReady && narrowSheet === "model" && (
-        <NarrowModelSheet visible sessionId={sessionId} onClose={closeNarrowSheet} config={agentConfig} />
-      )}
-      {sessionReady && narrowSheet === "effort" && (
-        <NarrowEffortSheet visible sessionId={sessionId} onClose={closeNarrowSheet} config={agentConfig} thinkingPreference={thinkingPreference} onThinkingPreferenceChange={setThinkingPreference} />
-      )}
-    </Animated.View>
-  );
+      {sessionReady && narrowSheet === "model" && <NarrowModelSheet visible sessionId={sessionId} onClose={closeNarrowSheet} config={agentConfig} />}
+      {sessionReady && narrowSheet === "effort" && <NarrowEffortSheet visible sessionId={sessionId} onClose={closeNarrowSheet} config={agentConfig} thinkingPreference={thinkingPreference} onThinkingPreferenceChange={setThinkingPreference} />}
+    </div>;
 }

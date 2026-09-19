@@ -1,11 +1,9 @@
-import { ScrollView, Text } from "@/components/dom";
+import { toTailwind } from "@/styles/to-tailwind";
 import { useRef, useEffect } from 'react';
-import { Animated, Pressable } from "@/components/dom";
-
+import { Animated } from "@/platform/animation";
 import { Fonts } from '@/constants/theme';
 import { SlashCommand } from '../../utils/prompt-input';
 import { usePromptTheme } from '@/components/surface-theme/use-prompt-theme';
-
 interface SlashCommandDropdownProps {
   commands: SlashCommand[];
   selectedIndex: number;
@@ -13,92 +11,63 @@ interface SlashCommandDropdownProps {
   overlay?: boolean;
   onSelect: (command: SlashCommand) => void;
 }
-
 export function SlashCommandDropdown({
   commands,
   selectedIndex,
   dropdownAnim,
   overlay = false,
-  onSelect,
+  onSelect
 }: SlashCommandDropdownProps) {
   const theme = usePromptTheme();
   const scrollRef = useRef<ScrollView>(null);
-
   useEffect(() => {
-    scrollRef.current?.scrollTo({ y: selectedIndex * 36, animated: true });
+    scrollRef.current?.scrollTo({
+      y: selectedIndex * 36,
+      animated: true
+    });
   }, [selectedIndex]);
-
-  return (
-    <Animated.View
-      style={[
-        styles.container,
-        overlay ? styles.overlayContainer : styles.stackedContainer,
-        {
-          backgroundColor: theme.dropdownBg,
-          borderColor: theme.dropdownBorder,
-          opacity: dropdownAnim,
-          transform: [
-            {
-              translateY: dropdownAnim.interpolate({
-                inputRange: [0, 1],
-                outputRange: [8, 0],
-              }),
-            },
-          ],
-          ...(overlay
-            ? {
-                boxShadow: '0px 10px 30px rgba(0, 0, 0, 0.14)',
-              }
-            : {}),
-        },
-      ]}
-    >
-      <ScrollView
-        ref={scrollRef}
-        style={styles.scroll}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
-      >
-        {commands.map((cmd, index) => (
-          <Pressable
-            key={cmd.name}
-            onPress={() => onSelect(cmd)}
-            accessibilityRole="menuitem"
-            accessibilityLabel={`/${cmd.name} — ${cmd.description}`}
-            accessibilityState={{ selected: index === selectedIndex }}
-            style={({ pressed, hovered }: any) => [
-              styles.item,
-              index === selectedIndex && { backgroundColor: theme.selectedBg },
-              (pressed || hovered) &&
-                index !== selectedIndex && { backgroundColor: theme.hoverBg },
-            ]}
-          >
-            <Text style={[styles.name, { color: theme.textPrimary }]}>
+  return <div className={toTailwind([styles.container, overlay ? styles.overlayContainer : styles.stackedContainer, {
+    backgroundColor: theme.dropdownBg,
+    borderColor: theme.dropdownBorder,
+    opacity: dropdownAnim,
+    transform: [{
+      translateY: dropdownAnim.interpolate({
+        inputRange: [0, 1],
+        outputRange: [8, 0]
+      })
+    }],
+    ...(overlay ? {
+      boxShadow: '0px 10px 30px rgba(0, 0, 0, 0.14)'
+    } : {})
+  }])}>
+      <div ref={scrollRef} className={toTailwind(styles.scroll)} keyboardShouldPersistTaps="handled">
+        {commands.map((cmd, index) => <button key={cmd.name} onClick={() => onSelect(cmd)} role="menuitem" aria-label={`/${cmd.name} — ${cmd.description}`} accessibilityState={{
+        selected: index === selectedIndex
+      }}>
+            <span className={toTailwind([styles.name, {
+          color: theme.textPrimary
+        }])}>
               /{cmd.name}
-            </Text>
-            <Text
-              style={[styles.desc, { color: theme.textMuted }]}
-              numberOfLines={1}
-            >
+            </span>
+            <span className={toTailwind([styles.desc, {
+          color: theme.textMuted
+        }])}>
               {cmd.description}
-            </Text>
-          </Pressable>
-        ))}
-      </ScrollView>
-    </Animated.View>
-  );
+            </span>
+          </button>)}
+      </div>
+    </div>;
 }
-
 const styles = {
   container: {
     borderWidth: 0.633,
-    overflow: 'hidden',
+    overflow: 'hidden'
   },
   stackedContainer: {
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12,
     borderBottomWidth: 0,
-    zIndex: 2,
+    zIndex: 2
   },
   overlayContainer: {
     position: 'absolute',
@@ -108,26 +77,27 @@ const styles = {
     marginBottom: 8,
     borderRadius: 12,
     zIndex: 20,
-    elevation: 12,
+    elevation: 12
   },
   scroll: {
-    maxHeight: 260,
+    maxHeight: 260
   },
   item: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingLeft: 16, paddingRight: 16,
+    paddingLeft: 16,
+    paddingRight: 16,
     height: 36,
-    gap: 12,
+    gap: 12
   },
   name: {
     fontSize: 13,
     fontFamily: Fonts.sansMedium,
-    minWidth: 80,
+    minWidth: 80
   },
   desc: {
     fontSize: 13,
     fontFamily: Fonts.sans,
-    flex: 1,
-  },
+    flex: 1
+  }
 } as const;

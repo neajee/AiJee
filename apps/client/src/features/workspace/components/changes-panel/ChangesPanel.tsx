@@ -1,7 +1,5 @@
-import { ScrollView, Spinner, Text, View } from "@/components/dom";
-import { Pressable } from "@/components/dom";
+import { toTailwind } from "@/styles/to-tailwind";
 import { ChevronDown, ChevronUp, GitCompare } from 'lucide-react';
-
 import { FileTree } from '../file-tree';
 import { useChangesTheme } from '../../hooks/use-changes-theme';
 import { BranchLabel } from './branch-label';
@@ -11,9 +9,17 @@ import { CommitBar } from './commit-bar';
 import { useChangesPanelController } from '../../hooks/use-changes-panel-controller';
 import { styles } from './style-tokens';
 import type { ChangesPanelProps } from './component-types';
-
-export function ChangesPanel({ renderExtraTab, ...props }: ChangesPanelProps = {}) {
-  const { textPrimary, textMuted, surfaceBg, dividerColor, hoverBg } = useChangesTheme();
+export function ChangesPanel({
+  renderExtraTab,
+  ...props
+}: ChangesPanelProps = {}) {
+  const {
+    textPrimary,
+    textMuted,
+    surfaceBg,
+    dividerColor,
+    hoverBg
+  } = useChangesTheme();
   const controller = useChangesPanelController(props);
   const {
     activeExtraTab,
@@ -46,69 +52,54 @@ export function ChangesPanel({ renderExtraTab, ...props }: ChangesPanelProps = {
     handleToggleDir,
     stage,
     unstage,
-    discard,
+    discard
   } = controller;
-  return (
-    <View style={[styles.container, { backgroundColor: surfaceBg }]}>
-      {activeExtraTab ? (
-        <View style={styles.content}>{renderExtraTab?.(activeExtraTab)}</View>
-      ) : (
-        <View style={styles.tabPanels}>
-          <View
-            {...(false ? { pointerEvents: currentTab === 'files' ? ('auto' as const) : ('none' as const) } : {})}
-            style={[styles.tabPanel, currentTab !== 'files' && styles.tabPanelHidden, true && ({ pointerEvents: currentTab === 'files' ? 'auto' : 'none' } as any)]}
-          >
-            {cwd ? (
-              <FileTree rootPath={cwd} viewingFile={viewingFile} onViewFile={setViewingFile} expandedDirs={expandedDirs} onToggleDir={handleToggleDir} />
-            ) : <Text style={[styles.emptyText, { color: textMuted }]}>No workspace selected</Text>}
-          </View>
-          {isGitRepo && (
-            <View
-              {...(false ? { pointerEvents: currentTab === 'git' ? ('auto' as const) : ('none' as const) } : {})}
-              style={[styles.tabPanel, currentTab !== 'git' && styles.tabPanelHidden, true && ({ pointerEvents: currentTab === 'git' ? 'auto' : 'none' } as any)]}
-            >
-              <View style={[styles.changesSection, { borderBottomColor: dividerColor }]}>
-                <Pressable
-                  onPress={() => setChangesOpen((open) => !open)}
-                  accessibilityRole="button"
-                  accessibilityState={{ expanded: changesOpen }}
-                  accessibilityLabel="Toggle changes"
-                  style={({ pressed, hovered }: any) => [styles.sectionHeader, (pressed || hovered) && { backgroundColor: hoverBg }]}
-                >
+  return <div className={toTailwind([styles.container, {
+    backgroundColor: surfaceBg
+  }])}>
+      {activeExtraTab ? <div className={toTailwind(styles.content)}>{renderExtraTab?.(activeExtraTab)}</div> : <div className={toTailwind(styles.tabPanels)}>
+          <div {...false ? {
+        pointerEvents: currentTab === 'files' ? 'auto' as const : 'none' as const
+      } : {}} className={toTailwind([styles.tabPanel, currentTab !== 'files' && styles.tabPanelHidden, true && {
+        pointerEvents: currentTab === 'files' ? 'auto' : 'none'
+      } as any])}>
+            {cwd ? <FileTree rootPath={cwd} viewingFile={viewingFile} onViewFile={setViewingFile} expandedDirs={expandedDirs} onToggleDir={handleToggleDir} /> : <span className={toTailwind([styles.emptyText, {
+          color: textMuted
+        }])}>No workspace selected</span>}
+          </div>
+          {isGitRepo && <div {...false ? {
+        pointerEvents: currentTab === 'git' ? 'auto' as const : 'none' as const
+      } : {}} className={toTailwind([styles.tabPanel, currentTab !== 'git' && styles.tabPanelHidden, true && {
+        pointerEvents: currentTab === 'git' ? 'auto' : 'none'
+      } as any])}>
+              <div className={toTailwind([styles.changesSection, {
+          borderBottomColor: dividerColor
+        }])}>
+                <button onClick={() => setChangesOpen(open => !open)} role="button" accessibilityState={{
+            expanded: changesOpen
+          }} aria-label="Toggle changes">
                   <GitCompare size={12} color={textMuted} strokeWidth={2} />
-                  <Text style={[styles.sectionHeaderText, { color: textPrimary }]}>Changes</Text>
-                  {totalChanges > 0 && <Text style={[styles.sectionCount, { color: textMuted }]}>{totalChanges}</Text>}
-                  <View style={{ flex: 1 }} />
+                  <span className={toTailwind([styles.sectionHeaderText, {
+              color: textPrimary
+            }])}>Changes</span>
+                  {totalChanges > 0 && <span className={toTailwind([styles.sectionCount, {
+              color: textMuted
+            }])}>{totalChanges}</span>}
+                  <div className={toTailwind({
+              flex: 1
+            })} />
                   {gitData && <BranchLabel branch={gitData.branch} ahead={gitData.ahead} behind={gitData.behind} />}
                   {changesOpen ? <ChevronUp size={13} color={textMuted} strokeWidth={2} /> : <ChevronDown size={13} color={textMuted} strokeWidth={2} />}
-                </Pressable>
-                {changesOpen && (
-                  <ScrollView style={styles.gitChanges} contentContainerStyle={styles.contentInner} showsVerticalScrollIndicator={false}>
-                    {isLoading ? <Spinner style={{ marginTop: 32 }} /> : (
-                      <ChangesTab
-                        staged={staged}
-                        unstaged={unstaged}
-                        untracked={untracked}
-                        selectedFile={selectedFile}
-                        diffContent={fileDiff}
-                        diffLoading={diffLoading}
-                        onFilePress={handleFilePress}
-                        onStage={stage}
-                        onUnstage={unstage}
-                        onDiscard={discard}
-                      />
-                    )}
-                  </ScrollView>
-                )}
-              </View>
-              <LogSection entries={logEntries} isLoading={logLoading} isOpen={logOpen} onToggle={() => setLogOpen((open) => !open)} />
-            </View>
-          )}
-        </View>
-      )}
-      {!activeExtraTab && currentTab === 'git' && staged.length > 0 && (
-        <CommitBar stagedCount={staged.length} commitMsg={commitMsg} onChangeCommitMsg={setCommitMsg} onCommit={handleCommit} isCommitting={isCommitting} />
-      )}
-    </View>
-  );
+                </button>
+                {changesOpen && <div className={toTailwind(styles.gitChanges)}>
+                    {isLoading ? <span className={toTailwind({
+              marginTop: 32
+            })} /> : <ChangesTab staged={staged} unstaged={unstaged} untracked={untracked} selectedFile={selectedFile} diffContent={fileDiff} diffLoading={diffLoading} onFilePress={handleFilePress} onStage={stage} onUnstage={unstage} onDiscard={discard} />}
+                  </div>}
+              </div>
+              <LogSection entries={logEntries} isLoading={logLoading} isOpen={logOpen} onToggle={() => setLogOpen(open => !open)} />
+            </div>}
+        </div>}
+      {!activeExtraTab && currentTab === 'git' && staged.length > 0 && <CommitBar stagedCount={staged.length} commitMsg={commitMsg} onChangeCommitMsg={setCommitMsg} onCommit={handleCommit} isCommitting={isCommitting} />}
+    </div>;
 }

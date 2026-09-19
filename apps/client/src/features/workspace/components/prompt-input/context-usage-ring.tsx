@@ -1,20 +1,16 @@
-import { Text, View } from "@/components/dom";
+import { toTailwind } from "@/styles/to-tailwind";
 import { useState } from "react";
-import { Pressable } from "@/components/dom";
 import Svg, { Circle as SvgCircle } from "@/platform/svg";
-
 import { Fonts } from "@/constants/theme";
-
 function formatTokens(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
   if (n >= 1_000) return `${(n / 1_000).toFixed(n >= 10_000 ? 0 : 1)}k`;
   return String(n);
 }
-
 export function ContextUsageRing({
   used,
   total,
-  isDark,
+  isDark
 }: {
   used: number;
   total: number;
@@ -34,57 +30,35 @@ export function ContextUsageRing({
   const fillColor = isDark ? "#555" : "#AAA";
   const free = Math.max(total - used, 0);
   const pct = Math.round(ratio * 100);
-
-  return (
-    <View style={styles.wrap}>
-      <Pressable onPress={() => setShowTooltip((v) => !v)}>
+  return <div className={toTailwind(styles.wrap)}>
+      <button onClick={() => setShowTooltip(v => !v)}>
         <Svg width={size} height={size}>
-          <SvgCircle
-            cx={size / 2}
-            cy={size / 2}
-            r={radius}
-            stroke={trackColor}
-            strokeWidth={stroke}
-            fill="none"
-          />
-          {ratio > 0 && (
-            <SvgCircle
-              cx={size / 2}
-              cy={size / 2}
-              r={radius}
-              stroke={fillColor}
-              strokeWidth={stroke}
-              fill="none"
-              strokeDasharray={`${filled} ${circumference - filled}`}
-              strokeDashoffset={circumference * 0.25}
-              strokeLinecap="round"
-            />
-          )}
+          <SvgCircle cx={size / 2} cy={size / 2} r={radius} stroke={trackColor} strokeWidth={stroke} fill="none" />
+          {ratio > 0 && <SvgCircle cx={size / 2} cy={size / 2} r={radius} stroke={fillColor} strokeWidth={stroke} fill="none" strokeDasharray={`${filled} ${circumference - filled}`} strokeDashoffset={circumference * 0.25} strokeLinecap="round" />}
         </Svg>
-      </Pressable>
-      {showTooltip && (
-        <Pressable
-          style={[
-            styles.tooltip,
-            { backgroundColor: isDark ? "#2A2A2A" : "#FFFFFF", borderColor: isDark ? "#3A3A3A" : "#E0E0E0" },
-          ]}
-          onPress={() => setShowTooltip(false)}
-        >
-          <Text style={[styles.tooltipTitle, { color: isDark ? "#CCC" : "#333" }]}>
+      </button>
+      {showTooltip && <button className={toTailwind([styles.tooltip, {
+      backgroundColor: isDark ? "#2A2A2A" : "#FFFFFF",
+      borderColor: isDark ? "#3A3A3A" : "#E0E0E0"
+    }])} onClick={() => setShowTooltip(false)}>
+          <span className={toTailwind([styles.tooltipTitle, {
+        color: isDark ? "#CCC" : "#333"
+      }])}>
             Context · {pct}%
-          </Text>
-          <Text style={[styles.tooltipRow, { color: isDark ? "#999" : "#666" }]}>
+          </span>
+          <span className={toTailwind([styles.tooltipRow, {
+        color: isDark ? "#999" : "#666"
+      }])}>
             Used {formatTokens(used)} of {formatTokens(total)}
-          </Text>
-          <Text style={[styles.tooltipRow, { color: isDark ? "#999" : "#666" }]}>
+          </span>
+          <span className={toTailwind([styles.tooltipRow, {
+        color: isDark ? "#999" : "#666"
+      }])}>
             Free {formatTokens(free)}
-          </Text>
-        </Pressable>
-      )}
-    </View>
-  );
+          </span>
+        </button>}
+    </div>;
 }
-
 const styles = {
   wrap: {
     justifyContent: "center",
@@ -92,7 +66,7 @@ const styles = {
     marginRight: 8,
     height: 32,
     width: 32,
-    alignItems: "center",
+    alignItems: "center"
   },
   tooltip: {
     position: "absolute",
@@ -100,24 +74,29 @@ const styles = {
     right: -8,
     borderRadius: 8,
     borderWidth: 0.633,
-    paddingLeft: 12, paddingRight: 12,
-    paddingTop: 8, paddingBottom: 8,
+    paddingLeft: 12,
+    paddingRight: 12,
+    paddingTop: 8,
+    paddingBottom: 8,
     minWidth: 150,
     gap: 2,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    elevation: 4,
+    elevation: 4
   },
   tooltipTitle: {
     fontSize: 12,
     fontFamily: Fonts.sansSemiBold,
     fontWeight: "600",
-    marginBottom: 2,
+    marginBottom: 2
   },
   tooltipRow: {
     fontSize: 11,
-    fontFamily: Fonts.sans,
-  },
+    fontFamily: Fonts.sans
+  }
 } as const;

@@ -1,8 +1,6 @@
-import { Input, Text, View } from "@/components/dom";
-import { Pressable } from "@/components/dom";
+import { toTailwind } from "@/styles/to-tailwind";
 import { styles } from './style-tokens';
 import type { EditWorkspaceFormProps } from './component-types';
-
 export function EditWorkspaceForm({
   workspace,
   isDark,
@@ -18,49 +16,43 @@ export function EditWorkspaceForm({
   nameRef,
   handleSave,
   handleKeyPress,
-  onClose,
+  onClose
 }: EditWorkspaceFormProps) {
-  return (
-    <>
-      <View style={styles.field}>
-        <Text style={[styles.label, { color: textMuted }]}>Workspace Name</Text>
-        <View style={[styles.inputRow, { backgroundColor: inputBg, borderColor: inputBorder }]}>
-          <Input
-            ref={nameRef}
-            style={[styles.input, { color: textPrimary }]}
-            value={name}
-            onChangeText={setName}
-            onKeyPress={handleKeyPress}
-            placeholder="My Project"
-            placeholderTextColor={textMuted}
-          />
-        </View>
-      </View>
-      <View style={styles.field}>
-        <Text style={[styles.label, { color: textMuted }]}>Path</Text>
-        <Text style={[styles.pathText, { color: textPrimary }]}>{workspace?.path}</Text>
-      </View>
-      <View style={styles.actions}>
-        <Pressable
-          onPress={onClose}
-          style={({ pressed }) => [styles.cancelButton, { borderColor: inputBorder }, pressed && { opacity: 0.7 }]}
-        >
-          <Text style={[styles.cancelText, { color: textPrimary }]}>Cancel</Text>
-        </Pressable>
-        <Pressable
-          onPress={handleSave}
-          disabled={!canSave || saving}
-          style={({ pressed }) => [
-            styles.saveButton,
-            { backgroundColor: canSave ? (isDark ? '#fefdfd' : colors.text) : isDark ? '#333' : '#CCC' },
-            pressed && canSave && { opacity: 0.8 },
-          ]}
-        >
-          <Text style={[styles.saveText, { color: canSave ? (isDark ? '#121212' : '#FFFFFF') : textMuted }]}>
+  return <>
+      <div className={toTailwind(styles.field)}>
+        <span className={toTailwind([styles.label, {
+        color: textMuted
+      }])}>Workspace Name</span>
+        <div className={toTailwind([styles.inputRow, {
+        backgroundColor: inputBg,
+        borderColor: inputBorder
+      }])}>
+          <input ref={nameRef} className={toTailwind([styles.input, {
+          color: textPrimary
+        }])} value={name} onChangeText={setName} onKeyPress={handleKeyPress} placeholder="My Project" placeholderTextColor={textMuted} />
+        </div>
+      </div>
+      <div className={toTailwind(styles.field)}>
+        <span className={toTailwind([styles.label, {
+        color: textMuted
+      }])}>Path</span>
+        <span className={toTailwind([styles.pathText, {
+        color: textPrimary
+      }])}>{workspace?.path}</span>
+      </div>
+      <div className={toTailwind(styles.actions)}>
+        <button onClick={onClose}>
+          <span className={toTailwind([styles.cancelText, {
+          color: textPrimary
+        }])}>Cancel</span>
+        </button>
+        <button onClick={handleSave} disabled={!canSave || saving}>
+          <span className={toTailwind([styles.saveText, {
+          color: canSave ? isDark ? '#121212' : '#FFFFFF' : textMuted
+        }])}>
             {saving ? 'Saving...' : 'Save'}
-          </Text>
-        </Pressable>
-      </View>
-    </>
-  );
+          </span>
+        </button>
+      </div>
+    </>;
 }

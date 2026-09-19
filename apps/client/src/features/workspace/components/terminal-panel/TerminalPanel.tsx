@@ -1,10 +1,7 @@
-import { Text, View } from "@/components/dom";
-import { Pressable } from "@/components/dom";
+import { toTailwind } from "@/styles/to-tailwind";
 import { X, Plus } from 'lucide-react';
-
 import { Fonts } from '@/constants/theme';
 import { useThemeTokens } from '@/hooks/use-theme-tokens';
-
 export function TerminalPanel() {
   const colors = useThemeTokens();
   const surfaceBg = colors.background;
@@ -13,99 +10,101 @@ export function TerminalPanel() {
   const activeTabBorder = colors.accent;
   const textPrimary = colors.text;
   const textMuted = colors.textTertiary;
-
-  return (
-    <View
-      style={[
-        styles.container,
-        {
-          backgroundColor: surfaceBg,
-          borderTopColor: topBorder,
-        },
-      ]}
-    >
+  return <div className={toTailwind([styles.container, {
+    backgroundColor: surfaceBg,
+    borderTopColor: topBorder
+  }])}>
       {/* Tab bar */}
-      <View style={[styles.tabBar, { borderBottomColor: tabDivider }]}>
-        <View style={styles.tabBarLeft}>
-          <View style={[styles.tab, { borderBottomColor: activeTabBorder }]}>
-            <Text style={[styles.tabText, { color: textPrimary }]}>
+      <div className={toTailwind([styles.tabBar, {
+      borderBottomColor: tabDivider
+    }])}>
+        <div className={toTailwind(styles.tabBarLeft)}>
+          <div className={toTailwind([styles.tab, {
+          borderBottomColor: activeTabBorder
+        }])}>
+            <span className={toTailwind([styles.tabText, {
+            color: textPrimary
+          }])}>
               Terminal 1
-            </Text>
-            <Pressable style={styles.tabClose}>
+            </span>
+            <button className={toTailwind(styles.tabClose)}>
               <X size={12} color={textMuted} strokeWidth={2} />
-            </Pressable>
-          </View>
+            </button>
+          </div>
 
-          <Pressable style={styles.addTabButton}>
+          <button className={toTailwind(styles.addTabButton)}>
             <Plus size={18} color={textMuted} strokeWidth={1.8} />
-          </Pressable>
-        </View>
-      </View>
+          </button>
+        </div>
+      </div>
 
       {/* Terminal content */}
-      <View style={styles.terminalContent}>
-        <Text
-          style={[
-            styles.terminalLine,
-            { color: textMuted, fontFamily: Fonts.mono },
-          ]}
-        >
-          <Text style={{ color: colors.success }}>~</Text>{' '}
-          <Text style={{ color: textPrimary }}>$</Text> _
-        </Text>
-      </View>
-    </View>
-  );
+      <div className={toTailwind(styles.terminalContent)}>
+        <span className={toTailwind([styles.terminalLine, {
+        color: textMuted,
+        fontFamily: Fonts.mono
+      }])}>
+          <span className={toTailwind({
+          color: colors.success
+        })}>~</span>{' '}
+          <span className={toTailwind({
+          color: textPrimary
+        })}>$</span> _
+        </span>
+      </div>
+    </div>;
 }
-
 const styles = {
   container: {
     height: 240,
-    borderTopWidth: 0.633,
+    borderTopWidth: 0.633
   },
   tabBar: {
     height: 40,
     flexDirection: 'row',
     alignItems: 'stretch',
     borderBottomWidth: 0.633,
-    paddingLeft: 24, paddingRight: 24,
+    paddingLeft: 24,
+    paddingRight: 24
   },
   tabBarLeft: {
     flexDirection: 'row',
     alignItems: 'stretch',
-    gap: 4,
+    gap: 4
   },
   tab: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    paddingLeft: 4, paddingRight: 4,
+    paddingLeft: 4,
+    paddingRight: 4,
     borderBottomWidth: 1.9,
-    marginBottom: -0.633,
+    marginBottom: -0.633
   },
   tabText: {
     fontSize: 14,
-    fontFamily: Fonts.sans,
+    fontFamily: Fonts.sans
   },
   tabClose: {
     width: 16,
     height: 16,
     borderRadius: 4,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'center'
   },
   addTabButton: {
     width: 24,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'center'
   },
   terminalContent: {
     flex: 1,
-    paddingLeft: 24, paddingRight: 24,
-    paddingTop: 12,
+    paddingLeft: 24,
+    paddingRight: 24,
+    paddingTop: 12
   },
   terminalLine: {
     fontSize: 13,
-    lineHeight: 20,
-  },
+    lineHeight: 20
+  }
 } as const;

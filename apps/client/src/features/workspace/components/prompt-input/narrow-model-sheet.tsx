@@ -1,15 +1,13 @@
-import { Input, ScrollView, Text, View } from "@/components/dom";
+import { toTailwind } from "@/styles/to-tailwind";
 import { memo, useRef, useState, useEffect } from 'react';
-import { Animated, Modal, Pressable, TextInput } from "@/components/dom";
+import { Animated } from "@/platform/animation";
 import { Check, X } from 'lucide-react';
-
 import { Fonts } from '@/constants/theme';
 import { ABSOLUTE_FILL_STYLE } from '@/constants/layout';
 import { matchesModelSearch } from '../../utils/prompt-input-search';
 import { usePromptTheme } from '@/components/surface-theme/use-prompt-theme';
 import { ProviderIcon } from '@/components/provider-icons';
 import type { AgentConfigHandle } from '@aijee/client-sdk';
-
 interface NarrowModelSheetProps {
   visible: boolean;
   sessionId?: string | null;
@@ -27,219 +25,232 @@ function NarrowModelSheetComponent({
   visible,
   sessionId,
   onClose,
-  config,
+  config
 }: NarrowModelSheetProps) {
   const theme = usePromptTheme();
   const searchRef = useRef<TextInput>(null);
   const [search, setSearch] = useState('');
   const slideAnim = useRef(new Animated.Value(300)).current;
   const overlayAnim = useRef(new Animated.Value(0)).current;
-
   const models = config.models;
   const currentModel = config.state?.model;
-
   useEffect(() => {
     if (visible) {
-      Animated.parallel([
-        Animated.timing(overlayAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
-        Animated.spring(slideAnim, { toValue: 0, tension: 120, friction: 14, useNativeDriver: true }),
-      ]).start();
+      Animated.parallel([Animated.timing(overlayAnim, {
+        toValue: 1,
+        duration: 250,
+        useNativeDriver: true
+      }), Animated.spring(slideAnim, {
+        toValue: 0,
+        tension: 120,
+        friction: 14,
+        useNativeDriver: true
+      })]).start();
     }
   }, [overlayAnim, slideAnim, visible]);
-
   const animateClose = (cb: () => void) => {
-    Animated.parallel([
-      Animated.timing(overlayAnim, { toValue: 0, duration: 200, useNativeDriver: true }),
-      Animated.timing(slideAnim, { toValue: 300, duration: 200, useNativeDriver: true }),
-    ]).start(() => cb());
+    Animated.parallel([Animated.timing(overlayAnim, {
+      toValue: 0,
+      duration: 200,
+      useNativeDriver: true
+    }), Animated.timing(slideAnim, {
+      toValue: 300,
+      duration: 200,
+      useNativeDriver: true
+    })]).start(() => cb());
   };
-
   const handleClose = () => {
     animateClose(() => {
       setSearch('');
       onClose();
     });
   };
-
   const handleSelect = (provider: string, modelId: string) => {
-    config.setModel({ provider, modelId });
+    config.setModel({
+      provider,
+      modelId
+    });
     animateClose(() => {
       setSearch('');
       onClose();
     });
   };
-
   const providers = (() => {
     if (!models) return [];
-    const grouped = new Map<string, Array<{ id: string; name: string; provider: string; reasoning?: boolean }>>();
+    const grouped = new Map<string, Array<{
+      id: string;
+      name: string;
+      provider: string;
+      reasoning?: boolean;
+    }>>();
     const order: string[] = [];
     for (const m of models) {
       const provider = m.provider ?? "unknown";
       const name = m.name ?? m.id;
-      const searchable = { ...m, name, provider };
+      const searchable = {
+        ...m,
+        name,
+        provider
+      };
       if (!matchesModelSearch(search, searchable)) continue;
       if (!grouped.has(provider)) {
         grouped.set(provider, []);
         order.push(provider);
       }
-      grouped.get(provider)!.push({ ...m, name, provider });
+      grouped.get(provider)!.push({
+        ...m,
+        name,
+        provider
+      });
     }
-    return order.map((p) => ({ name: p, models: grouped.get(p)! }));
+    return order.map(p => ({
+      name: p,
+      models: grouped.get(p)!
+    }));
   })();
-
-  return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="none"
-      onRequestClose={handleClose}
-    >
-      <View style={styles.modalRoot}>
-        <Animated.View style={[styles.overlay, { opacity: overlayAnim }]}>
-          <Pressable style={ABSOLUTE_FILL_STYLE} onPress={handleClose} />
-        </Animated.View>
-        <Animated.View
-          style={[
-            styles.container,
-            { backgroundColor: theme.isDark ? '#1e1e1e' : '#FFFFFF', transform: [{ translateY: slideAnim }] },
-          ]}
-        >
-          <View style={styles.handle}>
-            <View style={[styles.handleBar, { backgroundColor: theme.isDark ? '#555' : '#CCC' }]} />
-          </View>
-          <Text style={[styles.title, { color: theme.textPrimary }]}>
+  return <div visible={visible} transparent animationType="none" onRequestClose={handleClose}>
+      <div className={toTailwind(styles.modalRoot)}>
+        <div className={toTailwind([styles.overlay, {
+        opacity: overlayAnim
+      }])}>
+          <button className={toTailwind(ABSOLUTE_FILL_STYLE)} onClick={handleClose} />
+        </div>
+        <div className={toTailwind([styles.container, {
+        backgroundColor: theme.isDark ? '#1e1e1e' : '#FFFFFF',
+        transform: [{
+          translateY: slideAnim
+        }]
+      }])}>
+          <div className={toTailwind(styles.handle)}>
+            <div className={toTailwind([styles.handleBar, {
+            backgroundColor: theme.isDark ? '#555' : '#CCC'
+          }])} />
+          </div>
+          <span className={toTailwind([styles.title, {
+          color: theme.textPrimary
+        }])}>
             Select Model
-          </Text>
-          <View style={[styles.searchRow, { backgroundColor: theme.cardBg, borderColor: theme.cardBorder }]}>
-            <Input
-              ref={searchRef}
-              style={[styles.searchInput, { color: theme.textPrimary }]}
-              value={search}
-              onChangeText={setSearch}
-              placeholder="Search models..."
-              placeholderTextColor={theme.textMuted}
-              autoCapitalize="none"
-              autoCorrect={false}
-            />
-            {search.length > 0 && (
-              <Pressable onPress={() => setSearch('')}>
+          </span>
+          <div className={toTailwind([styles.searchRow, {
+          backgroundColor: theme.cardBg,
+          borderColor: theme.cardBorder
+        }])}>
+            <input ref={searchRef} className={toTailwind([styles.searchInput, {
+            color: theme.textPrimary
+          }])} value={search} onChangeText={setSearch} placeholder="Search models..." placeholderTextColor={theme.textMuted} autoCapitalize="none" autoCorrect={false} />
+            {search.length > 0 && <button onClick={() => setSearch('')}>
                 <X size={16} color={theme.textMuted} strokeWidth={2} />
-              </Pressable>
-            )}
-          </View>
-          <ScrollView style={styles.scroll} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
-            {providers.map((provider) => (
-              <View key={provider.name}>
-                <Text style={[styles.providerHeader, { color: theme.sectionColor }]}>
+              </button>}
+          </div>
+          <div className={toTailwind(styles.scroll)} keyboardShouldPersistTaps="handled">
+            {providers.map(provider => <div key={provider.name}>
+                <span className={toTailwind([styles.providerHeader, {
+              color: theme.sectionColor
+            }])}>
                   {provider.name}
-                </Text>
-                {provider.models.map((model) => {
-                  const isActive = model.id === currentModel?.id;
-                  return (
-                    <Pressable
-                      key={model.id}
-                      onPress={() => handleSelect(model.provider, model.id)}
-                      style={({ pressed }) => [
-                        styles.item,
-                        pressed && { backgroundColor: theme.hoverBg },
-                      ]}
-                    >
-                      <View style={styles.modelRow}>
+                </span>
+                {provider.models.map(model => {
+              const isActive = model.id === currentModel?.id;
+              return <button key={model.id} onClick={() => handleSelect(model.provider, model.id)}>
+                      <div className={toTailwind(styles.modelRow)}>
                         <ProviderIcon provider={model.provider} size={14} color={isActive ? theme.accentColor : theme.textMuted} />
-                        <Text style={[styles.modelName, { color: isActive ? theme.accentColor : theme.textPrimary }]}>
+                        <span className={toTailwind([styles.modelName, {
+                    color: isActive ? theme.accentColor : theme.textPrimary
+                  }])}>
                           {model.name}
-                        </Text>
-                      </View>
+                        </span>
+                      </div>
                       {isActive && <Check size={16} color={theme.accentColor} strokeWidth={2} />}
-                    </Pressable>
-                  );
-                })}
-              </View>
-            ))}
-          </ScrollView>
+                    </button>;
+            })}
+              </div>)}
+          </div>
 
-        </Animated.View>
-      </View>
-    </Modal>
-  );
+        </div>
+      </div>
+    </div>;
 }
-
 export const NarrowModelSheet = memo(NarrowModelSheetComponent);
-
 const styles = {
   modalRoot: {
     flex: 1,
-    justifyContent: 'flex-end',
+    justifyContent: 'flex-end'
   },
   overlay: {
     ...ABSOLUTE_FILL_STYLE,
-    backgroundColor: 'rgba(0,0,0,0.4)',
+    backgroundColor: 'rgba(0,0,0,0.4)'
   },
   container: {
     borderTopLeftRadius: 14,
     borderTopRightRadius: 14,
     paddingBottom: 34,
-    maxHeight: '70%',
+    maxHeight: '70%'
   },
   handle: {
     alignItems: 'center',
     paddingTop: 10,
-    paddingBottom: 6,
+    paddingBottom: 6
   },
   handleBar: {
     width: 36,
     height: 4,
-    borderRadius: 2,
+    borderRadius: 2
   },
   title: {
     fontSize: 15,
     fontFamily: Fonts.sansSemiBold,
-    paddingLeft: 20, paddingRight: 20,
-    paddingBottom: 12,
+    paddingLeft: 20,
+    paddingRight: 20,
+    paddingBottom: 12
   },
   searchRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginLeft: 20, marginRight: 20,
+    marginLeft: 20,
+    marginRight: 20,
     marginBottom: 12,
     height: 40,
     borderRadius: 8,
     borderWidth: 0.633,
-    paddingLeft: 12, paddingRight: 12,
-    gap: 8,
+    paddingLeft: 12,
+    paddingRight: 12,
+    gap: 8
   },
   searchInput: {
     flex: 1,
     fontSize: 14,
     fontFamily: Fonts.sans,
-    outlineStyle: 'none',
+    outlineStyle: 'none'
   } as any,
   scroll: {
-    maxHeight: 400,
+    maxHeight: 400
   },
   providerHeader: {
     fontSize: 11,
     fontFamily: Fonts.sansMedium,
     textTransform: 'uppercase',
     letterSpacing: 0.5,
-    paddingLeft: 20, paddingRight: 20,
+    paddingLeft: 20,
+    paddingRight: 20,
     paddingTop: 12,
-    paddingBottom: 4,
+    paddingBottom: 4
   },
   item: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingLeft: 20, paddingRight: 20,
-    paddingTop: 14, paddingBottom: 14,
+    paddingLeft: 20,
+    paddingRight: 20,
+    paddingTop: 14,
+    paddingBottom: 14
   },
   modelRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: 8
   },
   modelName: {
     fontSize: 13,
-    fontFamily: Fonts.sans,
-  },
+    fontFamily: Fonts.sans
+  }
 } as const;

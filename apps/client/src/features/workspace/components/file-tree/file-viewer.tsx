@@ -1,5 +1,4 @@
-import { Spinner, Text, View } from "@/components/dom";
-import { Pressable } from "@/components/dom";
+import { toTailwind } from "@/styles/to-tailwind";
 import { X } from 'lucide-react';
 import { useFileRead } from '@aijee/client-sdk';
 import { CodePreview } from '@/features/agent/components/message-list/code-preview';
@@ -7,11 +6,10 @@ import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { basename, languageOf } from '../../utils/file-tree';
 import { styles } from './style-tokens';
-
 export function FileViewer({
   filePath,
   rootPath,
-  onClose,
+  onClose
 }: {
   filePath: string;
   rootPath: string;
@@ -20,81 +18,60 @@ export function FileViewer({
   const colorScheme = useColorScheme() ?? "light";
   const colors = Colors[colorScheme];
   const isDark = colorScheme === "dark";
-
   const textPrimary = isDark ? "#fefdfd" : colors.text;
   const textMuted = isDark ? "#cdc8c5" : colors.textTertiary;
   const headerBg = isDark ? "#1a1a1a" : "#F0F0F0";
   const headerBorder = isDark ? "#323131" : "rgba(0,0,0,0.08)";
   const hoverBg = isDark ? "#252525" : "#E8E8E8";
-
   const fileName = basename(filePath);
   // Where the file sits, from the workspace root down to its directory.
-  const relative = filePath.startsWith(rootPath)
-    ? filePath.slice(rootPath.replace(/\/+$/, "").length + 1)
-    : filePath;
-  const trail = [
-    basename(rootPath),
-    ...relative.split("/").slice(0, -1),
-  ]
-    .filter(Boolean)
-    .join(" › ");
-
-  const { data: fileData, isLoading, error: fileError } = useFileRead(filePath);
-
-  return (
-    <View style={styles.viewerContainer}>
+  const relative = filePath.startsWith(rootPath) ? filePath.slice(rootPath.replace(/\/+$/, "").length + 1) : filePath;
+  const trail = [basename(rootPath), ...relative.split("/").slice(0, -1)].filter(Boolean).join(" › ");
+  const {
+    data: fileData,
+    isLoading,
+    error: fileError
+  } = useFileRead(filePath);
+  return <div className={toTailwind(styles.viewerContainer)}>
       {/* Sticky header */}
-      <View
-        style={[
-          styles.viewerHeader,
-          { backgroundColor: headerBg, borderBottomColor: headerBorder },
-        ]}
-      >
-        <Pressable
-          onPress={onClose}
-          accessibilityLabel="Close file"
-          {...{ title: "Close file" }}
-          style={({ pressed, hovered }: any) => [
-            styles.closeButton,
-            (pressed || hovered) && { backgroundColor: hoverBg },
-          ]}
-        >
+      <div className={toTailwind([styles.viewerHeader, {
+      backgroundColor: headerBg,
+      borderBottomColor: headerBorder
+    }])}>
+        <button onClick={onClose} aria-label="Close file" {...{
+        title: "Close file"
+      }}>
           {/* There is no page to go back to; this clears the open file. */}
           <X size={13} color={textMuted} strokeWidth={2} />
-        </Pressable>
+        </button>
         {/* The trail may lose its middle; the filename never does. */}
-        <Text style={[styles.crumbTrail, { color: textMuted }]} numberOfLines={1}>
+        <span className={toTailwind([styles.crumbTrail, {
+        color: textMuted
+      }])}>
           {trail}
-        </Text>
-        <Text style={[styles.crumbSeparator, { color: textMuted }]}>›</Text>
-        <Text style={[styles.crumbName, { color: textPrimary }]} numberOfLines={1}>
+        </span>
+        <span className={toTailwind([styles.crumbSeparator, {
+        color: textMuted
+      }])}>›</span>
+        <span className={toTailwind([styles.crumbName, {
+        color: textPrimary
+      }])}>
           {fileName}
-        </Text>
-        {fileData?.truncated && (
-          <Text style={[styles.viewerMeta, { color: textMuted }]}>truncated</Text>
-        )}
-      </View>
+        </span>
+        {fileData?.truncated && <span className={toTailwind([styles.viewerMeta, {
+        color: textMuted
+      }])}>truncated</span>}
+      </div>
 
       {/* Scrollable content */}
-      {isLoading ? (
-        <Spinner style={{ marginTop: 32 }} />
-      ) : fileError ? (
-        <View style={styles.viewerMessageWrap}>
-          <Text style={[styles.emptyText, { color: textMuted }]}>
-            {fileError.includes("non-UTF8")
-              ? "Binary file preview is not available."
-              : "Cannot read file"}
-          </Text>
-        </View>
-      ) : fileData ? (
-        <CodePreview
-          code={fileData.content}
-          isDark={isDark}
-          language={languageOf(filePath)}
-          bare
-          fill
-        />
-      ) : null}
-    </View>
-  );
+      {isLoading ? <span className={toTailwind({
+      marginTop: 32
+    })} /> : fileError ? <div className={toTailwind(styles.viewerMessageWrap)}>
+          <span className={toTailwind([styles.emptyText, {
+        color: textMuted
+      }])}>
+            {fileError.includes("non-UTF8") ? "Binary file preview is not available." : "Cannot read file"}
+          </span>
+        </div> : fileData ? <CodePreview code={fileData.content} isDark={isDark} language={languageOf(filePath)} bare fill /> : null}
+    </div>;
 }

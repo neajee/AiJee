@@ -1,259 +1,219 @@
-import { Input, ScrollView, Spinner, Text, View } from "@/components/dom";
-import { FlatList, KeyboardAvoidingView, Modal, Pressable } from "@/components/dom";
+import { toTailwind } from "@/styles/to-tailwind";
+import { VirtualList } from "@/components/ui/virtual-list";
 import { File, Folder } from "lucide-react";
 import type { PathCompletion } from "@aijee/client-sdk";
 import type { NewWorkspaceController } from "../../hooks/use-new-workspace-controller";
 import { styles } from "../../utils/new-workspace-dialog-styles";
 import { ABSOLUTE_FILL_STYLE } from '@/constants/layout';
-
-export function NewWorkspaceDialogView({ controller }: { controller: NewWorkspaceController }) {
+export function NewWorkspaceDialogView({
+  controller
+}: {
+  controller: NewWorkspaceController;
+}) {
   const {
-    visible, onClose, isDark, colors, isWideScreen, insets, useInlineSuggestions, path, name, nameEdited, showSuggestions, suggestionIndex, suggestions, loadingSuggestions,
-    pathRef, nameRef, suggestionsRef, fetchCompletions, setShowSuggestions, handleSuggestionScrollFailure, handlePathChange, handleSelectSuggestion, handleNameChange, dismissSuggestions, handleCreate, handlePathKeyPress, handleNameKeyPress,
-    canCreate, pathPreview, textPrimary, textMuted, inputBg, inputBorder, suggestionHover, selectedBg, popoverBg,
+    visible,
+    onClose,
+    isDark,
+    colors,
+    isWideScreen,
+    insets,
+    useInlineSuggestions,
+    path,
+    name,
+    nameEdited,
+    showSuggestions,
+    suggestionIndex,
+    suggestions,
+    loadingSuggestions,
+    pathRef,
+    nameRef,
+    suggestionsRef,
+    fetchCompletions,
+    setShowSuggestions,
+    handleSuggestionScrollFailure,
+    handlePathChange,
+    handleSelectSuggestion,
+    handleNameChange,
+    dismissSuggestions,
+    handleCreate,
+    handlePathKeyPress,
+    handleNameKeyPress,
+    canCreate,
+    pathPreview,
+    textPrimary,
+    textMuted,
+    inputBg,
+    inputBorder,
+    suggestionHover,
+    selectedBg,
+    popoverBg
   } = controller;
-  const formContent = (
-    <>
+  const formContent = <>
       {/* Path input */}
-      <View style={[styles.field, { zIndex: 10 }]}>
-        <Text style={[styles.label, { color: textMuted }]}>项目路径</Text>
-        <View style={[styles.inputRow, { backgroundColor: inputBg, borderColor: inputBorder }]}>
+      <div className={toTailwind([styles.field, {
+      zIndex: 10
+    }])}>
+        <span className={toTailwind([styles.label, {
+        color: textMuted
+      }])}>项目路径</span>
+        <div className={toTailwind([styles.inputRow, {
+        backgroundColor: inputBg,
+        borderColor: inputBorder
+      }])}>
           <Folder size={16} color={textMuted} strokeWidth={1.8} />
-          <Input
-            ref={pathRef}
-            style={[styles.input, { color: textPrimary }]}
-            focusStyle={{ outlineWidth: 0, borderWidth: 0, borderColor: 'transparent', boxShadow: 'none' } as any}
-            value={path}
-            onChangeText={handlePathChange}
-            onKeyPress={handlePathKeyPress}
-            placeholder="例如：~/work/my-project"
-            placeholderTextColor={textMuted}
-            autoCapitalize="none"
-            autoCorrect={false}
-            onFocus={() => {
-              if (path.length > 0) {
-                setShowSuggestions(true);
-                fetchCompletions(path);
-              }
-            }}
-            onBlur={useInlineSuggestions ? () => {
-              setTimeout(dismissSuggestions, 200);
-            } : undefined}
-          />
-          {loadingSuggestions && (
-            <Spinner size="small" color={textMuted} />
-          )}
-        </View>
+          <input ref={pathRef} className={toTailwind([styles.input, {
+          color: textPrimary
+        }])} focusStyle={{
+          outlineWidth: 0,
+          borderWidth: 0,
+          borderColor: 'transparent',
+          boxShadow: 'none'
+        } as any} value={path} onChangeText={handlePathChange} onKeyPress={handlePathKeyPress} placeholder="例如：~/work/my-project" placeholderTextColor={textMuted} autoCapitalize="none" autoCorrect={false} onFocus={() => {
+          if (path.length > 0) {
+            setShowSuggestions(true);
+            fetchCompletions(path);
+          }
+        }} onBlur={useInlineSuggestions ? () => {
+          setTimeout(dismissSuggestions, 200);
+        } : undefined} />
+          {loadingSuggestions && <span size="small" color={textMuted} />}
+        </div>
 
-        {pathPreview && !showSuggestions ? (
-          <View style={styles.pathPreview}>
-            <Text style={[styles.pathPreviewLabel, { color: textMuted }]}>位置</Text>
-            <Text style={[styles.pathPreviewValue, { color: textPrimary }]} numberOfLines={1}>
+        {pathPreview && !showSuggestions ? <div className={toTailwind(styles.pathPreview)}>
+            <span className={toTailwind([styles.pathPreviewLabel, {
+          color: textMuted
+        }])}>位置</span>
+            <span className={toTailwind([styles.pathPreviewValue, {
+          color: textPrimary
+        }])}>
               {pathPreview}
-            </Text>
-          </View>
-        ) : null}
+            </span>
+          </div> : null}
 
         {/* Path suggestions popover */}
-        {showSuggestions && suggestions.length > 0 && (
-          <View
-            style={[
-              useInlineSuggestions
-                ? styles.inlineSuggestionsPopover
-                : styles.suggestionsPopover,
-              {
-                backgroundColor: popoverBg,
-                borderColor: inputBorder,
-              },
-            ]}
-          >
-            {useInlineSuggestions ? (
-              <View>
-                {suggestions.map((item, index) => (
-                  <Pressable
-                    key={item.path}
-                    onPress={() => handleSelectSuggestion(item)}
-                    style={({ pressed, hovered }: any) => [
-                      styles.suggestionItem,
-                      index === suggestionIndex && { backgroundColor: selectedBg },
-                      (pressed || hovered) && index !== suggestionIndex && { backgroundColor: suggestionHover },
-                    ]}
-                  >
-                    {item.is_dir ? (
-                      <Folder size={14} color={textMuted} strokeWidth={1.8} />
-                    ) : (
-                      <File size={14} color={textMuted} strokeWidth={1.8} />
-                    )}
-                    <Text style={[styles.suggestionText, { color: textPrimary }]} numberOfLines={1}>
+        {showSuggestions && suggestions.length > 0 && <div className={toTailwind([useInlineSuggestions ? styles.inlineSuggestionsPopover : styles.suggestionsPopover, {
+        backgroundColor: popoverBg,
+        borderColor: inputBorder
+      }])}>
+            {useInlineSuggestions ? <div>
+                {suggestions.map((item, index) => <button key={item.path} onClick={() => handleSelectSuggestion(item)}>
+                    {item.is_dir ? <Folder size={14} color={textMuted} strokeWidth={1.8} /> : <File size={14} color={textMuted} strokeWidth={1.8} />}
+                    <span className={toTailwind([styles.suggestionText, {
+              color: textPrimary
+            }])}>
                       {item.path}
-                    </Text>
-                  </Pressable>
-                ))}
-              </View>
-            ) : (
-              <FlatList<PathCompletion>
-                ref={suggestionsRef}
-                data={suggestions}
-                keyExtractor={(item) => item.path}
-                style={styles.suggestionsScroll}
-                keyboardShouldPersistTaps="handled"
-                showsVerticalScrollIndicator={false}
-                nestedScrollEnabled
-                scrollEnabled={suggestions.length > 4}
-                getItemLayout={(_data, index) => ({
-                  length: 40,
-                  offset: 40 * index,
-                  index,
-                })}
-                onScrollToIndexFailed={handleSuggestionScrollFailure}
-                renderItem={({ item, index }) => (
-                  <Pressable
-                    onPress={() => handleSelectSuggestion(item)}
-                    style={({ pressed, hovered }: any) => [
-                      styles.suggestionItem,
-                      index === suggestionIndex && { backgroundColor: selectedBg },
-                      (pressed || hovered) && index !== suggestionIndex && { backgroundColor: suggestionHover },
-                    ]}
-                  >
-                    {item.is_dir ? (
-                      <Folder size={14} color={textMuted} strokeWidth={1.8} />
-                    ) : (
-                      <File size={14} color={textMuted} strokeWidth={1.8} />
-                    )}
-                    <Text style={[styles.suggestionText, { color: textPrimary }]} numberOfLines={1}>
+                    </span>
+                  </button>)}
+              </div> : <VirtualList<PathCompletion> ref={suggestionsRef} data={suggestions} keyExtractor={item => item.path} className={toTailwind(styles.suggestionsScroll)} keyboardShouldPersistTaps="handled" nestedScrollEnabled scrollEnabled={suggestions.length > 4} getItemLayout={(_data, index) => ({
+          length: 40,
+          offset: 40 * index,
+          index
+        })} onScrollToIndexFailed={handleSuggestionScrollFailure} renderItem={({
+          item,
+          index
+        }) => <button onClick={() => handleSelectSuggestion(item)}>
+                    {item.is_dir ? <Folder size={14} color={textMuted} strokeWidth={1.8} /> : <File size={14} color={textMuted} strokeWidth={1.8} />}
+                    <span className={toTailwind([styles.suggestionText, {
+            color: textPrimary
+          }])}>
                       {item.path}
-                    </Text>
-                  </Pressable>
-                )}
-              />
-            )}
-          </View>
-        )}
-      </View>
+                    </span>
+                  </button>} />}
+          </div>}
+      </div>
 
       {/* Name input */}
-      <View style={styles.field}>
-        <Text style={[styles.label, { color: textMuted }]}>项目名称</Text>
-        <View style={[styles.inputRow, { backgroundColor: inputBg, borderColor: inputBorder }]}>
-          <Input
-            ref={nameRef}
-            style={[styles.input, styles.nameInput, { color: textPrimary }]}
-            focusStyle={{ outlineWidth: 0, borderWidth: 0, borderColor: 'transparent', boxShadow: 'none' } as any}
-            value={name}
-            onChangeText={handleNameChange}
-            onKeyPress={handleNameKeyPress}
-            placeholder="例如：My Project"
-            placeholderTextColor={textMuted}
-          />
-        </View>
-        {!nameEdited && name.length > 0 && (
-          <Text style={[styles.hint, { color: textMuted }]}>
+      <div className={toTailwind(styles.field)}>
+        <span className={toTailwind([styles.label, {
+        color: textMuted
+      }])}>项目名称</span>
+        <div className={toTailwind([styles.inputRow, {
+        backgroundColor: inputBg,
+        borderColor: inputBorder
+      }])}>
+          <input ref={nameRef} className={toTailwind([styles.input, styles.nameInput, {
+          color: textPrimary
+        }])} focusStyle={{
+          outlineWidth: 0,
+          borderWidth: 0,
+          borderColor: 'transparent',
+          boxShadow: 'none'
+        } as any} value={name} onChangeText={handleNameChange} onKeyPress={handleNameKeyPress} placeholder="例如：My Project" placeholderTextColor={textMuted} />
+        </div>
+        {!nameEdited && name.length > 0 && <span className={toTailwind([styles.hint, {
+        color: textMuted
+      }])}>
             已根据路径自动生成
-          </Text>
-        )}
-      </View>
+          </span>}
+      </div>
 
       {/* Actions */}
-      <View style={styles.actions}>
-        <Pressable
-          onPress={onClose}
-          style={({ pressed }) => [
-            styles.cancelButton,
-            { borderColor: inputBorder },
-            pressed && { opacity: 0.7 },
-          ]}
-        >
-          <Text style={[styles.cancelText, { color: textPrimary }]}>取消</Text>
-        </Pressable>
-        <Pressable
-          onPress={handleCreate}
-          disabled={!canCreate}
-          style={({ pressed }) => [
-            styles.createButton,
-            { backgroundColor: canCreate ? (isDark ? '#fefdfd' : colors.text) : (isDark ? '#333' : '#CCC') },
-            pressed && canCreate && { opacity: 0.8 },
-          ]}
-        >
-          <Text style={[styles.createText, { color: canCreate ? (isDark ? '#121212' : '#FFFFFF') : textMuted }]}>
+      <div className={toTailwind(styles.actions)}>
+        <button onClick={onClose}>
+          <span className={toTailwind([styles.cancelText, {
+          color: textPrimary
+        }])}>取消</span>
+        </button>
+        <button onClick={handleCreate} disabled={!canCreate}>
+          <span className={toTailwind([styles.createText, {
+          color: canCreate ? isDark ? '#121212' : '#FFFFFF' : textMuted
+        }])}>
             添加项目
-          </Text>
-        </Pressable>
-      </View>
-    </>
-  );
+          </span>
+        </button>
+      </div>
+    </>;
 
   // Narrow: bottom sheet
   if (!isWideScreen) {
-    return (
-      <Modal
-        visible={visible}
-        transparent
-        animationType="slide"
-        onRequestClose={onClose}
-      >
-        <KeyboardAvoidingView
-          style={{ flex: 1 }}
-          behavior={false ? 'padding' : undefined}
-        >
-          <Pressable style={styles.sheetOverlay} onPress={onClose}>
-            <Pressable
-              style={[
-                styles.sheetContainer,
-                {
-                  backgroundColor: isDark ? '#1e1e1e' : '#FFFFFF',
-                  paddingBottom: insets.bottom + 20,
-                },
-              ]}
-              onPress={(e) => e.stopPropagation()}
-            >
-              <View style={styles.sheetHandle}>
-                <View style={[styles.sheetHandleBar, { backgroundColor: isDark ? '#555' : '#CCC' }]} />
-              </View>
-              <Text style={[styles.sheetTitle, { color: textPrimary }]}>新建项目</Text>
-              <ScrollView
-                style={styles.sheetBody}
-                contentContainerStyle={styles.sheetBodyContent}
-                keyboardShouldPersistTaps="handled"
-                showsVerticalScrollIndicator={false}
-              >
+    return <div visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+        <div className={toTailwind({
+        flex: 1
+      })} behavior={false ? 'padding' : undefined}>
+          <button className={toTailwind(styles.sheetOverlay)} onClick={onClose}>
+            <button className={toTailwind([styles.sheetContainer, {
+            backgroundColor: isDark ? '#1e1e1e' : '#FFFFFF',
+            paddingBottom: insets.bottom + 20
+          }])} onClick={e => e.stopPropagation()}>
+              <div className={toTailwind(styles.sheetHandle)}>
+                <div className={toTailwind([styles.sheetHandleBar, {
+                backgroundColor: isDark ? '#555' : '#CCC'
+              }])} />
+              </div>
+              <span className={toTailwind([styles.sheetTitle, {
+              color: textPrimary
+            }])}>新建项目</span>
+              <div className={toTailwind(styles.sheetBody)} keyboardShouldPersistTaps="handled">
                 {formContent}
-              </ScrollView>
-            </Pressable>
-          </Pressable>
-        </KeyboardAvoidingView>
-      </Modal>
-    );
+              </div>
+            </button>
+          </button>
+        </div>
+      </div>;
   }
 
   // Desktop: centered dialog
-  return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="fade"
-      onRequestClose={onClose}
-    >
-      <Pressable style={styles.overlay} onPress={onClose}>
-        <Pressable
-          style={[styles.dialog, { backgroundColor: isDark ? '#1e1e1e' : '#FFFFFF', borderColor: inputBorder }]}
-          onPress={(e) => e.stopPropagation()}
-        >
-          {showSuggestions && (
-            <Pressable
-              style={[ABSOLUTE_FILL_STYLE, { zIndex: 5 }]}
-              onPress={dismissSuggestions}
-            />
-          )}
-          <View style={styles.header}>
-            <View style={styles.headerCopy}>
-              <Text style={[styles.title, { color: textPrimary }]}>新建项目</Text>
-              <Text style={[styles.subtitle, { color: textMuted }]}>添加本地目录，随时切换</Text>
-            </View>
-          </View>
+  return <div visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+      <button className={toTailwind(styles.overlay)} onClick={onClose}>
+        <button className={toTailwind([styles.dialog, {
+        backgroundColor: isDark ? '#1e1e1e' : '#FFFFFF',
+        borderColor: inputBorder
+      }])} onClick={e => e.stopPropagation()}>
+          {showSuggestions && <button className={toTailwind([ABSOLUTE_FILL_STYLE, {
+          zIndex: 5
+        }])} onClick={dismissSuggestions} />}
+          <div className={toTailwind(styles.header)}>
+            <div className={toTailwind(styles.headerCopy)}>
+              <span className={toTailwind([styles.title, {
+              color: textPrimary
+            }])}>新建项目</span>
+              <span className={toTailwind([styles.subtitle, {
+              color: textMuted
+            }])}>添加本地目录，随时切换</span>
+            </div>
+          </div>
           {formContent}
-        </Pressable>
-      </Pressable>
-    </Modal>
-  );
-
+        </button>
+      </button>
+    </div>;
 }

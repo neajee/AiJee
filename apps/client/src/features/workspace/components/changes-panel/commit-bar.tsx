@@ -1,18 +1,14 @@
-import { Input, Spinner, View } from "@/components/dom";
+import { toTailwind } from "@/styles/to-tailwind";
 import { useRef } from "react";
-import { Pressable } from "@/components/dom";
-import type { TextInput as RNTextInput } from "@/components/dom";
 import { Send } from "lucide-react";
-
 import { Fonts } from "@/constants/theme";
 import { useChangesTheme } from "../../hooks/use-changes-theme";
-
 export function CommitBar({
   stagedCount,
   commitMsg,
   onChangeCommitMsg,
   onCommit,
-  isCommitting,
+  isCommitting
 }: {
   stagedCount: number;
   commitMsg: string;
@@ -20,102 +16,72 @@ export function CommitBar({
   onCommit: () => void;
   isCommitting: boolean;
 }) {
-  const { isDark, textPrimary, textMuted, dividerColor, inputBg, inputBorder, sendColor } =
-    useChangesTheme();
+  const {
+    isDark,
+    textPrimary,
+    textMuted,
+    dividerColor,
+    inputBg,
+    inputBorder,
+    sendColor
+  } = useChangesTheme();
   const commitInputRef = useRef<RNTextInput>(null);
-
-  return (
-    <View style={[styles.commitBar, { borderTopColor: dividerColor }]}>
-      <View
-        style={[
-          styles.commitInputBox,
-          { backgroundColor: inputBg, borderColor: inputBorder },
-        ]}
-      >
-        <Input
-          ref={commitInputRef}
-          style={[styles.commitTextarea, { color: textPrimary }]}
-          value={commitMsg}
-          onChangeText={onChangeCommitMsg}
-          placeholder={`Commit message for ${stagedCount} staged file${stagedCount !== 1 ? "s" : ""}...`}
-          placeholderTextColor={textMuted}
-          multiline
-          numberOfLines={3}
-          textAlignVertical="top"
-          editable={!isCommitting}
-        />
-        <View style={styles.commitActions}>
-          {isCommitting ? (
-            <Spinner size="small" />
-          ) : (
-            <Pressable
-              onPress={onCommit}
-              disabled={!commitMsg.trim()}
-              accessibilityLabel="Commit"
-              {...{ title: "Commit" }}
-              style={({ pressed }: any) => [
-                styles.commitSendButton,
-                {
-                  backgroundColor: commitMsg.trim()
-                    ? sendColor
-                    : isDark
-                      ? "#333"
-                      : "#CCC",
-                },
-                pressed && commitMsg.trim() && { opacity: 0.8 },
-              ]}
-            >
-              <Send
-                size={13}
-                color={
-                  commitMsg.trim()
-                    ? isDark
-                      ? "#121212"
-                      : "#FFFFFF"
-                    : textMuted
-                }
-                strokeWidth={2}
-              />
-            </Pressable>
-          )}
-        </View>
-      </View>
-    </View>
-  );
+  return <div className={toTailwind([styles.commitBar, {
+    borderTopColor: dividerColor
+  }])}>
+      <div className={toTailwind([styles.commitInputBox, {
+      backgroundColor: inputBg,
+      borderColor: inputBorder
+    }])}>
+        <input ref={commitInputRef} className={toTailwind([styles.commitTextarea, {
+        color: textPrimary
+      }])} value={commitMsg} onChangeText={onChangeCommitMsg} placeholder={`Commit message for ${stagedCount} staged file${stagedCount !== 1 ? "s" : ""}...`} placeholderTextColor={textMuted} multiline textAlignVertical="top" editable={!isCommitting} />
+        <div className={toTailwind(styles.commitActions)}>
+          {isCommitting ? <span size="small" /> : <button onClick={onCommit} disabled={!commitMsg.trim()} aria-label="Commit" {...{
+          title: "Commit"
+        }}>
+              <Send size={13} color={commitMsg.trim() ? isDark ? "#121212" : "#FFFFFF" : textMuted} strokeWidth={2} />
+            </button>}
+        </div>
+      </div>
+    </div>;
 }
-
 const styles = {
   commitBar: {
-    paddingLeft: 10, paddingRight: 10,
-    paddingTop: 8, paddingBottom: 8,
-    borderTopWidth: 0.633,
+    paddingLeft: 10,
+    paddingRight: 10,
+    paddingTop: 8,
+    paddingBottom: 8,
+    borderTopWidth: 0.633
   },
   commitInputBox: {
     borderWidth: 0.633,
     borderRadius: 8,
-    overflow: "hidden",
+    overflow: "hidden"
   },
   commitTextarea: {
     fontSize: 13,
     fontFamily: Fonts.sans,
-    paddingLeft: 10, paddingRight: 10,
+    paddingLeft: 10,
+    paddingRight: 10,
     paddingTop: 8,
     paddingBottom: 4,
     minHeight: 64,
     maxHeight: 100,
-    outlineStyle: "none",
+    outlineStyle: "none"
   } as any,
   commitActions: {
     flexDirection: "row",
     justifyContent: "flex-end",
-    paddingLeft: 8, paddingRight: 8,
-    paddingBottom: 6,
+    paddingLeft: 8,
+    paddingRight: 8,
+    paddingBottom: 6
   },
   commitSendButton: {
     width: 30,
     height: 26,
     borderRadius: 6,
     alignItems: "center",
-    justifyContent: "center",
-  },
+    justifyContent: "center"
+  }
 } as const;
