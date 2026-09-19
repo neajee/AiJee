@@ -1,0 +1,132 @@
+import { View } from "@/platform/dom";
+import { useLocalSearchParams, useRouter } from "@/platform/router-adapter";
+import { useCallback, useEffect, useState } from "react";
+import { useSafeAreaInsets } from "@/platform/dom";
+
+import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
+import { PromptInput } from "@/features/workspace/components/prompt-input";
+import { useColorScheme } from "@/hooks/use-color-scheme";
+import { useThemeTokens } from "@/hooks/use-theme-tokens";
+import { MessageList } from "@/features/agent/components/message-list";
+import { ChatShimmer } from "@/features/agent/components/message-list/chat-shimmer";
+import { ExtensionUiDialog } from "@/features/agent/components/extension-ui-dialog/index";
+import { useAgentSession, useChatSessions, useConnection } from "@aijee/client-sdk";
+import type { ImageContent } from "@aijee/client-sdk";
+import { requestBrowserNotificationPermission } from "@/features/agent/browser-notifications";
+import type { PendingExtensionUiRequest as LegacyPendingUiRequest } from "@/features/agent/extension-ui";
+import type { ChatMessage } from "@/features/agent/types";
+import type { Attachment } from "@/features/workspace/utils/prompt-input";
+import { attachmentsToImages } from "@/features/workspace/utils/prompt-input-attachments";
+
+export default function WorkSessionScreen() {
+  const { sessionId, sessionFile: sessionFileParam } = useLocalSearchParams<{
+    sessionId: string;
+    sessionFile?: string;
+  }>();
+  const router = useRouter();
+  const colorScheme = useColorScheme() ?? "light";
+  const colors = useThemeTokens();
+  const { isWideScreen } = useResponsiveLayout();
+  const insets = useSafeAreaInsets();
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
+  const { sessions } = useChatSessions();
+  const session = sessions.find((item) => item.id === sessionId);
+  const sessionFile = session?.file_path ?? (typeof sessionFileParam === "string" ? sessionFileParam : "");
+
+  const agentSession = useAgentSession(sessionId ?? null, { sessionFile });
+  const messages = agentSession.messages as ChatMessage[];
+  const connection = useConnection();
+  const inputBlockedByConnection =
+    connection.status === "reconnecting" || connection.status === "disconnected";
+
+  useEffect(() => {
+    setAlertMessage(null);
+  }, [sessionId]);
+
+  const handleSend = useCallback(
+    async (
+      text: string,
+      attachments: Attachment[],
+      options?: { queueBehavior?: "steer" | "followUp" },
+    ) => {
+      if (!sessionId || inputBlockedByConnection) return;
+      setAlertMessage(null);
+      requestBrowserNotificationPermission();
+      const images: ImageContent[] | undefined = attachmentsToImages(attachments);
+      try {
+        await agentSession.prompt(text, {
+          images,
+          streamingBehavior: options?.queueBehavior ?? "steer",
+        });
+      } catch (error) {
+        setAlertMessage(error instanceof Error ? error.message : "Failed to send prompt");
+        throw error;
+      }
+    },
+    [agentSession, inputBlockedByConnection, sessionId],
+  );
+
+  const handleAbort = useCallback(async () => {
+    if (!sessionId) return;
+    setAlertMessage(null);
+    try {
+      await agentSession.abort();
+    } catch (error) {
+      setAlertMessage(error instanceof Error ? error.message : "Failed to abort");
+    }
+  }, [agentSession, sessionId]);
+
+  const clearAlert = useCallback(() => setAlertMessage(null), []);
+  const isDark = colorScheme === "dark";
+
+  const hasMessages = messages.length > 0;
+  return (
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: isDark ? "#121212" : colors.background,
+          paddingBottom: isWideScreen ? 0 : insets.bottom,
+        },
+      ]}
+    >
+      <View style={styles.editorColumn}>
+        {agentSession.isReady && hasMessages && sessionId ? (
+          <MessageList
+            key={sessionId}
+            sessionId={sessionId}
+            onForked={(nextSessionId) => {
+              router.replace(`/work/${nextSessionId}`);
+            }}
+          />
+        ) : agentSession.isLoading || (!agentSession.isReady && sessionId) ? (
+          <ChatShimmer />
+        ) : (
+          <View style={styles.emptyCenter} />
+        )}
+        <ExtensionUiDialog
+          sessionId={sessionId}
+          request={agentSession.pendingExtensionUiRequest as LegacyPendingUiRequest | null}
+        />
+        <PromptInput
+          sessionId={sessionId}
+          onSend={handleSend}
+          isStreaming={agentSession.isStreaming}
+          onAbort={handleAbort}
+          sessionReady={agentSession.isReady}
+          disabled={inputBlockedByConnection || !!agentSession.pendingExtensionUiRequest}
+          allowTypingWhileDisabled={!inputBlockedByConnection}
+          stackedAbove={!!agentSession.pendingExtensionUiRequest}
+          errorMessage={alertMessage}
+          onClearError={clearAlert}
+        />
+      </View>
+    </View>
+  );
+}
+
+const styles = {
+  container: { flex: 1 },
+  editorColumn: { flex: 1 },
+  emptyCenter: { flex: 1, alignItems: "center", justifyContent: "center" },
+} as const;

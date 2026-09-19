@@ -5,12 +5,12 @@ import { fileURLToPath } from "node:url";
 const listenPort = Number(process.env.AIJEE_WEB_PORT ?? 8081);
 const listenHost = process.env.AIJEE_WEB_HOST ?? process.env.AIJEE_HOST ?? "0.0.0.0";
 const apiPort = Number(process.env.AIJEE_API_PORT ?? 10088);
-const expoPort = Number(process.env.AIJEE_EXPO_PORT ?? 8082);
+const frontendPort = Number(process.env.AIJEE_FRONTEND_PORT ?? 8082);
 
 function targetFor(pathname) {
   return pathname.startsWith("/api/") || pathname === "/health" || pathname === "/healthz" || pathname === "/version"
     ? apiPort
-    : expoPort;
+    : frontendPort;
 }
 
 function upstreamHeaders(requestFromClient, targetPort) {
@@ -19,9 +19,9 @@ function upstreamHeaders(requestFromClient, targetPort) {
     host: `127.0.0.1:${targetPort}`,
     "x-forwarded-for": requestFromClient.socket.remoteAddress ?? "",
   };
-  if (targetPort === expoPort) {
-    if (headers.origin) headers.origin = `http://127.0.0.1:${expoPort}`;
-    if (headers.referer) headers.referer = `http://127.0.0.1:${expoPort}/`;
+  if (targetPort === frontendPort) {
+    if (headers.origin) headers.origin = `http://127.0.0.1:${frontendPort}`;
+    if (headers.referer) headers.referer = `http://127.0.0.1:${frontendPort}/`;
   }
   return headers;
 }
@@ -38,7 +38,7 @@ function proxy(requestFromClient, responseToClient) {
       "cache-control": "no-store",
       "service-worker-allowed": "/",
     });
-    createReadStream(fileURLToPath(new URL("../public/preview-sw.js", import.meta.url))).pipe(responseToClient);
+    createReadStream(fileURLToPath(new URL("../apps/client/public/preview-sw.js", import.meta.url))).pipe(responseToClient);
     return;
   }
   const targetPort = targetFor(requestFromClient.url ?? "/");

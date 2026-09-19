@@ -86,8 +86,8 @@ const apiResolution = await resolveServicePort(Number(process.env.AIJEE_API_PORT
 const apiPort = apiResolution.port;
 const apiHost = process.env.AIJEE_API_HOST ?? process.env.AIJEE_HOST ?? "0.0.0.0";
 const reserved = new Set([apiPort]);
-const expoPort = await availablePort(Number(process.env.AIJEE_EXPO_PORT ?? 8082), reserved);
-reserved.add(expoPort);
+const frontendPort = await availablePort(Number(process.env.AIJEE_FRONTEND_PORT ?? 8082), reserved);
+reserved.add(frontendPort);
 const webResolution = await resolveServicePort(Number(process.env.AIJEE_WEB_PORT ?? 8081), isAiJeeProxy);
 if (webResolution.reuse) {
   console.log("AiJee web is already running at http://127.0.0.1:" + webResolution.port);
@@ -96,10 +96,8 @@ if (webResolution.reuse) {
   const childEnv = {
     ...process.env,
     AIJEE_API_PORT: String(apiPort),
-    AIJEE_EXPO_PORT: String(expoPort),
+    AIJEE_FRONTEND_PORT: String(frontendPort),
     AIJEE_WEB_PORT: String(webPort),
-    EXPO_PUBLIC_AIJEE_EXPO_PORT: String(expoPort),
-    EXPO_PUBLIC_AIJEE_WEB_PORT: String(webPort),
   };
 
   const runtime = apiResolution.reuse
@@ -118,9 +116,9 @@ if (webResolution.reuse) {
     console.error(error instanceof Error ? error.message : String(error));
     shutdown(1);
   }
-  const expo = startYarn(["workspace", "@aijee/client", "dev", "--port", String(expoPort)], { env: childEnv });
+  const frontend = startYarn(["workspace", "@aijee/client", "web", "--port", String(frontendPort)], { env: childEnv });
   const proxy = start("node", ["scripts/dev-web-proxy.mjs"], { env: childEnv });
-  console.log(`AiJee web: http://127.0.0.1:${webPort} (Expo ${expoPort}, API ${apiPort})`);
+  console.log(`AiJee web: http://127.0.0.1:${webPort} (Vite ${frontendPort}, API ${apiPort})`);
 
   function shutdown(code = 0) {
     for (const child of processes) {
@@ -130,6 +128,6 @@ if (webResolution.reuse) {
   }
 
   for (const signal of ["SIGINT", "SIGTERM"]) process.once(signal, () => shutdown());
-  expo.once("exit", (code) => shutdown(code ?? 0));
+  frontend.once("exit", (code) => shutdown(code ?? 0));
   proxy.once("exit", (code) => shutdown(code ?? 0));
 }

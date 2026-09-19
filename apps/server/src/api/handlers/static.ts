@@ -43,6 +43,7 @@ export async function web(ctx: HandlerContext, request: IncomingMessage, respons
         response.writeHead(304, headers);
         response.end();
         return;
+      }
       const compressible = new Set(["html", "js", "css", "json", "svg"]);
       const accepted = request.headers["accept-encoding"] ?? "";
       const encoding = compressible.has(extension) && metadata.size > 1024
@@ -62,7 +63,6 @@ export async function web(ctx: HandlerContext, request: IncomingMessage, respons
         await pipeline(source, createGzip({ level: 6 }), response);
       } else {
         await pipeline(source, response);
-      }
       }
     } catch (error) {
       if (!response.headersSent) ctx.error(response, 404, "Web assets not found; run yarn web:build");

@@ -1,0 +1,18 @@
+import { useMemo } from 'react';
+
+import { getThemeTokens, syncLegacyColors, type ThemeTokens } from '@/constants/theme';
+import { useAppSettingsStore } from '@/features/settings/store';
+import { useColorScheme } from './use-color-scheme';
+
+export function useThemeTokens(): ThemeTokens {
+  const scheme = useColorScheme() ?? 'light';
+  const preset = useAppSettingsStore((s) => s.themePreset);
+  const accent = useAppSettingsStore((s) => s.accentPreset);
+  return useMemo(() => {
+    syncLegacyColors(preset, scheme, accent);
+    const tokens = getThemeTokens(preset, scheme, accent);
+    return true
+      ? tokens
+      : { ...tokens, surfaceRaised: '#333333', surface: '#333333' };
+  }, [accent, preset, scheme]);
+}
