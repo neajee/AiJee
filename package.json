@@ -12,7 +12,7 @@
     "desktop": "yarn web:build && yarn workspace @aijee/desktop dev",
     "runtime:start": "node --experimental-strip-types apps/server/src/main.ts serve",
     "runtime:check": "yarn workspace @aijee/engine check && yarn workspace aijee check",
-    "typecheck": "yarn workspace @aijee/client-sdk typecheck && yarn exec tsc --noEmit -p apps/client/tsconfig.json",
+    "typecheck": "yarn workspace @aijee/client-sdk typecheck && yarn workspace @aijee/client typecheck",
     "lint": "yarn workspace @aijee/client lint",
     "test": "yarn workspace @aijee/client-sdk test && yarn workspace @aijee/client test && yarn workspace @aijee/engine test && yarn workspace aijee test",
     "web:build": "yarn workspace @aijee/client build && node scripts/write-releases-snapshot.mjs && node scripts/prepare-web-assets.cjs",

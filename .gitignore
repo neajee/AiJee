@@ -4,12 +4,10 @@
 node_modules/
 .yarn/install-state.gz
 
-# Expo
-.expo/
+# Web build
 dist/
 apps/server/public/
 web-build/
-expo-env.d.ts
 
 # Native
 .kotlin/
@@ -20,9 +18,9 @@ expo-env.d.ts
 *.key
 *.mobileprovision
 
-# Metro
+# Frontend tool caches
 .metro-health-check*
-apps/client/.tamagui/
+.tanstack/
 
 # debug
 npm-debug.*

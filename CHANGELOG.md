@@ -17,7 +17,7 @@
   - 桌面与移动端思考深度选择器统一接入 Auto；移除冗长的级别描述，UI 更紧凑
 - **长消息折叠**
   - 用户消息超过 12 行或 1600 字符时默认折叠，可一键展开 / 收起；窗口失焦自动收起
-- **统一 AppModal 组件**（`packages/ui/components/ui/app-modal.tsx`）
+- **统一 AppModal 组件**（`apps/client/src/components/ui/app-modal.tsx`）
   - 新增带毛玻璃背景的统一弹窗组件，替换模式选择器与插件详情中的原生 Modal 实现
 
 ### 🐛 修复
