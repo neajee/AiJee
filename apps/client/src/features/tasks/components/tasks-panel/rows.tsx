@@ -1,3 +1,4 @@
+import { toTailwind } from "@/styles/to-tailwind";
 import { Circle, Play, RotateCcw, Square, Trash2 } from 'lucide-react';
 import type { TaskDefinition, TaskInfo } from '@aijee/client-sdk';
 import { styles } from './style-tokens';
@@ -39,12 +40,12 @@ function SourceBadge({
   const bg = SOURCE_COLORS[source] ?? (isDark ? '#555' : '#999');
   const label = SOURCE_LABELS[source] ?? source;
   const textColor = source === 'bun' ? '#000' : '#fff';
-  return <div style={[styles.sourceBadge, {
+  return <div className={toTailwind([styles.sourceBadge, {
     backgroundColor: bg
-  }]}>
-      <span style={[styles.sourceBadgeText, {
+  }])}>
+      <span className={toTailwind([styles.sourceBadgeText, {
       color: textColor
-    }]}>
+    }])}>
         {label}
       </span>
     </div>;
@@ -80,41 +81,41 @@ export function TaskInstanceRow({
   hoverBg: string;
   isDark: boolean;
 }) {
-  return <button onClick={onSelect} style={({
+  return <button onClick={onSelect} className={toTailwind(({
     pressed,
     hovered
   }: any) => [styles.taskRow, isSelected && {
     backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'
   }, (pressed || hovered) && {
     backgroundColor: hoverBg
-  }]}>
+  }])}>
       <StatusDot status={instance.status} />
       <SourceBadge source={instance.source ?? 'pi'} isDark={isDark} />
-      <div style={styles.taskRowInfo}>
-        <span style={[styles.taskRowLabel, {
+      <div className={toTailwind(styles.taskRowInfo)}>
+        <span className={toTailwind([styles.taskRowLabel, {
         color: textPrimary
-      }]}>
+      }])}>
           {instance.label}
         </span>
-        <span style={[styles.taskRowCmd, {
+        <span className={toTailwind([styles.taskRowCmd, {
         color: textMuted
-      }]}>
+      }])}>
           {instance.command}
         </span>
       </div>
-      <div style={styles.taskRowActions}>
+      <div className={toTailwind(styles.taskRowActions)}>
         {instance.status === 'running' ? <>
-            <button onClick={onRestart} style={styles.actionBtn} aria-label="Restart task">
+            <button onClick={onRestart} className={toTailwind(styles.actionBtn)} aria-label="Restart task">
               <RotateCcw size={12} color={textMuted} strokeWidth={2} />
             </button>
-            <button onClick={onStop} style={styles.actionBtn} aria-label="Stop task">
+            <button onClick={onStop} className={toTailwind(styles.actionBtn)} aria-label="Stop task">
               <Square size={12} color="#FF3B30" strokeWidth={2} />
             </button>
           </> : <>
-            <button onClick={onRestart} style={styles.actionBtn} aria-label="Restart task">
+            <button onClick={onRestart} className={toTailwind(styles.actionBtn)} aria-label="Restart task">
               <Play size={12} color="#34C759" strokeWidth={2} />
             </button>
-            <button onClick={onRemove} style={styles.actionBtn} aria-label="Remove task">
+            <button onClick={onRemove} className={toTailwind(styles.actionBtn)} aria-label="Remove task">
               <Trash2 size={12} color={textMuted} strokeWidth={2} />
             </button>
           </>}
@@ -142,7 +143,7 @@ export function AvailableTaskRow({
   loading: boolean;
   isDark: boolean;
 }) {
-  return <button onClick={onSelect} disabled={loading} style={({
+  return <button onClick={onSelect} disabled={loading} className={toTailwind(({
     pressed,
     hovered
   }: any) => [styles.taskRow, isSelected && {
@@ -151,30 +152,30 @@ export function AvailableTaskRow({
     backgroundColor: hoverBg
   }, loading && {
     opacity: 0.5
-  }]}>
+  }])}>
       <SourceBadge source={definition.source ?? 'pi'} isDark={isDark} />
-      <div style={styles.taskRowInfo}>
-        <span style={[styles.taskRowLabel, {
+      <div className={toTailwind(styles.taskRowInfo)}>
+        <span className={toTailwind([styles.taskRowLabel, {
         color: textPrimary
-      }]}>
+      }])}>
           {definition.label}
         </span>
-        <span style={[styles.taskRowCmd, {
+        <span className={toTailwind([styles.taskRowCmd, {
         color: textMuted
-      }]}>
+      }])}>
           {definition.command}
         </span>
       </div>
-      {definition.group && <div style={[styles.groupBadge, {
+      {definition.group && <div className={toTailwind([styles.groupBadge, {
       borderColor: textMuted
-    }]}>
-          <span style={[styles.groupBadgeText, {
+    }])}>
+          <span className={toTailwind([styles.groupBadgeText, {
         color: textMuted
-      }]}>
+      }])}>
             {definition.group}
           </span>
         </div>}
-      <button onClick={onStart} disabled={loading} style={styles.actionBtn} aria-label="Start task">
+      <button onClick={onStart} disabled={loading} className={toTailwind(styles.actionBtn)} aria-label="Start task">
         <Play size={12} color="#34C759" strokeWidth={2.5} />
       </button>
     </button>;

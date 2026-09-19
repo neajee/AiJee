@@ -1,3 +1,4 @@
+import { toTailwind } from "@/styles/to-tailwind";
 import { useCallback, useEffect, useRef } from 'react';
 import { useSafeAreaInsets } from "@/platform/browser";
 import Animated, { Easing, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from "@/platform/animation";
@@ -91,64 +92,64 @@ export function TaskOutputSheet({
   const statusColor = selectedInstance?.status === 'running' ? '#34C759' : selectedInstance?.status === 'failed' ? '#FF3B30' : '#8E8E93';
   return <div {...false ? {
     pointerEvents: visible ? 'auto' as const : 'none' as const
-  } : {}} style={[styles.root, true && {
+  } : {}} className={toTailwind([styles.root, true && {
     pointerEvents: visible ? 'auto' : 'none'
-  } as any]}>
-      <div style={[styles.overlay, {
+  } as any])}>
+      <div className={toTailwind([styles.overlay, {
       backgroundColor: colors.overlay
-    }, overlayStyle]}>
-        <button style={ABSOLUTE_FILL_STYLE} onClick={dismiss} />
+    }, overlayStyle])}>
+        <button className={toTailwind(ABSOLUTE_FILL_STYLE)} onClick={dismiss} />
       </div>
 
-      <div style={[styles.sheet, {
+      <div className={toTailwind([styles.sheet, {
       backgroundColor: isDark ? '#1e1e1e' : '#FFFFFF',
       paddingBottom: insets.bottom,
       height: sheetHeight,
       maxHeight: sheetHeight
-    }, sheetStyle]}>
+    }, sheetStyle])}>
         <div>
-          <div style={styles.handleBar}>
-            <div style={[styles.handle, {
+          <div className={toTailwind(styles.handleBar)}>
+            <div className={toTailwind([styles.handle, {
             backgroundColor: colors.sheetHandle
-          }]} />
+          }])} />
           </div>
         </div>
 
-        <div style={[styles.header, {
+        <div className={toTailwind([styles.header, {
         borderBottomColor: borderColor
-      }]}>
-          <div style={styles.headerLeft}>
+      }])}>
+          <div className={toTailwind(styles.headerLeft)}>
             {selectedInstance ? <>
                 <Circle size={8} color={statusColor} fill={statusColor} strokeWidth={0} />
-                <span style={[styles.headerLabel, {
+                <span className={toTailwind([styles.headerLabel, {
               color: textPrimary
-            }]}>
+            }])}>
                   {selectedInstance.label}
                 </span>
-                <span style={[styles.headerCmd, {
+                <span className={toTailwind([styles.headerCmd, {
               color: textMuted
-            }]}>
+            }])}>
                   {selectedInstance.command}
                 </span>
-              </> : <span style={[styles.headerLabel, {
+              </> : <span className={toTailwind([styles.headerLabel, {
             color: textMuted
-          }]}>Task Output</span>}
+          }])}>Task Output</span>}
           </div>
-          <button onClick={dismiss} style={styles.closeBtn}>
+          <button onClick={dismiss} className={toTailwind(styles.closeBtn)}>
             <X size={14} color={textMuted} strokeWidth={2} />
           </button>
         </div>
 
-        <div ref={logScrollRef} style={[styles.logContent, {
+        <div ref={logScrollRef} className={toTailwind([styles.logContent, {
         backgroundColor: logBg
-      }]}>
-          {selectedLogs.length === 0 ? <span style={[styles.logLine, {
+      }])}>
+          {selectedLogs.length === 0 ? <span className={toTailwind([styles.logLine, {
           color: textMuted
-        }]}>
+        }])}>
               {selectedInstance ? 'No output yet...' : 'Select a running task to view output'}
-            </span> : selectedLogs.map((line, i) => <span key={i} style={[styles.logLine, {
+            </span> : selectedLogs.map((line, i) => <span key={i} className={toTailwind([styles.logLine, {
           color: textPrimary
-        }]} selectable>
+        }])} selectable>
                 {line}
               </span>)}
         </div>
