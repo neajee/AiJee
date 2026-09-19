@@ -1,20 +1,19 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated } from "@/components/dom";
+import { Animated } from "@/platform/animation";
 import { usePathname } from '@/platform/router-adapter';
-
 import { useResponsiveLayout } from '../../hooks/use-responsive-layout';
 import { useAuthStore } from '@/features/auth/store';
 import { useWorkspaceStore } from '@/features/workspace/store';
 import { useAppMode } from '@/hooks/use-app-mode';
 import { usePanelCoordination } from '../../store/panel-coordination';
-
 const SIDEBAR_DEFAULT = 280;
-
 export function useAdaptiveNavigationController() {
-  const { isWideScreen } = useResponsiveLayout();
-  const activeServerId = useAuthStore((s) => s.activeServerId);
+  const {
+    isWideScreen
+  } = useResponsiveLayout();
+  const activeServerId = useAuthStore(s => s.activeServerId);
   const hasServer = Boolean(activeServerId);
-  const hasWorkspaces = useWorkspaceStore((s) => s.workspaces.length > 0);
+  const hasWorkspaces = useWorkspaceStore(s => s.workspaces.length > 0);
   const appMode = useAppMode();
   const isCodeMode = appMode === 'code';
   const [sheetVisible, setSheetVisible] = useState(false);
@@ -26,64 +25,59 @@ export function useAdaptiveNavigationController() {
   const [sidebarMode, setSidebarMode] = useState<'persistent' | 'hover'>('persistent');
   const [hoverVisible, setHoverVisible] = useState(false);
   const [showPersistentSidebar, setShowPersistentSidebar] = useState(true);
-  const openedSide = usePanelCoordination((state) => state.openedSide);
-  const panelRevision = usePanelCoordination((state) => state.revision);
-  const notifyPanelOpened = usePanelCoordination((state) => state.notifyOpened);
+  const openedSide = usePanelCoordination(state => state.openedSide);
+  const panelRevision = usePanelCoordination(state => state.revision);
+  const notifyPanelOpened = usePanelCoordination(state => state.notifyOpened);
   const persistentAnim = useRef(new Animated.Value(1)).current;
   const hoverAnim = useRef(new Animated.Value(0)).current;
   const isPersistent = sidebarMode === 'persistent';
   const pathname = usePathname();
   const settingsMode = pathname.startsWith('/settings');
   const openSessionId = pathname.match(/^\/workspace\/[^/]+\/s\/([^/]+)$/)?.[1] ?? null;
-
   useEffect(() => {
     if (isPersistent) setShowPersistentSidebar(true);
     Animated.spring(persistentAnim, {
       toValue: isPersistent ? 1 : 0,
       tension: 180,
       friction: 22,
-      useNativeDriver: false,
-    }).start(({ finished }) => {
+      useNativeDriver: false
+    }).start(({
+      finished
+    }) => {
       if (finished && !isPersistent) setShowPersistentSidebar(false);
     });
   }, [isPersistent, persistentAnim]);
-
   useEffect(() => {
     Animated.spring(hoverAnim, {
       toValue: hoverVisible && !isPersistent ? 1 : 0,
       tension: 200,
       friction: 24,
-      useNativeDriver: true,
+      useNativeDriver: true
     }).start();
   }, [hoverAnim, hoverVisible, isPersistent]);
-
   const handleToggleSidebar = useCallback(() => {
-    setSidebarMode((previous) => {
+    setSidebarMode(previous => {
       if (previous === 'hover') notifyPanelOpened('left');
       return previous === 'persistent' ? 'hover' : 'persistent';
     });
     setHoverVisible(false);
   }, [notifyPanelOpened]);
-
   useEffect(() => {
     if (panelRevision === 0 || openedSide !== 'right') return;
     setSidebarMode('hover');
     setHoverVisible(false);
   }, [openedSide, panelRevision]);
-
   const handleHoverZoneIn = useCallback(() => {
     if (!isPersistent) setHoverVisible(true);
   }, [isPersistent]);
   const handleHoverZoneOut = useCallback(() => {
     if (!isPersistent) setHoverVisible(false);
   }, [isPersistent]);
-
   useEffect(() => {
     if (!settingsMode) return;
     setSidebarMode('persistent');
     setHoverVisible(false);
   }, [settingsMode]);
-
   const openFiles = useCallback(() => {
     setChangesSheetVisible(false);
     setPreviewSheetVisible(false);
@@ -98,13 +92,11 @@ export function useAdaptiveNavigationController() {
     setChangesSheetVisible(false);
     setPreviewSheetVisible(true);
   }, []);
-
   const animatedSidebarWidth = Animated.multiply(persistentAnim, SIDEBAR_DEFAULT);
   const hoverTranslateX = hoverAnim.interpolate({
     inputRange: [0, 1],
-    outputRange: [-SIDEBAR_DEFAULT, 0],
+    outputRange: [-SIDEBAR_DEFAULT, 0]
   });
-
   return {
     isWideScreen,
     hasServer,
@@ -136,6 +128,6 @@ export function useAdaptiveNavigationController() {
     openFiles,
     openGit,
     openPreview,
-    isWeb: true,
+    isWeb: true
   };
 }

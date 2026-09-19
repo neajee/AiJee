@@ -1,6 +1,6 @@
-import { Input, Spinner, Text, View } from "@/components/dom";
+import { toTailwind } from "@/styles/to-tailwind";
 import { useCallback, useEffect, useState } from 'react';
-import { Alert, Pressable } from "@/components/dom";
+import { Alert } from "@/platform/browser";
 import { Archive as ArchiveIcon, Pencil } from 'lucide-react';
 import { Fonts } from '@/constants/theme';
 import { useThemeTokens } from '@/hooks/use-theme-tokens';
@@ -8,8 +8,23 @@ import { useIsSessionStreaming, type SessionListItem } from '@aijee/client-sdk';
 import { SessionActivityIndicator } from '@/features/workspace/components/session-activity-indicator';
 import { RowAction } from '../workspace-rows';
 import { styles } from '../style-tokens';
-
-export function SessionRow({ session, isSelected, hasUnread, onPress, onRename, onArchive, isDark }: { session: SessionListItem; isSelected: boolean; hasUnread: boolean; onPress: () => void; onRename: (name: string) => Promise<void>; onArchive: () => Promise<void>; isDark: boolean }) {
+export function SessionRow({
+  session,
+  isSelected,
+  hasUnread,
+  onPress,
+  onRename,
+  onArchive,
+  isDark
+}: {
+  session: SessionListItem;
+  isSelected: boolean;
+  hasUnread: boolean;
+  onPress: () => void;
+  onRename: (name: string) => Promise<void>;
+  onArchive: () => Promise<void>;
+  isDark: boolean;
+}) {
   const colors = useThemeTokens();
   const isWorking = useIsSessionStreaming(session.id);
   const [hovered, setHovered] = useState(false);
@@ -50,14 +65,29 @@ export function SessionRow({ session, isSelected, hasUnread, onPress, onRename, 
       Alert.alert('归档失败', '无法归档该对话，请重试。');
     }
   }, [busy, onArchive]);
-  const status = <View style={styles.sessionLead}>{isWorking ? <SessionActivityIndicator sessionId={session.id} color={colors.textSecondary} idlePlaceholder={false} /> : hasUnread ? <View style={[styles.dot, { backgroundColor: isDark ? '#3FB950' : '#1A7F37' }]} /> : null}</View>;
-  return (
-    <View style={[styles.sessionRow, isSelected ? { backgroundColor: selectedBg } : hovered && { backgroundColor: hoverBg }]} onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)}>
-      {editing ? <View style={styles.sessionMain}>{status}<Input autoFocus selectTextOnFocus underlineColorAndroid="transparent" value={draft} onChangeText={setDraft} onSubmitEditing={() => void commitRename()} onKeyPress={(event) => { if (event.nativeEvent.key === 'Escape') setEditing(false); }} editable={busy !== 'rename'} maxLength={200} selectionColor={colors.tint} style={[styles.sessionInput, { color: colors.text, fontFamily: Fonts.sansMedium }]} /></View> : <Pressable onPress={onPress} style={({ pressed }) => [styles.sessionMain, pressed && { opacity: 0.7 }]}>{status}<Text style={[styles.sessionLabel, { color: isSelected ? colors.text : colors.textSecondary, fontFamily: isSelected ? Fonts.sansMedium : Fonts.sans }]} numberOfLines={1}>{title}</Text></Pressable>}
-      {showActions && !editing && <View style={styles.sessionActions}>
-        <RowAction label="重命名对话" onPress={() => setEditing(true)} isDark={isDark}><Pencil size={11} color={colors.textTertiary} strokeWidth={1.8} /></RowAction>
-        <RowAction label="归档对话" onPress={() => void handleArchive()} isDark={isDark}>{busy === 'archive' ? <Spinner size="small" color={colors.textTertiary} style={{ width: 10, height: 10 }} /> : <ArchiveIcon size={11} color={colors.textTertiary} strokeWidth={1.8} />}</RowAction>
-      </View>}
-    </View>
-  );
+  const status = <div className={toTailwind(styles.sessionLead)}>{isWorking ? <SessionActivityIndicator sessionId={session.id} color={colors.textSecondary} idlePlaceholder={false} /> : hasUnread ? <div className={toTailwind([styles.dot, {
+      backgroundColor: isDark ? '#3FB950' : '#1A7F37'
+    }])} /> : null}</div>;
+  return <div className={toTailwind([styles.sessionRow, isSelected ? {
+    backgroundColor: selectedBg
+  } : hovered && {
+    backgroundColor: hoverBg
+  }])} onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)}>
+      {editing ? <div className={toTailwind(styles.sessionMain)}>{status}<input autoFocus selectTextOnFocus underlineColorAndroid="transparent" value={draft} onChangeText={setDraft} onSubmitEditing={() => void commitRename()} onKeyPress={event => {
+        if (event.nativeEvent.key === 'Escape') setEditing(false);
+      }} editable={busy !== 'rename'} maxLength={200} selectionColor={colors.tint} className={toTailwind([styles.sessionInput, {
+        color: colors.text,
+        fontFamily: Fonts.sansMedium
+      }])} /></div> : <button onClick={onPress}>{status}<span className={toTailwind([styles.sessionLabel, {
+        color: isSelected ? colors.text : colors.textSecondary,
+        fontFamily: isSelected ? Fonts.sansMedium : Fonts.sans
+      }])}>{title}</span></button>}
+      {showActions && !editing && <div className={toTailwind(styles.sessionActions)}>
+        <RowAction label="重命名对话" onClick={() => setEditing(true)} isDark={isDark}><Pencil size={11} color={colors.textTertiary} strokeWidth={1.8} /></RowAction>
+        <RowAction label="归档对话" onClick={() => void handleArchive()} isDark={isDark}>{busy === 'archive' ? <span size="small" color={colors.textTertiary} className={toTailwind({
+          width: 10,
+          height: 10
+        })} /> : <ArchiveIcon size={11} color={colors.textTertiary} strokeWidth={1.8} />}</RowAction>
+      </div>}
+    </div>;
 }

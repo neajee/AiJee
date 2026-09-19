@@ -1,8 +1,6 @@
-import { View } from "@/components/dom";
+import { toTailwind } from "@/styles/to-tailwind";
 import { useEffect, useState } from "react";
-import { Pressable } from "@/components/dom";
 import { Search } from "lucide-react";
-
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
@@ -20,7 +18,6 @@ export function SidebarHeader() {
   const colors = useThemeTokens();
   const isDark = colorScheme === "dark";
   const [paletteVisible, setPaletteVisible] = useState(false);
-
   useEffect(() => {
     if (false) return;
     const handler = (e: KeyboardEvent) => {
@@ -32,34 +29,18 @@ export function SidebarHeader() {
     document.addEventListener("keydown", handler);
     return () => document.removeEventListener("keydown", handler);
   }, []);
-
   const iconColor = isDark ? "#cdc8c5" : colors.textSecondary;
   const hoverBg = isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)";
-
-  return (
-    <View style={styles.row}>
+  return <div className={toTailwind(styles.row)}>
       <ServerSwitcher />
 
-      <Pressable
-        onPress={() => setPaletteVisible(true)}
-        accessibilityRole="button"
-        accessibilityLabel="Search"
-        style={({ pressed, hovered }: any) => [
-          styles.iconBtn,
-          (pressed || hovered) && { backgroundColor: hoverBg },
-        ]}
-      >
+      <button onClick={() => setPaletteVisible(true)} role="button" aria-label="Search">
         <Search size={16} color={iconColor} strokeWidth={1.8} />
-      </Pressable>
+      </button>
 
-      <CommandPalette
-        visible={paletteVisible}
-        onClose={() => setPaletteVisible(false)}
-      />
-    </View>
-  );
+      <CommandPalette visible={paletteVisible} onClose={() => setPaletteVisible(false)} />
+    </div>;
 }
-
 const styles = {
   row: {
     flexDirection: "row",
@@ -68,7 +49,7 @@ const styles = {
     height: 40,
     paddingLeft: 6,
     // Clear of the content card's rounded corner, which crowds this edge.
-    paddingRight: 12,
+    paddingRight: 12
   },
   iconBtn: {
     width: 26,
@@ -76,6 +57,6 @@ const styles = {
     borderRadius: 6,
     alignItems: "center",
     justifyContent: "center",
-    cursor: "pointer",
-  } as any,
+    cursor: "pointer"
+  } as any
 } as const;

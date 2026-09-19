@@ -1,8 +1,5 @@
+import { toTailwind } from "@/styles/to-tailwind";
 import type { ReactNode } from 'react';
-import { GestureHandlerRootView } from "@/components/dom";
-import { SafeAreaView } from "@/components/dom";
-import { View } from "@/components/dom";
-
 import { NarrowHeaderBar } from '../../components/narrow-header-bar';
 import { WorkspaceSheet } from '../../components/workspace-sheet';
 import { NarrowChangesSheet } from '../../components/narrow-changes-sheet';
@@ -13,10 +10,16 @@ import { TasksSheet } from '@/features/tasks/components/tasks-sheet';
 import { TaskOutputSheet } from '@/features/tasks/components/task-output-sheet';
 import { styles } from './style-tokens';
 import type { useAdaptiveNavigationController } from './use-adaptive-navigation-controller';
-
 type Controller = ReturnType<typeof useAdaptiveNavigationController>;
-
-export function NarrowNavigation({ children, colors, controller }: { children: ReactNode; colors: ReturnType<typeof import('@/hooks/use-theme-tokens').useThemeTokens>; controller: Controller }) {
+export function NarrowNavigation({
+  children,
+  colors,
+  controller
+}: {
+  children: ReactNode;
+  colors: ReturnType<typeof import('@/hooks/use-theme-tokens').useThemeTokens>;
+  controller: Controller;
+}) {
   const {
     hasServer,
     hasWorkspaces,
@@ -36,47 +39,29 @@ export function NarrowNavigation({ children, colors, controller }: { children: R
     setTaskOutputSheetVisible,
     openFiles,
     openGit,
-    openPreview,
+    openPreview
   } = controller;
-
-  return (
-    <GestureHandlerRootView style={[styles.narrowContainer, { backgroundColor: colors.background }]}>
-      <SafeAreaView style={[styles.narrowSafeArea, { backgroundColor: colors.background }]} edges={['top']}>
-        {hasServer && (
-          <NarrowHeaderBar
-            onWorkspacePress={() => setSheetVisible(true)}
-            onFilesPress={openFiles}
-            onGitPress={openGit}
-            onPreviewPress={openPreview}
-            onTasksPress={() => setTasksSheetVisible(true)}
-            onTaskOutputPress={() => setTaskOutputSheetVisible(true)}
-          />
-        )}
-        <View style={styles.narrowContent}>{children}</View>
+  return <div className={toTailwind([styles.narrowContainer, {
+    backgroundColor: colors.background
+  }])}>
+      <div className={toTailwind([styles.narrowSafeArea, {
+      backgroundColor: colors.background
+    }])} edges={['top']}>
+        {hasServer && <NarrowHeaderBar onWorkspacePress={() => setSheetVisible(true)} onFilesPress={openFiles} onGitPress={openGit} onPreviewPress={openPreview} onTasksPress={() => setTasksSheetVisible(true)} onTaskOutputPress={() => setTaskOutputSheetVisible(true)} />}
+        <div className={toTailwind(styles.narrowContent)}>{children}</div>
         {hasServer && <ConnectionStatusBanner />}
-      </SafeAreaView>
-      {hasServer && isCodeMode && (
-        <>
+      </div>
+      {hasServer && isCodeMode && <>
           <WorkspaceSheet visible={sheetVisible} onClose={() => setSheetVisible(false)} />
-          {hasWorkspaces && (
-            <>
+          {hasWorkspaces && <>
               <NarrowChangesSheet visible={changesSheetVisible} onClose={() => setChangesSheetVisible(false)} />
-              <NarrowPreviewSheet
-                visible={previewSheetVisible}
-                onClose={() => setPreviewSheetVisible(false)}
-                sessionId={openSessionId}
-              />
-            </>
-          )}
-        </>
-      )}
-      {isCodeMode && (
-        <>
+              <NarrowPreviewSheet visible={previewSheetVisible} onClose={() => setPreviewSheetVisible(false)} sessionId={openSessionId} />
+            </>}
+        </>}
+      {isCodeMode && <>
           <TasksSheet visible={tasksSheetVisible} onClose={() => setTasksSheetVisible(false)} />
           <TaskOutputSheet visible={taskOutputSheetVisible} onClose={() => setTaskOutputSheetVisible(false)} />
-        </>
-      )}
+        </>}
       {hasServer && <NarrowFilesSheet visible={filesSheetVisible} onClose={() => setFilesSheetVisible(false)} />}
-    </GestureHandlerRootView>
-  );
+    </div>;
 }

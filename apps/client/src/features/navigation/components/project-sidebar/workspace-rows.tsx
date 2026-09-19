@@ -1,6 +1,5 @@
-import { Text, View } from "@/components/dom";
+import { toTailwind } from "@/styles/to-tailwind";
 import { useCallback, useRef, useState, type ReactNode } from "react";
-import { Pressable, type View as RNView } from "@/components/dom";
 import { Folder, MoreHorizontal, SquarePen } from "lucide-react";
 import { Fonts } from "@/constants/theme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
@@ -17,7 +16,7 @@ export function WorkspaceRow({
   onNewSession,
   onMenu,
   onLongPress,
-  isDark,
+  isDark
 }: {
   workspace: Workspace;
   isSelected: boolean;
@@ -40,7 +39,6 @@ export function WorkspaceRow({
   const moreRef = useRef<RNView>(null);
   // Hovering swaps the status dot for the actions; both never fit at once.
   const showActions = hovered;
-
   const openMenu = useCallback(() => {
     const node = moreRef.current;
     if (!node?.measureInWindow) {
@@ -52,7 +50,6 @@ export function WorkspaceRow({
       onMenu(x + width - MENU_WIDTH, y + height + 4);
     });
   }, [onMenu]);
-
   return (
     /*
      * Hover lives on a plain View using pointer events, not on the Pressable.
@@ -61,85 +58,45 @@ export function WorkspaceRow({
      * exist while hovering would vanish the moment the cursor reached them.
      * `pointerenter`/`pointerleave` don't fire for movement between children.
      */
-    <View
-      style={[styles.row, hovered && { backgroundColor: hoverBg }]}
-      onPointerEnter={() => setHovered(true)}
-      onPointerLeave={() => setHovered(false)}
-    >
-      <Pressable
-        onPress={onPress}
-        onLongPress={onLongPress}
-        delayLongPress={400}
-        accessibilityLabel={
-          isOpen ? `收起 ${workspace.title}` : `展开 ${workspace.title}`
-        }
-        style={({ pressed }) => [styles.rowMain, pressed && { opacity: 0.7 }]}
-      >
-        <View style={styles.rowIcon}>
+    <div className={toTailwind([styles.row, hovered && {
+      backgroundColor: hoverBg
+    }])} onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)}>
+      <button onClick={onPress} onLongPress={onLongPress} delayLongPress={400} aria-label={isOpen ? `收起 ${workspace.title}` : `展开 ${workspace.title}`}>
+        <div className={toTailwind(styles.rowIcon)}>
           <Folder size={15} color={colors.text} strokeWidth={1.8} />
-        </View>
-        <Text
-          style={[
-            styles.rowLabel,
-            {
-              color: isSelected ? colors.text : colors.textSecondary,
-              fontFamily: isSelected ? Fonts.sansMedium : Fonts.sans,
-            },
-          ]}
-          numberOfLines={1}
-        >
+        </div>
+        <span className={toTailwind([styles.rowLabel, {
+          color: isSelected ? colors.text : colors.textSecondary,
+          fontFamily: isSelected ? Fonts.sansMedium : Fonts.sans
+        }])}>
           {workspace.title}
-        </Text>
-      </Pressable>
+        </span>
+      </button>
 
-      <View style={styles.rowActions}>
-        {showActions && (
-          <RowAction
-            label={`在 ${workspace.title} 中新建对话`}
-            onPress={onNewSession}
-            isDark={isDark}
-          >
-            <SquarePen
-              size={13}
-              color={colors.textTertiary}
-              strokeWidth={1.8}
-            />
-          </RowAction>
-        )}
-        {showActions && (
-          <View ref={moreRef} collapsable={false}>
-            <RowAction
-              label={`${workspace.title} 的更多操作`}
-              onPress={openMenu}
-              isDark={isDark}
-            >
-              <MoreHorizontal
-                size={14}
-                color={colors.textTertiary}
-                strokeWidth={1.8}
-              />
+      <div className={toTailwind(styles.rowActions)}>
+        {showActions && <RowAction label={`在 ${workspace.title} 中新建对话`} onClick={onNewSession} isDark={isDark}>
+            <SquarePen size={13} color={colors.textTertiary} strokeWidth={1.8} />
+          </RowAction>}
+        {showActions && <div ref={moreRef} collapsable={false}>
+            <RowAction label={`${workspace.title} 的更多操作`} onClick={openMenu} isDark={isDark}>
+              <MoreHorizontal size={14} color={colors.textTertiary} strokeWidth={1.8} />
             </RowAction>
-          </View>
-        )}
+          </div>}
 
-        {!showActions && !isRunning && hasUnread && (
-          <View
-            style={[
-              styles.dot,
-              { backgroundColor: isDark ? "#3FB950" : "#1A7F37" },
-            ]}
-          />
-        )}
-      </View>
-    </View>
+        {!showActions && !isRunning && hasUnread && <div className={toTailwind([styles.dot, {
+          backgroundColor: isDark ? "#3FB950" : "#1A7F37"
+        }])} />}
+      </div>
+    </div>
   );
 }
 
-/** A small square button that sits beside a row's main pressable. */export function RowAction({
+/** A small square button that sits beside a row's main pressable. */
+export function RowAction({
   label,
   onPress,
   children,
-  isDark,
+  isDark
 }: {
   label: string;
   onPress: () => void;
@@ -148,23 +105,10 @@ export function WorkspaceRow({
 }) {
   const [hovered, setHovered] = useState(false);
   const hoverBg = isDark ? "rgba(255,255,255,0.09)" : "rgba(0,0,0,0.07)";
-
-  return (
-    <Pressable
-      onPress={(e) => {
-        e.stopPropagation();
-        onPress();
-      }}
-      accessibilityLabel={label}
-      onHoverIn={() => setHovered(true)}
-      onHoverOut={() => setHovered(false)}
-      style={({ pressed }) => [
-        styles.rowAction,
-        hovered && { backgroundColor: hoverBg },
-        pressed && { opacity: 0.6 },
-      ]}
-    >
+  return <button onClick={e => {
+    e.stopPropagation();
+    onPress();
+  }} aria-label={label} onHoverIn={() => setHovered(true)} onHoverOut={() => setHovered(false)}>
       {children}
-    </Pressable>
-  );
+    </button>;
 }

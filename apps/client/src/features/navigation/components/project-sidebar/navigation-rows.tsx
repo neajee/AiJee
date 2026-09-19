@@ -1,34 +1,32 @@
-import { Text, View } from "@/components/dom";
+import { toTailwind } from "@/styles/to-tailwind";
 import { useState, type ReactNode } from "react";
-import { Pressable } from "@/components/dom";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { styles } from "./style-tokens";
 export function SectionHeader({
   title,
   actions,
-  isDark,
+  isDark
 }: {
   title: string;
   actions?: ReactNode;
   isDark: boolean;
 }) {
   const colors = useThemeTokens();
-  return (
-    <View style={styles.sectionHeader}>
-      <Text style={[styles.sectionTitle, { color: colors.textTertiary }]}>
+  return <div className={toTailwind(styles.sectionHeader)}>
+      <span className={toTailwind([styles.sectionTitle, {
+      color: colors.textTertiary
+    }])}>
         {title}
-      </Text>
+      </span>
       {actions}
-    </View>
-  );
+    </div>;
 }
-
 export function HeaderAction({
   onPress,
   label,
   disabled,
   children,
-  isDark,
+  isDark
 }: {
   onPress: () => void;
   label: string;
@@ -38,23 +36,9 @@ export function HeaderAction({
 }) {
   const [hovered, setHovered] = useState(false);
   const hoverBg = isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)";
-
-  return (
-    <Pressable
-      onPress={onPress}
-      disabled={disabled}
-      accessibilityLabel={label}
-      onHoverIn={() => setHovered(true)}
-      onHoverOut={() => setHovered(false)}
-      style={({ pressed }) => [
-        styles.headerAction,
-        hovered && { backgroundColor: hoverBg },
-        pressed && { opacity: 0.6 },
-      ]}
-    >
+  return <button onClick={onPress} disabled={disabled} aria-label={label} onHoverIn={() => setHovered(true)} onHoverOut={() => setHovered(false)}>
       {children}
-    </Pressable>
-  );
+    </button>;
 }
 
 /** A flat icon + label row, used for the actions above and below the list. */
@@ -64,7 +48,7 @@ export function SidebarRow({
   onPress,
   isActive = false,
   disabled = false,
-  isDark,
+  isDark
 }: {
   icon: ReactNode;
   label: string;
@@ -77,32 +61,12 @@ export function SidebarRow({
   const [hovered, setHovered] = useState(false);
   const hoverBg = isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.035)";
   const activeBg = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)";
-
-  return (
-    <Pressable
-      onPress={onPress}
-      disabled={disabled}
-      onHoverIn={() => setHovered(true)}
-      onHoverOut={() => setHovered(false)}
-      style={({ pressed }) => [
-        styles.row,
-        isActive
-          ? { backgroundColor: activeBg }
-          : hovered && { backgroundColor: hoverBg },
-        disabled && { opacity: 0.4 },
-        pressed && { opacity: 0.7 },
-      ]}
-    >
-      <View style={styles.rowIcon}>{icon}</View>
-      <Text
-        style={[
-          styles.rowLabel,
-          { color: isActive ? colors.text : colors.textSecondary },
-        ]}
-        numberOfLines={1}
-      >
+  return <button onClick={onPress} disabled={disabled} onHoverIn={() => setHovered(true)} onHoverOut={() => setHovered(false)}>
+      <div className={toTailwind(styles.rowIcon)}>{icon}</div>
+      <span className={toTailwind([styles.rowLabel, {
+      color: isActive ? colors.text : colors.textSecondary
+    }])}>
         {label}
-      </Text>
-    </Pressable>
-  );
+      </span>
+    </button>;
 }

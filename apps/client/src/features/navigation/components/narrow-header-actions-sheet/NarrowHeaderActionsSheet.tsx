@@ -1,11 +1,8 @@
-import { Text, View } from "@/components/dom";
-import { Pressable } from "@/components/dom";
-import Animated from "@/components/dom";
-import { GestureDetector } from "@/components/dom";
+import { toTailwind } from "@/styles/to-tailwind";
+import Animated from "@/platform/animation";
 import { ABSOLUTE_FILL_STYLE } from '@/constants/layout';
 import { styles } from './style-tokens';
 import type { NarrowHeaderActionsSheetViewProps } from './component-types';
-
 export function NarrowHeaderActionsSheetView({
   visible,
   items,
@@ -19,44 +16,48 @@ export function NarrowHeaderActionsSheetView({
   sheetStyle,
   overlayStyle,
   panGesture,
-  onDismiss,
+  onDismiss
 }: NarrowHeaderActionsSheetViewProps) {
-  return (
-    <View
-      {...(false ? { pointerEvents: visible ? 'auto' : 'none' } : {})}
-      style={[styles.root, true && ({ pointerEvents: visible ? 'auto' : 'none' } as any)]}
-    >
-      <Animated.View style={[styles.overlay, { backgroundColor: overlayColor }, overlayStyle]}>
-        <Pressable style={ABSOLUTE_FILL_STYLE} onPress={onDismiss} />
-      </Animated.View>
+  return <div {...false ? {
+    pointerEvents: visible ? 'auto' : 'none'
+  } : {}} className={toTailwind([styles.root, true && {
+    pointerEvents: visible ? 'auto' : 'none'
+  } as any])}>
+      <div className={toTailwind([styles.overlay, {
+      backgroundColor: overlayColor
+    }, overlayStyle])}>
+        <button className={toTailwind(ABSOLUTE_FILL_STYLE)} onClick={onDismiss} />
+      </div>
 
-      <Animated.View style={[styles.sheet, { backgroundColor: isDark ? '#1e1e1e' : '#FFFFFF', paddingBottom: bottomInset + 12 }, sheetStyle]}>
-        <GestureDetector gesture={panGesture}>
-          <View style={styles.handleBar}>
-            <View style={[styles.handle, { backgroundColor: handleColor }]} />
-          </View>
-        </GestureDetector>
+      <div className={toTailwind([styles.sheet, {
+      backgroundColor: isDark ? '#1e1e1e' : '#FFFFFF',
+      paddingBottom: bottomInset + 12
+    }, sheetStyle])}>
+        <div>
+          <div className={toTailwind(styles.handleBar)}>
+            <div className={toTailwind([styles.handle, {
+            backgroundColor: handleColor
+          }])} />
+          </div>
+        </div>
 
-        <View style={styles.header}>
-          <Text style={[styles.title, { color: textPrimary }]}>More</Text>
-          <Text style={[styles.subtitle, { color: textSecondary }]}>Quick actions for this screen</Text>
-        </View>
+        <div className={toTailwind(styles.header)}>
+          <span className={toTailwind([styles.title, {
+          color: textPrimary
+        }])}>More</span>
+          <span className={toTailwind([styles.subtitle, {
+          color: textSecondary
+        }])}>Quick actions for this screen</span>
+        </div>
 
-        <View style={styles.list}>
-          {items.map((item, index) => (
-            <Pressable
-              key={item.key}
-              onPress={item.onPress}
-              style={({ pressed }) => [styles.row, { borderBottomColor: rowBorder }, index === items.length - 1 && styles.lastRow, pressed && { opacity: 0.7 }]}
-              accessibilityRole="button"
-              accessibilityLabel={item.label}
-            >
-              <View style={styles.rowIcon}>{item.icon}</View>
-              <Text style={[styles.rowLabel, { color: textPrimary }]} numberOfLines={1}>{item.label}</Text>
-            </Pressable>
-          ))}
-        </View>
-      </Animated.View>
-    </View>
-  );
+        <div className={toTailwind(styles.list)}>
+          {items.map((item, index) => <button key={item.key} onClick={item.onPress} role="button" aria-label={item.label}>
+              <div className={toTailwind(styles.rowIcon)}>{item.icon}</div>
+              <span className={toTailwind([styles.rowLabel, {
+            color: textPrimary
+          }])}>{item.label}</span>
+            </button>)}
+        </div>
+      </div>
+    </div>;
 }

@@ -1,12 +1,10 @@
-import { useColorScheme as useSystemColorScheme } from "@/components/dom";
+import { useColorScheme as useSystemColorScheme } from "@/platform/browser";
 import { useAppSettingsStore } from '@/features/settings/store';
-
 export function useColorScheme() {
   const systemScheme = useSystemColorScheme();
-  const themeMode = useAppSettingsStore((s) => s.themeMode);
+  const themeMode = useAppSettingsStore(s => s.themeMode);
   // Subscribe legacy Colors consumers to preset changes while they migrate.
-  useAppSettingsStore((s) => `${s.themePreset}:${s.accentPreset}`);
-
+  useAppSettingsStore(s => `${s.themePreset}:${s.accentPreset}`);
   if (themeMode === 'system') {
     return systemScheme;
   }

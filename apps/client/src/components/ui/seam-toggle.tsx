@@ -1,7 +1,7 @@
+import { toTailwind } from "@/styles/to-tailwind";
 import { useEffect, useRef, useState } from "react";
-import { Animated, Easing, Pressable } from "@/components/dom";
+import { Animated, Easing } from "@/platform/animation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
@@ -17,7 +17,6 @@ const REST_HEIGHT = 30;
 const ACTIVE_WIDTH = SEAM_TOGGLE_WIDTH;
 const ACTIVE_HEIGHT = 38;
 const MORPH_MS = 140;
-
 interface SeamToggleProps {
   /** Which way the panel moves when pressed. */
   chevron: "left" | "right";
@@ -45,32 +44,27 @@ export function SeamToggle({
   onPress,
   label,
   onHoverIn,
-  onHoverOut,
+  onHoverOut
 }: SeamToggleProps) {
   const colorScheme = useColorScheme() ?? "light";
   const colors = useThemeTokens();
   const isDark = colorScheme === "dark";
   const isWeb = true;
-
   const [active, setActive] = useState(!isWeb);
   const anim = useRef(new Animated.Value(isWeb ? 0 : 1)).current;
-
   useEffect(() => {
     Animated.timing(anim, {
       toValue: active ? 1 : 0,
       duration: MORPH_MS,
       easing: Easing.out(Easing.cubic),
       // Width, height and colours are layout and paint props.
-      useNativeDriver: false,
+      useNativeDriver: false
     }).start();
   }, [active, anim]);
-
   const Chevron = chevron === "left" ? ChevronLeft : ChevronRight;
-
   const restColor = isDark ? "rgba(255,255,255,0.18)" : "rgba(0,0,0,0.16)";
   const activeColor = isDark ? "#242424" : "#FFFFFF";
   const activeBorder = isDark ? "rgba(255,255,255,0.10)" : "rgba(0,0,0,0.10)";
-
   const handleIn = () => {
     if (isWeb) setActive(true);
     onHoverIn?.();
@@ -79,77 +73,64 @@ export function SeamToggle({
     if (isWeb) setActive(false);
     onHoverOut?.();
   };
-
-  const webHoverProps = isWeb
-    ? { onMouseEnter: handleIn, onMouseLeave: handleOut }
-    : {};
-
-  return (
-    <Pressable
-      onPress={onPress}
-      accessibilityRole="button"
-      accessibilityLabel={label}
-      {...{ title: label }}
-      {...webHoverProps}
-      // The mark is small; the hit area is the whole seam segment plus slop.
-      hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-      style={hitStyle}
-    >
-      <Animated.View
-        pointerEvents="none"
-        style={[
-          markStyle,
-          {
-            width: anim.interpolate({
-              inputRange: [0, 1],
-              outputRange: [REST_WIDTH, ACTIVE_WIDTH],
-            }),
-            height: anim.interpolate({
-              inputRange: [0, 1],
-              outputRange: [REST_HEIGHT, ACTIVE_HEIGHT],
-            }),
-            borderRadius: anim.interpolate({
-              inputRange: [0, 1],
-              outputRange: [REST_WIDTH / 2, ACTIVE_WIDTH / 2],
-            }),
-            backgroundColor: anim.interpolate({
-              inputRange: [0, 1],
-              outputRange: [restColor, activeColor],
-            }),
-            borderColor: anim.interpolate({
-              inputRange: [0, 1],
-              outputRange: ["rgba(0,0,0,0)", activeBorder],
-            }),
-          },
-        ]}
-      >
+  const webHoverProps = isWeb ? {
+    onMouseEnter: handleIn,
+    onMouseLeave: handleOut
+  } : {};
+  return <button onClick={onPress} role="button" aria-label={label} {...{
+    title: label
+  }} {...webHoverProps}
+  // The mark is small; the hit area is the whole seam segment plus slop.
+  hitSlop={{
+    top: 10,
+    bottom: 10,
+    left: 10,
+    right: 10
+  }} className={toTailwind(hitStyle)}>
+      <div pointerEvents="none" className={toTailwind([markStyle, {
+      width: anim.interpolate({
+        inputRange: [0, 1],
+        outputRange: [REST_WIDTH, ACTIVE_WIDTH]
+      }),
+      height: anim.interpolate({
+        inputRange: [0, 1],
+        outputRange: [REST_HEIGHT, ACTIVE_HEIGHT]
+      }),
+      borderRadius: anim.interpolate({
+        inputRange: [0, 1],
+        outputRange: [REST_WIDTH / 2, ACTIVE_WIDTH / 2]
+      }),
+      backgroundColor: anim.interpolate({
+        inputRange: [0, 1],
+        outputRange: [restColor, activeColor]
+      }),
+      borderColor: anim.interpolate({
+        inputRange: [0, 1],
+        outputRange: ["rgba(0,0,0,0)", activeBorder]
+      })
+    }])}>
         {/* Held back until the bar has some width to hold it. */}
-        <Animated.View
-          style={{
-            opacity: anim.interpolate({
-              inputRange: [0, 0.55, 1],
-              outputRange: [0, 0, 1],
-            }),
-          }}
-        >
+        <div className={toTailwind({
+        opacity: anim.interpolate({
+          inputRange: [0, 0.55, 1],
+          outputRange: [0, 0, 1]
+        })
+      })}>
           <Chevron size={13} color={colors.text} strokeWidth={2} />
-        </Animated.View>
-      </Animated.View>
-    </Pressable>
-  );
+        </div>
+      </div>
+    </button>;
 }
-
 const hitStyle = {
-    width: SEAM_TOGGLE_WIDTH,
-    height: SEAM_TOGGLE_HEIGHT,
-    alignItems: "center",
-    justifyContent: "center",
-    cursor: "pointer",
-  } as any;
-
+  width: SEAM_TOGGLE_WIDTH,
+  height: SEAM_TOGGLE_HEIGHT,
+  alignItems: "center",
+  justifyContent: "center",
+  cursor: "pointer"
+} as any;
 const markStyle = {
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 0.633,
-    overflow: "hidden",
-  } as const;
+  alignItems: "center",
+  justifyContent: "center",
+  borderWidth: 0.633,
+  overflow: "hidden"
+} as const;

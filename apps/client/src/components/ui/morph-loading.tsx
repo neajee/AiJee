@@ -1,79 +1,75 @@
+import { toTailwind } from "@/styles/to-tailwind";
 import { useEffect } from 'react';
-import { type StyleProp, type ViewStyle } from "@/components/dom";
-import { View } from "@/components/dom";
-import Animated, {
-  Easing,
-  interpolate,
-  useAnimatedStyle,
-  useSharedValue,
-  withRepeat,
-  withTiming,
-} from "@/components/dom";
-
+import { type StyleProp, type ViewStyle } from "@/types/dom";
+import Animated, { Easing, interpolate, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from "@/platform/animation";
 import { useColorScheme } from '@/hooks/use-color-scheme';
-
 type LoadingSize = 'sm' | 'md' | 'lg';
-
 interface MorphLoadingProps {
   size?: LoadingSize;
   style?: StyleProp<ViewStyle>;
 }
-
-const SIZES: Record<LoadingSize, number> = { sm: 64, md: 96, lg: 128 };
-const OFFSETS = [
-  [[0, 0, 1, 0], [20, -20, 1.2, 50], [40, 0, 0.8, 25], [20, 20, 1.1, 75]],
-  [[0, 0, 1, 0], [-20, -20, 1.3, 50], [-40, 0, 0.7, 25], [-20, 20, 1.2, 75]],
-  [[0, 0, 1, 0], [-20, 20, 0.9, 100], [0, 40, 1.4, 0], [20, 20, 0.8, 50]],
-  [[0, 0, 1, 0], [20, 20, 1.1, 25], [0, -40, 1.3, 100], [-20, -20, 0.9, 75]],
-] as const;
-
-function MorphBlock({ index, color, scale }: { index: number; color: string; scale: number }) {
+const SIZES: Record<LoadingSize, number> = {
+  sm: 64,
+  md: 96,
+  lg: 128
+};
+const OFFSETS = [[[0, 0, 1, 0], [20, -20, 1.2, 50], [40, 0, 0.8, 25], [20, 20, 1.1, 75]], [[0, 0, 1, 0], [-20, -20, 1.3, 50], [-40, 0, 0.7, 25], [-20, 20, 1.2, 75]], [[0, 0, 1, 0], [-20, 20, 0.9, 100], [0, 40, 1.4, 0], [20, 20, 0.8, 50]], [[0, 0, 1, 0], [20, 20, 1.1, 25], [0, -40, 1.3, 100], [-20, -20, 0.9, 75]]] as const;
+function MorphBlock({
+  index,
+  color,
+  scale
+}: {
+  index: number;
+  color: string;
+  scale: number;
+}) {
   const progress = useSharedValue(0);
-
   useEffect(() => {
-    progress.value = withRepeat(
-      withTiming(1, { duration: 2_000, easing: Easing.inOut(Easing.ease) }),
-      -1,
-      false,
-    );
+    progress.value = withRepeat(withTiming(1, {
+      duration: 2_000,
+      easing: Easing.inOut(Easing.ease)
+    }), -1, false);
   }, [index, progress]);
-
   const animatedStyle = useAnimatedStyle(() => {
     const points = OFFSETS[index];
     const inputRange = [0, 0.25, 0.5, 0.75, 1];
-    const values = <T extends number>(column: number) =>
-      [...points.map((point) => point[column] as T), points[0][column] as T];
+    const values = <T extends number,>(column: number) => [...points.map(point => point[column] as T), points[0][column] as T];
     return {
       borderRadius: `${interpolate(progress.value, inputRange, values(3))}%`,
-      transform: [
-        { translateX: interpolate(progress.value, inputRange, values(0)) * scale },
-        { translateY: interpolate(progress.value, inputRange, values(1)) * scale },
-        { scale: interpolate(progress.value, inputRange, values(2)) },
-      ],
+      transform: [{
+        translateX: interpolate(progress.value, inputRange, values(0)) * scale
+      }, {
+        translateY: interpolate(progress.value, inputRange, values(1)) * scale
+      }, {
+        scale: interpolate(progress.value, inputRange, values(2))
+      }]
     };
   });
-
-  return <Animated.View style={[blockStyle, { backgroundColor: color }, animatedStyle]} />;
+  return <div className={toTailwind([blockStyle, {
+    backgroundColor: color
+  }, animatedStyle])} />;
 }
-
-export default function MorphLoading({ size = 'md', style }: MorphLoadingProps) {
+export default function MorphLoading({
+  size = 'md',
+  style
+}: MorphLoadingProps) {
   const colorScheme = useColorScheme() ?? 'light';
   const dimension = SIZES[size];
   const scale = dimension / SIZES.md;
   const color = colorScheme === 'dark' ? '#FFFFFF' : '#000000';
-
-  return (
-    <View style={[containerStyle, { width: dimension, height: dimension }, style]}>
-      {[0, 1, 2, 3].map((index) => (
-        <MorphBlock key={index} index={index} color={color} scale={scale} />
-      ))}
-    </View>
-  );
+  return <div className={toTailwind([containerStyle, {
+    width: dimension,
+    height: dimension
+  }, style])}>
+      {[0, 1, 2, 3].map(index => <MorphBlock key={index} index={index} color={color} scale={scale} />)}
+    </div>;
 }
-
 const containerStyle = {
   alignItems: 'center' as const,
-  justifyContent: 'center' as const,
+  justifyContent: 'center' as const
 } as const;
-
-const blockStyle = { position: 'absolute', width: 16, height: 16 } as const;
+const blockStyle = {
+  position: 'absolute',
+  width: 16,
+  height: 16
+} as const;

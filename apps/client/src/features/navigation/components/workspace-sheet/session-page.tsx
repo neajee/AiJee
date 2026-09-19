@@ -1,9 +1,7 @@
-import { ScrollView, Spinner, Text, View } from "@/components/dom";
+import { toTailwind } from "@/styles/to-tailwind";
 import { useCallback, useState } from 'react';
-import { Pressable } from "@/components/dom";
 import { usePathname, useRouter } from '@/platform/router-adapter';
 import { SquarePen, RefreshCw } from 'lucide-react';
-
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useThemeTokens } from '@/hooks/use-theme-tokens';
 import { useWorkspaceSessions as useSessions } from '@aijee/client-sdk';
@@ -11,15 +9,17 @@ import { SessionActivityIndicator } from '@/features/workspace/components/sessio
 import { AnimatedListItem } from '@/components/ui/animated-list-item';
 import { styles } from './style-tokens';
 import type { SessionPageProps } from './component-types';
-
-export function SessionPage({ workspaceId, onSessionPress, onDismiss }: SessionPageProps) {
+export function SessionPage({
+  workspaceId,
+  onSessionPress,
+  onDismiss
+}: SessionPageProps) {
   const colorScheme = useColorScheme() ?? 'light';
   const colors = useThemeTokens();
   const isDark = colorScheme === 'dark';
   const router = useRouter();
   const pathname = usePathname();
-  const selectedSessionId =
-    pathname.match(new RegExp(`/workspace/${workspaceId}/s/([^/]+)`))?.[1] ?? null;
+  const selectedSessionId = pathname.match(new RegExp(`/workspace/${workspaceId}/s/([^/]+)`))?.[1] ?? null;
   const textPrimary = isDark ? '#fefdfd' : colors.text;
   const textMuted = isDark ? '#cdc8c5' : colors.textTertiary;
   const btnBg = isDark ? '#252525' : '#F0F0F0';
@@ -30,10 +30,9 @@ export function SessionPage({ workspaceId, onSessionPress, onDismiss }: SessionP
     hasNextPage,
     fetchNextPage,
     refetch,
-    isRefetching,
+    isRefetching
   } = useSessions(workspaceId);
   const [createPending, setCreatePending] = useState(false);
-
   const handleNewSession = useCallback(() => {
     if (createPending) return;
     setCreatePending(true);
@@ -41,94 +40,51 @@ export function SessionPage({ workspaceId, onSessionPress, onDismiss }: SessionP
     onDismiss();
     setCreatePending(false);
   }, [createPending, onDismiss, router, workspaceId]);
+  return <div className={toTailwind(styles.pageContent)}>
+      <div className={toTailwind(styles.sessionsHeader)}>
+        <span className={toTailwind([styles.sessionsTitle, {
+        color: textPrimary
+      }])}>Sessions</span>
+        <button onClick={() => refetch()} disabled={isRefetching}>
+          {isRefetching ? <span size="small" color={textMuted} className={toTailwind({
+          width: 13,
+          height: 13
+        })} /> : <RefreshCw size={13} color={textMuted} strokeWidth={1.8} />}
+        </button>
+      </div>
 
-  return (
-    <View style={styles.pageContent}>
-      <View style={styles.sessionsHeader}>
-        <Text style={[styles.sessionsTitle, { color: textPrimary }]}>Sessions</Text>
-        <Pressable
-          onPress={() => refetch()}
-          disabled={isRefetching}
-          style={({ pressed }) => [styles.iconButton, pressed && { opacity: 0.7 }]}
-        >
-          {isRefetching ? (
-            <Spinner size="small" color={textMuted} style={{ width: 13, height: 13 }} />
-          ) : (
-            <RefreshCw size={13} color={textMuted} strokeWidth={1.8} />
-          )}
-        </Pressable>
-      </View>
+      <div className={toTailwind(styles.actions)}>
+        <button onClick={handleNewSession} disabled={createPending}>
+          {createPending ? <span size="small" color={textPrimary} className={toTailwind({
+          width: 14,
+          height: 14
+        })} /> : <SquarePen size={14} color={textPrimary} strokeWidth={1.8} />}
+          <span className={toTailwind([styles.newSessionText, {
+          color: textPrimary
+        }])}>New session</span>
+        </button>
+      </div>
 
-      <View style={styles.actions}>
-        <Pressable
-          onPress={handleNewSession}
-          disabled={createPending}
-          style={({ pressed }) => [
-            styles.newSessionButton,
-            { backgroundColor: btnBg },
-            pressed && { opacity: 0.8 },
-          ]}
-        >
-          {createPending ? (
-            <Spinner size="small" color={textPrimary} style={{ width: 14, height: 14 }} />
-          ) : (
-            <SquarePen size={14} color={textPrimary} strokeWidth={1.8} />
-          )}
-          <Text style={[styles.newSessionText, { color: textPrimary }]}>New session</Text>
-        </Pressable>
-      </View>
-
-      <ScrollView
-        style={styles.sessionList}
-        contentContainerStyle={styles.sessionListContent}
-        showsVerticalScrollIndicator={false}
-        nestedScrollEnabled
-      >
-        {isLoading ? (
-          <Spinner style={{ marginTop: 24 }} />
-        ) : sessions.length === 0 ? (
-          <Text style={[styles.emptyText, { color: textMuted }]}>No sessions yet</Text>
-        ) : (
-          sessions.map((session) => (
-            <AnimatedListItem key={session.id}>
-              <Pressable
-                onPress={() => onSessionPress(session.id)}
-                style={({ pressed }) => [
-                  styles.sessionItem,
-                  session.id === selectedSessionId && {
-                    backgroundColor: isDark
-                      ? 'rgba(255,255,255,0.08)'
-                      : 'rgba(0,0,0,0.06)',
-                  },
-                  pressed && { opacity: 0.7 },
-                ]}
-              >
+      <div className={toTailwind(styles.sessionList)} nestedScrollEnabled>
+        {isLoading ? <span className={toTailwind({
+        marginTop: 24
+      })} /> : sessions.length === 0 ? <span className={toTailwind([styles.emptyText, {
+        color: textMuted
+      }])}>No sessions yet</span> : sessions.map(session => <AnimatedListItem key={session.id}>
+              <button onClick={() => onSessionPress(session.id)}>
                 <SessionActivityIndicator sessionId={session.id} color={textMuted} />
-                <Text style={[styles.sessionTitle, { color: textPrimary }]} numberOfLines={1}>
+                <span className={toTailwind([styles.sessionTitle, {
+            color: textPrimary
+          }])}>
                   {session.display_name ?? session.id}
-                </Text>
-              </Pressable>
-            </AnimatedListItem>
-          ))
-        )}
-        {hasNextPage && (
-          <Pressable
-            onPress={() => fetchNextPage()}
-            disabled={isFetchingNextPage}
-            style={({ pressed }) => [
-              styles.loadMoreButton,
-              { backgroundColor: btnBg },
-              pressed && { opacity: 0.8 },
-            ]}
-          >
-            {isFetchingNextPage ? (
-              <Spinner size="small" />
-            ) : (
-              <Text style={[styles.loadMoreText, { color: textMuted }]}>Load more</Text>
-            )}
-          </Pressable>
-        )}
-      </ScrollView>
-    </View>
-  );
+                </span>
+              </button>
+            </AnimatedListItem>)}
+        {hasNextPage && <button onClick={() => fetchNextPage()} disabled={isFetchingNextPage}>
+            {isFetchingNextPage ? <span size="small" /> : <span className={toTailwind([styles.loadMoreText, {
+          color: textMuted
+        }])}>Load more</span>}
+          </button>}
+      </div>
+    </div>;
 }

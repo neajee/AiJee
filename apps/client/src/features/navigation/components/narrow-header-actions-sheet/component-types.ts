@@ -1,21 +1,18 @@
 import type { ReactNode } from 'react';
-import type { PanGesture as PanGestureType } from "@/components/dom";
-import type { ViewStyle } from "@/components/dom";
-import type { AnimatedStyle } from "@/components/dom";
-
+import { PanGesture as PanGestureType } from "@/types/dom";
+import { ViewStyle } from "@/types/dom";
+import { AnimatedStyle } from "@/types/dom";
 export interface NarrowHeaderActionItem {
   key: string;
   label: string;
   icon: ReactNode;
   onPress: () => void;
 }
-
 export interface NarrowHeaderActionsSheetProps {
   visible: boolean;
   onClose: () => void;
   items: NarrowHeaderActionItem[];
 }
-
 export interface NarrowHeaderActionsSheetViewProps {
   visible: boolean;
   items: NarrowHeaderActionItem[];

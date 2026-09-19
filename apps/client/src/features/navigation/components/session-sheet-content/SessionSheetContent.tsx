@@ -1,17 +1,13 @@
-import { ScrollView, Spinner, Text, View } from "@/components/dom";
+import { toTailwind } from "@/styles/to-tailwind";
 import { type ReactNode } from 'react';
-import { Pressable } from "@/components/dom";
 import { SquarePen, RefreshCw } from 'lucide-react';
-
 import { Fonts } from '@/constants/theme';
 import { SessionActivityIndicator } from '@/features/workspace/components/session-activity-indicator';
 import { AnimatedListItem } from '@/components/ui/animated-list-item';
-
 export interface SessionItem {
   id: string;
   display_name?: string | null;
 }
-
 interface SessionSheetContentProps {
   title: string;
   subtitle?: string | null;
@@ -31,7 +27,6 @@ interface SessionSheetContentProps {
   onLoadMore: () => void;
   footer?: ReactNode;
 }
-
 export function SessionSheetContent({
   title,
   subtitle,
@@ -49,142 +44,97 @@ export function SessionSheetContent({
   onSelect,
   onRefresh,
   onLoadMore,
-  footer,
+  footer
 }: SessionSheetContentProps) {
   const textPrimary = isDark ? '#fefdfd' : '#1a1a1a';
   const textMuted = isDark ? '#cdc8c5' : '#999999';
   const textSecondary = isDark ? '#f1ece8' : '#666666';
   const btnBg = isDark ? '#252525' : '#F0F0F0';
-
-  return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.headerRow}>
-          <View style={styles.headerText}>
-            <Text style={[styles.title, { color: textPrimary }]}>{title}</Text>
-            {subtitle ? (
-              <Text style={[styles.subtitle, { color: textSecondary }]} numberOfLines={1}>
+  return <div className={toTailwind(styles.container)}>
+      <div className={toTailwind(styles.header)}>
+        <div className={toTailwind(styles.headerRow)}>
+          <div className={toTailwind(styles.headerText)}>
+            <span className={toTailwind([styles.title, {
+            color: textPrimary
+          }])}>{title}</span>
+            {subtitle ? <span className={toTailwind([styles.subtitle, {
+            color: textSecondary
+          }])}>
                 {subtitle}
-              </Text>
-            ) : null}
-          </View>
-          <Pressable
-            onPress={onRefresh}
-            disabled={isRefetching}
-            style={({ pressed }) => [styles.iconButton, pressed && { opacity: 0.7 }]}
-          >
-            {isRefetching ? (
-              <Spinner size={13 as any} color={textMuted} />
-            ) : (
-              <RefreshCw size={13} color={textMuted} strokeWidth={1.8} />
-            )}
-          </Pressable>
-        </View>
-      </View>
+              </span> : null}
+          </div>
+          <button onClick={onRefresh} disabled={isRefetching}>
+            {isRefetching ? <span size={13 as any} color={textMuted} /> : <RefreshCw size={13} color={textMuted} strokeWidth={1.8} />}
+          </button>
+        </div>
+      </div>
 
-      <View style={styles.actions}>
-        <Pressable
-          onPress={onNew}
-          disabled={createPending}
-          style={({ pressed }) => [
-            styles.newButton,
-            { backgroundColor: btnBg },
-            pressed && { opacity: 0.8 },
-          ]}
-        >
-          {createPending ? (
-            <Spinner size={14 as any} color={textPrimary} />
-          ) : (
-            <SquarePen size={14 as any} color={textPrimary} strokeWidth={1.8} />
-          )}
-          <Text style={[styles.newButtonText, { color: textPrimary }]}>{newButtonLabel}</Text>
-        </Pressable>
-      </View>
+      <div className={toTailwind(styles.actions)}>
+        <button onClick={onNew} disabled={createPending}>
+          {createPending ? <span size={14 as any} color={textPrimary} /> : <SquarePen size={14 as any} color={textPrimary} strokeWidth={1.8} />}
+          <span className={toTailwind([styles.newButtonText, {
+          color: textPrimary
+        }])}>{newButtonLabel}</span>
+        </button>
+      </div>
 
-      <ScrollView
-        style={styles.list}
-        contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {isLoading ? (
-          <Spinner style={{ marginTop: 24 }} />
-        ) : sessions.length === 0 ? (
-          <Text style={[styles.emptyText, { color: textMuted }]}>{emptyLabel}</Text>
-        ) : (
-          sessions.map((session) => (
-            <AnimatedListItem key={session.id}>
-              <Pressable
-                onPress={() => onSelect(session.id)}
-                style={({ pressed }) => [
-                  styles.sessionItem,
-                  session.id === selectedSessionId && {
-                    backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
-                  },
-                  pressed && { opacity: 0.7 },
-                ]}
-              >
+      <div className={toTailwind(styles.list)}>
+        {isLoading ? <span className={toTailwind({
+        marginTop: 24
+      })} /> : sessions.length === 0 ? <span className={toTailwind([styles.emptyText, {
+        color: textMuted
+      }])}>{emptyLabel}</span> : sessions.map(session => <AnimatedListItem key={session.id}>
+              <button onClick={() => onSelect(session.id)}>
                 <SessionActivityIndicator sessionId={session.id} color={textMuted} />
-                <Text style={[styles.sessionTitle, { color: textPrimary }]} numberOfLines={1}>
+                <span className={toTailwind([styles.sessionTitle, {
+            color: textPrimary
+          }])}>
                   {session.display_name ?? session.id}
-                </Text>
-              </Pressable>
-            </AnimatedListItem>
-          ))
-        )}
-        {hasNextPage && (
-          <Pressable
-            onPress={onLoadMore}
-            disabled={isFetchingNextPage}
-            style={({ pressed }) => [
-              styles.loadMoreButton,
-              { backgroundColor: btnBg },
-              pressed && { opacity: 0.8 },
-            ]}
-          >
-            {isFetchingNextPage ? (
-              <Spinner size="small" />
-            ) : (
-              <Text style={[styles.loadMoreText, { color: textMuted }]}>Load more</Text>
-            )}
-          </Pressable>
-        )}
-      </ScrollView>
+                </span>
+              </button>
+            </AnimatedListItem>)}
+        {hasNextPage && <button onClick={onLoadMore} disabled={isFetchingNextPage}>
+            {isFetchingNextPage ? <span size="small" /> : <span className={toTailwind([styles.loadMoreText, {
+          color: textMuted
+        }])}>Load more</span>}
+          </button>}
+      </div>
 
       {footer}
-    </View>
-  );
+    </div>;
 }
-
 const styles = {
   container: {
-    flex: 1,
+    flex: 1
   },
   header: {
-    paddingLeft: 20, paddingRight: 20,
-    paddingBottom: 8,
+    paddingLeft: 20,
+    paddingRight: 20,
+    paddingBottom: 8
   },
   headerRow: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'center'
   },
   headerText: {
-    flex: 1,
+    flex: 1
   },
   iconButton: {
-    padding: 6,
+    padding: 6
   },
   title: {
     fontSize: 15,
-    fontFamily: Fonts.sansSemiBold,
+    fontFamily: Fonts.sansSemiBold
   },
   subtitle: {
     fontSize: 13,
     fontFamily: Fonts.sans,
-    marginTop: 2,
+    marginTop: 2
   },
   actions: {
-    paddingLeft: 16, paddingRight: 16,
-    paddingBottom: 12,
+    paddingLeft: 16,
+    paddingRight: 16,
+    paddingBottom: 12
   },
   newButton: {
     flexDirection: 'row',
@@ -192,47 +142,50 @@ const styles = {
     justifyContent: 'center',
     gap: 6,
     height: 36,
-    borderRadius: 8,
+    borderRadius: 8
   },
   newButtonText: {
     fontSize: 14,
-    fontFamily: Fonts.sansMedium,
+    fontFamily: Fonts.sansMedium
   },
   list: {
-    flex: 1,
+    flex: 1
   },
   listContent: {
-    paddingLeft: 12, paddingRight: 12,
-    gap: 2,
+    paddingLeft: 12,
+    paddingRight: 12,
+    gap: 2
   },
   sessionItem: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 10,
-    paddingLeft: 10, paddingRight: 10,
-    paddingTop: 10, paddingBottom: 10,
-    borderRadius: 8,
+    paddingLeft: 10,
+    paddingRight: 10,
+    paddingTop: 10,
+    paddingBottom: 10,
+    borderRadius: 8
   },
   sessionTitle: {
     fontSize: 14,
     fontFamily: Fonts.sans,
-    flex: 1,
+    flex: 1
   },
   emptyText: {
     fontSize: 13,
     fontFamily: Fonts.sans,
     textAlign: 'center',
-    marginTop: 24,
+    marginTop: 24
   },
   loadMoreButton: {
     alignItems: 'center',
     justifyContent: 'center',
     height: 36,
     borderRadius: 8,
-    marginTop: 8,
+    marginTop: 8
   },
   loadMoreText: {
     fontSize: 13,
-    fontFamily: Fonts.sansMedium,
-  },
+    fontFamily: Fonts.sansMedium
+  }
 } as const;

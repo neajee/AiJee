@@ -1,5 +1,4 @@
-import { useWindowDimensions } from "@/components/dom";
-
+import { useWindowDimensions } from "@/platform/browser";
 interface SheetHeightOptions {
   /** Fraction of the window height the sheet should target. */
   fraction?: number;
@@ -18,9 +17,11 @@ interface SheetHeightOptions {
 export function useSheetHeight({
   fraction = 0.72,
   min = 360,
-  max = 620,
+  max = 620
 }: SheetHeightOptions = {}): number {
-  const { height } = useWindowDimensions();
+  const {
+    height
+  } = useWindowDimensions();
   const computed = Math.round(height * fraction);
   return Math.max(min, Math.min(max, computed));
 }

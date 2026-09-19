@@ -1,31 +1,29 @@
+import { toTailwind } from "@/styles/to-tailwind";
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from '@/platform/router-adapter';
-
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
-
 export default function ModalScreen() {
-  return (
-    <ThemedView style={styles.container}>
+  return <ThemedView className={toTailwind(styles.container)}>
       <ThemedText type="title">This is a modal</ThemedText>
-      <Link href="/" dismissTo style={styles.link}>
+      <Link href="/" dismissTo className={toTailwind(styles.link)}>
         <ThemedText type="link">Go to home screen</ThemedText>
       </Link>
-    </ThemedView>
-  );
+    </ThemedView>;
 }
-
 const styles = {
   container: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 20,
+    padding: 20
   },
   link: {
     marginTop: 15,
-    paddingTop: 15, paddingBottom: 15,
-  },
+    paddingTop: 15,
+    paddingBottom: 15
+  }
 } as const;
-
-export const Route = createFileRoute("/modal")({ component: ModalScreen });
+export const Route = createFileRoute("/modal")({
+  component: ModalScreen
+});

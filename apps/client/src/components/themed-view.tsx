@@ -1,15 +1,21 @@
-import { View } from "@/components/dom";
-import { type ViewProps } from "@/components/dom";
-
+import { toTailwind } from "@/styles/to-tailwind";
+import { type ViewProps } from "@/types/dom";
 import { useThemeColor } from '@/hooks/use-theme-color';
-
 export type ThemedViewProps = ViewProps & {
   lightColor?: string;
   darkColor?: string;
 };
-
-export function ThemedView({ style, lightColor, darkColor, ...otherProps }: ThemedViewProps) {
-  const backgroundColor = useThemeColor({ light: lightColor, dark: darkColor }, 'background');
-
-  return <View style={[{ backgroundColor }, style]} {...otherProps} />;
+export function ThemedView({
+  style,
+  lightColor,
+  darkColor,
+  ...otherProps
+}: ThemedViewProps) {
+  const backgroundColor = useThemeColor({
+    light: lightColor,
+    dark: darkColor
+  }, 'background');
+  return <div className={toTailwind([{
+    backgroundColor
+  }, style])} {...otherProps} />;
 }

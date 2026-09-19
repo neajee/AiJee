@@ -1,8 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
-import { Linking } from "@/components/dom";
+import { Linking } from "@/platform/browser";
 import { usePathname } from '@/platform/router-adapter';
 import { ExternalLink, GitBranch, Globe, Play } from 'lucide-react';
-
 import { useThemeTokens } from '@/hooks/use-theme-tokens';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useAppMode } from '@/hooks/use-app-mode';
@@ -13,29 +12,34 @@ import { useGitStatus, useNestedRepos } from '@aijee/client-sdk';
 import { remotesToLinks, type RemoteLink } from '@/features/workspace/utils/git-remote-url';
 import type { NarrowHeaderBarProps } from '../components/narrow-header-bar/types';
 import type { NarrowHeaderActionItem } from '@/features/navigation/components/narrow-header-actions-sheet';
-
 const EMPTY_TARGETS: never[] = [];
-
 export function useNarrowHeaderController(props: NarrowHeaderBarProps) {
   const colors = useThemeTokens();
   const isDark = (useColorScheme() ?? 'light') === 'dark';
   const appMode = useAppMode();
   const pathname = usePathname();
-  const hasTaskConfig = useTasksStore((s) => s.hasConfig);
-  const taskInstances = useTasksStore((s) => s.instances);
-  const selectedTaskId = useTasksStore((s) => s.selectedTaskId);
+  const hasTaskConfig = useTasksStore(s => s.hasConfig);
+  const taskInstances = useTasksStore(s => s.instances);
+  const selectedTaskId = useTasksStore(s => s.selectedTaskId);
   const [moreVisible, setMoreVisible] = useState(false);
   const currentSessionId = pathname.match(/^\/workspace\/[^/]+\/s\/([^/]+)$/)?.[1] ?? null;
-  const previewTargets = usePreviewStore((state) =>
-    currentSessionId ? state.targetsBySession[currentSessionId] ?? EMPTY_TARGETS : EMPTY_TARGETS,
-  );
-  const workspace = useWorkspaceStore((s) => s.workspaces.find((w) => w.id === s.selectedWorkspaceId));
+  const previewTargets = usePreviewStore(state => currentSessionId ? state.targetsBySession[currentSessionId] ?? EMPTY_TARGETS : EMPTY_TARGETS);
+  const workspace = useWorkspaceStore(s => s.workspaces.find(w => w.id === s.selectedWorkspaceId));
   const cwd = appMode === 'code' ? workspace?.path ?? null : null;
-  const { data: gitData } = useGitStatus(cwd);
-  const { repos: nestedRepos } = useNestedRepos(cwd);
-  const allLinks: (RemoteLink & { repoPath?: string })[] = remotesToLinks(gitData?.remotes);
+  const {
+    data: gitData
+  } = useGitStatus(cwd);
+  const {
+    repos: nestedRepos
+  } = useNestedRepos(cwd);
+  const allLinks: (RemoteLink & {
+    repoPath?: string;
+  })[] = remotesToLinks(gitData?.remotes);
   for (const repo of nestedRepos ?? []) {
-    for (const link of remotesToLinks(repo.remotes)) allLinks.push({ ...link, repoPath: repo.path });
+    for (const link of remotesToLinks(repo.remotes)) allLinks.push({
+      ...link,
+      repoPath: repo.path
+    });
   }
   const firstLink = allLinks[0] ?? null;
   const textPrimary = isDark ? '#fefdfd' : colors.text;
@@ -43,37 +47,63 @@ export function useNarrowHeaderController(props: NarrowHeaderBarProps) {
   const hasTasks = appMode === 'code' && (hasTaskConfig || taskInstances.length > 0);
   const hasTaskOutput = appMode === 'code' && (Boolean(selectedTaskId) || taskInstances.length > 0);
   const closeMore = useCallback(() => setMoreVisible(false), []);
-
   const actionItems = useMemo<NarrowHeaderActionItem[]>(() => {
     if (appMode !== 'code') return [];
-    const items: NarrowHeaderActionItem[] = [
-      {
-        key: 'git',
-        label: 'Git changes',
-        icon: <GitBranch size={18} color={textPrimary} strokeWidth={1.8} />,
-        onPress: () => { closeMore(); props.onGitPress(); },
-      },
-    ];
+    const items: NarrowHeaderActionItem[] = [{
+      key: 'git',
+      label: 'Git changes',
+      icon: <GitBranch size={18} color={textPrimary} strokeWidth={1.8} />,
+      onPress: () => {
+        closeMore();
+        props.onGitPress();
+      }
+    }];
     if (hasPreview && props.onPreviewPress) {
-      items.push({ key: 'preview', label: 'Preview', icon: <Globe size={18} color={textPrimary} strokeWidth={1.8} />, onPress: () => { closeMore(); props.onPreviewPress?.(); } });
+      items.push({
+        key: 'preview',
+        label: 'Preview',
+        icon: <Globe size={18} color={textPrimary} strokeWidth={1.8} />,
+        onPress: () => {
+          closeMore();
+          props.onPreviewPress?.();
+        }
+      });
     }
     if (hasTasks && props.onTasksPress) {
-      items.push({ key: 'tasks', label: 'Tasks', icon: <Play size={18} color={textPrimary} strokeWidth={1.8} />, onPress: () => { closeMore(); props.onTasksPress?.(); } });
+      items.push({
+        key: 'tasks',
+        label: 'Tasks',
+        icon: <Play size={18} color={textPrimary} strokeWidth={1.8} />,
+        onPress: () => {
+          closeMore();
+          props.onTasksPress?.();
+        }
+      });
     }
     if (hasTaskOutput && props.onTaskOutputPress) {
-      items.push({ key: 'task-output', label: 'Task output', icon: <Play size={18} color={textPrimary} strokeWidth={1.8} />, onPress: () => { closeMore(); props.onTaskOutputPress?.(); } });
+      items.push({
+        key: 'task-output',
+        label: 'Task output',
+        icon: <Play size={18} color={textPrimary} strokeWidth={1.8} />,
+        onPress: () => {
+          closeMore();
+          props.onTaskOutputPress?.();
+        }
+      });
     }
     if (firstLink) {
       items.push({
         key: 'remote',
         label: `Open in ${firstLink.label}`,
         icon: <ExternalLink size={18} color={textPrimary} strokeWidth={1.8} />,
-        onPress: () => { closeMore(); void Linking.openURL(firstLink.browserUrl); },
+        onPress: () => {
+          closeMore();
+          void Linking.openURL(firstLink.browserUrl);
+        }
       });
     }
     return items;
   }, [appMode, closeMore, firstLink, hasPreview, hasTaskOutput, hasTasks, props, textPrimary]);
-
   return {
     colors,
     textPrimary,
@@ -84,6 +114,6 @@ export function useNarrowHeaderController(props: NarrowHeaderBarProps) {
     actionItems,
     moreVisible,
     setMoreVisible,
-    closeMore,
+    closeMore
   };
 }

@@ -1,32 +1,28 @@
-import { View } from "@/components/dom";
+import { toTailwind } from "@/styles/to-tailwind";
 import { useCallback, useEffect } from "react";
-import { Pressable } from "@/components/dom";
-import { useSafeAreaInsets } from "@/components/dom";
-import Animated, {
-  Easing,
-  runOnJS,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from "@/components/dom";
-import { Gesture, GestureDetector } from "@/components/dom";
-
+import { useSafeAreaInsets } from "@/platform/browser";
+import Animated, { Easing, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from "@/platform/animation";
+import { Gesture } from "@/platform/animation";
 import { Colors } from "@/constants/theme";
 import { ABSOLUTE_FILL_STYLE } from "@/constants/layout";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { PreviewPanel } from "@/features/preview/components/preview-panel";
 import { useSheetHeight } from "../../hooks/use-sheet-height";
-
-const TIMING_CONFIG = { duration: 280, easing: Easing.out(Easing.cubic) };
-
+const TIMING_CONFIG = {
+  duration: 280,
+  easing: Easing.out(Easing.cubic)
+};
 interface NarrowPreviewSheetProps {
   visible: boolean;
   onClose: () => void;
   sessionId: string | null;
 }
-
-export function NarrowPreviewSheet({ visible, onClose, sessionId }: NarrowPreviewSheetProps) {
+export function NarrowPreviewSheet({
+  visible,
+  onClose,
+  sessionId
+}: NarrowPreviewSheetProps) {
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme() ?? "light";
   const colors = useThemeTokens();
@@ -34,11 +30,13 @@ export function NarrowPreviewSheet({ visible, onClose, sessionId }: NarrowPrevie
 
   // Adapt to the viewport so the sheet never over-covers short screens nor
   // under-covers tall ones (the old fixed 520 px caused the layout anomaly).
-  const sheetHeight = useSheetHeight({ fraction: 0.68, min: 420, max: 560 });
-
+  const sheetHeight = useSheetHeight({
+    fraction: 0.68,
+    min: 420,
+    max: 560
+  });
   const translateY = useSharedValue(sheetHeight);
   const overlayOpacity = useSharedValue(0);
-
   useEffect(() => {
     if (visible) {
       translateY.value = withTiming(0, TIMING_CONFIG);
@@ -48,84 +46,70 @@ export function NarrowPreviewSheet({ visible, onClose, sessionId }: NarrowPrevie
       overlayOpacity.value = withTiming(0, TIMING_CONFIG);
     }
   }, [overlayOpacity, translateY, visible, sheetHeight]);
-
   const dismiss = useCallback(() => {
     translateY.value = withTiming(sheetHeight, TIMING_CONFIG);
     overlayOpacity.value = withTiming(0, TIMING_CONFIG, () => {
       runOnJS(onClose)();
     });
   }, [onClose, overlayOpacity, translateY, sheetHeight]);
-
-  const panGesture = Gesture.Pan()
-    .onUpdate((event) => {
-      if (event.translationY > 0) {
-        translateY.value = event.translationY;
-      }
-    })
-    .onEnd((event) => {
-      if (event.translationY > 100 || event.velocityY > 500) {
-        runOnJS(dismiss)();
-      } else {
-        translateY.value = withTiming(0, TIMING_CONFIG);
-      }
-    });
-
+  const panGesture = Gesture.Pan().onUpdate(event => {
+    if (event.translationY > 0) {
+      translateY.value = event.translationY;
+    }
+  }).onEnd(event => {
+    if (event.translationY > 100 || event.velocityY > 500) {
+      runOnJS(dismiss)();
+    } else {
+      translateY.value = withTiming(0, TIMING_CONFIG);
+    }
+  });
   const sheetStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: translateY.value }],
+    transform: [{
+      translateY: translateY.value
+    }]
   }));
-
   const overlayStyle = useAnimatedStyle(() => ({
     opacity: overlayOpacity.value,
-    pointerEvents: overlayOpacity.value > 0 ? ("auto" as const) : ("none" as const),
+    pointerEvents: overlayOpacity.value > 0 ? "auto" as const : "none" as const
   }));
+  return <div {...false ? {
+    pointerEvents: visible ? "auto" as const : "none" as const
+  } : {}} className={toTailwind([styles.root, true && {
+    pointerEvents: visible ? "auto" : "none"
+  } as any])}>
+      <div className={toTailwind([styles.overlay, {
+      backgroundColor: colors.overlay
+    }, overlayStyle])}>
+        <button className={toTailwind(ABSOLUTE_FILL_STYLE)} onClick={dismiss} />
+      </div>
 
-  return (
-    <View
-      {...(false
-        ? { pointerEvents: visible ? ("auto" as const) : ("none" as const) }
-        : {})}
-      style={[
-        styles.root,
-        true && ({ pointerEvents: visible ? "auto" : "none" } as any),
-      ]}
-    >
-      <Animated.View style={[styles.overlay, { backgroundColor: colors.overlay }, overlayStyle]}>
-        <Pressable style={ABSOLUTE_FILL_STYLE} onPress={dismiss} />
-      </Animated.View>
+      <div className={toTailwind([styles.sheet, {
+      backgroundColor: isDark ? "#1e1e1e" : "#FFFFFF",
+      paddingBottom: insets.bottom,
+      height: sheetHeight,
+      maxHeight: sheetHeight
+    }, sheetStyle])}>
+        <div>
+          <div className={toTailwind(styles.handleBar)}>
+            <div className={toTailwind([styles.handle, {
+            backgroundColor: colors.sheetHandle
+          }])} />
+          </div>
+        </div>
 
-      <Animated.View
-        style={[
-          styles.sheet,
-          {
-            backgroundColor: isDark ? "#1e1e1e" : "#FFFFFF",
-            paddingBottom: insets.bottom,
-            height: sheetHeight,
-            maxHeight: sheetHeight,
-          },
-          sheetStyle,
-        ]}
-      >
-        <GestureDetector gesture={panGesture}>
-          <View style={styles.handleBar}>
-            <View style={[styles.handle, { backgroundColor: colors.sheetHandle }]} />
-          </View>
-        </GestureDetector>
-
-        <View style={styles.content}>
+        <div className={toTailwind(styles.content)}>
           <PreviewPanel sessionId={sessionId} />
-        </View>
-      </Animated.View>
-    </View>
-  );
+        </div>
+      </div>
+    </div>;
 }
-
 const styles = {
   root: {
     ...ABSOLUTE_FILL_STYLE,
-    zIndex: 100,
+    zIndex: 100
   },
   overlay: {
-    ...ABSOLUTE_FILL_STYLE,
+    ...ABSOLUTE_FILL_STYLE
   },
   sheet: {
     position: "absolute",
@@ -133,20 +117,20 @@ const styles = {
     left: 0,
     right: 0,
     borderTopLeftRadius: 14,
-    borderTopRightRadius: 14,
+    borderTopRightRadius: 14
   },
   handleBar: {
     alignItems: "center",
     paddingTop: 10,
-    paddingBottom: 10,
+    paddingBottom: 10
   },
   handle: {
     width: 36,
     height: 4,
-    borderRadius: 2,
+    borderRadius: 2
   },
   content: {
     flex: 1,
-    overflow: "hidden",
-  },
+    overflow: "hidden"
+  }
 } as const;

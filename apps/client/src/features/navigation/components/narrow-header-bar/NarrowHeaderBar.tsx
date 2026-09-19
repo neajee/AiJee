@@ -1,56 +1,50 @@
-import { Text, View } from "@/components/dom";
+import { toTailwind } from "@/styles/to-tailwind";
 import { Ellipsis, FolderOpen } from 'lucide-react';
-import { Pressable } from "@/components/dom";
-
 import { NarrowHeaderActionsSheet } from '@/features/navigation/components/narrow-header-actions-sheet';
 import { useNarrowHeaderController } from '../../hooks/use-narrow-header-controller';
 import { styles } from './style-tokens';
 import type { NarrowHeaderBarProps } from './component-types';
-
 export function NarrowHeaderBar(props: NarrowHeaderBarProps) {
-  const { colors, textPrimary, borderColor, buttonBg, appMode, workspace, actionItems, moreVisible, setMoreVisible, closeMore } = useNarrowHeaderController(props);
-  return (
-    <>
-      <View style={[styles.container, { backgroundColor: colors.background, borderBottomColor: borderColor }]}>
-        <View style={styles.leftSection}>
-          <Pressable
-            onPress={props.onWorkspacePress}
-            style={({ pressed }) => [styles.workspaceButton, pressed && { opacity: 0.7 }]}
-            accessibilityRole="button"
-            accessibilityLabel="Open workspace switcher"
-          >
-            {workspace && (
-              <View style={[styles.avatar, { backgroundColor: workspace.color }]}>
-                <Text style={styles.avatarInitial}>{workspace.title.charAt(0).toUpperCase()}</Text>
-              </View>
-            )}
-            <Text style={[styles.workspaceName, { color: textPrimary }]} numberOfLines={1}>
+  const {
+    colors,
+    textPrimary,
+    borderColor,
+    buttonBg,
+    appMode,
+    workspace,
+    actionItems,
+    moreVisible,
+    setMoreVisible,
+    closeMore
+  } = useNarrowHeaderController(props);
+  return <>
+      <div className={toTailwind([styles.container, {
+      backgroundColor: colors.background,
+      borderBottomColor: borderColor
+    }])}>
+        <div className={toTailwind(styles.leftSection)}>
+          <button onClick={props.onWorkspacePress} role="button" aria-label="Open workspace switcher">
+            {workspace && <div className={toTailwind([styles.avatar, {
+            backgroundColor: workspace.color
+          }])}>
+                <span className={toTailwind(styles.avatarInitial)}>{workspace.title.charAt(0).toUpperCase()}</span>
+              </div>}
+            <span className={toTailwind([styles.workspaceName, {
+            color: textPrimary
+          }])}>
               {workspace?.title ?? 'Workspace'}
-            </Text>
-          </Pressable>
-        </View>
-        <View style={styles.headerActions}>
-          <Pressable
-            onPress={props.onFilesPress}
-            style={({ pressed }) => [styles.iconButton, { backgroundColor: buttonBg }, pressed && { opacity: 0.7 }]}
-            accessibilityRole="button"
-            accessibilityLabel="Files"
-          >
+            </span>
+          </button>
+        </div>
+        <div className={toTailwind(styles.headerActions)}>
+          <button onClick={props.onFilesPress} role="button" aria-label="Files">
             <FolderOpen size={16} color={textPrimary} strokeWidth={1.8} />
-          </Pressable>
-          {appMode === 'code' && actionItems.length > 0 && (
-            <Pressable
-              onPress={() => setMoreVisible(true)}
-              style={({ pressed }) => [styles.iconButton, { backgroundColor: buttonBg }, pressed && { opacity: 0.7 }]}
-              accessibilityRole="button"
-              accessibilityLabel="More actions"
-            >
+          </button>
+          {appMode === 'code' && actionItems.length > 0 && <button onClick={() => setMoreVisible(true)} role="button" aria-label="More actions">
               <Ellipsis size={16} color={textPrimary} strokeWidth={1.8} />
-            </Pressable>
-          )}
-        </View>
-      </View>
+            </button>}
+        </div>
+      </div>
       <NarrowHeaderActionsSheet visible={moreVisible} onClose={closeMore} items={actionItems} />
-    </>
-  );
+    </>;
 }
