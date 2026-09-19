@@ -1,5 +1,5 @@
-import { Input, Text, View } from "@/platform/dom";
-import { Pressable } from "@/platform/dom";
+import { Input, Text, View } from "@/components/dom";
+import { Pressable } from "@/components/dom";
 import { Search, X } from 'lucide-react';
 import type { MarketplacePackage } from '@aijee/client-sdk';
 import { Fonts } from '@/constants/theme';

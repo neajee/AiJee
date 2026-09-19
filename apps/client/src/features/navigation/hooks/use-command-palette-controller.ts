@@ -1,6 +1,6 @@
-import { ScrollView, View } from "@/platform/dom";
+import { ScrollView, View } from "@/components/dom";
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Animated, TextInput, type ScrollView as RNScrollView, type View as RNView } from "@/platform/dom";
+import { Animated, TextInput, type ScrollView as RNScrollView, type View as RNView } from "@/components/dom";
 import { useRouter } from '@/platform/router-adapter';
 import { MessageSquare } from 'lucide-react';
 

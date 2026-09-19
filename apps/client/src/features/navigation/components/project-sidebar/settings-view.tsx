@@ -1,4 +1,4 @@
-import { ScrollView, Text, View } from "@/platform/dom";
+import { ScrollView, Text, View } from "@/components/dom";
 import { usePathname, useRouter } from "@/platform/router-adapter";
 import { ChevronLeft } from "lucide-react";
 import { useColorScheme } from "@/hooks/use-color-scheme";

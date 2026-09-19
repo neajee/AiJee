@@ -1,6 +1,6 @@
-import { Input, ScrollView, Text, View } from "@/platform/dom";
+import { Input, ScrollView, Text, View } from "@/components/dom";
 import { memo, useRef, useState, useEffect } from 'react';
-import { Animated, Modal, Pressable, TextInput } from "@/platform/dom";
+import { Animated, Modal, Pressable, TextInput } from "@/components/dom";
 import { Check, X } from 'lucide-react';
 
 import { Fonts } from '@/constants/theme';

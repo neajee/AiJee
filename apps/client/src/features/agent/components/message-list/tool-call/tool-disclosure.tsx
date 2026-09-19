@@ -1,13 +1,13 @@
-import { View } from "@/platform/dom";
+import { View } from "@/components/dom";
 import { memo, type ReactNode } from "react";
-import { Pressable } from "@/platform/dom";
+import { Pressable } from "@/components/dom";
 import { ChevronRight } from "lucide-react";
 import Animated, {
   Easing,
   useAnimatedStyle,
   useDerivedValue,
   withTiming,
-} from "@/platform/dom";
+} from "@/components/dom";
 import { Colors } from "@/constants/theme";
 import { HAIRLINE_WIDTH } from "@/constants/layout";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";

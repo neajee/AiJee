@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import { Linking } from "@/platform/dom";
+import { Linking } from "@/components/dom";
 import { usePathname } from '@/platform/router-adapter';
 import { ExternalLink, GitBranch, Globe, Play } from 'lucide-react';
 

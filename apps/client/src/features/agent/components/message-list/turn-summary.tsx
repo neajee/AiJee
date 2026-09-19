@@ -1,6 +1,6 @@
-import { Text, View } from "@/platform/dom";
+import { Text, View } from "@/components/dom";
 import { memo, useCallback, useMemo, useState } from "react";
-import { ScrollView } from "@/platform/dom";
+import { ScrollView } from "@/components/dom";
 import { useWorkspaceStore } from "@/features/workspace/store";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import type { TurnFileStats } from "../../types";

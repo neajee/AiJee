@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated } from "@/platform/dom";
+import { Animated } from "@/components/dom";
 import { usePathname } from '@/platform/router-adapter';
 
 import { useResponsiveLayout } from '../../hooks/use-responsive-layout';

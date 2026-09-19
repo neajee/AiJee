@@ -1,4 +1,4 @@
-import { Pressable } from "@/platform/dom";
+import { Pressable } from "@/components/dom";
 
 export function IconButton({
   onPress,

@@ -1,6 +1,6 @@
-import { View } from "@/platform/dom";
+import { View } from "@/components/dom";
 import { useCallback, useRef, useState } from 'react';
-import { Animated, Easing, useWindowDimensions, type View as RNView } from "@/platform/dom";
+import { Animated, Easing, useWindowDimensions, type View as RNView } from "@/components/dom";
 
 import type { ToolCallInfo } from '../types';
 import { basename, isToolActive, parseToolArguments } from '../utils/message-list';

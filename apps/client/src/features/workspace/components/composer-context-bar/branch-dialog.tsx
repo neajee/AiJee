@@ -1,5 +1,5 @@
-import { Input, Text, View } from "@/platform/dom";
-import { Modal, Pressable } from "@/platform/dom";
+import { Input, Text, View } from "@/components/dom";
+import { Modal, Pressable } from "@/components/dom";
 import { usePromptTheme } from '@/components/surface-theme/use-prompt-theme';
 import { styles } from '../../utils/composer-context-bar-styles';
 

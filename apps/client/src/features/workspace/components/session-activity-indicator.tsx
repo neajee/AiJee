@@ -1,6 +1,6 @@
-import { View } from "@/platform/dom";
+import { View } from "@/components/dom";
 import { useEffect, useRef } from "react";
-import { Animated } from "@/platform/dom";
+import { Animated } from "@/components/dom";
 import { Minus } from "lucide-react";
 
 import { useAgentSession } from "@aijee/client-sdk";

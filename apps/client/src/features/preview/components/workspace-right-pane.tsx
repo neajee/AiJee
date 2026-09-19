@@ -1,5 +1,5 @@
 import { memo, useEffect, useState } from "react";
-import { View } from "@/platform/dom";
+import { View } from "@/components/dom";
 
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { ChangesPanel } from "@/features/workspace/components/changes-panel";

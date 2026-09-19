@@ -1,7 +1,7 @@
-import { Text, View } from "@/platform/dom";
-import { Pressable } from "@/platform/dom";
-import Animated from "@/platform/dom";
-import { GestureDetector } from "@/platform/dom";
+import { Text, View } from "@/components/dom";
+import { Pressable } from "@/components/dom";
+import Animated from "@/components/dom";
+import { GestureDetector } from "@/components/dom";
 import { ABSOLUTE_FILL_STYLE } from '@/constants/layout';
 import { styles } from './styles';
 import type { NarrowHeaderActionsSheetViewProps } from './types';

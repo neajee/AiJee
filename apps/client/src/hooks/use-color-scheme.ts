@@ -1,4 +1,4 @@
-import { useColorScheme as useSystemColorScheme } from "@/platform/dom";
+import { useColorScheme as useSystemColorScheme } from "@/components/dom";
 import { useAppSettingsStore } from '@/features/settings/store';
 
 export function useColorScheme() {

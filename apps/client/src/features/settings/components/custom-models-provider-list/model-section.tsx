@@ -1,4 +1,4 @@
-import { Text, View } from "@/platform/dom";
+import { Text, View } from "@/components/dom";
 
 import { providerPageStyles } from '../../utils/custom-models-styles';
 import type { ModelSectionProps } from './types';

@@ -1,4 +1,4 @@
-import { ScrollView, Spinner, Text } from "@/platform/dom";
+import { ScrollView, Spinner, Text } from "@/components/dom";
 import { useFileList, type FsEntry } from '@aijee/client-sdk';
 import { applyFilter } from '../../utils/file-tree';
 import type { FileTreeNodeProps } from './types';

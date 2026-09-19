@@ -1,4 +1,4 @@
-import { Text, View } from "@/platform/dom";
+import { Text, View } from "@/components/dom";
 import type { ReactNode } from "react";
 import { HAIRLINE_WIDTH } from '@/constants/layout';
 import { useSettingsMetrics, useSettingsPalette } from "@/components/settings-surface";

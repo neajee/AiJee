@@ -1,7 +1,7 @@
 import { type ReactNode } from 'react';
-import { Pressable } from "@/platform/dom";
-import { ScrollView, Text, View } from "@/platform/dom";
-import { useSafeAreaInsets } from "@/platform/dom";
+import { Pressable } from "@/components/dom";
+import { ScrollView, Text, View } from "@/components/dom";
+import { useSafeAreaInsets } from "@/components/dom";
 import { ChevronLeft } from 'lucide-react';
 import {
   SettingsHeadingProvider,

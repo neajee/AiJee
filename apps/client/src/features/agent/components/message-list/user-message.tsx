@@ -1,6 +1,6 @@
-import { Image, Input, ScrollView, Text, View } from "@/platform/dom";
+import { Image, Input, ScrollView, Text, View } from "@/components/dom";
 import { memo, useEffect, useMemo, useState } from "react";
-import { Pressable } from "@/platform/dom";
+import { Pressable } from "@/components/dom";
 import { Check, ChevronDown, Pencil, X } from "lucide-react";
 import { Colors, Fonts } from "@/constants/theme";
 import { HAIRLINE_WIDTH } from "@/constants/layout";

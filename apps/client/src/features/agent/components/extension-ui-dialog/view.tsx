@@ -1,5 +1,5 @@
-import { Input, ScrollView, Spinner, Text, View } from "@/platform/dom";
-import { Pressable } from "@/platform/dom";
+import { Input, ScrollView, Spinner, Text, View } from "@/components/dom";
+import { Pressable } from "@/components/dom";
 import { Check, Circle, CircleDot, X } from "lucide-react";
 import { styles } from "./styles";
 import type { ExtensionUiController } from "../../hooks/use-extension-ui-controller";

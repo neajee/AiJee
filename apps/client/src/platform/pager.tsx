@@ -1,5 +1,5 @@
 import React, { forwardRef, useImperativeHandle, useRef } from "react";
-import { View } from "@/platform/dom";
+import { View } from "@/components/dom";
 
 export interface PagerHandle { setPage(index: number): void; }
 export const Pager = forwardRef<PagerHandle, any>(({ children, onPageSelected, ...props }, ref) => {

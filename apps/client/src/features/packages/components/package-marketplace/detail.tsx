@@ -1,6 +1,6 @@
-import { ScrollView, Text, View } from "@/platform/dom";
+import { ScrollView, Text, View } from "@/components/dom";
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Linking, Pressable, useWindowDimensions } from "@/platform/dom";
+import { Linking, Pressable, useWindowDimensions } from "@/components/dom";
 import { Download, ExternalLink, X } from 'lucide-react';
 import { usePiClient } from '@aijee/client-sdk';
 import type { MarketplacePackage } from '@aijee/client-sdk';

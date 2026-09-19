@@ -1,4 +1,4 @@
-import { ScrollView, Text, View } from "@/platform/dom";
+import { ScrollView, Text, View } from "@/components/dom";
 
 
 import { Fonts } from "@/constants/theme";

@@ -1,6 +1,6 @@
-import { Text, View } from "@/platform/dom";
+import { Text, View } from "@/components/dom";
 import { useState, type ReactNode } from "react";
-import { Pressable } from "@/platform/dom";
+import { Pressable } from "@/components/dom";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { styles } from "./styles";
 export function SectionHeader({

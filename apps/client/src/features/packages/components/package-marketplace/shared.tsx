@@ -1,5 +1,5 @@
-import { Spinner, Text, View } from "@/platform/dom";
-import { Pressable } from "@/platform/dom";
+import { Spinner, Text, View } from "@/components/dom";
+import { Pressable } from "@/components/dom";
 import { ShieldAlert } from 'lucide-react';
 import { Fonts } from '@/constants/theme';
 import { useSettingsMetrics, useSettingsPalette } from '@/components/settings-surface';

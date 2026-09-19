@@ -1,5 +1,5 @@
 import { memo, useEffect } from "react";
-import { View } from "@/platform/dom";
+import { View } from "@/components/dom";
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -8,7 +8,7 @@ import Animated, {
   withTiming,
   withDelay,
   Easing,
-} from "@/platform/dom";
+} from "@/components/dom";
 
 interface StreamingCursorProps {
   color?: string;

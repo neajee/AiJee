@@ -1,7 +1,7 @@
-import { ScrollView, Text, View } from "@/platform/dom";
+import { ScrollView, Text, View } from "@/components/dom";
 import { Layers } from 'lucide-react';
 import { AppModal } from '@/components/ui';
-import { Pressable } from "@/platform/dom";
+import { Pressable } from "@/components/dom";
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useModePickerController } from '../../hooks/use-mode-picker-controller';
 import { ModeOption } from './mode-option';

@@ -1,5 +1,5 @@
 import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
-import { Animated, Keyboard, LayoutAnimation, NativeSyntheticEvent, TextInput, TextInputKeyPressEventData } from "@/platform/dom";
+import { Animated, Keyboard, LayoutAnimation, NativeSyntheticEvent, TextInput, TextInputKeyPressEventData } from "@/components/dom";
 import * as DocumentPicker from '@/platform/files';
 import { File as ExpoFile } from '@/platform/files';
 import { useQuery } from '@tanstack/react-query';

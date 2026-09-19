@@ -1,4 +1,4 @@
-import { Input, Text, View } from "@/platform/dom";
+import { Input, Text, View } from "@/components/dom";
 import { formStyles } from './styles';
 
 interface ServerFormFieldsProps {

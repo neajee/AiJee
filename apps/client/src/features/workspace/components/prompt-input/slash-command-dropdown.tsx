@@ -1,6 +1,6 @@
-import { ScrollView, Text } from "@/platform/dom";
+import { ScrollView, Text } from "@/components/dom";
 import { useRef, useEffect } from 'react';
-import { Animated, Pressable } from "@/platform/dom";
+import { Animated, Pressable } from "@/components/dom";
 
 import { Fonts } from '@/constants/theme';
 import { SlashCommand } from '../../utils/prompt-input';

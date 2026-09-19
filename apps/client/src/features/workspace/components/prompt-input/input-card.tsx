@@ -1,5 +1,5 @@
-import { Input, Text, View } from "@/platform/dom";
-import { Animated, Pressable } from "@/platform/dom";
+import { Input, Text, View } from "@/components/dom";
+import { Animated, Pressable } from "@/components/dom";
 import { ArrowUp, Mic, Plus, Square } from 'lucide-react';
 import { formatAgentModeLabel } from '@/features/agent/mode';
 import { Toolbar } from './toolbar/index';

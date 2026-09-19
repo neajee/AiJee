@@ -1,12 +1,12 @@
-import { Text, View } from "@/platform/dom";
+import { Text, View } from "@/components/dom";
 import { useEffect } from 'react';
-import { Pressable } from "@/platform/dom";
+import { Pressable } from "@/components/dom";
 import { Play, Square, ChevronDown } from 'lucide-react';
 
 import { Fonts } from '@/constants/theme';
 import { useTasksStore } from '../store';
 import { useWorkspaceStore } from '@/features/workspace/store';
-import { TasksDropdown } from './tasks-panel/index';
+import { TasksDropdown } from './tasks-panel/TasksDropdown';
 
 export function TaskSelector({
   placement = 'below',

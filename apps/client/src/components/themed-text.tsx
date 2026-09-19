@@ -1,5 +1,5 @@
-import { Text } from "@/platform/dom";
-import { type TextProps } from "@/platform/dom";
+import { Text } from "@/components/dom";
+import { type TextProps } from "@/components/dom";
 
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Fonts } from '@/constants/theme';

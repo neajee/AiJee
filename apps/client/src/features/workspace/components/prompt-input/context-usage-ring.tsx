@@ -1,6 +1,6 @@
-import { Text, View } from "@/platform/dom";
+import { Text, View } from "@/components/dom";
 import { useState } from "react";
-import { Pressable } from "@/platform/dom";
+import { Pressable } from "@/components/dom";
 import Svg, { Circle as SvgCircle } from "@/platform/svg";
 
 import { Fonts } from "@/constants/theme";

@@ -1,4 +1,4 @@
-import { useWindowDimensions } from "@/platform/dom";
+import { useWindowDimensions } from "@/components/dom";
 
 const WIDE_SCREEN_BREAKPOINT = 768;
 

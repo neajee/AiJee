@@ -1,6 +1,6 @@
-import { View } from "@/platform/dom";
+import { View } from "@/components/dom";
 import { memo, useEffect, useMemo, useState } from "react";
-import { Text } from "@/platform/dom";
+import { Text } from "@/components/dom";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { formatTurnAction, summarizeTurnActions, type WorkStep } from "../../utils/turns";
 import { isToolActive } from "../../utils/message-list";

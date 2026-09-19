@@ -1,7 +1,7 @@
-import { Spinner, Text, View } from "@/platform/dom";
+import { Spinner, Text, View } from "@/components/dom";
 import { useState } from "react";
 import {
-  Pressable } from "@/platform/dom";
+  Pressable } from "@/components/dom";
 
 import { Fonts } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";

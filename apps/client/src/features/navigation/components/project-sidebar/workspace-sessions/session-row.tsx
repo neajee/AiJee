@@ -1,6 +1,6 @@
-import { Input, Spinner, Text, View } from "@/platform/dom";
+import { Input, Spinner, Text, View } from "@/components/dom";
 import { useCallback, useEffect, useState } from 'react';
-import { Alert, Pressable } from "@/platform/dom";
+import { Alert, Pressable } from "@/components/dom";
 import { Archive as ArchiveIcon, Pencil } from 'lucide-react';
 import { Fonts } from '@/constants/theme';
 import { useThemeTokens } from '@/hooks/use-theme-tokens';

@@ -1,6 +1,6 @@
-import { Text, View } from "@/platform/dom";
+import { Text, View } from "@/components/dom";
 import { Check, CircleOff, Star } from 'lucide-react';
-import { Pressable } from "@/platform/dom";
+import { Pressable } from "@/components/dom";
 import type { AgentMode } from '@aijee/client-sdk';
 import { styles } from './styles';
 

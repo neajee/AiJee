@@ -1,6 +1,6 @@
-import { Text, View } from "@/platform/dom";
+import { Text, View } from "@/components/dom";
 import { useEffect, useMemo, useState } from 'react';
-import { Pressable } from "@/platform/dom";
+import { Pressable } from "@/components/dom";
 import { Cpu, Pencil, Trash2 } from 'lucide-react';
 import { HAIRLINE_WIDTH } from '@/constants/layout';
 import { type CustomModelEntry } from '../../store/custom-models';

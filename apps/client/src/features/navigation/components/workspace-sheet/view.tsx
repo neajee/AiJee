@@ -1,10 +1,10 @@
-import { ScrollView, Text, View } from "@/platform/dom";
+import { ScrollView, Text, View } from "@/components/dom";
 import MaterialIcons from '@/platform/icons';
-import { Pressable } from "@/platform/dom";
-import { useSafeAreaInsets } from "@/platform/dom";
+import { Pressable } from "@/components/dom";
+import { useSafeAreaInsets } from "@/components/dom";
 import { Plus } from 'lucide-react';
-import Animated from "@/platform/dom";
-import { GestureDetector } from "@/platform/dom";
+import Animated from "@/components/dom";
+import { GestureDetector } from "@/components/dom";
 import { Pager } from '@/platform/pager';
 
 import { Fonts } from '@/constants/theme';

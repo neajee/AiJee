@@ -1,7 +1,7 @@
-import { ScrollView, Text, View } from "@/platform/dom";
-import { KeyboardAvoidingView, Modal, Pressable } from "@/platform/dom";
+import { ScrollView, Text, View } from "@/components/dom";
+import { KeyboardAvoidingView, Modal, Pressable } from "@/components/dom";
 import { X } from 'lucide-react';
-import { useSafeAreaInsets } from "@/platform/dom";
+import { useSafeAreaInsets } from "@/components/dom";
 
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';

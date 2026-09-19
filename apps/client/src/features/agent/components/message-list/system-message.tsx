@@ -1,6 +1,6 @@
-import { Text, View } from "@/platform/dom";
+import { Text, View } from "@/components/dom";
 import { memo, useState } from "react";
-import { Pressable } from "@/platform/dom";
+import { Pressable } from "@/components/dom";
 import { Colors, Fonts } from "@/constants/theme";
 import { HAIRLINE_WIDTH } from "@/constants/layout";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";

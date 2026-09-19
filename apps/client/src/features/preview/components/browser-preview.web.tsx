@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { View } from "@/platform/dom";
+import { View } from "@/components/dom";
 
 import type { PreviewTarget } from "@/features/preview/store";
 import { buildPreviewSrc } from "@/features/preview/service-worker";

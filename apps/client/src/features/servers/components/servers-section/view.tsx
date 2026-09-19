@@ -1,5 +1,5 @@
-import { Modal, Pressable } from "@/platform/dom";
-import { Image, Spinner, Text, View } from "@/platform/dom";
+import { Modal, Pressable } from "@/components/dom";
+import { Image, Spinner, Text, View } from "@/components/dom";
 import { Copy, Pencil, Plus, QrCode, RefreshCw, Trash2, X } from "lucide-react";
 import * as Clipboard from "@/platform/clipboard";
 import { Fonts } from "@/constants/theme";

@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
-import { GestureHandlerRootView } from "@/platform/dom";
-import { SafeAreaView } from "@/platform/dom";
-import { View } from "@/platform/dom";
+import { GestureHandlerRootView } from "@/components/dom";
+import { SafeAreaView } from "@/components/dom";
+import { View } from "@/components/dom";
 
 import { NarrowHeaderBar } from '../../components/narrow-header-bar';
 import { WorkspaceSheet } from '../../components/workspace-sheet';

@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
-import { View } from "@/platform/dom";
-import type { LayoutChangeEvent } from "@/platform/dom";
+import { View } from "@/components/dom";
+import type { LayoutChangeEvent } from "@/components/dom";
 import Animated, {
   Easing,
   runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
-} from "@/platform/dom";
+} from "@/components/dom";
 
 interface AnimatedCollapseProps {
   expanded: boolean;

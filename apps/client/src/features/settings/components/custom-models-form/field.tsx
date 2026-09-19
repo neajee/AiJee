@@ -1,4 +1,4 @@
-import { Input, Text, View } from "@/platform/dom";
+import { Input, Text, View } from "@/components/dom";
 import { Fonts } from '@/constants/theme';
 import { useColors } from '../../hooks/use-custom-models-theme';
 

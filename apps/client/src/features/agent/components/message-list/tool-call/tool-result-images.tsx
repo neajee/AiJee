@@ -1,6 +1,6 @@
-import { Image, View } from "@/platform/dom";
+import { Image, View } from "@/components/dom";
 import { memo, useCallback, useState } from "react";
-import { Pressable, Modal } from "@/platform/dom";
+import { Pressable, Modal } from "@/components/dom";
 import type { ToolResultImage } from "../../../types";
 
 interface ToolResultImagesProps {

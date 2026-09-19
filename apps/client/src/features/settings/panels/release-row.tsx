@@ -1,6 +1,6 @@
-import { Text, View } from "@/platform/dom";
+import { Text, View } from "@/components/dom";
 import { useState } from "react";
-import { Pressable } from "@/platform/dom";
+import { Pressable } from "@/components/dom";
 import { HAIRLINE_WIDTH } from '@/constants/layout';
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useSettingsPalette } from "@/components/settings-surface";

@@ -1,5 +1,5 @@
-import { type ViewStyle, type StyleProp } from "@/platform/dom";
-import { View } from "@/platform/dom";
+import { type ViewStyle, type StyleProp } from "@/components/dom";
+import { View } from "@/components/dom";
 
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 

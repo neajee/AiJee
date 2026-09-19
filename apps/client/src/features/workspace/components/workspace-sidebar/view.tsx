@@ -1,6 +1,6 @@
-import { View } from "@/platform/dom";
+import { View } from "@/components/dom";
 import { Files, GitBranch, Globe2 } from 'lucide-react';
-import { Animated } from "@/platform/dom";
+import { Animated } from "@/components/dom";
 
 import {
   SeamToggle,

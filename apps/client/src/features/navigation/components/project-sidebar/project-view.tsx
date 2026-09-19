@@ -1,6 +1,6 @@
-import { ScrollView, Text, View } from "@/platform/dom";
+import { ScrollView, Text, View } from "@/components/dom";
 import { useCallback } from "react";
-import { Modal, Pressable } from "@/platform/dom";
+import { Modal, Pressable } from "@/components/dom";
 import { PackageOpen, Plus, Settings, SquarePen } from "lucide-react";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { NewWorkspaceDialog } from "@/features/workspace/components/new-workspace-dialog";

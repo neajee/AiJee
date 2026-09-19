@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import {  Alert  } from "@/platform/dom";
+import {  Alert  } from "@/components/dom";
 import { useRouter } from "@/platform/router-adapter";
 import QRCode from "qrcode";
 import { useOptionalPiClient } from "@aijee/client-sdk";

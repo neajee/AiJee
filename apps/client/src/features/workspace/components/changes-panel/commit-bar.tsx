@@ -1,7 +1,7 @@
-import { Input, Spinner, View } from "@/platform/dom";
+import { Input, Spinner, View } from "@/components/dom";
 import { useRef } from "react";
-import { Pressable } from "@/platform/dom";
-import type { TextInput as RNTextInput } from "@/platform/dom";
+import { Pressable } from "@/components/dom";
+import type { TextInput as RNTextInput } from "@/components/dom";
 import { Send } from "lucide-react";
 
 import { Fonts } from "@/constants/theme";

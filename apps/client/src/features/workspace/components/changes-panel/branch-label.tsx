@@ -1,4 +1,4 @@
-import { Text, View } from "@/platform/dom";
+import { Text, View } from "@/components/dom";
 
 import { GitBranch, ArrowUp, ArrowDown } from "lucide-react";
 

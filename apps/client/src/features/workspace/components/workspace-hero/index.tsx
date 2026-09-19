@@ -1,6 +1,6 @@
-import { Text, View } from "@/platform/dom";
+import { Text, View } from "@/components/dom";
 import { useRef, useEffect, useMemo } from "react";
-import { Animated } from "@/platform/dom";
+import { Animated } from "@/components/dom";
 
 import { Fonts } from "@/constants/theme";
 import { AiJeeLogo } from "@/components/aijee-logo";

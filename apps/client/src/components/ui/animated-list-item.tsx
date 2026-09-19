@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import Animated, { FadeIn, FadeOut, LinearTransition } from "@/platform/dom";
+import Animated, { FadeIn, FadeOut, LinearTransition } from "@/components/dom";
 
 const ITEM_LAYOUT = LinearTransition.springify().damping(18).stiffness(180).mass(0.7);
 

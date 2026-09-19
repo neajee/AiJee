@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from 'react';
-import { Easing, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from "@/platform/dom";
-import { Gesture } from "@/platform/dom";
-import { useSafeAreaInsets } from "@/platform/dom";
+import { Easing, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from "@/components/dom";
+import { Gesture } from "@/components/dom";
+import { useSafeAreaInsets } from "@/components/dom";
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useThemeTokens } from '@/hooks/use-theme-tokens';
 import { NARROW_HEADER_ACTIONS_SHEET_HEIGHT } from '../utils/narrow-header-actions';

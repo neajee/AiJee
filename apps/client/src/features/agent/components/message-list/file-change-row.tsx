@@ -1,6 +1,6 @@
-import { View } from "@/platform/dom";
+import { View } from "@/components/dom";
 import { memo } from "react";
-import { Text } from "@/platform/dom";
+import { Text } from "@/components/dom";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { basename, relativePath, type TurnFileChange } from "../../utils/message-list";
 import { styles } from "./styles";

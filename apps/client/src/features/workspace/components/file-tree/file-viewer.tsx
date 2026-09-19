@@ -1,5 +1,5 @@
-import { Spinner, Text, View } from "@/platform/dom";
-import { Pressable } from "@/platform/dom";
+import { Spinner, Text, View } from "@/components/dom";
+import { Pressable } from "@/components/dom";
 import { X } from 'lucide-react';
 import { useFileRead } from '@aijee/client-sdk';
 import { CodePreview } from '@/features/agent/components/message-list/code-preview';

@@ -1,6 +1,6 @@
-import { Text } from "@/platform/dom";
+import { Text } from "@/components/dom";
 import { useState } from 'react';
-import { Pressable } from "@/platform/dom";
+import { Pressable } from "@/components/dom";
 import { useThemeTokens } from '@/hooks/use-theme-tokens';
 import { styles } from '../styles';
 

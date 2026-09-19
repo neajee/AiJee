@@ -1,4 +1,4 @@
-import { useWindowDimensions } from "@/platform/dom";
+import { useWindowDimensions } from "@/components/dom";
 
 interface SheetHeightOptions {
   /** Fraction of the window height the sheet should target. */

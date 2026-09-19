@@ -1,5 +1,5 @@
-import { Text, View } from "@/platform/dom";
-import { Linking, Modal, Pressable } from "@/platform/dom";
+import { Text, View } from "@/components/dom";
+import { Linking, Modal, Pressable } from "@/components/dom";
 import { ExternalLink, Pencil, Pin, PinOff, SquarePen, Trash2 } from 'lucide-react';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';

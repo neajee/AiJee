@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
-import type { PanGesture as PanGestureType } from "@/platform/dom";
-import type { ViewStyle } from "@/platform/dom";
-import type { AnimatedStyle } from "@/platform/dom";
+import type { PanGesture as PanGestureType } from "@/components/dom";
+import type { ViewStyle } from "@/components/dom";
+import type { AnimatedStyle } from "@/components/dom";
 
 export interface NarrowHeaderActionItem {
   key: string;

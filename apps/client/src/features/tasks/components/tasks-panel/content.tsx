@@ -1,7 +1,7 @@
-import { ScrollView, Text, View } from "@/platform/dom";
+import { ScrollView, Text, View } from "@/components/dom";
 import { useCallback, useEffect, useState } from 'react';
 import {
-  Pressable } from "@/platform/dom";
+  Pressable } from "@/components/dom";
 import { ChevronDown, ChevronRight } from 'lucide-react';
 
 import { Colors } from '@/constants/theme';
@@ -9,7 +9,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useTasksStore } from '../../store';
 import { useWorkspaceStore } from '@/features/workspace/store';
 import { AvailableTaskRow, TaskInstanceRow } from './rows';
-import { styles } from './styles';
+import { styles } from './style-tokens';
 
 export function TasksPanelContent() {
   const colorScheme = useColorScheme() ?? 'light';

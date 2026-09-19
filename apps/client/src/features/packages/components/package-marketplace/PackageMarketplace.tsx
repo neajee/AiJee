@@ -1,4 +1,4 @@
-import { ScrollView, Spinner, Text, View } from "@/platform/dom";
+import { ScrollView, Spinner, Text, View } from "@/components/dom";
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { usePiClient } from '@aijee/client-sdk';

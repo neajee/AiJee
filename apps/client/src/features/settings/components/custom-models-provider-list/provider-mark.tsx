@@ -1,4 +1,4 @@
-import { Text, View } from "@/platform/dom";
+import { Text, View } from "@/components/dom";
 
 import { ProviderIcon as LobeProviderIcon } from '@/platform/provider-icons';
 import { ProviderIcon } from '@/components/provider-icons';

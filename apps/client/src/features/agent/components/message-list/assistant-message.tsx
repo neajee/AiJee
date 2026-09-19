@@ -1,6 +1,6 @@
-import { Text, View } from "@/platform/dom";
+import { Text, View } from "@/components/dom";
 import { memo, useCallback, useEffect, useState } from "react";
-import { Pressable } from "@/platform/dom";
+import { Pressable } from "@/components/dom";
 import * as Clipboard from "@/platform/clipboard";
 import { Copy } from "lucide-react";
 import Animated, {
@@ -8,7 +8,7 @@ import Animated, {
   useAnimatedStyle,
   withTiming,
   Easing,
-} from "@/platform/dom";
+} from "@/components/dom";
 import { Colors, Fonts } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";

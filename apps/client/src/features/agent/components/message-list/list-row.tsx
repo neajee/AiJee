@@ -1,5 +1,5 @@
 import { memo } from "react";
-import Animated, { FadeIn, FadeOut } from "@/platform/dom";
+import Animated, { FadeIn, FadeOut } from "@/components/dom";
 import type { ChatMessage } from "../../types";
 import { SystemMessage } from "./system-message";
 import { UserMessage } from "./user-message";

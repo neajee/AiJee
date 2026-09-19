@@ -1,5 +1,5 @@
-import { Pressable } from "@/platform/dom";
-import { Text, TextArea, View } from "@/platform/dom";
+import { Pressable } from "@/components/dom";
+import { Text, TextArea, View } from "@/components/dom";
 import { Fonts } from '@/constants/theme';
 import { useSettingsPalette, useSettingsPhoneLayout } from '@/components/settings-surface';
 import { useAgentModesController } from '../../hooks/use-agent-modes-controller';

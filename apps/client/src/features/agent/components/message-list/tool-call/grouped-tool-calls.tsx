@@ -1,6 +1,6 @@
-import { Text, View } from "@/platform/dom";
+import { Text, View } from "@/components/dom";
 import { memo, useEffect, useRef, useState } from 'react';
-import { Animated, Pressable } from "@/platform/dom";
+import { Animated, Pressable } from "@/components/dom";
 import { useThemeTokens } from '@/hooks/use-theme-tokens';
 import type { ToolCallInfo } from '../../../types';
 import { isToolActive } from '../../../utils/message-list';

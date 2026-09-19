@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useWindowDimensions } from "@/platform/dom";
+import { useWindowDimensions } from "@/components/dom";
 
 import { useGitStatus, useNestedRepos } from '@aijee/client-sdk';
 import { remotesToLinks, type RemoteLink } from '@/features/workspace/utils/git-remote-url';

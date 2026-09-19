@@ -1,7 +1,7 @@
-import { Spinner, Text, View } from "@/platform/dom";
+import { Spinner, Text, View } from "@/components/dom";
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
-import { Pressable } from "@/platform/dom";
-import Animated, { Easing, FadeIn, useAnimatedStyle, useSharedValue, withTiming } from "@/platform/dom";
+import { Pressable } from "@/components/dom";
+import Animated, { Easing, FadeIn, useAnimatedStyle, useSharedValue, withTiming } from "@/components/dom";
 import { ChevronRight, GitFork } from "lucide-react";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { AssistantMessage, MessageToolbar } from "./assistant-message";

@@ -1,8 +1,8 @@
-import { Spinner, Text, View } from "@/platform/dom";
+import { Spinner, Text, View } from "@/components/dom";
 import { useCallback } from "react";
 import {
-  FlatList, Pressable, type ListRenderItemInfo } from "@/platform/dom";
-import Animated, { FadeIn, FadeOut } from "@/platform/dom";
+  FlatList, Pressable, type ListRenderItemInfo } from "@/components/dom";
+import Animated, { FadeIn, FadeOut } from "@/components/dom";
 import { ArrowDown } from "lucide-react";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";

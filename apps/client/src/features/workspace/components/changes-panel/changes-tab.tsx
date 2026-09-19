@@ -1,6 +1,6 @@
-import { Text, View } from "@/platform/dom";
+import { Text, View } from "@/components/dom";
 import { useCallback, useMemo } from "react";
-import { Alert } from "@/platform/dom";
+import { Alert } from "@/components/dom";
 import { Plus, Minus, Undo2, Check } from "lucide-react";
 
 import { Fonts } from "@/constants/theme";

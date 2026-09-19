@@ -1,5 +1,5 @@
-import { Text, View } from "@/platform/dom";
-import { Animated, Pressable } from "@/platform/dom";
+import { Text, View } from "@/components/dom";
+import { Animated, Pressable } from "@/components/dom";
 import { ChevronDown } from 'lucide-react';
 import { styles } from '../../../utils/toolbar-styles';
 import type { ToolbarController } from './types';

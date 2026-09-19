@@ -1,4 +1,4 @@
-import { View } from "@/platform/dom";
+import { View } from "@/components/dom";
 
 import type { DiffTab } from "./context";
 

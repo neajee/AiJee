@@ -1,8 +1,8 @@
-import { Text, View } from "@/platform/dom";
-import { Pressable } from "@/platform/dom";
+import { Text, View } from "@/components/dom";
+import { Pressable } from "@/components/dom";
 import { Circle, Play, RotateCcw, Square, Trash2 } from 'lucide-react';
 import type { TaskDefinition, TaskInfo } from '@aijee/client-sdk';
-import { styles } from './styles';
+import { styles } from './style-tokens';
 
 const SOURCE_COLORS: Record<string, string> = {
   npm: '#CB3837',

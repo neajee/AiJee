@@ -1,6 +1,6 @@
-import { Text, View } from "@/platform/dom";
+import { Text, View } from "@/components/dom";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Pressable } from "@/platform/dom";
+import { Pressable } from "@/components/dom";
 import { Brain, ChevronRight } from "lucide-react";
 import Animated, {
   Easing,
@@ -9,7 +9,7 @@ import Animated, {
   withRepeat,
   withSequence,
   withTiming,
-} from "@/platform/dom";
+} from "@/components/dom";
 import { Colors, Fonts } from "@/constants/theme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { AnimatedCollapse } from "./animated-collapse";

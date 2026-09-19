@@ -1,6 +1,6 @@
-import { Text, View } from "@/platform/dom";
+import { Text, View } from "@/components/dom";
 import { useEffect, type ComponentType } from "react";
-import { Pressable } from "@/platform/dom";
+import { Pressable } from "@/components/dom";
 import { Monitor, Moon, Sun } from "lucide-react";
 import { HAIRLINE_WIDTH } from '@/constants/layout';
 import { Fonts, type AccentPreset, type ThemePreset } from "@/constants/theme";

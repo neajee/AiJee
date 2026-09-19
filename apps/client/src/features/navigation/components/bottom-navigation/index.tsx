@@ -1,8 +1,8 @@
-import { ScrollView, View } from "@/platform/dom";
+import { ScrollView, View } from "@/components/dom";
 import MaterialIcons from '@/platform/icons';
 import { useRouter, usePathname } from '@/platform/router-adapter';
-import { Pressable } from "@/platform/dom";
-import { useSafeAreaInsets } from "@/platform/dom";
+import { Pressable } from "@/components/dom";
+import { useSafeAreaInsets } from "@/components/dom";
 
 import { Colors, WorkspaceColors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';

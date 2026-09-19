@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { View } from "@/platform/dom";
+import { View } from "@/components/dom";
 
 import type { PreviewTarget } from "@/features/preview/store";
 import { buildPreviewUrl } from "@/features/preview/utils";

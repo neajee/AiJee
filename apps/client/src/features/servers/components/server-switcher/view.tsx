@@ -1,6 +1,6 @@
 import { Check, ChevronDown, Settings } from 'lucide-react';
-import { Pressable } from "@/platform/dom";
-import { ScrollView, Text, View } from "@/platform/dom";
+import { Pressable } from "@/components/dom";
+import { ScrollView, Text, View } from "@/components/dom";
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useThemeTokens } from '@/hooks/use-theme-tokens';

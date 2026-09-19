@@ -1,4 +1,4 @@
-import { Text, View } from "@/platform/dom";
+import { Text, View } from "@/components/dom";
 import { useCallback, useState } from "react";
 
 import { Colors, Fonts } from "@/constants/theme";

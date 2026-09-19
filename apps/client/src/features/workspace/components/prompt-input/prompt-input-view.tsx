@@ -1,6 +1,6 @@
-import { Text, View } from "@/platform/dom";
+import { Text, View } from "@/components/dom";
 import type { ChangeEvent, RefObject } from 'react';
-import { Animated, NativeSyntheticEvent, Pressable, TextInput, TextInputKeyPressEventData } from "@/platform/dom";
+import { Animated, NativeSyntheticEvent, Pressable, TextInput, TextInputKeyPressEventData } from "@/components/dom";
 
 import { formatAgentModeLabel, type AgentMode } from '@/features/agent/mode';
 import { useCachedAgentConfig } from '@/features/agent/hooks/use-cached-agent-config';

@@ -1,6 +1,6 @@
 import { type ReactNode } from 'react';
-import { ScrollView, View } from "@/platform/dom";
-import { useSafeAreaInsets } from "@/platform/dom";
+import { ScrollView, View } from "@/components/dom";
+import { useSafeAreaInsets } from "@/components/dom";
 import {
   useSettingsContentStyle,
   useSettingsPalette,

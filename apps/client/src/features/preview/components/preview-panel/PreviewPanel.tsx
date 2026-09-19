@@ -1,12 +1,12 @@
-import { Input, ScrollView, Spinner, Text, View } from "@/platform/dom";
+import { Input, ScrollView, Spinner, Text, View } from "@/components/dom";
 import { memo } from "react";
-import { Pressable } from "@/platform/dom";
+import { Pressable } from "@/components/dom";
 import { Plus } from "lucide-react";
 
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { BrowserPreview } from "@/features/preview/components/browser-preview";
 import { usePreviewPanelController } from "../../hooks/use-preview-panel-controller";
-import { styles } from "./styles";
+import { styles } from "./style-tokens";
 
 interface PreviewPanelProps {
   sessionId: string | null;

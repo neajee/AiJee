@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { type NativeSyntheticEvent, TextInput, type TextInputKeyPressEventData } from "@/platform/dom";
+import { type NativeSyntheticEvent, TextInput, type TextInputKeyPressEventData } from "@/components/dom";
 
 import { api } from '@aijee/client-sdk';
 import { useWorkspaceStore } from '../store';

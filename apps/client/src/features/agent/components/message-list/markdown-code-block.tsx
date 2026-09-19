@@ -1,6 +1,6 @@
-import { Text, View } from "@/platform/dom";
+import { Text, View } from "@/components/dom";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
-import { Pressable } from "@/platform/dom";
+import { Pressable } from "@/components/dom";
 import * as Clipboard from "@/platform/clipboard";
 import { Check, Copy } from "lucide-react";
 import { Colors, Fonts } from "@/constants/theme";

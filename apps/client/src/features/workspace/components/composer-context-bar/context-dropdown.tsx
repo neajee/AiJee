@@ -1,6 +1,6 @@
-import { ScrollView, Spinner, Text, View } from "@/platform/dom";
+import { ScrollView, Spinner, Text, View } from "@/components/dom";
 import type { ReactNode } from 'react';
-import { Animated, Pressable } from "@/platform/dom";
+import { Animated, Pressable } from "@/components/dom";
 import { Check, ChevronDown, FolderGit2, GitBranch, Globe, Plus } from 'lucide-react';
 import { usePromptTheme } from '@/components/surface-theme/use-prompt-theme';
 import type { GitBranch as GitBranchInfo } from '@aijee/client-sdk';

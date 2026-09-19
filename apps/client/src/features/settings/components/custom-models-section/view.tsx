@@ -1,5 +1,5 @@
-import { Input, Text, View } from "@/platform/dom";
-import { Linking, Pressable } from "@/platform/dom";
+import { Input, Text, View } from "@/components/dom";
+import { Linking, Pressable } from "@/components/dom";
 import { ChevronDown, ChevronUp, KeyRound, LogIn, LogOut, Plus, X } from "lucide-react";
 import type { BuiltinProvider } from "@aijee/client-sdk";
 import { useCustomModelsStore } from "../../store/custom-models";

@@ -1,5 +1,5 @@
 import { memo } from "react";
-import { View } from "@/platform/dom";
+import { View } from "@/components/dom";
 
 interface DiffSidebarProps {
   messages: unknown[];

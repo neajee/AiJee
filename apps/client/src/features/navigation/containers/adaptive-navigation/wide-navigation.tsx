@@ -1,7 +1,7 @@
-import { View } from "@/platform/dom";
+import { View } from "@/components/dom";
 import type { ReactNode } from 'react';
-import { Animated } from "@/platform/dom";
-import { SafeAreaView } from "@/platform/dom";
+import { Animated } from "@/components/dom";
+import { SafeAreaView } from "@/components/dom";
 
 import { ConnectionStatusBanner } from '@/features/agent/components/connection-status-banner';
 import { ProjectSidebar, SettingsSidebar } from '../../components/project-sidebar';

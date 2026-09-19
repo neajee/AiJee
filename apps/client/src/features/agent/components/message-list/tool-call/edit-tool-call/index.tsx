@@ -1,6 +1,6 @@
-import { Text, View } from "@/platform/dom";
+import { Text, View } from "@/components/dom";
 import { memo, useCallback } from 'react';
-import { Animated, Modal, Pressable, useWindowDimensions } from "@/platform/dom";
+import { Animated, Modal, Pressable, useWindowDimensions } from "@/components/dom";
 import { Maximize2, X } from 'lucide-react';
 
 import { useThemeTokens } from '@/hooks/use-theme-tokens';

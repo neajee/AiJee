@@ -1,6 +1,6 @@
-import { Spinner, Text, View } from "@/platform/dom";
+import { Spinner, Text, View } from "@/components/dom";
 import { useCallback, useEffect, useState } from "react";
-import { Linking, Pressable } from "@/platform/dom";
+import { Linking, Pressable } from "@/components/dom";
 import { ArrowUpCircle, CheckCircle2, Info, RefreshCw } from "lucide-react";
 import { api, unwrapApiData } from "@aijee/client-sdk";
 import { Fonts } from "@/constants/theme";

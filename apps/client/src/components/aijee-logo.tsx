@@ -1,5 +1,5 @@
-import { Image } from "@/platform/dom";
-import type { ImageStyle, StyleProp } from "@/platform/dom";
+import { Image } from "@/components/dom";
+import type { ImageStyle, StyleProp } from "@/components/dom";
 
 // The adaptive-icon monochrome asset is a 1024² canvas where the mark only
 // occupies the middle ~61% (alpha bbox 200..823). Scaling the box by this

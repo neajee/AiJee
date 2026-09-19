@@ -1,6 +1,6 @@
-import { Spinner, Text, View } from "@/platform/dom";
+import { Spinner, Text, View } from "@/components/dom";
 import { useCallback, useEffect, useState, type ComponentType } from "react";
-import { Pressable } from "@/platform/dom";
+import { Pressable } from "@/components/dom";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
 import { api, unwrapApiData, type PackageStatus } from "@aijee/client-sdk";
 import { useSettingsMetrics, useSettingsPalette } from "@/components/settings-surface";

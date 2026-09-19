@@ -1,14 +1,14 @@
-import { ScrollView, Text, View } from "@/platform/dom";
+import { ScrollView, Text, View } from "@/components/dom";
 import { useEffect, useRef, useCallback, useState } from 'react';
 import {
-  PanResponder, Pressable } from "@/platform/dom";
+  PanResponder, Pressable } from "@/components/dom";
 import { X, Circle, Minus, Maximize2 } from 'lucide-react';
 
 import { Colors, Fonts } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useTasksStore } from '../../store';
 import { useTaskOutputData } from '../../hooks/use-task-output-data';
-import { styles } from './styles';
+import { styles } from './style-tokens';
 
 export function TaskOutputPanel() {
   const colorScheme = useColorScheme() ?? 'light';

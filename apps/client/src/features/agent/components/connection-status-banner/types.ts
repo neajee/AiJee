@@ -1,4 +1,4 @@
-import type { Animated } from "@/platform/dom";
+import type { Animated } from "@/components/dom";
 
 export interface ConnectionStatusBannerViewProps {
   bottomPad: number;

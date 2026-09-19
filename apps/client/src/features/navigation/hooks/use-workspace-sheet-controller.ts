@@ -1,4 +1,4 @@
-import { ScrollView } from "@/platform/dom";
+import { ScrollView } from "@/components/dom";
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from '@/platform/router-adapter';
 import Animated, {
@@ -7,8 +7,8 @@ import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withTiming,
-} from "@/platform/dom";
-import { Gesture } from "@/platform/dom";
+} from "@/components/dom";
+import { Gesture } from "@/components/dom";
 import type { PagerHandle } from '@/platform/pager';
 
 import { useWorkspaceStore } from '@/features/workspace/store';

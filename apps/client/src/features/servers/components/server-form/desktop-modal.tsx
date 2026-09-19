@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Modal, Pressable } from "@/platform/dom";
-import { Spinner, Text, View } from "@/platform/dom";
+import { Modal, Pressable } from "@/components/dom";
+import { Spinner, Text, View } from "@/components/dom";
 import { X } from 'lucide-react';
 
 import { ServerFormFields } from './fields';

@@ -1,5 +1,5 @@
-import { Image, ScrollView, Text, View } from "@/platform/dom";
-import { Pressable } from "@/platform/dom";
+import { Image, ScrollView, Text, View } from "@/components/dom";
+import { Pressable } from "@/components/dom";
 import { X, FileText, ImageIcon } from 'lucide-react';
 
 import { Fonts } from '@/constants/theme';

@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
-import { Modal, Pressable, type StyleProp, type ViewStyle } from "@/platform/dom";
-import { View } from "@/platform/dom";
+import { Modal, Pressable, type StyleProp, type ViewStyle } from "@/components/dom";
+import { View } from "@/components/dom";
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 

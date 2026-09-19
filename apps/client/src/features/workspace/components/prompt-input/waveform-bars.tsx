@@ -1,6 +1,6 @@
-import { View } from "@/platform/dom";
+import { View } from "@/components/dom";
 import { useEffect, useRef } from "react";
-import { Animated } from "@/platform/dom";
+import { Animated } from "@/components/dom";
 
 const BAR_COUNT = 5;
 const BAR_SCALES = [0.6, 0.85, 1, 0.85, 0.6];

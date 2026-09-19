@@ -1,6 +1,6 @@
-import { ScrollView, Spinner, Text, View } from "@/platform/dom";
+import { ScrollView, Spinner, Text, View } from "@/components/dom";
 import { useCallback, useState } from 'react';
-import { Pressable } from "@/platform/dom";
+import { Pressable } from "@/components/dom";
 import { usePathname, useRouter } from '@/platform/router-adapter';
 import { SquarePen, RefreshCw } from 'lucide-react';
 

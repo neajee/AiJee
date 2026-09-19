@@ -1,6 +1,6 @@
-import { ScrollView, Spinner, Text, View } from "@/platform/dom";
+import { ScrollView, Spinner, Text, View } from "@/components/dom";
 import { type ReactNode } from 'react';
-import { Pressable } from "@/platform/dom";
+import { Pressable } from "@/components/dom";
 import { SquarePen, RefreshCw } from 'lucide-react';
 
 import { Fonts } from '@/constants/theme';

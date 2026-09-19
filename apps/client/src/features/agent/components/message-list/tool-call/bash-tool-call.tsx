@@ -1,6 +1,6 @@
-import { ScrollView, Text, View } from "@/platform/dom";
+import { ScrollView, Text, View } from "@/components/dom";
 import { memo, useCallback, useRef, useState } from "react";
-import { type ScrollView as RNScrollView } from "@/platform/dom";
+import { type ScrollView as RNScrollView } from "@/components/dom";
 import { Colors, Fonts } from "@/constants/theme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import type { ToolCallInfo } from "../../../types";

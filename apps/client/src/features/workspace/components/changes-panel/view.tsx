@@ -1,5 +1,5 @@
-import { ScrollView, Spinner, Text, View } from "@/platform/dom";
-import { Pressable } from "@/platform/dom";
+import { ScrollView, Spinner, Text, View } from "@/components/dom";
+import { Pressable } from "@/components/dom";
 import { ChevronDown, ChevronUp, GitCompare } from 'lucide-react';
 
 import { FileTree } from '../file-tree';

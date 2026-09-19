@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Animated } from "@/platform/dom";
+import { Animated } from "@/components/dom";
 import { useRouter } from '@/platform/router-adapter';
 import { useWorkspaceStore } from '@/features/workspace/store';
 import { useServersStore, type Server } from '@/features/servers/store';

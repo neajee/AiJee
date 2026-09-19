@@ -1,6 +1,6 @@
 import { Redirect } from '@/platform/router-adapter';
 import { ChevronRight } from 'lucide-react';
-import { Text } from "@/platform/dom";
+import { Text } from "@/components/dom";
 import {
   SettingsGroup,
   SettingsLayoutProvider,

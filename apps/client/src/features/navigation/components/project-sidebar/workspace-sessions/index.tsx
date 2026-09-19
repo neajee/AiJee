@@ -1,6 +1,6 @@
-import { Text, View } from "@/platform/dom";
+import { Text, View } from "@/components/dom";
 import { useEffect, useState } from 'react';
-import { Spinner } from "@/platform/dom";
+import { Spinner } from "@/components/dom";
 
 import { useWorkspaceStore } from '@/features/workspace/store';
 import { useWorkspaceSessions as useSessions } from '@aijee/client-sdk';

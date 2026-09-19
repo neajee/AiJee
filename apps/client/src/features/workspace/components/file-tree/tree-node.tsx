@@ -1,6 +1,6 @@
-import { Spinner, Text, View } from "@/platform/dom";
+import { Spinner, Text, View } from "@/components/dom";
 import { useCallback } from 'react';
-import { Pressable } from "@/platform/dom";
+import { Pressable } from "@/components/dom";
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useFileList, type FsEntry } from '@aijee/client-sdk';
 import { Colors } from '@/constants/theme';

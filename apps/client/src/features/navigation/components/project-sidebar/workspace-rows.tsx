@@ -1,6 +1,6 @@
-import { Text, View } from "@/platform/dom";
+import { Text, View } from "@/components/dom";
 import { useCallback, useRef, useState, type ReactNode } from "react";
-import { Pressable, type View as RNView } from "@/platform/dom";
+import { Pressable, type View as RNView } from "@/components/dom";
 import { Folder, MoreHorizontal, SquarePen } from "lucide-react";
 import { Fonts } from "@/constants/theme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";

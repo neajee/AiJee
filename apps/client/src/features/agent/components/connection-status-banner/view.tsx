@@ -1,5 +1,5 @@
-import { Spinner, Text, View } from "@/platform/dom";
-import { Animated, Pressable } from "@/platform/dom";
+import { Spinner, Text, View } from "@/components/dom";
+import { Animated, Pressable } from "@/components/dom";
 import { styles } from './styles';
 import type { ConnectionStatusBannerViewProps } from './types';
 

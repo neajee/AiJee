@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
-import { type StyleProp, type ViewStyle } from "@/platform/dom";
-import { View } from "@/platform/dom";
+import { type StyleProp, type ViewStyle } from "@/components/dom";
+import { View } from "@/components/dom";
 import Animated, {
   Easing,
   interpolate,
@@ -8,7 +8,7 @@ import Animated, {
   useSharedValue,
   withRepeat,
   withTiming,
-} from "@/platform/dom";
+} from "@/components/dom";
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 

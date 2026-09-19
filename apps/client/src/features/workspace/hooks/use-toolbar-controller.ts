@@ -3,7 +3,7 @@ import {
   Animated, NativeSyntheticEvent, TextInput, TextInputKeyPressEventData,
   type ScrollView as RNScrollView,
   type View as RNView,
-} from "@/platform/dom";
+} from "@/components/dom";
 
 import { buildThinkingLevelOptions, thinkingLevelLabel, type FlatModel, type ThinkingPreference } from '../utils/prompt-input';
 import { matchesModelSearch } from '../utils/prompt-input-search';

@@ -1,6 +1,6 @@
 import { memo, useState, type ComponentType, type ReactNode } from 'react';
-import { Pressable, Switch } from "@/platform/dom";
-import { Text, View } from "@/platform/dom";
+import { Pressable, Switch } from "@/components/dom";
+import { Text, View } from "@/components/dom";
 import { Fonts } from '@/constants/theme';
 import { useSettingsMetrics } from './metrics';
 import { useSettingsPalette } from './palette';

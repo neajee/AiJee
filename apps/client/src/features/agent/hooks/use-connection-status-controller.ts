@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated, useWindowDimensions } from "@/platform/dom";
-import { useSafeAreaInsets } from "@/platform/dom";
+import { Animated, useWindowDimensions } from "@/components/dom";
+import { useSafeAreaInsets } from "@/components/dom";
 import { useConnection } from '@aijee/client-sdk';
 import type { ConnectionStatusBannerViewProps } from '../components/connection-status-banner/types';
 

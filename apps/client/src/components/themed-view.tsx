@@ -1,5 +1,5 @@
-import { View } from "@/platform/dom";
-import { type ViewProps } from "@/platform/dom";
+import { View } from "@/components/dom";
+import { type ViewProps } from "@/components/dom";
 
 import { useThemeColor } from '@/hooks/use-theme-color';
 

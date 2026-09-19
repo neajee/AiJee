@@ -1,5 +1,5 @@
-import { Input, ScrollView, Spinner, Text, View } from "@/platform/dom";
-import { Animated, Modal, Pressable } from "@/platform/dom";
+import { Input, ScrollView, Spinner, Text, View } from "@/components/dom";
+import { Animated, Modal, Pressable } from "@/components/dom";
 import { Search } from 'lucide-react';
 
 import { ABSOLUTE_FILL_STYLE } from '@/constants/layout';

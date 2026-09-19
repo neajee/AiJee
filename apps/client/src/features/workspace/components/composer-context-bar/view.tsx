@@ -1,4 +1,4 @@
-import { View } from "@/platform/dom";
+import { View } from "@/components/dom";
 
 import { usePromptTheme } from '@/components/surface-theme/use-prompt-theme';
 import { NewWorkspaceDialog } from '@/features/workspace/components/new-workspace-dialog';

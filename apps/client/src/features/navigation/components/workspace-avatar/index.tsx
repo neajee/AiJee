@@ -1,5 +1,5 @@
-import { Text, View } from "@/platform/dom";
-import { Pressable } from "@/platform/dom";
+import { Text, View } from "@/components/dom";
+import { Pressable } from "@/components/dom";
 
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';

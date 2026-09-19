@@ -1,5 +1,5 @@
-import { Spinner, Text, View } from "@/platform/dom";
-import { Pressable } from "@/platform/dom";
+import { Spinner, Text, View } from "@/components/dom";
+import { Pressable } from "@/components/dom";
 import { formatAgentModeLabel, type AgentMode } from '@/features/agent/mode';
 import { styles } from '../../../utils/toolbar-styles';
 import type { ToolbarController } from './types';

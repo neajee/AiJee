@@ -1,15 +1,15 @@
-import { View } from "@/platform/dom";
+import { View } from "@/components/dom";
 import { useCallback, useEffect } from "react";
-import { Pressable } from "@/platform/dom";
-import { useSafeAreaInsets } from "@/platform/dom";
+import { Pressable } from "@/components/dom";
+import { useSafeAreaInsets } from "@/components/dom";
 import Animated, {
   Easing,
   runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
-} from "@/platform/dom";
-import { Gesture, GestureDetector } from "@/platform/dom";
+} from "@/components/dom";
+import { Gesture, GestureDetector } from "@/components/dom";
 
 import { Colors } from "@/constants/theme";
 import { ABSOLUTE_FILL_STYLE } from "@/constants/layout";

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useColorScheme as useRNColorScheme } from "@/platform/dom";
+import { useColorScheme as useRNColorScheme } from "@/components/dom";
 import { useAppSettingsStore } from '@/features/settings/store';
 
 /**

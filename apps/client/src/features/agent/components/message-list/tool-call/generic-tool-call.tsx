@@ -1,6 +1,6 @@
-import { Text, View } from "@/platform/dom";
+import { Text, View } from "@/components/dom";
 import { memo, useCallback, useState } from "react";
-import { ScrollView } from "@/platform/dom";
+import { ScrollView } from "@/components/dom";
 import { Colors, Fonts } from "@/constants/theme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import type { ToolCallInfo } from "../../../types";

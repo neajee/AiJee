@@ -1,5 +1,5 @@
-import { Input, Text, View } from "@/platform/dom";
-import { Pressable } from "@/platform/dom";
+import { Input, Text, View } from "@/components/dom";
+import { Pressable } from "@/components/dom";
 import { styles } from './styles';
 import type { EditWorkspaceFormProps } from './types';
 

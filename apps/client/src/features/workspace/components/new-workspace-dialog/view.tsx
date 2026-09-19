@@ -1,5 +1,5 @@
-import { Input, ScrollView, Spinner, Text, View } from "@/platform/dom";
-import { FlatList, KeyboardAvoidingView, Modal, Pressable } from "@/platform/dom";
+import { Input, ScrollView, Spinner, Text, View } from "@/components/dom";
+import { FlatList, KeyboardAvoidingView, Modal, Pressable } from "@/components/dom";
 import { File, Folder } from "lucide-react";
 import type { PathCompletion } from "@aijee/client-sdk";
 import type { NewWorkspaceController } from "../../hooks/use-new-workspace-controller";

@@ -1,6 +1,6 @@
-import { Text, View } from "@/platform/dom";
+import { Text, View } from "@/components/dom";
 import { memo, useRef, useEffect, useMemo } from 'react';
-import { Animated, Modal, Pressable } from "@/platform/dom";
+import { Animated, Modal, Pressable } from "@/components/dom";
 import { Check } from 'lucide-react';
 
 import { Fonts } from '@/constants/theme';

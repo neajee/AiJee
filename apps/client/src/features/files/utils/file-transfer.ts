@@ -1,4 +1,4 @@
-import { Alert } from "@/platform/dom";
+import { Alert } from "@/components/dom";
 import * as DocumentPicker from "@/platform/files";
 import { File as ExpoFile, Paths } from "@/platform/files";
 import type { ApiClient } from "@aijee/client-sdk";

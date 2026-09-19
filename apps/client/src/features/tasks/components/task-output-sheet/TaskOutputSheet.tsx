@@ -1,22 +1,22 @@
-import { ScrollView, Text, View } from "@/platform/dom";
+import { ScrollView, Text, View } from "@/components/dom";
 import { useCallback, useEffect, useRef } from 'react';
-import { Pressable } from "@/platform/dom";
-import { useSafeAreaInsets } from "@/platform/dom";
+import { Pressable } from "@/components/dom";
+import { useSafeAreaInsets } from "@/components/dom";
 import Animated, {
   Easing,
   runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
-} from "@/platform/dom";
-import { Gesture, GestureDetector } from "@/platform/dom";
+} from "@/components/dom";
+import { Gesture, GestureDetector } from "@/components/dom";
 import { Circle, X } from 'lucide-react';
 
 import { Colors, Fonts } from '@/constants/theme';
 import { ABSOLUTE_FILL_STYLE } from '@/constants/layout';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useTaskOutputData } from '../../hooks/use-task-output-data';
-import { styles } from './styles';
+import { styles } from './style-tokens';
 import { useSheetHeight } from '@/features/navigation/hooks/use-sheet-height';
 
 const TIMING_CONFIG = { duration: 280, easing: Easing.out(Easing.cubic) };

@@ -4,7 +4,7 @@ import {
   Easing,
   PanResponder,
   useWindowDimensions,
-} from "@/platform/dom";
+} from "@/components/dom";
 import * as SecureStore from '@/platform/storage';
 
 import { usePanelCoordination } from '@/features/navigation/store/panel-coordination';

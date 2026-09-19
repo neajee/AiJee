@@ -1,6 +1,6 @@
 import type { Workspace } from '../../types';
 import type { RefObject } from 'react';
-import type { NativeSyntheticEvent, TextInput, TextInputKeyPressEventData } from '@/platform/dom';
+import type { NativeSyntheticEvent, TextInput, TextInputKeyPressEventData } from '@/components/dom';
 
 export interface EditWorkspaceDialogProps {
   visible: boolean;

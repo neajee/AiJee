@@ -1,4 +1,4 @@
-import { Spinner, View } from "@/platform/dom";
+import { Spinner, View } from "@/components/dom";
 import { memo, useEffect } from "react";
 import Animated, {
   useSharedValue,
@@ -7,7 +7,7 @@ import Animated, {
   withSequence,
   withTiming,
   Easing,
-} from "@/platform/dom";
+} from "@/components/dom";
 import type { ToolCallInfo } from "../../../types";
 
 interface ToolStatusDotProps {

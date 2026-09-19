@@ -1,5 +1,5 @@
-import { Modal, Pressable } from "@/platform/dom";
-import { Input, Spinner, Text, View } from "@/platform/dom";
+import { Modal, Pressable } from "@/components/dom";
+import { Input, Spinner, Text, View } from "@/components/dom";
 import { AlertCircle, Check, Wifi, X } from 'lucide-react';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';

@@ -1,5 +1,5 @@
 import { memo, useMemo } from 'react';
-import { View } from "@/platform/dom";
+import { View } from "@/components/dom";
 import type { ToolCallInfo } from '../../../types';
 import { BashToolCall } from './bash-tool-call';
 import { ReadToolCall } from './read-tool-call';

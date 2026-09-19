@@ -1,6 +1,6 @@
-import { Text, View } from "@/platform/dom";
+import { Text, View } from "@/components/dom";
 import { Ellipsis, FolderOpen } from 'lucide-react';
-import { Pressable } from "@/platform/dom";
+import { Pressable } from "@/components/dom";
 
 import { NarrowHeaderActionsSheet } from '@/features/navigation/components/narrow-header-actions-sheet';
 import { useNarrowHeaderController } from '../../hooks/use-narrow-header-controller';

@@ -1,5 +1,5 @@
-import { Input, ScrollView, Text, View } from "@/platform/dom";
-import { Animated, Pressable } from "@/platform/dom";
+import { Input, ScrollView, Text, View } from "@/components/dom";
+import { Animated, Pressable } from "@/components/dom";
 import { Check, ChevronDown } from 'lucide-react';
 import { ProviderIcon } from '@/components/provider-icons';
 import { styles } from '../../../utils/toolbar-styles';

@@ -1,6 +1,6 @@
-import { Text, View } from "@/platform/dom";
+import { Text, View } from "@/components/dom";
 import { useState } from 'react';
-import { Pressable } from "@/platform/dom";
+import { Pressable } from "@/components/dom";
 import { Plus } from 'lucide-react';
 import { API_TYPES, ApiTypeSelector, Field, ModelEntryRow } from '../custom-models-form';
 import { providerPageStyles } from '../../utils/custom-models-styles';

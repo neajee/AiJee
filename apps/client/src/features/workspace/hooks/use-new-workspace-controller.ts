@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { FlatList, KeyboardAvoidingView, TextInput, type NativeSyntheticEvent, type TextInputKeyPressEventData } from "@/platform/dom";
-import { useSafeAreaInsets } from "@/platform/dom";
+import { FlatList, KeyboardAvoidingView, TextInput, type NativeSyntheticEvent, type TextInputKeyPressEventData } from "@/components/dom";
+import { useSafeAreaInsets } from "@/components/dom";
 import { Colors, WorkspaceColors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useResponsiveLayout } from "@/hooks/use-responsive-layout";

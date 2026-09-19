@@ -3,7 +3,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Outlet } from "@tanstack/react-router";
 import { createRootRoute } from "@tanstack/react-router";
 
-import { SafeAreaProvider } from "@/platform/dom";
+import { SafeAreaProvider } from "@/components/dom";
 
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";

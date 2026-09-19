@@ -1,4 +1,4 @@
-import { View } from "@/platform/dom";
+import { View } from "@/components/dom";
 
 import { providerPageStyles } from '../../utils/custom-models-styles';
 import type { RowDividerProps } from './types';

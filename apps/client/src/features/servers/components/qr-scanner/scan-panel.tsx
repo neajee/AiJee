@@ -1,4 +1,4 @@
-import { Text, View } from "@/platform/dom";
+import { Text, View } from "@/components/dom";
 import { QrCode } from "lucide-react";
 
 import { Fonts } from "@/constants/theme";

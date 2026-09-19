@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Animated, Easing, Pressable } from "@/platform/dom";
+import { Animated, Easing, Pressable } from "@/components/dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import { Colors } from "@/constants/theme";

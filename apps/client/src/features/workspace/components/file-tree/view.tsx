@@ -1,6 +1,6 @@
-import { Input, Text, View } from "@/platform/dom";
+import { Input, Text, View } from "@/components/dom";
 import { useState } from 'react';
-import { Pressable } from "@/platform/dom";
+import { Pressable } from "@/components/dom";
 import { FolderOpen, Search, X } from 'lucide-react';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';

@@ -1,15 +1,15 @@
-import { ScrollView, Spinner, Text, View } from "@/platform/dom";
+import { ScrollView, Spinner, Text, View } from "@/components/dom";
 import { useCallback, useEffect, useState } from 'react';
-import { Keyboard, Modal, Pressable, useWindowDimensions } from "@/platform/dom";
-import { useSafeAreaInsets } from "@/platform/dom";
+import { Keyboard, Modal, Pressable, useWindowDimensions } from "@/components/dom";
+import { useSafeAreaInsets } from "@/components/dom";
 import Animated, {
   Easing,
   runOnJS,
   useAnimatedStyle,
   useSharedValue,
   withTiming,
-} from "@/platform/dom";
-import { Gesture, GestureDetector } from "@/platform/dom";
+} from "@/components/dom";
+import { Gesture, GestureDetector } from "@/components/dom";
 
 import { Colors } from '@/constants/theme';
 import { ABSOLUTE_FILL_STYLE } from '@/constants/layout';

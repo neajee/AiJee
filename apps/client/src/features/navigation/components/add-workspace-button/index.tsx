@@ -1,5 +1,5 @@
-import { View } from "@/platform/dom";
-import { Pressable } from "@/platform/dom";
+import { View } from "@/components/dom";
+import { Pressable } from "@/components/dom";
 import { Plus } from 'lucide-react';
 
 import { Colors } from '@/constants/theme';

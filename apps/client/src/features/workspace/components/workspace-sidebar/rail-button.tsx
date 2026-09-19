@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Pressable } from "@/platform/dom";
+import { Pressable } from "@/components/dom";
 import { styles } from './styles';
 
 interface RailButtonProps {

@@ -1,6 +1,6 @@
 import type { ReactNode, RefObject } from 'react';
 import type { AgentConfigHandle, ModelInfo, AgentStateData } from '@aijee/client-sdk';
-import type { Animated, ScrollView, TextInput, View } from "@/platform/dom";
+import type { Animated, ScrollView, TextInput, View } from "@/components/dom";
 
 import type { AgentMode } from '@/features/agent/mode';
 import type { AppMode } from '@/hooks/use-app-mode';

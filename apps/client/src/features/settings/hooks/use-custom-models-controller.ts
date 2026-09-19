@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import {  Linking  } from "@/platform/dom";
+import {  Linking  } from "@/components/dom";
 import { useBuiltinProviders, type BuiltinProvider } from "@aijee/client-sdk";
 import { useCustomModelsStore } from "../store/custom-models";
 

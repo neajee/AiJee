@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { Animated, Pressable } from "@/platform/dom";
-import { Spinner, Text, View } from "@/platform/dom";
+import { Animated, Pressable } from "@/components/dom";
+import { Spinner, Text, View } from "@/components/dom";
 import { MoreHorizontal, Pencil, QrCode, X, Trash2 } from "lucide-react";
 import { Fonts } from "@/constants/theme";
 import { PiLogo } from "@/components/pi-logo";
