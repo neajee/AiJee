@@ -1,12 +1,10 @@
 import { create } from 'zustand';
-import { sdk, unwrapApiData, extractApiErrorMessage } from '@aijee/client-sdk';
+import { api, unwrapApiData, extractApiErrorMessage } from '@aijee/client-sdk';
 import type {
   CustomProvider,
   CustomModelEntry,
   CustomModelsConfigResult,
 } from '@aijee/client-sdk';
-const { getCustomModels, saveCustomModels } = sdk;
-
 export type { CustomProvider, CustomModelEntry };
 
 export type ProvidersMap = Record<string, CustomProvider>;
@@ -39,7 +37,7 @@ export const useCustomModelsStore = create<CustomModelsState>((set, get) => ({
 
   load: async () => {
     try {
-      const result = await getCustomModels();
+      const result = await api.getCustomModels();
       const data = unwrapApiData(result.data) as
         | CustomModelsConfigResult
         | undefined;
@@ -61,7 +59,7 @@ export const useCustomModelsStore = create<CustomModelsState>((set, get) => ({
     }
     set({ saving: true, error: null });
     try {
-      await saveCustomModels({ body: { providers } });
+      await api.saveCustomModels({ body: { providers } });
       set({ providers, saving: false });
     } catch (e) {
       set({ saving: false, error: extractApiErrorMessage(e, '保存自定义模型失败') });

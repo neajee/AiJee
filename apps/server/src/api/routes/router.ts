@@ -1,8 +1,10 @@
 import type { IncomingMessage, ServerResponse } from "node:http";
 import { gitRoutes, type Ctx } from "./git.ts";
+import type { HandlerContext } from "../handlers/context.ts";
 
 // The HTTP server supplies bound handlers; this module owns only method/path dispatch.
-export type RouteContext = Ctx & Record<string, any>;
+// http-server binds handlers/* into this context; routing stays a pure method/path dispatcher.
+export type RouteContext = Ctx & HandlerContext;
 
 export async function dispatchRoute(ctx: RouteContext, request: IncomingMessage, response: ServerResponse, url: URL): Promise<void> {
   if (request.method === "GET" && ["/health", "/healthz", "/api/health"].includes(url.pathname)) return ctx.json(response, 200, { status: "ok" });

@@ -1,7 +1,7 @@
 import { BehaviorSubject, Subject, Observable, filter, map, distinctUntilChanged } from "rxjs";
 import type { ConnectionState, PiClientConfig, SessionListItem } from "../types";
-import type { StreamEventEnvelope, ImageContent, AgentStateData } from "../types/stream-events";
-import type { ChatMessage, AgentMode, PendingExtensionUiRequest } from "../types/chat-message";
+import type { StreamEventEnvelope, ImageContent, AgentStateData } from "@aijee/protocol";
+import type { ChatMessage, ProductAgentMode, PendingExtensionUiRequest } from "../types/chat-message";
 import { ApiClient } from "./api-client";
 import { StreamConnection } from "./stream-connection";
 import { reduceStreamEvent, createEmptySessionState, convertRawMessages, isModeSlashCommand, type SessionState } from "./message-reducer";
@@ -223,7 +223,7 @@ export class PiClient {
     return this.session$(sessionId).pipe(map((s) => s.isStreaming), distinctUntilChanged());
   }
 
-  mode$(sessionId: string): Observable<AgentMode> {
+  mode$(sessionId: string): Observable<ProductAgentMode> {
     return this.session$(sessionId).pipe(map((s) => s.mode), distinctUntilChanged());
   }
 

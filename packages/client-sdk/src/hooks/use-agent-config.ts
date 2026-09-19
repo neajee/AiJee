@@ -4,8 +4,8 @@ import type {
   ModelInfo,
   AgentStateData,
   ModelThinkingLevel,
-} from "../types/stream-events";
-import type { AgentMode } from "../types/chat-message";
+} from "@aijee/protocol";
+import type { ProductAgentMode } from "../types/chat-message";
 import { getSupportedThinkingLevels } from "../utils/thinking-levels";
 import {
   getContextWindow,
@@ -51,7 +51,7 @@ export interface AgentConfigHandle {
   contextWindow: number | null;
   setModel: (params: { provider: string; modelId: string }) => Promise<void>;
   setThinkingLevel: (level: string) => Promise<void>;
-  setMode: (mode: AgentMode) => Promise<void>;
+  setMode: (mode: ProductAgentMode) => Promise<void>;
   reload: () => Promise<void>;
   retry: () => void;
 }
@@ -238,7 +238,7 @@ export function useAgentConfig(
   );
 
   const setMode = useCallback(
-    async (mode: AgentMode) => {
+    async (mode: ProductAgentMode) => {
       if (!sessionId) return;
 
       setState((prev) =>

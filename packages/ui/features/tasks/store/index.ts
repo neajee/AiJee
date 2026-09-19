@@ -1,15 +1,6 @@
 import { create } from 'zustand';
-import { sdk, unwrapApiData, extractApiErrorMessage } from '@aijee/client-sdk';
-import type { TaskDefinition, TaskInfo } from '@aijee/client-sdk';
-const {
-  getConfig,
-  listTasks,
-  startTask: apiStartTask,
-  stopTask: apiStopTask,
-  restartTask: apiRestartTask,
-  getLogs,
-  removeTask: apiRemoveTask,
-} = sdk;
+import { api, unwrapApiData, extractApiErrorMessage } from '@aijee/client-sdk';
+import type { TaskDefinition, TaskInfo, TaskLogs, TasksConfig } from '@aijee/client-sdk';
 
 interface TasksState {
   definitions: TaskDefinition[];
@@ -70,9 +61,9 @@ export const useTasksStore = create<TasksState>((set, get) => ({
   fetchConfig: async (workspaceId) => {
     const generation = serverStateGeneration;
     try {
-      const result = await getConfig({ path: { workspace_id: workspaceId } });
+      const result = await api.getConfig({ path: { workspace_id: workspaceId } });
       if (generation !== serverStateGeneration) return;
-      const config = unwrapApiData(result.data);
+      const config = unwrapApiData(result.data) as TasksConfig | undefined;
       if (config) {
         const tasks = config.tasks;
         const state = get();
@@ -96,9 +87,9 @@ export const useTasksStore = create<TasksState>((set, get) => ({
   fetchInstances: async (workspaceId) => {
     const generation = serverStateGeneration;
     try {
-      const result = await listTasks({ path: { workspace_id: workspaceId } });
+      const result = await api.listTasks({ path: { workspace_id: workspaceId } });
       if (generation !== serverStateGeneration) return;
-      const instances = unwrapApiData(result.data);
+      const instances = unwrapApiData(result.data) as TaskInfo[] | undefined;
       if (instances) {
         set({ instances, error: null });
       }
@@ -111,9 +102,9 @@ export const useTasksStore = create<TasksState>((set, get) => ({
   fetchLogs: async (taskId) => {
     const generation = serverStateGeneration;
     try {
-      const result = await getLogs({ path: { task_id: taskId } });
+      const result = await api.getLogs({ path: { task_id: taskId } });
       if (generation !== serverStateGeneration) return;
-      const logs = unwrapApiData(result.data);
+      const logs = unwrapApiData(result.data) as TaskLogs | undefined;
       if (logs) {
         set((s) => ({
           logsById: { ...s.logsById, [taskId]: logs.lines },
@@ -129,11 +120,11 @@ export const useTasksStore = create<TasksState>((set, get) => ({
     const generation = serverStateGeneration;
     set({ loading: true, error: null });
     try {
-      const result = await apiStartTask({
+      const result = await api.startTask({
         body: { label, workspace_id: workspaceId },
       });
       if (generation !== serverStateGeneration) return;
-      const info = unwrapApiData(result.data);
+      const info = unwrapApiData(result.data) as TaskInfo | undefined;
       if (info) {
         set((s) => ({
           instances: [...s.instances.filter((i) => i.id !== info.id), info],
@@ -171,9 +162,9 @@ export const useTasksStore = create<TasksState>((set, get) => ({
     }));
 
     try {
-      const result = await apiStopTask({ body: { task_id: taskId } });
+      const result = await api.stopTask({ body: { task_id: taskId } });
       if (generation !== serverStateGeneration) return;
-      const info = unwrapApiData(result.data);
+      const info = unwrapApiData(result.data) as TaskInfo | undefined;
       if (info) {
         set((s) => ({
           instances: s.instances.map((i) => (i.id === info.id ? info : i)),
@@ -197,9 +188,9 @@ export const useTasksStore = create<TasksState>((set, get) => ({
     const generation = serverStateGeneration;
     set({ loading: true, error: null });
     try {
-      const result = await apiRestartTask({ body: { task_id: taskId } });
+      const result = await api.restartTask({ body: { task_id: taskId } });
       if (generation !== serverStateGeneration) return;
-      const info = unwrapApiData(result.data);
+      const info = unwrapApiData(result.data) as TaskInfo | undefined;
       if (info) {
         set((s) => ({
           instances: [
@@ -227,7 +218,7 @@ export const useTasksStore = create<TasksState>((set, get) => ({
   removeTask: async (taskId) => {
     const generation = serverStateGeneration;
     try {
-      await apiRemoveTask({ path: { task_id: taskId } });
+      await api.removeTask({ path: { task_id: taskId } });
       if (generation !== serverStateGeneration) return;
       set((s) => ({
         instances: s.instances.filter((i) => i.id !== taskId),

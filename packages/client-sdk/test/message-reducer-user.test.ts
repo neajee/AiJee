@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import { createEmptySessionState, reduceStreamEvent } from "../src/core/message-reducer.ts";
-import type { StreamEventEnvelope } from "../src/types/stream-events.ts";
+import type { StreamEventEnvelope } from "@aijee/protocol";
 
 let nextId = 1;
 function event(type: string, message: Record<string, unknown>): StreamEventEnvelope {

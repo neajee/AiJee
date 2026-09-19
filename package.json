@@ -15,8 +15,6 @@
     "typecheck": "yarn workspace @aijee/client-sdk typecheck && yarn exec tsc --noEmit -p apps/client/tsconfig.json",
     "lint": "yarn workspace @aijee/client lint",
     "test": "yarn workspace @aijee/client-sdk test && yarn workspace @aijee/ui test && yarn workspace @aijee/engine test && yarn workspace aijee test",
-    "api:generate": "yarn workspace @aijee/api-contract generate && yarn workspace @aijee/client-sdk api:generate",
-    "api:check": "yarn workspace @aijee/api-contract validate",
     "web:build": "yarn workspace @aijee/client build && node scripts/write-releases-snapshot.mjs && node scripts/prepare-web-assets.cjs",
     "release:snapshot": "node scripts/write-releases-snapshot.mjs",
     "build:prod": "yarn web:build && yarn runtime:check"

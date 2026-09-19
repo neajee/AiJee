@@ -5,7 +5,7 @@ import {
   getSupportedThinkingLevels,
   supportsThinking,
 } from "../src/utils/thinking-levels.ts";
-import type { ModelInfo } from "../src/types/stream-events.ts";
+import type { ModelInfo } from "@aijee/protocol";
 
 function model(overrides: Partial<ModelInfo>): ModelInfo {
   return { id: "m", provider: "p", reasoning: true, ...overrides };

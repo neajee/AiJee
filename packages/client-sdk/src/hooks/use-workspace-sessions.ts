@@ -3,7 +3,7 @@ import { BehaviorSubject } from "rxjs";
 import { usePiClient } from "./context";
 import { useObservable } from "./use-observable";
 import type { SessionListItem } from "../types";
-import type { StreamEventEnvelope } from "../types/stream-events";
+import type { StreamEventEnvelope } from "@aijee/protocol";
 
 const PAGE_SIZE = 20;
 const REFRESH_DEBOUNCE_MS = 350;

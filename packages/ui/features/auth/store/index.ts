@@ -2,16 +2,10 @@ import { create } from 'zustand';
 import * as SecureStore from 'expo-secure-store';
 
 import {
-  client,
-  sdk,
+  api,
   unwrapApiData,
 } from '@aijee/client-sdk';
 import { useServersStore, type Server } from '@/features/servers/store';
-
-const {
-  checkSession,
-  logout: apiLogout,
-} = sdk;
 
 const TOKENS_KEY = 'auth_tokens';
 const ACTIVE_SERVER_KEY = 'auth_active_server';
@@ -233,7 +227,7 @@ function configureClient(serverId: string | null, baseUrl?: string) {
       currentConfiguredAccessToken(),
     )}`,
   );
-  client.setConfig({ baseUrl, auth: async () => currentConfiguredAccessToken() });
+  api.setConfig({ baseUrl, auth: async () => currentConfiguredAccessToken() });
 }
 
 function currentRequestPath(requestUrl: string, path?: string) {
@@ -430,7 +424,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
 
       if (session && server) {
         try {
-          await apiLogout({
+          await api.logout({
             baseUrl: server.address,
             headers: session.accessToken
               ? { Authorization: `Bearer ${session.accessToken}` }
@@ -470,7 +464,7 @@ export const useAuthStore = create<AuthState>((set, get) => {
         return false;
       }
 
-      const result = await checkSession();
+      const result = await api.checkSession();
       if (result.error) {
         const status = result.response?.status ?? 0;
         if (status === 401 || status === 403) {
@@ -545,7 +539,7 @@ function initializeClientAuth() {
   }
   clientAuthInitialized = true;
 
-  (client.setConfig as (cfg: Record<string, unknown>) => void)({
+  api.setConfig({
     auth: async () => currentConfiguredAccessToken(),
     requestValidator: async (value: unknown) => {
       const request = value as {
@@ -576,7 +570,7 @@ function initializeClientAuth() {
     },
   });
 
-  client.interceptors.request.use(async (request, opts) => {
+  api.interceptors.request.use(async (request, opts) => {
     const path = currentRequestPath(request.url, opts.url);
     if (!RETRY_EXCLUDED_ROUTES.some((route) => path.includes(route))) {
       await useAuthStore.getState().ensureActiveServerSession();
@@ -599,7 +593,7 @@ function initializeClientAuth() {
     return request;
   });
 
-  client.interceptors.response.use(async (response, request, opts) => {
+  api.interceptors.response.use(async (response, request, opts) => {
     if (response.status !== 401 || (opts as { _authRetry?: boolean })._authRetry) {
       return response;
     }

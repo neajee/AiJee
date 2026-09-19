@@ -1,4 +1,4 @@
-import type { ModelInfo, ModelThinkingLevel } from "../types/stream-events";
+import type { ModelInfo, ModelThinkingLevel } from "@aijee/protocol";
 
 /**
  * Every thinking level pi knows about, ordered from cheapest to deepest.

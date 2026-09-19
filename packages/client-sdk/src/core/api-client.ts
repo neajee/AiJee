@@ -1,1395 +1,155 @@
-import { AIJEE_STREAM_PATH } from "./constants";
-import * as sdk from "../generated/sdk.gen";
-import type {
-  AgentSessionInfo,
-  PaginatedSessions,
-  ActiveSessionSummary,
-  AgentSessionCommandResponse,
-  AgentRuntimeStatus,
-  SessionDetail,
-  SessionEntry,
-  SessionTreeNode,
-  Workspace,
-  GitStatusResponse,
-  GitBranch,
-  GitLogEntry,
-  GitDiffResponse,
-  GitFileDiffResponse,
-  GitStashEntry,
-  GitWorktree,
-  NestedGitReposResponse,
-  PackageStatus,
-  MarketplacePackage,
-  PackageSearchResponse,
-  PackageOperationRequest,
-  OperationResult,
-  TaskInfo,
-  TasksConfig,
-  TaskLogs,
-  TaskDefinition,
-  AgentMode,
-  CustomModelsConfig,
-  CustomProvider,
-  FsListResponse,
-  FsReadResponse,
-  FsEntry,
-  FsUploadResponse,
-  PathCompletion,
-  SessionHistoryResponse,
-  SessionListItem,
-} from "../generated/types.gen";
-import type {
-  AgentStateData,
-  CompactionResult,
-  ImageContent,
-  ModelInfo,
-} from "../types/stream-events";
-import type { BuiltinProvider, CustomModelsConfigResult } from "../types";
+import { ApiTransport } from "../api/transport";
+import * as auth from "../api/auth";
+import * as agent from "../api/agent";
+import * as chat from "../api/chat";
+import * as workspaces from "../api/workspaces";
+import * as git from "../api/git";
+import * as fs from "../api/fs";
+import * as packages from "../api/packages";
+import * as tasks from "../api/tasks";
+import * as models from "../api/models";
+import * as modes from "../api/modes";
+import * as history from "../api/history";
 
-function unwrapResult<T>(result: { data?: unknown; error?: unknown }): T {
-  if (result.error !== undefined && result.error !== null) {
-    const errBody = result.error;
-    if (typeof errBody === "object" && errBody !== null && "error" in errBody) {
-      throw new Error((errBody as { error: string }).error);
-    }
-    throw new Error("Request failed");
-  }
-  const body = result.data;
-  if (
-    body !== null &&
-    body !== undefined &&
-    typeof body === "object" &&
-    "success" in body
-  ) {
-    const envelope = body as { success: boolean; data?: T; error?: string };
-    if (envelope.success === false) {
-      throw new Error(envelope.error ?? "Request failed");
-    }
-    return envelope.data as T;
-  }
-  return body as T;
-}
+type Delegate<F extends (transport: ApiTransport, ...args: any[]) => any> =
+  (...args: F extends (transport: ApiTransport, ...args: infer A) => any ? A : never) => ReturnType<F>;
 
 export class ApiClient {
-  private _serverUrl: string;
-  private _accessToken: string;
-  private _onAuthError?: () => Promise<string | null>;
+  private readonly transport: ApiTransport;
 
   constructor(serverUrl: string, accessToken: string) {
-    this._serverUrl = serverUrl;
-    this._accessToken = accessToken;
-  }
-
-  get serverUrl(): string {
-    return this._serverUrl;
-  }
-
-  get accessToken(): string {
-    return this._accessToken;
-  }
-
-  updateConfig(serverUrl: string, accessToken: string): void {
-    this._serverUrl = serverUrl;
-    this._accessToken = accessToken;
-  }
-
-  updateToken(accessToken: string): void {
-    this._accessToken = accessToken;
-  }
-
-  setAuthErrorHandler(handler: () => Promise<string | null>): void {
-    this._onAuthError = handler;
-  }
-
-  private buildApiUrl(path: string, query?: Record<string, string | number | boolean | undefined>): string {
-    const url = new URL(path, this._serverUrl);
-    if (query) {
-      for (const [key, value] of Object.entries(query)) {
-        if (value === undefined) continue;
-        url.searchParams.set(key, String(value));
-      }
-    }
-    return url.toString();
-  }
-
-  private async authFetch(input: string, init?: RequestInit, allowRetry = true): Promise<Response> {
-    const headers = new Headers(init?.headers);
-    headers.set("Authorization", `Bearer ${this._accessToken}`);
-
-    const response = await fetch(input, {
-      ...init,
-      headers,
-    });
-
-    if (response.status !== 401 || !allowRetry || !this._onAuthError) {
-      return response;
-    }
-
-    const newToken = await this._onAuthError();
-    if (!newToken) return response;
-
-    this._accessToken = newToken;
-    const retryHeaders = new Headers(init?.headers);
-    retryHeaders.set("Authorization", `Bearer ${newToken}`);
-
-    return fetch(input, {
-      ...init,
-      headers: retryHeaders,
-    });
-  }
-
-  // ---------------------------------------------------------------------------
-  // Auth
-  // ---------------------------------------------------------------------------
-
-  async createDevice(code?: string, name?: string): Promise<{ device_id: string; token: string; name: string; created_at: string }> {
-    const response = await this.authFetch(this.buildApiUrl('/api/devices'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code, name }) });
-    return unwrapResult(await response.json());
-  }
-
-  async listDevices(): Promise<Array<{ device_id: string; name: string; created_at: string; last_seen: string }>> {
-    const response = await this.authFetch(this.buildApiUrl('/api/devices'));
-    return unwrapResult(await response.json());
-  }
-
-  async revokeDevice(deviceId: string): Promise<void> {
-    const response = await this.authFetch(this.buildApiUrl(`/api/devices/${encodeURIComponent(deviceId)}`), { method: 'DELETE' });
-    unwrapResult(await response.json());
-  }
-
-  async createDeviceCode(): Promise<{ code: string; url: string; expires_at: null }> {
-    const response = await this.authFetch(this.buildApiUrl('/api/devices/code'), { method: 'POST' });
-    return unwrapResult(await response.json());
-  }
-
-  async getDeviceCode(): Promise<{ code: string; url: string; expires_at: null }> {
-    const response = await this.authFetch(this.buildApiUrl('/api/devices/code'));
-    return unwrapResult(await response.json());
-  }
-
-  async logout(refreshToken?: string, baseUrl?: string): Promise<void> {
-    const result = await sdk.logout({
-      body: refreshToken ? { refresh_token: refreshToken } : undefined,
-      ...(baseUrl && { baseUrl }),
-    });
-    unwrapResult(result);
-  }
-
-  async checkSession(): Promise<void> {
-    const result = await sdk.checkSession({});
-    unwrapResult(result);
-  }
-
-  // ---------------------------------------------------------------------------
-  // Agent — runtime
-  // ---------------------------------------------------------------------------
-
-  async runtimeStatus(): Promise<AgentRuntimeStatus> {
-    const result = await sdk.runtimeStatus({});
-    return unwrapResult<AgentRuntimeStatus>(result);
-  }
-
-  // ---------------------------------------------------------------------------
-  // Agent — session lifecycle
-  // ---------------------------------------------------------------------------
-
-  async createAgentSession(params: {
-    workspaceId: string;
-    sessionPath?: string;
-    modeId?: string;
-    draft?: boolean;
-  }): Promise<AgentSessionInfo> {
-    const body = {
-      workspace_id: params.workspaceId,
-      session_path: params.sessionPath,
-      mode_id: params.modeId,
-      draft: params.draft,
-    };
-    const result = await sdk.createSession({
-      body,
-    });
-    return unwrapResult<AgentSessionInfo>(result);
-  }
-
-  async touchAgentSession(
-    sessionId: string,
-    params: { sessionFile: string; workspaceId: string },
-  ): Promise<AgentSessionInfo> {
-    const result = await sdk.touchSession({
-      path: { session_id: sessionId },
-      body: {
-        session_file: params.sessionFile,
-        workspace_id: params.workspaceId,
-      },
-    });
-    return unwrapResult<AgentSessionInfo>(result);
-  }
-
-  async killSession(sessionId: string): Promise<void> {
-    const result = await sdk.killSession({
-      path: { session_id: sessionId },
-    });
-    unwrapResult(result);
-  }
-
-  async listActiveSessions(): Promise<ActiveSessionSummary[]> {
-    const result = await sdk.listSessions({});
-    return unwrapResult<ActiveSessionSummary[]>(result);
-  }
-
-  async getAgentState(sessionId: string): Promise<AgentStateData> {
-    const result = await sdk.getState({ body: { session_id: sessionId } });
-    return unwrapResult<AgentStateData>(result);
-  }
-
-  // ---------------------------------------------------------------------------
-  // Agent — prompting
-  // ---------------------------------------------------------------------------
-
-  async prompt(params: {
-    sessionId: string;
-    message: string;
-    images?: ImageContent[];
-    streamingBehavior?: "steer" | "followUp";
-    workspaceId?: string;
-    sessionFile?: string;
-    fromEntryId?: string;
-  }): Promise<void> {
-    const result = await sdk.prompt({
-      body: {
-        session_id: params.sessionId,
-        message: params.message,
-        images: params.images,
-        streaming_behavior: params.streamingBehavior,
-        workspace_id: params.workspaceId,
-        session_file: params.sessionFile,
-        from_entry_id: params.fromEntryId,
-      } as never,
-    });
-    unwrapResult(result);
-  }
-
-  async steer(params: {
-    sessionId: string;
-    message: string;
-    images?: ImageContent[];
-    workspaceId?: string;
-    sessionFile?: string;
-  }): Promise<void> {
-    const result = await sdk.steer({
-      body: {
-        session_id: params.sessionId,
-        message: params.message,
-        images: params.images,
-        workspace_id: params.workspaceId,
-        session_file: params.sessionFile,
-      },
-    });
-    unwrapResult(result);
-  }
-
-  async followUp(params: {
-    sessionId: string;
-    message: string;
-    images?: ImageContent[];
-    workspaceId?: string;
-    sessionFile?: string;
-  }): Promise<void> {
-    const result = await sdk.followUp({
-      body: {
-        session_id: params.sessionId,
-        message: params.message,
-        images: params.images,
-        workspace_id: params.workspaceId,
-        session_file: params.sessionFile,
-      },
-    });
-    unwrapResult(result);
-  }
-
-  async abort(sessionId: string): Promise<void> {
-    const result = await sdk.abort({
-      body: { session_id: sessionId },
-    });
-    unwrapResult(result);
-  }
-
-  // ---------------------------------------------------------------------------
-  // Agent — state & config
-  // ---------------------------------------------------------------------------
-
-  async getState(sessionId: string): Promise<Record<string, unknown>> {
-    const result = await sdk.getState({
-      body: { session_id: sessionId },
-    });
-    return unwrapResult<Record<string, unknown>>(result);
-  }
-
-  async getMessages(
-    sessionId: string,
-  ): Promise<{ messages: Record<string, string>[] }> {
-    const result = await sdk.getMessages({
-      body: { session_id: sessionId },
-    });
-    return unwrapResult<{ messages: Record<string, string>[] }>(result);
-  }
-
-  async setModel(
-    sessionId: string,
-    params: { provider: string; modelId: string },
-  ): Promise<void> {
-    const result = await sdk.setModel({
-      body: {
-        session_id: sessionId,
-        provider: params.provider,
-        modelId: params.modelId,
-      },
-    });
-    unwrapResult(result);
-  }
-
-  async cycleModel(sessionId: string): Promise<void> {
-    const result = await sdk.cycleModel({
-      body: { session_id: sessionId },
-    });
-    unwrapResult(result);
-  }
-
-  /**
-   * The agent returns full model descriptors here (contextWindow, maxTokens,
-   * input modalities, cost, reasoning, thinkingLevelMap), not just ids.
-   */
-  async getAvailableModels(sessionId: string): Promise<{ models: ModelInfo[] }> {
-    const result = await sdk.getAvailableModels({
-      body: { session_id: sessionId },
-    });
-    return unwrapResult<{ models: ModelInfo[] }>(result);
-  }
-
-  async setThinkingLevel(sessionId: string, level: string): Promise<void> {
-    const result = await sdk.setThinkingLevel({
-      body: { session_id: sessionId, level },
-    });
-    unwrapResult(result);
-  }
-
-  async cycleThinkingLevel(sessionId: string): Promise<void> {
-    const result = await sdk.cycleThinkingLevel({
-      body: { session_id: sessionId },
-    });
-    unwrapResult(result);
-  }
-
-  async getAvailableThinkingLevels(sessionId: string): Promise<{ levels: string[] }> {
-    const result = await sdk.getAvailableThinkingLevels({
-      body: { session_id: sessionId },
-    });
-    return unwrapResult<{ levels: string[] }>(result);
-  }
-
-  async setSteeringMode(sessionId: string, mode: string): Promise<void> {
-    const result = await sdk.setSteeringMode({
-      body: { session_id: sessionId, mode },
-    });
-    unwrapResult(result);
-  }
-
-  async setFollowUpMode(sessionId: string, mode: string): Promise<void> {
-    const result = await sdk.setFollowUpMode({
-      body: { session_id: sessionId, mode },
-    });
-    unwrapResult(result);
-  }
-
-  // ---------------------------------------------------------------------------
-  // Agent — compaction & retry
-  // ---------------------------------------------------------------------------
-
-  async compact(
-    sessionId: string,
-    customInstructions?: string,
-  ): Promise<CompactionResult> {
-    const result = await sdk.compact({
-      body: { session_id: sessionId, customInstructions },
-    });
-    return unwrapResult<CompactionResult>(result);
-  }
-
-  async setAutoCompaction(
-    sessionId: string,
-    enabled: boolean,
-  ): Promise<void> {
-    const result = await sdk.setAutoCompaction({
-      body: { session_id: sessionId, enabled },
-    });
-    unwrapResult(result);
-  }
-
-  async setAutoRetry(sessionId: string, enabled: boolean): Promise<void> {
-    const result = await sdk.setAutoRetry({
-      body: { session_id: sessionId, enabled },
-    });
-    unwrapResult(result);
-  }
-
-  async abortRetry(sessionId: string): Promise<void> {
-    const result = await sdk.abortRetry({
-      body: { session_id: sessionId },
-    });
-    unwrapResult(result);
-  }
-
-  // ---------------------------------------------------------------------------
-  // Agent — bash
-  // ---------------------------------------------------------------------------
-
-  async bash(
-    sessionId: string,
-    command: string,
-    id?: string,
-  ): Promise<{
-    output: string;
-    exitCode: number;
-    cancelled: boolean;
-    truncated: boolean;
-    fullOutputPath?: string | null;
-  }> {
-    const result = await sdk.bash({
-      body: { session_id: sessionId, command, id },
-    });
-    return unwrapResult(result);
-  }
-
-  async abortBash(sessionId: string): Promise<void> {
-    const result = await sdk.abortBash({
-      body: { session_id: sessionId },
-    });
-    unwrapResult(result);
-  }
-
-  // ---------------------------------------------------------------------------
-  // Agent — session switching / forking
-  // ---------------------------------------------------------------------------
-
-  async newSession(
-    sessionId: string,
-    parentSession?: string,
-  ): Promise<AgentSessionCommandResponse> {
-    const result = await sdk.newSession({
-      body: { session_id: sessionId, parentSession },
-    });
-    return unwrapResult<AgentSessionCommandResponse>(result);
-  }
-
-  async switchSession(
-    sessionId: string,
-    sessionPath: string,
-  ): Promise<AgentSessionCommandResponse> {
-    const result = await sdk.switchSession({
-      body: { session_id: sessionId, sessionPath },
-    });
-    return unwrapResult<AgentSessionCommandResponse>(result);
-  }
-
-  async fork(
-    sessionId: string,
-    entryId: string,
-    position: "before" | "at" = "before",
-  ): Promise<{ text?: string; selectedText?: string; cancelled: boolean; session?: { sessionId: string; sessionFile?: string; workspaceId?: string; listItem?: SessionListItem } }> {
-    const result = await sdk.fork({
-      body: { session_id: sessionId, entryId, position } as never,
-    });
-    return unwrapResult(result);
-  }
-
-  async cloneSession(sessionId: string): Promise<AgentSessionCommandResponse> {
-    const result = await sdk.cloneSession({
-      body: { session_id: sessionId },
-    });
-    return unwrapResult<AgentSessionCommandResponse>(result);
-  }
-
-  async getEntries(
-    sessionId: string,
-    since?: string,
-  ): Promise<Record<string, unknown>> {
-    const result = await sdk.getEntries({
-      body: { session_id: sessionId, since },
-    });
-    return unwrapResult<Record<string, unknown>>(result);
-  }
-
-  async getTree(sessionId: string): Promise<Record<string, unknown>> {
-    const result = await sdk.getTree({
-      body: { session_id: sessionId },
-    });
-    return unwrapResult<Record<string, unknown>>(result);
-  }
-
-  async getForkMessages(
-    sessionId: string,
-  ): Promise<{ messages: Array<{ entryId: string; text: string }> }> {
-    const result = await sdk.getForkMessages({
-      body: { session_id: sessionId },
-    });
-    return unwrapResult(result);
-  }
-
-  async getLastAssistantText(
-    sessionId: string,
-  ): Promise<{ text: string | null }> {
-    const result = await sdk.getLastAssistantText({
-      body: { session_id: sessionId },
-    });
-    return unwrapResult(result);
-  }
-
-  // ---------------------------------------------------------------------------
-  // Agent — stats / export / name / commands
-  // ---------------------------------------------------------------------------
-
-  async getSessionStats(sessionId: string): Promise<{
-    sessionFile: string;
-    sessionId: string;
-    userMessages: number;
-    assistantMessages: number;
-    toolCalls: number;
-    toolResults: number;
-    totalMessages: number;
-    tokens: {
-      input: number;
-      output: number;
-      cacheRead: number;
-      cacheWrite: number;
-      total: number;
-    };
-    cost: number;
-    contextUsage?: {
-      tokens: number | null;
-      contextWindow: number;
-      percent: number | null;
-    };
-  }> {
-    const result = await sdk.getSessionStats({
-      body: { session_id: sessionId },
-    });
-    return unwrapResult(result);
-  }
-
-  async exportHtml(
-    sessionId: string,
-    outputPath?: string,
-  ): Promise<{ path: string }> {
-    const result = await sdk.exportHtml({
-      body: { session_id: sessionId, outputPath },
-    });
-    return unwrapResult(result);
-  }
-
-  async setSessionName(sessionId: string, name: string): Promise<void> {
-    const result = await sdk.setSessionName({
-      body: { session_id: sessionId, name },
-    });
-    unwrapResult(result);
-  }
-
-  async getCommands(sessionId: string): Promise<{
-    commands: Array<{
-      name: string;
-      description?: string;
-      source?: "extension" | "prompt" | "skill";
-      location?: "user" | "project" | "path";
-      path?: string;
-      sourceInfo?: {
-        path?: string;
-        scope?: "user" | "project";
-        source?: string;
-      };
-    }>;
-  }> {
-    const result = await sdk.getCommands({
-      body: { session_id: sessionId },
-    });
-    return unwrapResult(result);
-  }
-
-  // ---------------------------------------------------------------------------
-  // Agent — extension UI
-  // ---------------------------------------------------------------------------
-
-  async extensionUiResponse(params: {
-    sessionId: string;
-    id: string;
-    value?: string;
-    confirmed?: boolean;
-    cancelled?: boolean;
-  }): Promise<void> {
-    const result = await sdk.extensionUiResponse({
-      body: {
-        session_id: params.sessionId,
-        id: params.id,
-        value: params.value,
-        confirmed: params.confirmed,
-        cancelled: params.cancelled,
-      },
-    });
-    unwrapResult(result);
-  }
-
-  // ---------------------------------------------------------------------------
-  // Chat — session lifecycle
-  // ---------------------------------------------------------------------------
-
-  async createChatSession(params?: {
-    noTools?: boolean;
-    systemPrompt?: string;
-    modeId?: string;
-  }): Promise<AgentSessionInfo> {
-    const result = await sdk.createSession2({
-      body: {
-        no_tools: params?.noTools,
-        system_prompt: params?.systemPrompt,
-        mode_id: params?.modeId,
-      },
-    });
-    return unwrapResult<AgentSessionInfo>(result);
-  }
-
-  async listChatSessions(params?: {
-    page?: number;
-    limit?: number;
-  }): Promise<PaginatedSessions> {
-    const result = await sdk.listSessions2({
-      query: { page: params?.page, limit: params?.limit },
-    });
-    return unwrapResult<PaginatedSessions>(result);
-  }
-
-  async touchChatSession(
-    sessionId: string,
-    sessionFile?: string,
-  ): Promise<AgentSessionInfo> {
-    const result = await sdk.touchSession2({
-      path: { session_id: sessionId },
-      body: { session_file: sessionFile },
-    });
-    return unwrapResult<AgentSessionInfo>(result);
-  }
-
-  async deleteChatSession(sessionId: string): Promise<void> {
-    const result = await sdk.deleteSession({
-      path: { session_id: sessionId },
-    });
-    unwrapResult(result);
-  }
-
-  // ---------------------------------------------------------------------------
-  // Workspaces
-  // ---------------------------------------------------------------------------
-
-  async listWorkspaces(includeArchived?: boolean): Promise<Workspace[]> {
-    const result = await sdk.list2({
-      query: { include_archived: includeArchived },
-    });
-    return unwrapResult<Workspace[]>(result);
-  }
-
-  async getWorkspace(id: string): Promise<Workspace> {
-    const result = await sdk.get({ path: { id } });
-    return unwrapResult<Workspace>(result);
-  }
-
-  async createWorkspace(params: {
-    name: string;
-    path: string;
-    color?: string;
-    workspaceEnabled?: boolean;
-    startupScript?: string;
-  }): Promise<Workspace> {
-    const result = await sdk.create({
-      body: {
-        name: params.name,
-        path: params.path,
-        color: params.color,
-        workspace_enabled: params.workspaceEnabled,
-        startup_script: params.startupScript,
-      },
-    });
-    return unwrapResult<Workspace>(result);
-  }
-
-  async updateWorkspace(
-    id: string,
-    params: {
-      name?: string;
-      path?: string;
-      color?: string;
-      workspaceEnabled?: boolean;
-      startupScript?: string;
-    },
-  ): Promise<Workspace> {
-    const result = await sdk.update2({
-      path: { id },
-      body: {
-        name: params.name,
-        path: params.path,
-        color: params.color,
-        workspace_enabled: params.workspaceEnabled,
-        startup_script: params.startupScript,
-      },
-    });
-    return unwrapResult<Workspace>(result);
-  }
-
-  async deleteWorkspace(id: string): Promise<void> {
-    const result = await sdk.delete2({ path: { id } });
-    unwrapResult(result);
-  }
-
-  async archiveWorkspace(id: string): Promise<Workspace> {
-    const result = await sdk.archive({ path: { id } });
-    return unwrapResult<Workspace>(result);
-  }
-
-  async unarchiveWorkspace(id: string): Promise<Workspace> {
-    const result = await sdk.unarchive({ path: { id } });
-    return unwrapResult<Workspace>(result);
-  }
-
-  async suggestWorkspaces(): Promise<string[]> {
-    const result = await sdk.suggestWorkspaces({});
-    return unwrapResult<string[]>(result);
-  }
-
-  // ---------------------------------------------------------------------------
-  // Workspace sessions (file-based)
-  // ---------------------------------------------------------------------------
-
-  async listWorkspaceSessions(
-    workspaceId: string,
-    params?: { page?: number; limit?: number },
-  ): Promise<PaginatedSessions> {
-    const result = await sdk.sessionsList({
-      path: { id: workspaceId },
-      query: { page: params?.page, limit: params?.limit },
-    });
-    return unwrapResult<PaginatedSessions>(result);
-  }
-
-  async getWorkspaceSession(
-    workspaceId: string,
-    sessionId: string,
-  ): Promise<SessionDetail> {
-    const result = await sdk.sessionsGet({
-      path: { id: workspaceId, session_id: sessionId },
-    });
-    return unwrapResult<SessionDetail>(result);
-  }
-
-  async deleteWorkspaceSession(
-    workspaceId: string,
-    sessionId: string,
-  ): Promise<void> {
-    const result = await sdk.sessionsDelete({
-      path: { id: workspaceId, session_id: sessionId },
-    });
-    unwrapResult(result);
-  }
-
-  async renameWorkspaceSession(
-    workspaceId: string,
-    sessionId: string,
-    name: string,
-  ): Promise<void> {
-    const result = await sdk.sessionsRename({
-      path: { id: workspaceId, session_id: sessionId },
-      body: { name },
-    });
-    unwrapResult(result);
-  }
-
-  async archiveWorkspaceSession(
-    workspaceId: string,
-    sessionId: string,
-  ): Promise<void> {
-    const result = await sdk.sessionsArchive({
-      path: { id: workspaceId, session_id: sessionId },
-    });
-    unwrapResult(result);
-  }
-
-  async getSessionTree(
-    workspaceId: string,
-    sessionId: string,
-  ): Promise<SessionTreeNode[]> {
-    const result = await sdk.sessionsTree({
-      path: { id: workspaceId, session_id: sessionId },
-    });
-    return unwrapResult<SessionTreeNode[]>(result);
-  }
-
-  async getSessionLeaf(
-    workspaceId: string,
-    sessionId: string,
-  ): Promise<SessionEntry> {
-    const result = await sdk.sessionsLeaf({
-      path: { id: workspaceId, session_id: sessionId },
-    });
-    return unwrapResult<SessionEntry>(result);
-  }
-
-  async getSessionChildren(
-    workspaceId: string,
-    sessionId: string,
-    entryId: string,
-  ): Promise<SessionEntry[]> {
-    const result = await sdk.sessionsChildren({
-      path: { id: workspaceId, session_id: sessionId, entry_id: entryId },
-    });
-    return unwrapResult<SessionEntry[]>(result);
-  }
-
-  async getSessionBranch(
-    workspaceId: string,
-    sessionId: string,
-    entryId: string,
-  ): Promise<SessionEntry[]> {
-    const result = await sdk.sessionsBranch({
-      path: { id: workspaceId, session_id: sessionId, entry_id: entryId },
-    });
-    return unwrapResult<SessionEntry[]>(result);
-  }
-
-  // ---------------------------------------------------------------------------
-  // Git
-  // ---------------------------------------------------------------------------
-
-  async gitStatus(cwd: string): Promise<GitStatusResponse> {
-    const result = await sdk.status({ query: { cwd } });
-    return unwrapResult<GitStatusResponse>(result);
-  }
-
-  async gitBranches(cwd: string): Promise<GitBranch[]> {
-    const result = await sdk.branches({ query: { cwd } });
-    return unwrapResult<GitBranch[]>(result);
-  }
-
-  async gitCheckout(
-    cwd: string,
-    params: { branch: string; create?: boolean },
-  ): Promise<void> {
-    const result = await sdk.checkout({
-      query: { cwd },
-      body: {
-        branch: params.branch,
-        create: params.create,
-      },
-    });
-    unwrapResult(result);
-  }
-
-  async gitCommit(cwd: string, message: string): Promise<void> {
-    const result = await sdk.commit({ query: { cwd }, body: { message } });
-    unwrapResult(result);
-  }
-
-  async gitDiff(
-    cwd: string,
-    staged?: boolean,
-  ): Promise<GitDiffResponse> {
-    const result = await sdk.diff({ query: { cwd, staged } });
-    return unwrapResult<GitDiffResponse>(result);
-  }
-
-  async gitDiffFile(
-    cwd: string,
-    path: string,
-    staged?: boolean,
-  ): Promise<GitFileDiffResponse> {
-    const result = await sdk.diffFile({ query: { cwd, path, staged } });
-    return unwrapResult<GitFileDiffResponse>(result);
-  }
-
-  async gitDiscard(cwd: string, paths: string[]): Promise<void> {
-    const result = await sdk.discard({ query: { cwd }, body: { paths } });
-    unwrapResult(result);
-  }
-
-  async gitLog(
-    cwd: string,
-    count?: number,
-  ): Promise<GitLogEntry[]> {
-    const result = await sdk.log({ query: { cwd, count } });
-    return unwrapResult<GitLogEntry[]>(result);
-  }
-
-  async gitStage(cwd: string, paths: string[]): Promise<void> {
-    const result = await sdk.stage({ query: { cwd }, body: { paths } });
-    unwrapResult(result);
-  }
-
-  async gitUnstage(cwd: string, paths: string[]): Promise<void> {
-    const result = await sdk.unstage({ query: { cwd }, body: { paths } });
-    unwrapResult(result);
-  }
-
-  async gitNestedRepos(cwd: string): Promise<NestedGitReposResponse> {
-    const result = await sdk.nestedRepos({ query: { cwd } });
-    return unwrapResult<NestedGitReposResponse>(result);
-  }
-
-  async gitStashList(cwd: string): Promise<GitStashEntry[]> {
-    const result = await sdk.stashList({ query: { cwd } });
-    return unwrapResult<GitStashEntry[]>(result);
-  }
-
-  async gitStashPush(cwd: string, message?: string): Promise<void> {
-    const result = await sdk.stashPush({
-      query: { cwd, message },
-    });
-    unwrapResult(result);
-  }
-
-  async gitStashApply(cwd: string, index?: number, pop?: boolean): Promise<void> {
-    const result = await sdk.stashApply({
-      query: { cwd },
-      body: { index, pop },
-    });
-    unwrapResult(result);
-  }
-
-  async gitStashDrop(cwd: string, index: number): Promise<void> {
-    const result = await sdk.stashDrop({
-      query: { cwd, index },
-    });
-    unwrapResult(result);
-  }
-
-  async gitWorktreeList(cwd: string): Promise<GitWorktree[]> {
-    const result = await sdk.worktreeList({ query: { cwd } });
-    return unwrapResult<GitWorktree[]>(result);
-  }
-
-  async gitWorktreeAdd(
-    cwd: string,
-    params: { path: string; branch?: string; newBranch?: string },
-  ): Promise<void> {
-    const result = await sdk.worktreeAdd({
-      query: { cwd },
-      body: {
-        path: params.path,
-        branch: params.branch,
-        new_branch: params.newBranch,
-      },
-    });
-    unwrapResult(result);
-  }
-
-  async gitWorktreeRemove(cwd: string, path: string): Promise<void> {
-    const result = await sdk.worktreeRemove({
-      query: { cwd },
-      body: { path },
-    });
-    unwrapResult(result);
-  }
-
-  // ---------------------------------------------------------------------------
-  // Filesystem
-  // ---------------------------------------------------------------------------
-
-  async fsList(path: string): Promise<FsListResponse> {
-    const result = await sdk.list({ query: { path } });
-    return unwrapResult<FsListResponse>(result);
-  }
-
-  async fsRead(path: string): Promise<FsReadResponse> {
-    const result = await sdk.read({ query: { path } });
-    return unwrapResult<FsReadResponse>(result);
-  }
-
-  async fsWrite(path: string, content: string): Promise<void> {
-    const result = await sdk.write({ body: { path, content } });
-    unwrapResult(result);
-  }
-
-  async fsDelete(path: string): Promise<void> {
-    const result = await sdk.delete_({ body: { path } });
-    unwrapResult(result);
-  }
-
-  async fsMkdir(path: string): Promise<void> {
-    const result = await sdk.mkdir({ body: { path } });
-    unwrapResult(result);
-  }
-
-  async fsComplete(input: string): Promise<PathCompletion[]> {
-    const result = await sdk.complete({ query: { q: input } });
-    return unwrapResult<PathCompletion[]>(result);
-  }
-
-  async fsUpload(params: {
-    path: string;
-    createFormData: () => FormData;
-    onProgress?: (loaded: number, total: number) => void;
-  }): Promise<FsUploadResponse> {
-    const url = this.buildApiUrl("/api/fs/upload", { path: params.path });
-
-    const execute = (allowRetry: boolean) =>
-      new Promise<FsUploadResponse>((resolve, reject) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open("POST", url);
-        xhr.setRequestHeader("Authorization", `Bearer ${this._accessToken}`);
-        xhr.responseType = "text";
-
-        xhr.upload.onprogress = (event) => {
-          if (event.lengthComputable) {
-            params.onProgress?.(event.loaded, event.total);
-          }
-        };
-
-        xhr.onerror = () => reject(new Error("Upload failed"));
-        xhr.onabort = () => reject(new Error("Upload cancelled"));
-        xhr.onload = async () => {
-          if (xhr.status === 401 && allowRetry && this._onAuthError) {
-            const newToken = await this._onAuthError();
-            if (newToken) {
-              this._accessToken = newToken;
-              execute(false).then(resolve).catch(reject);
-              return;
-            }
-          }
-
-          let parsed: any = null;
-          try {
-            parsed = xhr.responseText ? JSON.parse(xhr.responseText) : null;
-          } catch {
-            // ignore parse failure and use status handling below
-          }
-
-          if (xhr.status < 200 || xhr.status >= 300) {
-            const message = parsed?.error ?? parsed?.output ?? `Upload failed (${xhr.status})`;
-            reject(new Error(message));
-            return;
-          }
-
-          try {
-            resolve(unwrapResult<FsUploadResponse>({ data: parsed }));
-          } catch (error) {
-            reject(error instanceof Error ? error : new Error("Upload failed"));
-          }
-        };
-
-        xhr.send(params.createFormData());
-      });
-
-    return execute(true);
-  }
-
-  async fsDownload(path: string): Promise<{
-    data: Uint8Array;
-    fileName: string;
-    contentType: string;
-  }> {
-    const url = this.buildApiUrl("/api/fs/download", { path });
-    const response = await this.authFetch(url);
-
-    if (!response.ok) {
-      let message = `Download failed (${response.status})`;
-      try {
-        const data = await response.json();
-        if (data && typeof data === "object") {
-          message = (data as any).error ?? message;
-        }
-      } catch {
-        // ignore json parse errors
-      }
-      throw new Error(message);
-    }
-
-    const contentDisposition = response.headers.get("content-disposition") ?? "";
-    const fileNameMatch = contentDisposition.match(/filename="?([^";]+)"?/i);
-    const fileName = fileNameMatch?.[1] ?? path.split("/").pop() ?? "file";
-    const contentType = response.headers.get("content-type") ?? "application/octet-stream";
-    const buffer = await response.arrayBuffer();
-
-    return {
-      data: new Uint8Array(buffer),
-      fileName,
-      contentType,
-    };
-  }
-
-  // ---------------------------------------------------------------------------
-  // Package management
-  // ---------------------------------------------------------------------------
-
-  async packageStatus(): Promise<PackageStatus> {
-    const result = await sdk.status2({});
-    return unwrapResult<PackageStatus>(result);
-  }
-
-  async packageUpdate(): Promise<void> {
-    const result = await sdk.update({});
-    unwrapResult(result);
-  }
-
-  async packageInstall(): Promise<void> {
-    const result = await sdk.install({});
-    unwrapResult(result);
-  }
-
-  async packageLogs(limit?: number): Promise<TaskLogs> {
-    const result = await sdk.logs({ query: { limit } });
-    return unwrapResult<TaskLogs>(result);
-  }
-
-  async marketplaceSearch(params?: { query?: string; category?: string; page?: number; limit?: number }): Promise<PackageSearchResponse> {
-    const result = await sdk.marketplaceSearch({ query: params });
-    return unwrapResult<PackageSearchResponse>(result);
-  }
-
-  async marketplaceDetail(name: string): Promise<MarketplacePackage> {
-    const result = await sdk.marketplaceDetail({ path: { name } });
-    return unwrapResult<MarketplacePackage>(result);
-  }
-
-  async marketplaceInstalled(): Promise<OperationResult> {
-    const result = await sdk.marketplaceInstalled({});
-    return unwrapResult<OperationResult>(result);
-  }
-
-  async marketplaceOperation(request: PackageOperationRequest): Promise<OperationResult> {
-    const result = await sdk.marketplaceOperation({ body: request });
-    return unwrapResult<OperationResult>(result);
-  }
-
-  // ---------------------------------------------------------------------------
-  // Tasks
-  // ---------------------------------------------------------------------------
-
-  async getTaskConfig(workspaceId: string): Promise<TasksConfig> {
-    const result = await sdk.getConfig({ path: { workspace_id: workspaceId } });
-    return unwrapResult<TasksConfig>(result);
-  }
-
-  async listTasks(workspaceId: string): Promise<TaskInfo[]> {
-    const result = await sdk.listTasks({ path: { workspace_id: workspaceId } });
-    return unwrapResult<TaskInfo[]>(result);
-  }
-
-  async startTask(label: string, workspaceId: string): Promise<TaskInfo> {
-    const result = await sdk.startTask({
-      body: { label, workspace_id: workspaceId },
-    });
-    return unwrapResult<TaskInfo>(result);
-  }
-
-  async stopTask(taskId: string): Promise<TaskInfo> {
-    const result = await sdk.stopTask({ body: { task_id: taskId } });
-    return unwrapResult<TaskInfo>(result);
-  }
-
-  async restartTask(taskId: string): Promise<TaskInfo> {
-    const result = await sdk.restartTask({ body: { task_id: taskId } });
-    return unwrapResult<TaskInfo>(result);
-  }
-
-  async removeTask(taskId: string): Promise<void> {
-    const result = await sdk.removeTask({ path: { task_id: taskId } });
-    unwrapResult(result);
-  }
-
-  async getTaskLogs(taskId: string): Promise<TaskLogs> {
-    const result = await sdk.getLogs({ path: { task_id: taskId } });
-    return unwrapResult<TaskLogs>(result);
-  }
-
-  // ---------------------------------------------------------------------------
-  // Custom models
-  // ---------------------------------------------------------------------------
-
-  async getCustomModels(): Promise<CustomModelsConfigResult> {
-    const result = await sdk.getCustomModels({});
-    return unwrapResult<CustomModelsConfigResult>(result);
-  }
-
-  async listBuiltinProviders(): Promise<BuiltinProvider[]> {
-    const response = await this.authFetch(this.buildApiUrl("/api/providers"));
-    return unwrapResult<BuiltinProvider[]>(await response.json());
-  }
-
-  async saveBuiltinProviderKey(providerId: string, apiKey: string): Promise<void> {
-    const response = await this.authFetch(this.buildApiUrl(`/api/providers/${encodeURIComponent(providerId)}/api-key`), { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ api_key: apiKey }) });
-    unwrapResult(await response.json());
-  }
-
-  async removeBuiltinProviderKey(providerId: string): Promise<void> {
-    const response = await this.authFetch(this.buildApiUrl(`/api/providers/${encodeURIComponent(providerId)}/api-key`), { method: "DELETE" });
-    unwrapResult(await response.json());
-  }
-
-  async startProviderOAuth(providerId: string): Promise<{ id: string; url: string | null; instructions: string | null; status: string; error: string | null; prompt?: { id: string; message: string; type: string } | null }> {
-    const response = await this.authFetch(this.buildApiUrl(`/api/providers/${encodeURIComponent(providerId)}/oauth`), { method: "POST" });
-    return unwrapResult(await response.json());
-  }
-
-  async getProviderOAuth(providerId: string, loginId: string): Promise<{ url: string | null; instructions: string | null; status: "pending" | "complete" | "failed"; error: string | null; prompt?: { id: string; message: string; type: string } | null }> {
-    const response = await this.authFetch(this.buildApiUrl(`/api/providers/${encodeURIComponent(providerId)}/oauth/${encodeURIComponent(loginId)}`));
-    return unwrapResult(await response.json());
-  }
-
-  async resolveProviderOAuthPrompt(providerId: string, loginId: string, promptId: string, value: string): Promise<void> {
-    const response = await this.authFetch(this.buildApiUrl(`/api/providers/${encodeURIComponent(providerId)}/oauth/${encodeURIComponent(loginId)}/prompt/${encodeURIComponent(promptId)}`), { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ value }) });
-    unwrapResult(await response.json());
-  }
-
-  async saveCustomModels(config: { providers: Record<string, CustomProvider> }): Promise<void> {
-    const result = await sdk.saveCustomModels({ body: { providers: config.providers } });
-    unwrapResult(result);
-  }
-
-  // ---------------------------------------------------------------------------
-  // Modes
-  // ---------------------------------------------------------------------------
-
-  async listModes(): Promise<AgentMode[]> {
-    const result = await sdk.listModes();
-    return unwrapResult<AgentMode[]>(result).map((mode) => ({
-      ...mode,
-      extensions: Array.isArray(mode.extensions) ? mode.extensions : [],
-      skills: Array.isArray(mode.skills) ? mode.skills : [],
-      extra_args: Array.isArray(mode.extra_args) ? mode.extra_args : [],
-    }));
-  }
-
-  async createMode(params: {
-    name: string;
-    description?: string;
-    model?: string;
-    thinkingLevel?: string;
-    systemPrompt?: string;
-    extensions?: string[];
-    skills?: string[];
-    extraArgs?: string[];
-    isDefault?: boolean;
-    sortOrder?: number;
-  }): Promise<AgentMode> {
-    const result = await sdk.createMode({
-      body: {
-        name: params.name,
-        description: params.description,
-        model: params.model,
-        thinking_level: params.thinkingLevel,
-        system_prompt: params.systemPrompt,
-        extensions: Array.isArray(params.extensions) && params.extensions.length > 0 ? params.extensions : undefined,
-        skills: Array.isArray(params.skills) && params.skills.length > 0 ? params.skills : undefined,
-        extra_args: Array.isArray(params.extraArgs) && params.extraArgs.length > 0 ? params.extraArgs : undefined,
-        is_default: params.isDefault,
-        sort_order: params.sortOrder,
-      },
-    });
-    return unwrapResult<AgentMode>(result);
-  }
-
-  async updateMode(
-    modeId: string,
-    params: {
-      name?: string;
-      description?: string;
-      model?: string;
-      thinkingLevel?: string;
-      systemPrompt?: string;
-      extensions?: string[];
-      skills?: string[];
-      extraArgs?: string[];
-      isDefault?: boolean;
-      sortOrder?: number;
-    },
-  ): Promise<AgentMode> {
-    const result = await sdk.updateMode({
-      path: { mode_id: modeId },
-      body: {
-        name: params.name,
-        description: params.description,
-        model: params.model,
-        thinking_level: params.thinkingLevel,
-        system_prompt: params.systemPrompt,
-        extensions: Array.isArray(params.extensions) ? params.extensions : undefined,
-        skills: Array.isArray(params.skills) ? params.skills : undefined,
-        extra_args: Array.isArray(params.extraArgs) ? params.extraArgs : undefined,
-        is_default: params.isDefault,
-        sort_order: params.sortOrder,
-      },
-    });
-    return unwrapResult<AgentMode>(result);
-  }
-
-  async deleteMode(modeId: string): Promise<void> {
-    const result = await sdk.deleteMode({ path: { mode_id: modeId } });
-    unwrapResult(result);
-  }
-
-  async getSessionMode(sessionId: string): Promise<{ session_id: string; mode: AgentMode | null }> {
-    const result = await sdk.getSessionMode({ path: { session_id: sessionId } });
-    return unwrapResult<{ session_id: string; mode: AgentMode | null }>(result);
-  }
-
-  // ---------------------------------------------------------------------------
-  // Session history (REST)
-  // ---------------------------------------------------------------------------
-
-  async getSessionHistory(
-    sessionId: string,
-    params?: { before?: string; limit?: number },
-  ): Promise<SessionHistoryResponse> {
-    const result = await sdk.sessionHistory({
-      path: { session_id: sessionId },
-      query: { before: params?.before, limit: params?.limit },
-    });
-    return unwrapResult<SessionHistoryResponse>(result);
-  }
-
-  // ---------------------------------------------------------------------------
-  // Active session (per-connection)
-  // ---------------------------------------------------------------------------
-
-  async setActiveSession(
-    connectionId: string,
-    sessionId: string | null,
-    fromEventId?: number,
-    fromDeltaEventId?: number,
-  ): Promise<void> {
-    const url = this.buildApiUrl("/api/stream-active-session");
-    const response = await this.authFetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        connection_id: connectionId,
-        session_id: sessionId,
-        from_event_id: fromEventId,
-        from_delta_event_id: fromDeltaEventId,
-      }),
-    });
-    if (!response.ok) {
-      const body = await response.json().catch(() => null);
-      throw new Error((body as any)?.error ?? `setActiveSession failed (${response.status})`);
-    }
-  }
-
-  // ---------------------------------------------------------------------------
-  // Stream URLs
-  // ---------------------------------------------------------------------------
-
-  getStreamUrl(from?: number): string {
-    const url = new URL(`${this._serverUrl}${AIJEE_STREAM_PATH}`);
-    if (from !== undefined) url.searchParams.set("from", String(from));
-    return url.toString();
-  }
-
-  getWsStreamUrl(from?: number): string {
-    const httpUrl = new URL(`${this._serverUrl}/ws/stream`);
-    if (from !== undefined) httpUrl.searchParams.set("from", String(from));
-    httpUrl.protocol = httpUrl.protocol === "https:" ? "wss:" : "ws:";
-    return httpUrl.toString();
-  }
+    this.transport = new ApiTransport(serverUrl, accessToken);
+  }
+
+  get serverUrl(): string { return this.transport.serverUrl; }
+  get accessToken(): string { return this.transport.accessToken; }
+  updateConfig(serverUrl: string, accessToken: string): void { this.transport.updateConfig(serverUrl, accessToken); }
+  updateToken(accessToken: string): void { this.transport.updateToken(accessToken); }
+  setAuthErrorHandler(handler: () => Promise<string | null>): void { this.transport.setAuthErrorHandler(handler); }
+
+  readonly createDevice: Delegate<typeof auth.createDevice> = (...args) => auth.createDevice(this.transport, ...args);
+  readonly listDevices: Delegate<typeof auth.listDevices> = (...args) => auth.listDevices(this.transport, ...args);
+  readonly revokeDevice: Delegate<typeof auth.revokeDevice> = (...args) => auth.revokeDevice(this.transport, ...args);
+  readonly createDeviceCode: Delegate<typeof auth.createDeviceCode> = (...args) => auth.createDeviceCode(this.transport, ...args);
+  readonly getDeviceCode: Delegate<typeof auth.getDeviceCode> = (...args) => auth.getDeviceCode(this.transport, ...args);
+  readonly logout: Delegate<typeof auth.logout> = (...args) => auth.logout(this.transport, ...args);
+  readonly checkSession: Delegate<typeof auth.checkSession> = (...args) => auth.checkSession(this.transport, ...args);
+  readonly runtimeStatus: Delegate<typeof agent.runtimeStatus> = (...args) => agent.runtimeStatus(this.transport, ...args);
+  readonly createAgentSession: Delegate<typeof agent.createAgentSession> = (...args) => agent.createAgentSession(this.transport, ...args);
+  readonly touchAgentSession: Delegate<typeof agent.touchAgentSession> = (...args) => agent.touchAgentSession(this.transport, ...args);
+  readonly killSession: Delegate<typeof agent.killSession> = (...args) => agent.killSession(this.transport, ...args);
+  readonly listActiveSessions: Delegate<typeof agent.listActiveSessions> = (...args) => agent.listActiveSessions(this.transport, ...args);
+  readonly getAgentState: Delegate<typeof agent.getAgentState> = (...args) => agent.getAgentState(this.transport, ...args);
+  readonly prompt: Delegate<typeof agent.prompt> = (...args) => agent.prompt(this.transport, ...args);
+  readonly steer: Delegate<typeof agent.steer> = (...args) => agent.steer(this.transport, ...args);
+  readonly followUp: Delegate<typeof agent.followUp> = (...args) => agent.followUp(this.transport, ...args);
+  readonly abort: Delegate<typeof agent.abort> = (...args) => agent.abort(this.transport, ...args);
+  readonly getState: Delegate<typeof agent.getState> = (...args) => agent.getState(this.transport, ...args);
+  readonly getMessages: Delegate<typeof agent.getMessages> = (...args) => agent.getMessages(this.transport, ...args);
+  readonly setModel: Delegate<typeof agent.setModel> = (...args) => agent.setModel(this.transport, ...args);
+  readonly cycleModel: Delegate<typeof agent.cycleModel> = (...args) => agent.cycleModel(this.transport, ...args);
+  readonly getAvailableModels: Delegate<typeof agent.getAvailableModels> = (...args) => agent.getAvailableModels(this.transport, ...args);
+  readonly setThinkingLevel: Delegate<typeof agent.setThinkingLevel> = (...args) => agent.setThinkingLevel(this.transport, ...args);
+  readonly cycleThinkingLevel: Delegate<typeof agent.cycleThinkingLevel> = (...args) => agent.cycleThinkingLevel(this.transport, ...args);
+  readonly getAvailableThinkingLevels: Delegate<typeof agent.getAvailableThinkingLevels> = (...args) => agent.getAvailableThinkingLevels(this.transport, ...args);
+  readonly setSteeringMode: Delegate<typeof agent.setSteeringMode> = (...args) => agent.setSteeringMode(this.transport, ...args);
+  readonly setFollowUpMode: Delegate<typeof agent.setFollowUpMode> = (...args) => agent.setFollowUpMode(this.transport, ...args);
+  readonly compact: Delegate<typeof agent.compact> = (...args) => agent.compact(this.transport, ...args);
+  readonly setAutoCompaction: Delegate<typeof agent.setAutoCompaction> = (...args) => agent.setAutoCompaction(this.transport, ...args);
+  readonly setAutoRetry: Delegate<typeof agent.setAutoRetry> = (...args) => agent.setAutoRetry(this.transport, ...args);
+  readonly abortRetry: Delegate<typeof agent.abortRetry> = (...args) => agent.abortRetry(this.transport, ...args);
+  readonly bash: Delegate<typeof agent.bash> = (...args) => agent.bash(this.transport, ...args);
+  readonly abortBash: Delegate<typeof agent.abortBash> = (...args) => agent.abortBash(this.transport, ...args);
+  readonly newSession: Delegate<typeof agent.newSession> = (...args) => agent.newSession(this.transport, ...args);
+  readonly switchSession: Delegate<typeof agent.switchSession> = (...args) => agent.switchSession(this.transport, ...args);
+  readonly fork: Delegate<typeof agent.fork> = (...args) => agent.fork(this.transport, ...args);
+  readonly cloneSession: Delegate<typeof agent.cloneSession> = (...args) => agent.cloneSession(this.transport, ...args);
+  readonly getEntries: Delegate<typeof agent.getEntries> = (...args) => agent.getEntries(this.transport, ...args);
+  readonly getTree: Delegate<typeof agent.getTree> = (...args) => agent.getTree(this.transport, ...args);
+  readonly getForkMessages: Delegate<typeof agent.getForkMessages> = (...args) => agent.getForkMessages(this.transport, ...args);
+  readonly getLastAssistantText: Delegate<typeof agent.getLastAssistantText> = (...args) => agent.getLastAssistantText(this.transport, ...args);
+  readonly getSessionStats: Delegate<typeof agent.getSessionStats> = (...args) => agent.getSessionStats(this.transport, ...args);
+  readonly exportHtml: Delegate<typeof agent.exportHtml> = (...args) => agent.exportHtml(this.transport, ...args);
+  readonly setSessionName: Delegate<typeof agent.setSessionName> = (...args) => agent.setSessionName(this.transport, ...args);
+  readonly getCommands: Delegate<typeof agent.getCommands> = (...args) => agent.getCommands(this.transport, ...args);
+  readonly extensionUiResponse: Delegate<typeof agent.extensionUiResponse> = (...args) => agent.extensionUiResponse(this.transport, ...args);
+  readonly createChatSession: Delegate<typeof chat.createChatSession> = (...args) => chat.createChatSession(this.transport, ...args);
+  readonly listChatSessions: Delegate<typeof chat.listChatSessions> = (...args) => chat.listChatSessions(this.transport, ...args);
+  readonly touchChatSession: Delegate<typeof chat.touchChatSession> = (...args) => chat.touchChatSession(this.transport, ...args);
+  readonly deleteChatSession: Delegate<typeof chat.deleteChatSession> = (...args) => chat.deleteChatSession(this.transport, ...args);
+  readonly listWorkspaces: Delegate<typeof workspaces.listWorkspaces> = (...args) => workspaces.listWorkspaces(this.transport, ...args);
+  readonly getWorkspace: Delegate<typeof workspaces.getWorkspace> = (...args) => workspaces.getWorkspace(this.transport, ...args);
+  readonly createWorkspace: Delegate<typeof workspaces.createWorkspace> = (...args) => workspaces.createWorkspace(this.transport, ...args);
+  readonly updateWorkspace: Delegate<typeof workspaces.updateWorkspace> = (...args) => workspaces.updateWorkspace(this.transport, ...args);
+  readonly deleteWorkspace: Delegate<typeof workspaces.deleteWorkspace> = (...args) => workspaces.deleteWorkspace(this.transport, ...args);
+  readonly archiveWorkspace: Delegate<typeof workspaces.archiveWorkspace> = (...args) => workspaces.archiveWorkspace(this.transport, ...args);
+  readonly unarchiveWorkspace: Delegate<typeof workspaces.unarchiveWorkspace> = (...args) => workspaces.unarchiveWorkspace(this.transport, ...args);
+  readonly suggestWorkspaces: Delegate<typeof workspaces.suggestWorkspaces> = (...args) => workspaces.suggestWorkspaces(this.transport, ...args);
+  readonly listWorkspaceSessions: Delegate<typeof workspaces.listWorkspaceSessions> = (...args) => workspaces.listWorkspaceSessions(this.transport, ...args);
+  readonly getWorkspaceSession: Delegate<typeof workspaces.getWorkspaceSession> = (...args) => workspaces.getWorkspaceSession(this.transport, ...args);
+  readonly deleteWorkspaceSession: Delegate<typeof workspaces.deleteWorkspaceSession> = (...args) => workspaces.deleteWorkspaceSession(this.transport, ...args);
+  readonly renameWorkspaceSession: Delegate<typeof workspaces.renameWorkspaceSession> = (...args) => workspaces.renameWorkspaceSession(this.transport, ...args);
+  readonly archiveWorkspaceSession: Delegate<typeof workspaces.archiveWorkspaceSession> = (...args) => workspaces.archiveWorkspaceSession(this.transport, ...args);
+  readonly getSessionTree: Delegate<typeof workspaces.getSessionTree> = (...args) => workspaces.getSessionTree(this.transport, ...args);
+  readonly getSessionLeaf: Delegate<typeof workspaces.getSessionLeaf> = (...args) => workspaces.getSessionLeaf(this.transport, ...args);
+  readonly getSessionChildren: Delegate<typeof workspaces.getSessionChildren> = (...args) => workspaces.getSessionChildren(this.transport, ...args);
+  readonly getSessionBranch: Delegate<typeof workspaces.getSessionBranch> = (...args) => workspaces.getSessionBranch(this.transport, ...args);
+  readonly gitStatus: Delegate<typeof git.gitStatus> = (...args) => git.gitStatus(this.transport, ...args);
+  readonly gitBranches: Delegate<typeof git.gitBranches> = (...args) => git.gitBranches(this.transport, ...args);
+  readonly gitCheckout: Delegate<typeof git.gitCheckout> = (...args) => git.gitCheckout(this.transport, ...args);
+  readonly gitCommit: Delegate<typeof git.gitCommit> = (...args) => git.gitCommit(this.transport, ...args);
+  readonly gitDiff: Delegate<typeof git.gitDiff> = (...args) => git.gitDiff(this.transport, ...args);
+  readonly gitDiffFile: Delegate<typeof git.gitDiffFile> = (...args) => git.gitDiffFile(this.transport, ...args);
+  readonly gitDiscard: Delegate<typeof git.gitDiscard> = (...args) => git.gitDiscard(this.transport, ...args);
+  readonly gitLog: Delegate<typeof git.gitLog> = (...args) => git.gitLog(this.transport, ...args);
+  readonly gitStage: Delegate<typeof git.gitStage> = (...args) => git.gitStage(this.transport, ...args);
+  readonly gitUnstage: Delegate<typeof git.gitUnstage> = (...args) => git.gitUnstage(this.transport, ...args);
+  readonly gitNestedRepos: Delegate<typeof git.gitNestedRepos> = (...args) => git.gitNestedRepos(this.transport, ...args);
+  readonly gitStashList: Delegate<typeof git.gitStashList> = (...args) => git.gitStashList(this.transport, ...args);
+  readonly gitStashPush: Delegate<typeof git.gitStashPush> = (...args) => git.gitStashPush(this.transport, ...args);
+  readonly gitStashApply: Delegate<typeof git.gitStashApply> = (...args) => git.gitStashApply(this.transport, ...args);
+  readonly gitStashDrop: Delegate<typeof git.gitStashDrop> = (...args) => git.gitStashDrop(this.transport, ...args);
+  readonly gitWorktreeList: Delegate<typeof git.gitWorktreeList> = (...args) => git.gitWorktreeList(this.transport, ...args);
+  readonly gitWorktreeAdd: Delegate<typeof git.gitWorktreeAdd> = (...args) => git.gitWorktreeAdd(this.transport, ...args);
+  readonly gitWorktreeRemove: Delegate<typeof git.gitWorktreeRemove> = (...args) => git.gitWorktreeRemove(this.transport, ...args);
+  readonly fsList: Delegate<typeof fs.fsList> = (...args) => fs.fsList(this.transport, ...args);
+  readonly fsRead: Delegate<typeof fs.fsRead> = (...args) => fs.fsRead(this.transport, ...args);
+  readonly fsWrite: Delegate<typeof fs.fsWrite> = (...args) => fs.fsWrite(this.transport, ...args);
+  readonly fsDelete: Delegate<typeof fs.fsDelete> = (...args) => fs.fsDelete(this.transport, ...args);
+  readonly fsMkdir: Delegate<typeof fs.fsMkdir> = (...args) => fs.fsMkdir(this.transport, ...args);
+  readonly fsComplete: Delegate<typeof fs.fsComplete> = (...args) => fs.fsComplete(this.transport, ...args);
+  readonly fsUpload: Delegate<typeof fs.fsUpload> = (...args) => fs.fsUpload(this.transport, ...args);
+  readonly fsDownload: Delegate<typeof fs.fsDownload> = (...args) => fs.fsDownload(this.transport, ...args);
+  readonly packageStatus: Delegate<typeof packages.packageStatus> = (...args) => packages.packageStatus(this.transport, ...args);
+  readonly packageUpdate: Delegate<typeof packages.packageUpdate> = (...args) => packages.packageUpdate(this.transport, ...args);
+  readonly packageInstall: Delegate<typeof packages.packageInstall> = (...args) => packages.packageInstall(this.transport, ...args);
+  readonly packageLogs: Delegate<typeof packages.packageLogs> = (...args) => packages.packageLogs(this.transport, ...args);
+  readonly marketplaceSearch: Delegate<typeof packages.marketplaceSearch> = (...args) => packages.marketplaceSearch(this.transport, ...args);
+  readonly marketplaceDetail: Delegate<typeof packages.marketplaceDetail> = (...args) => packages.marketplaceDetail(this.transport, ...args);
+  readonly marketplaceInstalled: Delegate<typeof packages.marketplaceInstalled> = (...args) => packages.marketplaceInstalled(this.transport, ...args);
+  readonly marketplaceOperation: Delegate<typeof packages.marketplaceOperation> = (...args) => packages.marketplaceOperation(this.transport, ...args);
+  readonly getTaskConfig: Delegate<typeof tasks.getTaskConfig> = (...args) => tasks.getTaskConfig(this.transport, ...args);
+  readonly listTasks: Delegate<typeof tasks.listTasks> = (...args) => tasks.listTasks(this.transport, ...args);
+  readonly startTask: Delegate<typeof tasks.startTask> = (...args) => tasks.startTask(this.transport, ...args);
+  readonly stopTask: Delegate<typeof tasks.stopTask> = (...args) => tasks.stopTask(this.transport, ...args);
+  readonly restartTask: Delegate<typeof tasks.restartTask> = (...args) => tasks.restartTask(this.transport, ...args);
+  readonly removeTask: Delegate<typeof tasks.removeTask> = (...args) => tasks.removeTask(this.transport, ...args);
+  readonly getTaskLogs: Delegate<typeof tasks.getTaskLogs> = (...args) => tasks.getTaskLogs(this.transport, ...args);
+  readonly getCustomModels: Delegate<typeof models.getCustomModels> = (...args) => models.getCustomModels(this.transport, ...args);
+  readonly listBuiltinProviders: Delegate<typeof models.listBuiltinProviders> = (...args) => models.listBuiltinProviders(this.transport, ...args);
+  readonly saveBuiltinProviderKey: Delegate<typeof models.saveBuiltinProviderKey> = (...args) => models.saveBuiltinProviderKey(this.transport, ...args);
+  readonly removeBuiltinProviderKey: Delegate<typeof models.removeBuiltinProviderKey> = (...args) => models.removeBuiltinProviderKey(this.transport, ...args);
+  readonly startProviderOAuth: Delegate<typeof models.startProviderOAuth> = (...args) => models.startProviderOAuth(this.transport, ...args);
+  readonly getProviderOAuth: Delegate<typeof models.getProviderOAuth> = (...args) => models.getProviderOAuth(this.transport, ...args);
+  readonly resolveProviderOAuthPrompt: Delegate<typeof models.resolveProviderOAuthPrompt> = (...args) => models.resolveProviderOAuthPrompt(this.transport, ...args);
+  readonly saveCustomModels: Delegate<typeof models.saveCustomModels> = (...args) => models.saveCustomModels(this.transport, ...args);
+  readonly listModes: Delegate<typeof modes.listModes> = (...args) => modes.listModes(this.transport, ...args);
+  readonly createMode: Delegate<typeof modes.createMode> = (...args) => modes.createMode(this.transport, ...args);
+  readonly updateMode: Delegate<typeof modes.updateMode> = (...args) => modes.updateMode(this.transport, ...args);
+  readonly deleteMode: Delegate<typeof modes.deleteMode> = (...args) => modes.deleteMode(this.transport, ...args);
+  readonly getSessionMode: Delegate<typeof history.getSessionMode> = (...args) => history.getSessionMode(this.transport, ...args);
+  readonly getSessionHistory: Delegate<typeof history.getSessionHistory> = (...args) => history.getSessionHistory(this.transport, ...args);
+  readonly setActiveSession: Delegate<typeof history.setActiveSession> = (...args) => history.setActiveSession(this.transport, ...args);
+  readonly getStreamUrl: Delegate<typeof history.getStreamUrl> = (...args) => history.getStreamUrl(this.transport, ...args);
+  readonly getWsStreamUrl: Delegate<typeof history.getWsStreamUrl> = (...args) => history.getWsStreamUrl(this.transport, ...args);
 }

@@ -2,7 +2,7 @@ import { Spinner, Text, View } from 'tamagui';
 import { useCallback, useEffect, useState } from "react";
 import { Linking, Pressable } from 'react-native';
 import { ArrowUpCircle, CheckCircle2, Info, RefreshCw } from "lucide-react-native";
-import { client, unwrapApiData } from "@aijee/client-sdk";
+import { api, unwrapApiData } from "@aijee/client-sdk";
 import { Fonts } from "@/constants/theme";
 import { SettingsGroup, SettingsRow, useSettingsMetrics, useSettingsPalette } from "@/components/settings-surface";
 import { AboutGroup } from "./about-group";
@@ -58,7 +58,7 @@ export function AboutPanel() {
   const checkLatest = useCallback(async () => {
     setCheckState('checking');
     try {
-      const result = await client.get({ url: '/api/version/latest' });
+      const result = await api.get({ url: '/api/version/latest' });
       const data = unwrapApiData(result.data) as LatestRelease | undefined;
       setRelease(data ?? null);
       setCheckState(data?.latest ? 'checked' : 'error');

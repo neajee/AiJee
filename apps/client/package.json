@@ -6,8 +6,7 @@
     "start": "expo start --host lan",
     "dev": "expo start --web --host lan",
     "lint": "expo lint",
-    "build": "expo export --platform web --clear --output-dir ../../dist",
-    "api:generate": "yarn workspace @aijee/client-sdk api:generate"
+    "build": "expo export --platform web --clear --output-dir ../../dist"
   },
   "dependencies": {
     "@aijee/client-sdk": "workspace:*",

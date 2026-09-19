@@ -1,4 +1,4 @@
-import { client, unwrapApiData } from "@aijee/client-sdk";
+import { api, unwrapApiData } from "@aijee/client-sdk";
 export type ReleaseNote = { type: 'feature' | 'fix' | 'other'; title: string; scope?: string | null; commit?: string | null };
 
 export type VersionInfo = {
@@ -49,6 +49,6 @@ export function parseDescribeTag(value: string | null | undefined): { tag: strin
 }
 
 export async function getVersionInfo(): Promise<VersionInfo> {
-  const result = await client.get({ url: "/api/version" });
+  const result = await api.get({ url: "/api/version" });
   return unwrapApiData(result.data) as VersionInfo;
 }

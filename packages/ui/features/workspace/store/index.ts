@@ -2,8 +2,7 @@ import { create } from 'zustand';
 import * as SecureStore from 'expo-secure-store';
 import type { Workspace } from '../types';
 import type { Workspace as ApiWorkspace } from '@aijee/client-sdk';
-import { sdk, unwrapApiData } from '@aijee/client-sdk';
-const { list2: list, create: apiCreate, delete2: apiDelete } = sdk;
+import { api, unwrapApiData } from '@aijee/client-sdk';
 import { WorkspaceColors } from '@/constants/theme';
 import { useTasksStore } from '@/features/tasks/store';
 import { usePreviewStore } from '@/features/preview/store';
@@ -214,7 +213,7 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
       pinnedWorkspaceIds: restoredPinned,
       currentServerId: sid,
     });
-    const result = await list();
+    const result = await api.list2();
     if (result.error) {
       set({ loading: false, error: 'Failed to fetch workspaces' });
       return;
@@ -259,7 +258,7 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
   },
 
   addWorkspace: async (workspace) => {
-    const result = await apiCreate({
+    const result = await api.create({
       body: {
         name: workspace.title,
         path: workspace.path,
@@ -280,7 +279,7 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
   },
 
   removeWorkspace: async (id) => {
-    const result = await apiDelete({ path: { id } });
+    const result = await api.delete2({ path: { id } });
     if (!result.error) {
       set((state) => {
         const filtered = state.workspaces.filter((w) => w.id !== id);

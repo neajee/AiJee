@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { usePiClient } from "./context";
-import type { StreamEventEnvelope } from "../types/stream-events";
+import type { StreamEventEnvelope } from "@aijee/protocol";
 
 interface UseAgentEventOptions {
   sessionId?: string;

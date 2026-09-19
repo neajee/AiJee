@@ -1,11 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { type NativeSyntheticEvent, TextInput, type TextInputKeyPressEventData } from 'react-native';
 
-import { sdk } from '@aijee/client-sdk';
+import { api } from '@aijee/client-sdk';
 import { useWorkspaceStore } from '../store';
 import type { Workspace } from '../types';
-
-const { update2 } = sdk;
 
 export function useEditWorkspaceController(visible: boolean, workspace: Workspace | null, onClose: () => void) {
   const fetchWorkspaces = useWorkspaceStore((s) => s.fetchWorkspaces);
@@ -24,7 +22,7 @@ export function useEditWorkspaceController(visible: boolean, workspace: Workspac
   const handleSave = useCallback(async () => {
     if (!workspace || !name.trim() || saving) return;
     setSaving(true);
-    await update2({ path: { id: workspace.id }, body: { name: name.trim() } });
+    await api.update2({ path: { id: workspace.id }, body: { name: name.trim() } });
     await fetchWorkspaces();
     setSaving(false);
     onClose();

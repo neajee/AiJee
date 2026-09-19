@@ -1,4 +1,4 @@
-import type { ModelInfo, ModelInputType } from "../types/stream-events";
+import type { ModelInfo, ModelInputType } from "@aijee/protocol";
 
 /**
  * Defaults pi applies to a custom model that omits these fields

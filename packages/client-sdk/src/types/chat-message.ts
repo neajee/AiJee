@@ -1,4 +1,4 @@
-import type { StopReason } from "./stream-events";
+import type { StopReason } from "@aijee/protocol";
 
 export interface SubagentProgressStep {
   tool: string;
@@ -105,7 +105,7 @@ export interface ChatMessage {
 }
 
 /** Product-facing modes. The engine still receives `/chat` for Work mode. */
-export type AgentMode = "work" | "plan";
+export type ProductAgentMode = "work" | "plan";
 
 export type ExtensionUiDialogMethod = "select" | "confirm" | "input" | "editor";
 

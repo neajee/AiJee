@@ -5,9 +5,7 @@ import { Colors, WorkspaceColors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
 import { useWorkspaceStore } from "../store";
-import { sdk, unwrapApiData, type PathCompletion } from "@aijee/client-sdk";
-
-const { complete } = sdk;
+import { api, unwrapApiData, type PathCompletion } from "@aijee/client-sdk";
 
 export function useNewWorkspaceController({ visible, onClose }: { visible: boolean; onClose: () => void }) {
   const colorScheme = useColorScheme() ?? 'light';
@@ -62,7 +60,7 @@ export function useNewWorkspaceController({ visible, onClose }: { visible: boole
     }
     setLoadingSuggestions(true);
     try {
-      const result = await complete({ query: { q: query } });
+      const result = await api.complete({ query: { q: query } });
       const rawSuggestions = unwrapApiData(result.data);
       if (rawSuggestions) {
         setSuggestions(rawSuggestions);

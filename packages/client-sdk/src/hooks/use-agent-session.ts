@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo } from "react";
 import { usePiClient } from "./context";
 import { useObservable } from "./use-observable";
 import type { SessionState } from "../core/message-reducer";
-import type { ImageContent } from "../types/stream-events";
+import type { ImageContent } from "@aijee/protocol";
 
 interface UseAgentSessionOptions {
   workspaceId?: string;

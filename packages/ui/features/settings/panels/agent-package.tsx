@@ -2,11 +2,10 @@ import { Spinner, Text, View } from 'tamagui';
 import { useCallback, useEffect, useState, type ComponentType } from "react";
 import { Pressable } from 'react-native';
 import { AlertCircle, CheckCircle2 } from "lucide-react-native";
-import { sdk, unwrapApiData, type PackageStatus } from "@aijee/client-sdk";
+import { api, unwrapApiData, type PackageStatus } from "@aijee/client-sdk";
 import { useSettingsMetrics, useSettingsPalette } from "@/components/settings-surface";
 import { pkgStyles } from "../utils/package-styles";
 
-const { status2: getPackageStatus, update: updatePackage, install: installPackage } = sdk;
 export const PLATFORM_LABEL =
   process.env.EXPO_OS === 'ios' ? 'iOS' : process.env.EXPO_OS === 'android' ? 'Android' : 'Web';
 
@@ -22,7 +21,7 @@ export function useAgentPackage() {
     setLoading(true);
     setError(null);
     try {
-      const result = await getPackageStatus();
+      const result = await api.status2();
       const data = unwrapApiData(result.data) as PackageStatus | undefined;
       setPkg(data ?? null);
     } catch {
@@ -42,10 +41,10 @@ export function useAgentPackage() {
     setSuccess(null);
     try {
       if (pkg && !pkg.installed) {
-        await installPackage();
+        await api.install();
         setSuccess('Pi agent 安装成功');
       } else {
-        await updatePackage();
+        await api.update();
         setSuccess('Pi agent 更新成功');
       }
       await fetchStatus();

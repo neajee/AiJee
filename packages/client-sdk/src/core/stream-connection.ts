@@ -1,7 +1,7 @@
 import { Subject, BehaviorSubject, Observable } from "rxjs";
 import { AIJEE_STREAM_PATH } from "./constants";
 import type { ConnectionState } from "../types";
-import type { StreamEventEnvelope } from "../types/stream-events";
+import type { StreamEventEnvelope } from "@aijee/protocol";
 import { XhrEventSource } from "./event-source";
 import { extractActiveSessionIds } from "./active-sessions";
 

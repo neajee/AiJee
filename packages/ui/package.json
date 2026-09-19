@@ -5,6 +5,7 @@
   "sideEffects": false,
   "dependencies": {
     "@aijee/client-sdk": "workspace:*",
+    "@aijee/protocol": "workspace:*",
     "@lobehub/icons-rn": "^2.12.0",
     "expo-linear-gradient": "^57.0.1",
     "react": "19.1.0",

@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { usePiClient } from "./context";
-import type { StreamEventEnvelope } from "../types/stream-events";
+import type { StreamEventEnvelope } from "@aijee/protocol";
 
 export interface TurnEndEvent {
   sessionId: string;

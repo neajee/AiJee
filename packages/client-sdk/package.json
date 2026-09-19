@@ -6,18 +6,16 @@
   "types": "src/index.ts",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "test": "node --experimental-strip-types --test test/*.test.ts",
-    "api:generate": "openapi-ts -i ../api-contract/openapi.yaml -o ./src/generated -c @hey-api/client-fetch"
+    "test": "node --experimental-strip-types --test test/*.test.ts"
   },
   "dependencies": {
-    "@hey-api/client-fetch": "^0.11.0",
+    "@aijee/protocol": "workspace:*",
     "rxjs": "^7.8.1"
   },
   "peerDependencies": {
     "react": ">=19.0.0"
   },
   "devDependencies": {
-    "@hey-api/openapi-ts": "^0.73.0",
     "typescript": "~5.8.0"
   }
 }
