@@ -1,9 +1,6 @@
-import { Text, View } from "@/components/dom";
-import { Pressable } from "@/components/dom";
 import { Circle, Play, RotateCcw, Square, Trash2 } from 'lucide-react';
 import type { TaskDefinition, TaskInfo } from '@aijee/client-sdk';
 import { styles } from './style-tokens';
-
 const SOURCE_COLORS: Record<string, string> = {
   npm: '#CB3837',
   yarn: '#2C8EBB',
@@ -16,9 +13,8 @@ const SOURCE_COLORS: Record<string, string> = {
   rake: '#CC342D',
   gradle: '#02303A',
   deno: '#000000',
-  pi: '#8B5CF6',
+  pi: '#8B5CF6'
 };
-
 const SOURCE_LABELS: Record<string, string> = {
   npm: 'npm',
   yarn: 'yarn',
@@ -31,33 +27,36 @@ const SOURCE_LABELS: Record<string, string> = {
   rake: 'rake',
   gradle: 'gradle',
   deno: 'deno',
-  pi: 'pi',
+  pi: 'pi'
 };
-
-function SourceBadge({ source, isDark }: { source: string; isDark: boolean }) {
+function SourceBadge({
+  source,
+  isDark
+}: {
+  source: string;
+  isDark: boolean;
+}) {
   const bg = SOURCE_COLORS[source] ?? (isDark ? '#555' : '#999');
   const label = SOURCE_LABELS[source] ?? source;
   const textColor = source === 'bun' ? '#000' : '#fff';
-  return (
-    <View style={[styles.sourceBadge, { backgroundColor: bg }]}>
-      <Text style={[styles.sourceBadgeText, { color: textColor }]}>
+  return <div style={[styles.sourceBadge, {
+    backgroundColor: bg
+  }]}>
+      <span style={[styles.sourceBadgeText, {
+      color: textColor
+    }]}>
         {label}
-      </Text>
-    </View>
-  );
+      </span>
+    </div>;
 }
-
-function StatusDot({ status }: { status: TaskInfo['status'] }) {
-  const color =
-    status === 'running'
-      ? '#34C759'
-      : status === 'failed'
-        ? '#FF3B30'
-        : '#8E8E93';
+function StatusDot({
+  status
+}: {
+  status: TaskInfo['status'];
+}) {
+  const color = status === 'running' ? '#34C759' : status === 'failed' ? '#FF3B30' : '#8E8E93';
   return <Circle size={8} color={color} fill={color} strokeWidth={0} />;
 }
-
-
 export function TaskInstanceRow({
   instance,
   isSelected,
@@ -68,7 +67,7 @@ export function TaskInstanceRow({
   textPrimary,
   textMuted,
   hoverBg,
-  isDark,
+  isDark
 }: {
   instance: TaskInfo;
   isSelected: boolean;
@@ -81,52 +80,47 @@ export function TaskInstanceRow({
   hoverBg: string;
   isDark: boolean;
 }) {
-  return (
-    <Pressable
-      onPress={onSelect}
-      style={({ pressed, hovered }: any) => [
-        styles.taskRow,
-        isSelected && {
-          backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
-        },
-        (pressed || hovered) && { backgroundColor: hoverBg },
-      ]}
-    >
+  return <button onClick={onSelect} style={({
+    pressed,
+    hovered
+  }: any) => [styles.taskRow, isSelected && {
+    backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'
+  }, (pressed || hovered) && {
+    backgroundColor: hoverBg
+  }]}>
       <StatusDot status={instance.status} />
       <SourceBadge source={instance.source ?? 'pi'} isDark={isDark} />
-      <View style={styles.taskRowInfo}>
-        <Text style={[styles.taskRowLabel, { color: textPrimary }]} numberOfLines={1}>
+      <div style={styles.taskRowInfo}>
+        <span style={[styles.taskRowLabel, {
+        color: textPrimary
+      }]}>
           {instance.label}
-        </Text>
-        <Text style={[styles.taskRowCmd, { color: textMuted }]} numberOfLines={1}>
+        </span>
+        <span style={[styles.taskRowCmd, {
+        color: textMuted
+      }]}>
           {instance.command}
-        </Text>
-      </View>
-      <View style={styles.taskRowActions}>
-        {instance.status === 'running' ? (
-          <>
-            <Pressable onPress={onRestart} style={styles.actionBtn} accessibilityLabel="Restart task">
+        </span>
+      </div>
+      <div style={styles.taskRowActions}>
+        {instance.status === 'running' ? <>
+            <button onClick={onRestart} style={styles.actionBtn} aria-label="Restart task">
               <RotateCcw size={12} color={textMuted} strokeWidth={2} />
-            </Pressable>
-            <Pressable onPress={onStop} style={styles.actionBtn} accessibilityLabel="Stop task">
+            </button>
+            <button onClick={onStop} style={styles.actionBtn} aria-label="Stop task">
               <Square size={12} color="#FF3B30" strokeWidth={2} />
-            </Pressable>
-          </>
-        ) : (
-          <>
-            <Pressable onPress={onRestart} style={styles.actionBtn} accessibilityLabel="Restart task">
+            </button>
+          </> : <>
+            <button onClick={onRestart} style={styles.actionBtn} aria-label="Restart task">
               <Play size={12} color="#34C759" strokeWidth={2} />
-            </Pressable>
-            <Pressable onPress={onRemove} style={styles.actionBtn} accessibilityLabel="Remove task">
+            </button>
+            <button onClick={onRemove} style={styles.actionBtn} aria-label="Remove task">
               <Trash2 size={12} color={textMuted} strokeWidth={2} />
-            </Pressable>
-          </>
-        )}
-      </View>
-    </Pressable>
-  );
+            </button>
+          </>}
+      </div>
+    </button>;
 }
-
 export function AvailableTaskRow({
   definition,
   isSelected,
@@ -136,7 +130,7 @@ export function AvailableTaskRow({
   textMuted,
   hoverBg,
   loading,
-  isDark,
+  isDark
 }: {
   definition: TaskDefinition;
   isSelected: boolean;
@@ -148,43 +142,40 @@ export function AvailableTaskRow({
   loading: boolean;
   isDark: boolean;
 }) {
-  return (
-    <Pressable
-      onPress={onSelect}
-      disabled={loading}
-      style={({ pressed, hovered }: any) => [
-        styles.taskRow,
-        isSelected && {
-          backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)',
-        },
-        (pressed || hovered) && { backgroundColor: hoverBg },
-        loading && { opacity: 0.5 },
-      ]}
-    >
+  return <button onClick={onSelect} disabled={loading} style={({
+    pressed,
+    hovered
+  }: any) => [styles.taskRow, isSelected && {
+    backgroundColor: isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.06)'
+  }, (pressed || hovered) && {
+    backgroundColor: hoverBg
+  }, loading && {
+    opacity: 0.5
+  }]}>
       <SourceBadge source={definition.source ?? 'pi'} isDark={isDark} />
-      <View style={styles.taskRowInfo}>
-        <Text style={[styles.taskRowLabel, { color: textPrimary }]} numberOfLines={1}>
+      <div style={styles.taskRowInfo}>
+        <span style={[styles.taskRowLabel, {
+        color: textPrimary
+      }]}>
           {definition.label}
-        </Text>
-        <Text style={[styles.taskRowCmd, { color: textMuted }]} numberOfLines={1}>
+        </span>
+        <span style={[styles.taskRowCmd, {
+        color: textMuted
+      }]}>
           {definition.command}
-        </Text>
-      </View>
-      {definition.group && (
-        <View style={[styles.groupBadge, { borderColor: textMuted }]}>
-          <Text style={[styles.groupBadgeText, { color: textMuted }]}>
+        </span>
+      </div>
+      {definition.group && <div style={[styles.groupBadge, {
+      borderColor: textMuted
+    }]}>
+          <span style={[styles.groupBadgeText, {
+        color: textMuted
+      }]}>
             {definition.group}
-          </Text>
-        </View>
-      )}
-      <Pressable
-        onPress={onStart}
-        disabled={loading}
-        style={styles.actionBtn}
-        accessibilityLabel="Start task"
-      >
+          </span>
+        </div>}
+      <button onClick={onStart} disabled={loading} style={styles.actionBtn} aria-label="Start task">
         <Play size={12} color="#34C759" strokeWidth={2.5} />
-      </Pressable>
-    </Pressable>
-  );
+      </button>
+    </button>;
 }

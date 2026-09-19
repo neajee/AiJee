@@ -1,13 +1,9 @@
-import { Text, View } from "@/components/dom";
 import { useEffect } from 'react';
-import { Pressable } from "@/components/dom";
 import { X } from 'lucide-react';
-
 import { Colors, Fonts } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useTasksStore } from '../../store';
 import { TasksPanelContent } from './content';
-
 interface TasksDropdownProps {
   /**
    * Where the panel opens relative to its trigger. The composer toolbar sits at
@@ -15,8 +11,9 @@ interface TasksDropdownProps {
    */
   placement?: "below" | "above";
 }
-
-export function TasksDropdown({ placement = "below" }: TasksDropdownProps) {
+export function TasksDropdown({
+  placement = "below"
+}: TasksDropdownProps) {
   const colorScheme = useColorScheme() ?? 'light';
   const colors = Colors[colorScheme];
   const isDark = colorScheme === 'dark';
@@ -24,9 +21,7 @@ export function TasksDropdown({ placement = "below" }: TasksDropdownProps) {
   const textMuted = isDark ? '#cdc8c5' : colors.textTertiary;
   const popoverBg = isDark ? '#252525' : '#FFFFFF';
   const borderColor = isDark ? '#3b3a39' : 'rgba(0,0,0,0.12)';
-
-  const setPanelOpen = useTasksStore((s) => s.setPanelOpen);
-
+  const setPanelOpen = useTasksStore(s => s.setPanelOpen);
   useEffect(() => {
     if (false) return;
     const handler = (e: MouseEvent) => {
@@ -38,30 +33,28 @@ export function TasksDropdown({ placement = "below" }: TasksDropdownProps) {
     setTimeout(() => document.addEventListener('click', handler), 0);
     return () => document.removeEventListener('click', handler);
   }, [setPanelOpen]);
-
-  return (
-    <View
-      {...({ 'data-tasks-panel': true } as any)}
-      style={[
-        styles.panel,
-        placement === "above" ? styles.panelAbove : styles.panelBelow,
-        { backgroundColor: popoverBg, borderColor },
-      ]}
-    >
-      <View style={[styles.panelHeader, { borderBottomColor: borderColor }]}>
-        <Text style={[styles.panelTitle, { color: textPrimary }]}>Tasks</Text>
-        <Pressable onPress={() => setPanelOpen(false)} style={styles.closeBtn}>
+  return <div {...{
+    'data-tasks-panel': true
+  } as any} style={[styles.panel, placement === "above" ? styles.panelAbove : styles.panelBelow, {
+    backgroundColor: popoverBg,
+    borderColor
+  }]}>
+      <div style={[styles.panelHeader, {
+      borderBottomColor: borderColor
+    }]}>
+        <span style={[styles.panelTitle, {
+        color: textPrimary
+      }]}>Tasks</span>
+        <button onClick={() => setPanelOpen(false)} style={styles.closeBtn}>
           <X size={14} color={textMuted} strokeWidth={2} />
-        </Pressable>
-      </View>
+        </button>
+      </div>
 
-      <View style={styles.panelBody}>
+      <div style={styles.panelBody}>
         <TasksPanelContent />
-      </View>
-    </View>
-  );
+      </div>
+    </div>;
 }
-
 const styles = {
   panel: {
     position: 'absolute',
@@ -72,37 +65,41 @@ const styles = {
     borderWidth: 0.633,
     zIndex: 1000,
     overflow: 'hidden',
-    ...(true
-      ? { boxShadow: '0 8px 24px rgba(0,0,0,0.2)' }
-      : { elevation: 16 }),
+    ...(true ? {
+      boxShadow: '0 8px 24px rgba(0,0,0,0.2)'
+    } : {
+      elevation: 16
+    })
   } as any,
   panelBelow: {
-    top: 30,
+    top: 30
   },
   panelAbove: {
-    bottom: 34,
+    bottom: 34
   },
   panelHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingLeft: 14, paddingRight: 14,
-    paddingTop: 8, paddingBottom: 8,
-    borderBottomWidth: 0.633,
+    paddingLeft: 14,
+    paddingRight: 14,
+    paddingTop: 8,
+    paddingBottom: 8,
+    borderBottomWidth: 0.633
   },
   panelTitle: {
     fontSize: 13,
     fontFamily: Fonts.sansSemiBold,
-    fontWeight: '600',
+    fontWeight: '600'
   },
   closeBtn: {
     width: 24,
     height: 24,
     borderRadius: 4,
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'center'
   },
   panelBody: {
-    flex: 1,
-  },
+    flex: 1
+  }
 } as const;

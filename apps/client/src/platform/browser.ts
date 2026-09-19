@@ -7,6 +7,7 @@ export const Alert = {
 };
 
 export const Linking = { openURL: (url: string) => window.open(url, "_blank", "noopener,noreferrer") };
+export function useSafeAreaInsets() { return { top: 0, right: 0, bottom: 0, left: 0 }; }
 
 export function useWindowDimensions() {
   const [size, setSize] = useState({ width: window.innerWidth, height: window.innerHeight, scale: 1, fontScale: 1 });
