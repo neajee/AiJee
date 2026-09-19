@@ -7,9 +7,9 @@ import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { FileTypeBadge } from '../file-type-badge';
 import { applyFilter } from '../../utils/file-tree';
-import type { FileTreeNodeProps } from './types';
+import type { FileTreeNodeProps } from './component-types';
 import { NODE_INDENT, NODE_STEP } from '../../utils/file-tree-constants';
-import { styles } from './styles';
+import { styles } from './style-tokens';
 
 export function FileTreeNode({
   entry,

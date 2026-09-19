@@ -1,5 +1,5 @@
 import { Input, Text, View } from "@/components/dom";
-import { formStyles } from './styles';
+import { formStyles } from './style-tokens';
 
 interface ServerFormFieldsProps {
   name: string;

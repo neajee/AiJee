@@ -4,8 +4,8 @@ import { Spinner, Text, View } from "@/components/dom";
 import { X } from 'lucide-react';
 
 import { ServerFormFields } from './fields';
-import { formStyles } from './styles';
-import type { ServerFormProps } from './types';
+import { formStyles } from './style-tokens';
+import type { ServerFormProps } from './component-types';
 
 export function ServerFormDesktopModal({
   visible,

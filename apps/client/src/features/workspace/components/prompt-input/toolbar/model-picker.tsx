@@ -3,7 +3,7 @@ import { Animated, Pressable } from "@/components/dom";
 import { Check, ChevronDown } from 'lucide-react';
 import { ProviderIcon } from '@/components/provider-icons';
 import { styles } from '../../../utils/toolbar-styles';
-import type { ToolbarController } from './types';
+import type { ToolbarController } from './component-types';
 
 type ModelPickerProps = Pick<ToolbarController, 'theme' | 'inline' | 'isWideScreen' | 'onOpenNarrowSheet' | 'currentModel' | 'toolbarDisabled' | 'controlHeight' | 'activeDropdown' | 'toggleDropdown' | 'toolbarDropdownAnim' | 'modelSearchRef' | 'modelScrollRef' | 'modelSearch' | 'setModelSearch' | 'setPopoverIndex' | 'popoverIndex' | 'handleSearchKeyPress' | 'providers' | 'hasModels' | 'flatModels' | 'handleSelectModel'>;
 

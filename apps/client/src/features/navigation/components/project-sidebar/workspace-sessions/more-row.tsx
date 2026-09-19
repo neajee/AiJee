@@ -2,7 +2,7 @@ import { Text } from "@/components/dom";
 import { useState } from 'react';
 import { Pressable } from "@/components/dom";
 import { useThemeTokens } from '@/hooks/use-theme-tokens';
-import { styles } from '../styles';
+import { styles } from '../style-tokens';
 
 export function MoreRow({ label, onPress, disabled }: { label: string; onPress: () => void; disabled?: boolean }) {
   const colors = useThemeTokens();

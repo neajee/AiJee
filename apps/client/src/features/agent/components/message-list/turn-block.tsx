@@ -11,7 +11,7 @@ import { TurnSummary } from "./turn-summary";
 import { WorkActivityGroup } from "./work-activity-group";
 import { WorkStepView } from "./work-step";
 import { useTurnElapsed } from "../../hooks/use-turn-elapsed";
-import { styles } from "./styles";
+import { styles } from "./style-tokens";
 
 /**
  * A whole assistant turn: the work history behind one "Worked for X" divider,

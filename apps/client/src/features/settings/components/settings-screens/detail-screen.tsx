@@ -13,7 +13,7 @@ import {
 } from '@/components/settings-surface';
 import { type SettingsSection } from '../../sections';
 import { SettingsScroll } from './settings-scroll';
-import { desktopStyles, styles } from './styles';
+import { desktopStyles, styles } from './style-tokens';
 
 export function SettingsDetailScreen({
   section,

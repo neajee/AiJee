@@ -7,7 +7,7 @@ import { ConnectionStatusBanner } from '@/features/agent/components/connection-s
 import { ProjectSidebar, SettingsSidebar } from '../../components/project-sidebar';
 import { TaskOutputPanel } from '@/features/tasks/components/task-output-panel';
 import { SeamToggle, SEAM_TOGGLE_WIDTH } from '@/components/ui/seam-toggle';
-import { styles } from './styles';
+import { styles } from './style-tokens';
 import type { useAdaptiveNavigationController } from './use-adaptive-navigation-controller';
 
 type Controller = ReturnType<typeof useAdaptiveNavigationController>;

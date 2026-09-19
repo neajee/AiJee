@@ -6,7 +6,7 @@ import { Fonts } from "@/constants/theme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import type { Workspace } from "@/features/workspace/types";
 import { MENU_WIDTH } from "../workspace-context-menu";
-import { styles } from "./styles";
+import { styles } from "./style-tokens";
 export function WorkspaceRow({
   workspace,
   isSelected,

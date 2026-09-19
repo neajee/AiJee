@@ -6,7 +6,7 @@ import { usePromptTheme } from '@/components/surface-theme/use-prompt-theme';
 import type { GitBranch as GitBranchInfo } from '@aijee/client-sdk';
 import type { Server } from '@/features/servers/store';
 import { styles } from '../../utils/composer-context-bar-styles';
-import type { DropdownKind } from './types';
+import type { DropdownKind } from './component-types';
 
 type PromptTheme = ReturnType<typeof usePromptTheme>;
 

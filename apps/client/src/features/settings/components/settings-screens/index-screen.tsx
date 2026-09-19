@@ -11,7 +11,7 @@ import {
 } from '@/components/settings-surface';
 import { SETTINGS_SECTIONS, type SettingsSection } from '../../sections';
 import { SettingsScroll } from './settings-scroll';
-import { styles } from './styles';
+import { styles } from './style-tokens';
 
 export function SettingsIndexScreen({
   onOpenSection,

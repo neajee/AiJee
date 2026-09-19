@@ -2,7 +2,7 @@ import { View } from "@/components/dom";
 import { useCallback, useRef, useState } from 'react';
 import { Animated, Easing, useWindowDimensions, type View as RNView } from "@/components/dom";
 
-import type { ToolCallInfo } from '../types';
+import type { ToolCallInfo } from '../agent-types';
 import { basename, isToolActive, parseToolArguments } from '../utils/message-list';
 
 function detectLanguage(fileName: string, filePath: string) {

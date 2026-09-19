@@ -2,11 +2,11 @@ import { Text, View } from "@/components/dom";
 import { memo, useEffect, useRef, useState } from 'react';
 import { Animated, Pressable } from "@/components/dom";
 import { useThemeTokens } from '@/hooks/use-theme-tokens';
-import type { ToolCallInfo } from '../../../types';
+import type { ToolCallInfo } from '../agent-types';
 import { isToolActive } from '../../../utils/message-list';
 import { ToolBody, ToolHeader } from './tool-disclosure';
 import { formatSingleLine } from '../../../utils/tool-call-grouping';
-import { styles } from './styles';
+import { styles } from './style-tokens';
 
 const MAX_VISIBLE = 5;
 const GROUP_LABELS: Record<string, { before: string; after: string; activeBefore?: string }> = {

@@ -8,7 +8,7 @@ import Animated, {
   withTiming,
   Easing,
 } from "@/components/dom";
-import type { ToolCallInfo } from "../../../types";
+import type { ToolCallInfo } from "../agent-types";
 
 interface ToolStatusDotProps {
   status: ToolCallInfo["status"];

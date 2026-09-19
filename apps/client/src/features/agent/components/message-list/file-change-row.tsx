@@ -3,7 +3,7 @@ import { memo } from "react";
 import { Text } from "@/components/dom";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { basename, relativePath, type TurnFileChange } from "../../utils/message-list";
-import { styles } from "./styles";
+import { styles } from "./style-tokens";
 
 export const FileChangeRow = memo(function FileChangeRow({
   change,

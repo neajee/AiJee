@@ -1,1 +1,1 @@
-export { TaskOutputSheet } from './view';
+export { TaskOutputSheet } from './TaskOutputSheet';

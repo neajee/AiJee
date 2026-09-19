@@ -1,1 +1,1 @@
-export { TaskOutputPanel } from './view';
+export { TaskOutputPanel } from './TaskOutputPanel';

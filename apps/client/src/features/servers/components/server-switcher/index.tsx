@@ -1,1 +1,0 @@
-export { ServerSwitcher } from './view';

@@ -14,7 +14,7 @@ import { Square } from 'lucide-react';
 import { ToolbarSkeleton } from './toolbar-skeleton';
 import { InputCard } from './input-card';
 import { usePromptTheme } from '@/components/surface-theme/use-prompt-theme';
-import { styles } from './styles';
+import { styles } from './style-tokens';
 
 type QueueBehavior = 'steer' | 'followUp';
 type PromptTheme = ReturnType<typeof usePromptTheme>;

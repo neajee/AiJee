@@ -2,7 +2,7 @@ import { Text, View } from "@/components/dom";
 import { Pressable } from "@/components/dom";
 import { providerPageStyles } from '../../utils/custom-models-styles';
 import { ProviderMark } from './provider-mark';
-import type { ProviderRowProps } from './types';
+import type { ProviderRowProps } from './component-types';
 
 export function ProviderRow({
   name,

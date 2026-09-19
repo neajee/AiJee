@@ -7,7 +7,7 @@ import { PiLogo } from "@/components/pi-logo";
 import { useSettingsPalette } from "@/components/settings-surface";
 import { useIsSessionStreaming } from "@aijee/client-sdk";
 import type { Server } from "@/features/servers/store";
-import { styles } from "./styles";
+import { styles } from "./style-tokens";
 function ConnectionStatusDot({ label, color, connecting }: { label: string; color: string; connecting: boolean }) {
   const opacity = useRef(new Animated.Value(1)).current;
   useEffect(() => {

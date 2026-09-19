@@ -1,7 +1,7 @@
 import { Input, Text, View } from "@/components/dom";
 import { Pressable } from "@/components/dom";
-import { styles } from './styles';
-import type { EditWorkspaceFormProps } from './types';
+import { styles } from './style-tokens';
+import type { EditWorkspaceFormProps } from './component-types';
 
 export function EditWorkspaceForm({
   workspace,

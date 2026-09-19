@@ -15,8 +15,8 @@ import { Colors } from '@/constants/theme';
 import { ABSOLUTE_FILL_STYLE } from '@/constants/layout';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { ServerFormFields } from './fields';
-import { formStyles, SHEET_HEIGHT, sheetStyles } from './styles';
-import type { ServerFormProps } from './types';
+import { formStyles, SHEET_HEIGHT, sheetStyles } from './style-tokens';
+import type { ServerFormProps } from './component-types';
 
 const TIMING_CONFIG = { duration: 280, easing: Easing.out(Easing.cubic) };
 

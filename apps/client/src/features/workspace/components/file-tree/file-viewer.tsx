@@ -6,7 +6,7 @@ import { CodePreview } from '@/features/agent/components/message-list/code-previ
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { basename, languageOf } from '../../utils/file-tree';
-import { styles } from './styles';
+import { styles } from './style-tokens';
 
 export function FileViewer({
   filePath,

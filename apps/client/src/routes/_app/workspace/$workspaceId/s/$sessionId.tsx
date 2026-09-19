@@ -19,7 +19,7 @@ import { useAgentSession, useConnection, useWorkspaceSessions as useSessions } f
 import type { ImageContent } from "@aijee/client-sdk";
 import { requestBrowserNotificationPermission } from "@/features/agent/browser-notifications";
 import type { PendingExtensionUiRequest as LegacyPendingUiRequest } from "@/features/agent/extension-ui";
-import type { ChatMessage } from "@/features/agent/types";
+import type { ChatMessage } from "@/features/agent/agent-types";
 import type { Attachment } from "@/features/workspace/utils/prompt-input";
 import { attachmentsToImages } from "@/features/workspace/utils/prompt-input-attachments";
 

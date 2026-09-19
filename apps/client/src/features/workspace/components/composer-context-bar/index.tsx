@@ -1,1 +1,0 @@
-export { ComposerContextBar } from './view';

@@ -3,11 +3,11 @@ import { memo, useCallback, useMemo, useState } from "react";
 import { ScrollView } from "@/components/dom";
 import { useWorkspaceStore } from "@/features/workspace/store";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
-import type { TurnFileStats } from "../../types";
+import type { TurnFileStats } from "../agent-types";
 import { basename, relativePath, type TurnFileChange } from "../../utils/message-list";
 import { ToolBody, ToolHeader, ToolSurface } from "./tool-call/tool-disclosure";
 import { FileChangeRow } from "./file-change-row";
-import { SUMMARY_BLOCKS, SUMMARY_ROW_HEIGHT, SUMMARY_SCROLL_AFTER, styles } from "./styles";
+import { SUMMARY_BLOCKS, SUMMARY_ROW_HEIGHT, SUMMARY_SCROLL_AFTER, styles } from "./style-tokens";
 
 export const TurnSummary = memo(function TurnSummary({
   stats,

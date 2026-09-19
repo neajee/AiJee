@@ -6,7 +6,7 @@ import { Toolbar } from './toolbar/index';
 import { ToolbarSkeleton } from './toolbar-skeleton';
 import { ContextUsageRing } from './context-usage-ring';
 import { WaveformBars } from './waveform-bars';
-import { styles } from './styles';
+import { styles } from './style-tokens';
 import type { PromptInputViewProps } from './prompt-input-view';
 
 type QueueBehavior = 'steer' | 'followUp';

@@ -1,4 +1,4 @@
-import type { ToolCallInfo } from "../types";
+import type { ToolCallInfo } from "../agent-types";
 
 /** One file touched during a turn, as derived from the turn's tool calls. */
 export interface TurnFileChange {

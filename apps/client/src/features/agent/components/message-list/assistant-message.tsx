@@ -12,7 +12,7 @@ import Animated, {
 import { Colors, Fonts } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
-import type { ChatMessage } from "../../types";
+import type { ChatMessage } from "../agent-types";
 import { AssistantMarkdown } from "./assistant-markdown";
 import { StreamingCursor } from "./streaming-cursor";
 

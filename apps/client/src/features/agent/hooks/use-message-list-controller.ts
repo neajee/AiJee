@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { FlatList, type NativeScrollEvent, type NativeSyntheticEvent } from "@/components/dom";
 import { useAgentSession } from "@aijee/client-sdk";
-import type { ChatMessage } from "../types";
+import type { ChatMessage } from "../agent-types";
 import { buildListItems, reconcileItems, type ListItem } from "../utils/turns";
 
 export interface MessageListProps {

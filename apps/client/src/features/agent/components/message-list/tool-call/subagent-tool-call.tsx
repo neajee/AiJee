@@ -4,7 +4,7 @@ import { ScrollView } from "@/components/dom";
 import { Colors, Fonts } from "@/constants/theme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { useAppSettingsStore } from "@/features/settings/store";
-import type { ToolCallInfo } from "../../../types";
+import type { ToolCallInfo } from "../agent-types";
 import { useStableMarkdown } from "../../../hooks/use-stable-markdown";
 import { createMarkedOptions } from "../../../theme";
 import { isToolActive, parseToolArguments } from "../../../utils/message-list";

@@ -3,7 +3,7 @@ import { memo, useCallback, useRef, useState } from "react";
 import { type ScrollView as RNScrollView } from "@/components/dom";
 import { Colors, Fonts } from "@/constants/theme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
-import type { ToolCallInfo } from "../../../types";
+import type { ToolCallInfo } from "../agent-types";
 import { parseToolArguments, truncateOutput } from "../../../utils/message-list";
 import { ToolBody, ToolHeader, ToolSurface } from "./tool-disclosure";
 import { ToolResultImages } from "./tool-result-images";

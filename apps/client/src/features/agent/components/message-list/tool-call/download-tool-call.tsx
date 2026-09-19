@@ -3,7 +3,7 @@ import { memo } from "react";
 import { Text } from "@/components/dom";
 import { Colors, Fonts } from "@/constants/theme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
-import type { ToolCallInfo } from "../../../types";
+import type { ToolCallInfo } from "../agent-types";
 import { parseToolArguments } from "../../../utils/message-list";
 
 interface DownloadToolCallProps {

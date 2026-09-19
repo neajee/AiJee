@@ -2,7 +2,7 @@ import { Text, View } from "@/components/dom";
 import { useState, type ReactNode } from "react";
 import { Pressable } from "@/components/dom";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
-import { styles } from "./styles";
+import { styles } from "./style-tokens";
 export function SectionHeader({
   title,
   actions,

@@ -11,7 +11,7 @@ import { NarrowPreviewSheet } from '../../components/narrow-preview-sheet';
 import { ConnectionStatusBanner } from '@/features/agent/components/connection-status-banner';
 import { TasksSheet } from '@/features/tasks/components/tasks-sheet';
 import { TaskOutputSheet } from '@/features/tasks/components/task-output-sheet';
-import { styles } from './styles';
+import { styles } from './style-tokens';
 import type { useAdaptiveNavigationController } from './use-adaptive-navigation-controller';
 
 type Controller = ReturnType<typeof useAdaptiveNavigationController>;

@@ -1,11 +1,11 @@
 import { memo } from "react";
 import Animated, { FadeIn, FadeOut } from "@/components/dom";
-import type { ChatMessage } from "../../types";
+import type { ChatMessage } from "../agent-types";
 import { SystemMessage } from "./system-message";
 import { UserMessage } from "./user-message";
 import { TurnBlock } from "./turn-block";
 import type { ListItem } from "../../utils/turns";
-import { styles } from "./styles";
+import { styles } from "./style-tokens";
 
 export const ListRow = memo(function ListRow({
   item,

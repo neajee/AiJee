@@ -6,7 +6,7 @@ import {
   useSettingsPalette,
   useSettingsPhoneLayout,
 } from '@/components/settings-surface';
-import { styles } from './styles';
+import { styles } from './style-tokens';
 
 export function SettingsScroll({ children }: { children: ReactNode }) {
   const insets = useSafeAreaInsets();

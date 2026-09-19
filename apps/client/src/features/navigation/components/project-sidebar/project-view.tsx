@@ -11,7 +11,7 @@ import type { Workspace } from "@/features/workspace/types";
 import { HeaderAction, SectionHeader, SidebarRow } from "./navigation-rows";
 import { WorkspaceRow } from "./workspace-rows";
 import { WorkspaceSessions } from "./workspace-sessions";
-import { styles } from "./styles";
+import { styles } from "./style-tokens";
 import type { ProjectSidebarController } from "../../hooks/use-project-sidebar-controller";
 
 export function ProjectSidebarView({ controller }: { controller: ProjectSidebarController }) {

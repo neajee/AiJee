@@ -1,7 +1,7 @@
 import { Image, View } from "@/components/dom";
 import { memo, useCallback, useState } from "react";
 import { Pressable, Modal } from "@/components/dom";
-import type { ToolResultImage } from "../../../types";
+import type { ToolResultImage } from "../agent-types";
 
 interface ToolResultImagesProps {
   images: ToolResultImage[];

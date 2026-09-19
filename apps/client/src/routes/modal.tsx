@@ -1,3 +1,31 @@
 import { createFileRoute } from "@tanstack/react-router";
-import ModalScreen from "@/screens/modal";
+import { Link } from '@/platform/router-adapter';
+
+import { ThemedText } from '@/components/themed-text';
+import { ThemedView } from '@/components/themed-view';
+
+export default function ModalScreen() {
+  return (
+    <ThemedView style={styles.container}>
+      <ThemedText type="title">This is a modal</ThemedText>
+      <Link href="/" dismissTo style={styles.link}>
+        <ThemedText type="link">Go to home screen</ThemedText>
+      </Link>
+    </ThemedView>
+  );
+}
+
+const styles = {
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  link: {
+    marginTop: 15,
+    paddingTop: 15, paddingBottom: 15,
+  },
+} as const;
+
 export const Route = createFileRoute("/modal")({ component: ModalScreen });

@@ -6,7 +6,7 @@ import { formatTurnAction, summarizeTurnActions, type WorkStep } from "../../uti
 import { isToolActive } from "../../utils/message-list";
 import { ToolBody, ToolHeader } from "./tool-call/tool-disclosure";
 import { WorkStepView } from "./work-step";
-import { styles } from "./styles";
+import { styles } from "./style-tokens";
 
 export const WorkActivityGroup = memo(function WorkActivityGroup({
   steps,

@@ -7,7 +7,7 @@ import { useWorkspaceStore } from "@/features/workspace/store";
 import { SETTINGS_SECTIONS } from "@/features/settings/sections";
 import { SidebarHeader } from "../sidebar-header";
 import { SidebarRow } from "./navigation-rows";
-import { styles } from "./styles";
+import { styles } from "./style-tokens";
 
 export function SettingsSidebar() {
   const colorScheme = useColorScheme() ?? "light";

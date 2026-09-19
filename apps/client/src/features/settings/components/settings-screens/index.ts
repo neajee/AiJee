@@ -1,1 +1,1 @@
-export { SettingsDetailScreen, SettingsIndexScreen } from './view';
+export { SettingsDetailScreen, SettingsIndexScreen } from './SettingsScreens';

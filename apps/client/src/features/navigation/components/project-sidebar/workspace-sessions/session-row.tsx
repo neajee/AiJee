@@ -7,7 +7,7 @@ import { useThemeTokens } from '@/hooks/use-theme-tokens';
 import { useIsSessionStreaming, type SessionListItem } from '@aijee/client-sdk';
 import { SessionActivityIndicator } from '@/features/workspace/components/session-activity-indicator';
 import { RowAction } from '../workspace-rows';
-import { styles } from '../styles';
+import { styles } from '../style-tokens';
 
 export function SessionRow({ session, isSelected, hasUnread, onPress, onRename, onArchive, isDark }: { session: SessionListItem; isSelected: boolean; hasUnread: boolean; onPress: () => void; onRename: (name: string) => Promise<void>; onArchive: () => Promise<void>; isDark: boolean }) {
   const colors = useThemeTokens();

@@ -9,8 +9,8 @@ import { useThemeTokens } from '@/hooks/use-theme-tokens';
 import { useWorkspaceSessions as useSessions } from '@aijee/client-sdk';
 import { SessionActivityIndicator } from '@/features/workspace/components/session-activity-indicator';
 import { AnimatedListItem } from '@/components/ui/animated-list-item';
-import { styles } from './styles';
-import type { SessionPageProps } from './types';
+import { styles } from './style-tokens';
+import type { SessionPageProps } from './component-types';
 
 export function SessionPage({ workspaceId, onSessionPress, onDismiss }: SessionPageProps) {
   const colorScheme = useColorScheme() ?? 'light';

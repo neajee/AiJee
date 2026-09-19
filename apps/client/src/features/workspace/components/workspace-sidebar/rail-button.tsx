@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { Pressable } from "@/components/dom";
-import { styles } from './styles';
+import { styles } from './style-tokens';
 
 interface RailButtonProps {
   label: string;

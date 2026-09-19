@@ -2,7 +2,7 @@ import { Text, View } from "@/components/dom";
 import { Animated, Pressable } from "@/components/dom";
 import { ChevronDown } from 'lucide-react';
 import { styles } from '../../../utils/toolbar-styles';
-import type { ToolbarController } from './types';
+import type { ToolbarController } from './component-types';
 
 type EffortPickerProps = Pick<ToolbarController, 'theme' | 'inline' | 'isWideScreen' | 'onOpenNarrowSheet' | 'currentModel' | 'toolbarDisabled' | 'controlHeight' | 'thinkingDisabled' | 'thinkingLabel' | 'thinkingPreference' | 'effortOptions' | 'activeDropdown' | 'toggleDropdown' | 'toolbarDropdownAnim' | 'popoverIndex' | 'handleSelectThinking'>;
 

@@ -1,9 +1,9 @@
 import { ScrollView, Spinner, Text } from "@/components/dom";
 import { useFileList, type FsEntry } from '@aijee/client-sdk';
 import { applyFilter } from '../../utils/file-tree';
-import type { FileTreeNodeProps } from './types';
+import type { FileTreeNodeProps } from './component-types';
 import { FileTreeNode } from './tree-node';
-import { styles } from './styles';
+import { styles } from './style-tokens';
 
 export function FileTreeRoot({
   rootPath,

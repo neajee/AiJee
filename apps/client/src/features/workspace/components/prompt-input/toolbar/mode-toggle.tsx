@@ -2,7 +2,7 @@ import { Spinner, Text, View } from "@/components/dom";
 import { Pressable } from "@/components/dom";
 import { formatAgentModeLabel, type AgentMode } from '@/features/agent/mode';
 import { styles } from '../../../utils/toolbar-styles';
-import type { ToolbarController } from './types';
+import type { ToolbarController } from './component-types';
 
 type ModeToggleProps = Pick<ToolbarController, 'theme' | 'appMode' | 'toolbarDisabled' | 'displayedMode' | 'pendingMode' | 'handleSelectMode'>;
 

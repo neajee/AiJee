@@ -6,7 +6,7 @@ import { AssistantMarkdown } from "./assistant-markdown";
 import { ToolCallGroup } from "./tool-call";
 import { ThinkingBlock } from "./thinking-block";
 import type { WorkStep } from "../../utils/turns";
-import { styles } from "./styles";
+import { styles } from "./style-tokens";
 
 export const WorkStepView = memo(function WorkStepView({
   step,

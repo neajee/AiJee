@@ -3,7 +3,7 @@ import { memo, useCallback, useState } from "react";
 import { ScrollView } from "@/components/dom";
 import { Colors, Fonts } from "@/constants/theme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
-import type { ToolCallInfo } from "../../../types";
+import type { ToolCallInfo } from "../agent-types";
 import { toolDisplayName } from "../../../utils/message-list";
 import { ToolBody, ToolHeader, ToolSurface, TOOL_BODY_MAX_HEIGHT } from "./tool-disclosure";
 import { ToolResultImages } from "./tool-result-images";

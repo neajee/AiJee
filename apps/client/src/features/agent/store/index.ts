@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { StreamEvent } from "../types";
+import type { StreamEvent } from "../agent-types";
 import {
   convertPiMessages,
   convertSessionEntries,

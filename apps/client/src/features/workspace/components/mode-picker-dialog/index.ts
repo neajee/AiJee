@@ -1,2 +1,2 @@
-export { ModePickerDialog } from './view';
-export type { ModePickerDialogProps } from './types';
+export { ModePickerDialog } from './ModePickerDialog';
+export type { ModePickerDialogProps } from './component-types';

@@ -5,7 +5,7 @@ import { Plus } from 'lucide-react';
 import { API_TYPES, ApiTypeSelector, Field, ModelEntryRow } from '../custom-models-form';
 import { providerPageStyles } from '../../utils/custom-models-styles';
 import { ProviderRow } from './provider-row';
-import type { CustomProviderRowProps } from './types';
+import type { CustomProviderRowProps } from './component-types';
 
 export function CustomProviderRow({ name, provider, colors, onUpdate, onRemove }: CustomProviderRowProps) {
   const [expanded, setExpanded] = useState(false);

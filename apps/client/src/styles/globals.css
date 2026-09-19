@@ -2,10 +2,20 @@
 
 @theme {
   --color-background: var(--aijee-background, #ffffff);
+  --color-surface: var(--aijee-surface, #ffffff);
+  --color-surface-raised: var(--aijee-surface-raised, #f7f7f8);
   --color-foreground: var(--aijee-text, #1c1c1c);
+  --color-text-secondary: var(--aijee-text-secondary, #60646c);
+  --color-text-tertiary: var(--aijee-text-tertiary, #8b8d98);
   --color-primary: var(--aijee-accent, #2563eb);
   --color-border: var(--aijee-border, #e5e7eb);
   --color-muted-foreground: var(--aijee-text-secondary, #6b7280);
+  --color-code: var(--aijee-code-background, #f6f8fa);
+  --font-sans: var(--aijee-ui-font-family, system-ui, sans-serif);
+  --font-mono: var(--aijee-code-font-family, ui-monospace, monospace);
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
 }
 
 :root { font-family: system-ui, sans-serif; color-scheme: light dark; }

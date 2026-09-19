@@ -2,7 +2,7 @@ import { Text, View } from "@/components/dom";
 import { Check, CircleOff, Star } from 'lucide-react';
 import { Pressable } from "@/components/dom";
 import type { AgentMode } from '@aijee/client-sdk';
-import { styles } from './styles';
+import { styles } from './style-tokens';
 
 interface ModeOptionProps {
   mode?: AgentMode;
