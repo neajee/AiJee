@@ -1,3 +1,4 @@
+import { toTailwind } from "@/styles/to-tailwind";
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Linking, useWindowDimensions } from "@/platform/browser";
 import { Download, ExternalLink, X } from 'lucide-react';
@@ -69,44 +70,44 @@ export function PackageDetail({
     height: phone ? '100%' : undefined,
     maxHeight: phone ? undefined : maxHeight
   }]}>
-        <div style={[styles.dialogInner]}>
-          <div style={[styles.dialogHeader, {
+        <div className={toTailwind([styles.dialogInner])}>
+          <div className={toTailwind([styles.dialogHeader, {
         borderBottomColor: p.separator,
         padding: m.gutter
-      }]}>
-            <div style={styles.dialogTitleCol}>
-              <span style={[styles.dialogTitle, {
+      }])}>
+            <div className={toTailwind(styles.dialogTitleCol)}>
+              <span className={toTailwind([styles.dialogTitle, {
             color: p.text,
             fontSize: m.labelSize + 2
-          }]}>
+          }])}>
                 {pkg.name}
               </span>
-              <span style={[styles.meta, {
+              <span className={toTailwind([styles.meta, {
             color: p.textTertiary
-          }]}>
+          }])}>
                 v{pkg.version}
                 {pkg.author ? ` · ${pkg.author}` : ''}
                 {pkg.package_types.length ? ` · ${pkg.package_types.join('、')}` : ''}
               </span>
             </div>
-            <button onClick={onClose} role="button" aria-label="关闭" hitSlop={8} style={({
+            <button onClick={onClose} role="button" aria-label="关闭" hitSlop={8} className={toTailwind(({
           pressed,
           hovered
         }: any) => [styles.iconButton, hovered && {
           backgroundColor: p.pressed
         }, pressed && {
           opacity: 0.6
-        }]}>
+        }])}>
               <X size={16} color={p.textSecondary} strokeWidth={2} />
             </button>
           </div>
 
           <div>
-            <span style={{
+            <span className={toTailwind({
           color: p.textSecondary,
           fontSize: m.valueSize,
           lineHeight: m.valueSize * 1.5
-        }}>
+        })}>
               {pkg.description || '作者未提供介绍'}
             </span>
 
@@ -114,24 +115,24 @@ export function PackageDetail({
 
           </div>
 
-          <div style={[styles.dialogFooter, {
+          <div className={toTailwind([styles.dialogFooter, {
         borderTopColor: p.separator,
         padding: m.gutter
-      }]}>
-            {pkg.repository || pkg.homepage ? <button onClick={() => Linking.openURL((pkg.repository ?? pkg.homepage)!)} role="link" aria-label="打开仓库" style={({
+      }])}>
+            {pkg.repository || pkg.homepage ? <button onClick={() => Linking.openURL((pkg.repository ?? pkg.homepage)!)} role="link" aria-label="打开仓库" className={toTailwind(({
           pressed,
           hovered
         }: any) => [styles.linkButton, hovered && {
           backgroundColor: p.pressed
         }, pressed && {
           opacity: 0.6
-        }]}>
+        }])}>
                 <ExternalLink size={13} color={p.textSecondary} strokeWidth={1.8} />
-                <span style={{
+                <span className={toTailwind({
             fontSize: m.descSize,
             fontFamily: Fonts.sans,
             color: p.textSecondary
-          }}>
+          })}>
                   仓库
                 </span>
               </button> : <div />}

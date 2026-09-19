@@ -1,3 +1,4 @@
+import { toTailwind } from "@/styles/to-tailwind";
 import { Search, X } from 'lucide-react';
 import type { MarketplacePackage } from '@aijee/client-sdk';
 import { Fonts } from '@/constants/theme';
@@ -21,15 +22,15 @@ export function Segmented({
 }) {
   const m = useSettingsMetrics();
   const p = useSettingsPalette();
-  return <div style={[styles.segmented, {
+  return <div className={toTailwind([styles.segmented, {
     backgroundColor: p.tile,
     borderRadius: m.tileRadius + 2
-  }]}>
+  }])}>
       {options.map(option => {
       const active = option.value === value;
       return <button key={option.value} onClick={() => onChange(option.value)} role="button" accessibilityState={{
         selected: active
-      }} aria-label={option.label} style={({
+      }} aria-label={option.label} className={toTailwind(({
         pressed,
         hovered
       }: any) => [styles.segment, {
@@ -41,12 +42,12 @@ export function Segmented({
         backgroundColor: p.pressed
       }, pressed && {
         opacity: 0.6
-      }]}>
-            <span style={{
+      }])}>
+            <span className={toTailwind({
           fontSize: m.descSize,
           fontFamily: active ? Fonts.sansMedium : Fonts.sans,
           color: active ? p.text : p.textTertiary
-        }}>
+        })}>
               {option.label}
             </span>
           </button>;
@@ -64,21 +65,21 @@ export function SearchField({
 }) {
   const m = useSettingsMetrics();
   const p = useSettingsPalette();
-  return <div style={[styles.search, {
+  return <div className={toTailwind([styles.search, {
     backgroundColor: p.tile,
     borderColor: p.separator,
     borderRadius: m.tileRadius
-  }]}>
+  }])}>
       <Search size={14} color={p.textTertiary} strokeWidth={1.8} />
-      <input value={value} onChangeText={onChangeText} onSubmitEditing={onSubmit} placeholder="搜索插件名称或关键词" placeholderTextColor={p.textTertiary} returnKeyType="search" autoCapitalize="none" autoCorrect={false} aria-label="搜索插件" style={[styles.searchInput, {
+      <input value={value} onChangeText={onChangeText} onSubmitEditing={onSubmit} placeholder="搜索插件名称或关键词" placeholderTextColor={p.textTertiary} returnKeyType="search" autoCapitalize="none" autoCorrect={false} aria-label="搜索插件" className={toTailwind([styles.searchInput, {
       color: p.text,
       fontSize: m.valueSize
-    }]} />
-      {value ? <button onClick={() => onChangeText('')} role="button" aria-label="清空搜索" hitSlop={6} style={({
+    }])} />
+      {value ? <button onClick={() => onChangeText('')} role="button" aria-label="清空搜索" hitSlop={6} className={toTailwind(({
       pressed
     }) => [pressed && {
       opacity: 0.6
-    }]}>
+    }])}>
           <X size={13} color={p.textTertiary} strokeWidth={2} />
         </button> : null}
     </div>;
@@ -96,7 +97,7 @@ export function Chip({
   const p = useSettingsPalette();
   return <button onClick={onPress} role="button" accessibilityState={{
     selected: active
-  }} aria-label={label} style={({
+  }} aria-label={label} className={toTailwind(({
     pressed,
     hovered
   }: any) => [styles.chip, {
@@ -107,12 +108,12 @@ export function Chip({
     backgroundColor: p.pressed
   }, pressed && {
     opacity: 0.6
-  }]}>
-      <span style={{
+  }])}>
+      <span className={toTailwind({
       fontSize: m.descSize,
       fontFamily: active ? Fonts.sansMedium : Fonts.sans,
       color: active ? p.text : p.textSecondary
-    }}>
+    })}>
         {label}
       </span>
     </button>;
@@ -132,7 +133,7 @@ export function PackageCard({
 }) {
   const m = useSettingsMetrics();
   const p = useSettingsPalette();
-  return <button onClick={onPress} role="button" aria-label={`${pkg.name} 详情`} style={({
+  return <button onClick={onPress} role="button" aria-label={`${pkg.name} 详情`} className={toTailwind(({
     pressed,
     hovered
   }: any) => [styles.card, {
@@ -147,33 +148,33 @@ export function PackageCard({
     backgroundColor: p.isDark ? p.tile : p.card
   }, pressed && {
     opacity: 0.75
-  }]}>
-      <div style={styles.cardTop}>
-        <span style={[styles.cardName, {
+  }])}>
+      <div className={toTailwind(styles.cardTop)}>
+        <span className={toTailwind([styles.cardName, {
         color: p.text,
         fontSize: m.labelSize
-      }]}>
+      }])}>
           {pkg.name}
         </span>
-        <span style={[styles.version, {
+        <span className={toTailwind([styles.version, {
         color: p.textTertiary
-      }]}>v{pkg.version}</span>
+      }])}>v{pkg.version}</span>
       </div>
-      <span style={[styles.cardDesc, {
+      <span className={toTailwind([styles.cardDesc, {
       color: p.textSecondary,
       fontSize: m.descSize
-    }]}>
+    }])}>
         {pkg.description || '作者未提供介绍'}
       </span>
-      <div style={styles.cardBottom}>
-        <span style={[styles.meta, {
+      <div className={toTailwind(styles.cardBottom)}>
+        <span className={toTailwind([styles.meta, {
         color: p.textTertiary
-      }]}>
+      }])}>
           {pkg.package_types.join(' · ') || 'npm'}
         </span>
-        {pkg.downloads ? <span style={[styles.meta, {
+        {pkg.downloads ? <span className={toTailwind([styles.meta, {
         color: p.textTertiary
-      }]}>
+      }])}>
             {pkg.downloads.toLocaleString()} 次/周
           </span> : null}
       </div>
