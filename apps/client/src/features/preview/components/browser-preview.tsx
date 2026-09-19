@@ -1,3 +1,4 @@
+import { toTailwind } from "@/styles/to-tailwind";
 import { useMemo } from "react";
 import type { PreviewTarget } from "@/features/preview/store";
 import { buildPreviewUrl } from "@/features/preview/utils";
@@ -17,8 +18,8 @@ export function BrowserPreview({
     sessionId,
     target
   }), [serverUrl, sessionId, target]);
-  return <div style={styles.container}>
-      <iframe src={src} title={`Preview ${target.label}`} style={iframeStyle as unknown as React.CSSProperties} sandbox="allow-same-origin allow-scripts allow-forms allow-modals allow-popups allow-downloads" allow="clipboard-read; clipboard-write" />
+  return <div className={toTailwind(styles.container)}>
+      <iframe src={src} title={`Preview ${target.label}`} className={toTailwind(iframeStyle as unknown as React.CSSProperties)} sandbox="allow-same-origin allow-scripts allow-forms allow-modals allow-popups allow-downloads" allow="clipboard-read; clipboard-write" />
     </div>;
 }
 const styles = {

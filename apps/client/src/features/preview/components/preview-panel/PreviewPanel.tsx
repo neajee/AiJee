@@ -1,3 +1,4 @@
+import { toTailwind } from "@/styles/to-tailwind";
 import { memo } from "react";
 import { Plus } from "lucide-react";
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -28,68 +29,68 @@ function PreviewPanelComponent({
     handleAddSuggestion
   } = controller;
   if (!sessionId) {
-    return <div style={[styles.emptyState, {
+    return <div className={toTailwind([styles.emptyState, {
       backgroundColor: isDark ? "#151515" : "#FAFAFA"
-    }]}>
-        <span style={[styles.emptyTitle, {
+    }])}>
+        <span className={toTailwind([styles.emptyTitle, {
         color: isDark ? "#F5F5F5" : "#1A1A1A"
-      }]}>Preview</span>
-        <span style={[styles.emptyBody, {
+      }])}>Preview</span>
+        <span className={toTailwind([styles.emptyBody, {
         color: isDark ? "#8B8685" : "#6B6B6B"
-      }]}>
+      }])}>
           Open a session to preview running apps.
         </span>
       </div>;
   }
   if (targets.length === 0) {
-    return <div style={[styles.emptyState, {
+    return <div className={toTailwind([styles.emptyState, {
       backgroundColor: isDark ? "#151515" : "#FAFAFA"
-    }]}>
-        <span style={[styles.emptyTitle, {
+    }])}>
+        <span className={toTailwind([styles.emptyTitle, {
         color: isDark ? "#F5F5F5" : "#1A1A1A"
-      }]}>Preview</span>
-        <span style={[styles.emptyBody, {
+      }])}>Preview</span>
+        <span className={toTailwind([styles.emptyBody, {
         color: isDark ? "#8B8685" : "#6B6B6B"
-      }]}>
+      }])}>
           Add a port to preview a running app.
         </span>
-        <div style={styles.addPortRow}>
-          <input style={[styles.portInput, {
+        <div className={toTailwind(styles.addPortRow)}>
+          <input className={toTailwind([styles.portInput, {
           color: isDark ? "#F5F5F5" : "#1A1A1A",
           backgroundColor: isDark ? "#1E1E1E" : "#FFFFFF",
           borderColor: isDark ? "#3A3A3A" : "#D5D5D5"
-        }]} placeholder="Port (e.g. 3000)" placeholderTextColor={isDark ? "#6B6B6B" : "#999"} value={portInput} onChangeText={setPortInput} keyboardType="number-pad" onSubmitEditing={handleAddPort} />
-          <button onClick={handleAddPort} disabled={!portInput.trim()} style={({
+        }])} placeholder="Port (e.g. 3000)" placeholderTextColor={isDark ? "#6B6B6B" : "#999"} value={portInput} onChangeText={setPortInput} keyboardType="number-pad" onSubmitEditing={handleAddPort} />
+          <button onClick={handleAddPort} disabled={!portInput.trim()} className={toTailwind(({
           pressed
         }) => [styles.addPortBtn, {
           backgroundColor: isDark ? "#2B2A2A" : "#EDEDED",
           opacity: !portInput.trim() ? 0.4 : pressed ? 0.7 : 1
-        }]}>
-            <span style={[styles.addPortBtnText, {
+        }])}>
+            <span className={toTailwind([styles.addPortBtnText, {
             color: isDark ? "#F5F5F5" : "#1A1A1A"
-          }]}>
+          }])}>
               Add
             </span>
           </button>
         </div>
-        {suggestions.length > 0 && <div style={styles.suggestionsWrap}>
-            <span style={[styles.suggestionsLabel, {
+        {suggestions.length > 0 && <div className={toTailwind(styles.suggestionsWrap)}>
+            <span className={toTailwind([styles.suggestionsLabel, {
           color: isDark ? "#8B8685" : "#6B6B6B"
-        }]}>
+        }])}>
               Detected ports
             </span>
-            <div style={styles.suggestionsRow}>
-              {suggestions.map(s => <button key={s.id} onClick={() => handleAddSuggestion(s)} style={({
+            <div className={toTailwind(styles.suggestionsRow)}>
+              {suggestions.map(s => <button key={s.id} onClick={() => handleAddSuggestion(s)} className={toTailwind(({
             pressed
           }) => [styles.suggestionChip, {
             backgroundColor: isDark ? "#1E1E1E" : "#F2F2F2",
             borderColor: isDark ? "#3A3A3A" : "#E3E3E3"
           }, pressed && {
             opacity: 0.7
-          }]}>
-                  <span style={[styles.suggestionChipText, {
+          }])}>
+                  <span className={toTailwind([styles.suggestionChipText, {
               color: isDark ? "#B9B4B1" : "#555"
-            }]}>
+            }])}>
                     {s.label}
                   </span>
                 </button>)}
@@ -97,54 +98,54 @@ function PreviewPanelComponent({
           </div>}
       </div>;
   }
-  return <div style={[styles.container, {
+  return <div className={toTailwind([styles.container, {
     backgroundColor: isDark ? "#151515" : "#FAFAFA"
-  }]}>
-      <div style={[styles.toolbar, {
+  }])}>
+      <div className={toTailwind([styles.toolbar, {
       borderBottomColor: isDark ? "#323131" : "rgba(0,0,0,0.08)"
-    }]}>
-        <span style={[styles.title, {
+    }])}>
+        <span className={toTailwind([styles.title, {
         color: isDark ? "#F5F5F5" : "#1A1A1A"
-      }]}>Preview</span>
+      }])}>Preview</span>
         <div horizontal>
           {targets.map(target => {
           const active = selectedTarget?.id === target.id;
-          return <button key={target.id} onClick={() => selectTarget(sessionId, target.id)} style={({
+          return <button key={target.id} onClick={() => selectTarget(sessionId, target.id)} className={toTailwind(({
             pressed
           }) => [styles.targetChip, {
             backgroundColor: active ? isDark ? "#2B2A2A" : "#EDEDED" : isDark ? "#1B1B1B" : "#F2F2F2",
             borderColor: active ? isDark ? "#4A4848" : "#D5D5D5" : isDark ? "#2E2E2E" : "#E3E3E3"
           }, pressed && {
             opacity: 0.8
-          }]}>
-                <span style={[styles.targetChipLabel, {
+          }])}>
+                <span className={toTailwind([styles.targetChipLabel, {
               color: active ? isDark ? "#F5F5F5" : "#1A1A1A" : isDark ? "#B9B4B1" : "#555555"
-            }]}>
+            }])}>
                   {target.label}
                 </span>
               </button>;
         })}
-          {showPortInput ? <div style={styles.inlinePortRow}>
-              <input autoFocus style={[styles.inlinePortInput, {
+          {showPortInput ? <div className={toTailwind(styles.inlinePortRow)}>
+              <input autoFocus className={toTailwind([styles.inlinePortInput, {
             color: isDark ? "#F5F5F5" : "#1A1A1A",
             backgroundColor: isDark ? "#1E1E1E" : "#FFFFFF",
             borderColor: isDark ? "#3A3A3A" : "#D5D5D5"
-          }]} placeholder="Port" placeholderTextColor={isDark ? "#6B6B6B" : "#999"} value={portInput} onChangeText={setPortInput} keyboardType="number-pad" onSubmitEditing={handleAddPort} onBlur={() => {
+          }])} placeholder="Port" placeholderTextColor={isDark ? "#6B6B6B" : "#999"} value={portInput} onChangeText={setPortInput} keyboardType="number-pad" onSubmitEditing={handleAddPort} onBlur={() => {
             if (!portInput.trim()) setShowPortInput(false);
           }} />
-            </div> : <button onClick={() => setShowPortInput(true)} style={({
+            </div> : <button onClick={() => setShowPortInput(true)} className={toTailwind(({
           pressed
         }) => [styles.addChipBtn, {
           borderColor: isDark ? "#2E2E2E" : "#E3E3E3"
         }, pressed && {
           opacity: 0.7
-        }]}>
+        }])}>
               <Plus size={14} color={isDark ? "#8B8685" : "#999"} strokeWidth={1.8} />
             </button>}
         </div>
       </div>
-      <div style={styles.content}>
-        {selectedTarget ? <BrowserPreview serverUrl={serverUrl} accessToken={accessToken} sessionId={sessionId} target={selectedTarget} /> : <div style={styles.loadingState}>
+      <div className={toTailwind(styles.content)}>
+        {selectedTarget ? <BrowserPreview serverUrl={serverUrl} accessToken={accessToken} sessionId={sessionId} target={selectedTarget} /> : <div className={toTailwind(styles.loadingState)}>
             <span size="small" />
           </div>}
       </div>

@@ -1,3 +1,4 @@
+import { toTailwind } from "@/styles/to-tailwind";
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { PreviewTarget } from "@/features/preview/store";
 import { buildPreviewUrl } from "@/features/preview/utils";
@@ -54,11 +55,11 @@ export function BrowserPreviewDesktop({
     };
   }, [targetUrl, accessToken, brokerUrl]);
   const send = (message: unknown) => socket.current?.send(JSON.stringify(message));
-  return <div style={styles.container}>
-    {frame ? <img src={frame} alt={`Preview ${target.label}`} style={{
+  return <div className={toTailwind(styles.container)}>
+    {frame ? <img src={frame} alt={`Preview ${target.label}`} className={toTailwind({
       ...imageStyle,
       aspectRatio: size.width / size.height
-    }} onClick={event => {
+    })} onClick={event => {
       const rect = event.currentTarget.getBoundingClientRect();
       send({
         type: "click",
@@ -94,7 +95,7 @@ export function BrowserPreviewDesktop({
           modifiers
         }
       });
-    }} tabIndex={0} /> : <div style={styles.image} />}
+    }} tabIndex={0} /> : <div className={toTailwind(styles.image)} />}
   </div>;
 }
 const styles = {

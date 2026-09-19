@@ -1,3 +1,4 @@
+import { toTailwind } from "@/styles/to-tailwind";
 import { memo, useEffect, useState } from "react";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { ChangesPanel } from "@/features/workspace/components/changes-panel";
@@ -29,9 +30,9 @@ function WorkspaceRightPaneComponent({
   useEffect(() => {
     setPreviewActive(previewPaneOpen);
   }, [previewPaneOpen]);
-  return <div style={[styles.container, {
+  return <div className={toTailwind([styles.container, {
     backgroundColor: isDark ? "#151515" : "#FAFAFA"
-  }]}>
+  }])}>
       <ChangesPanel extraTabs={isDesktopShell ? PREVIEW_TAB : undefined} activeExtraTab={isDesktopShell && previewActive ? "preview" : null} onExtraTabChange={isDesktopShell ? key => {
       const open = key === "preview";
       setPreviewActive(open);
