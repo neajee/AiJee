@@ -1,5 +1,4 @@
-import { Text, View } from "@/components/dom";
-import { Pressable } from "@/components/dom";
+import { toTailwind } from "@/styles/to-tailwind";
 import { useColors } from '../../hooks/use-custom-models-theme';
 
 // ─── Capability chips ─────────────────────────────────────────
@@ -13,7 +12,7 @@ export function ChipToggleRow({
   label,
   hint,
   options,
-  colors,
+  colors
 }: {
   label: string;
   hint?: string;
@@ -26,46 +25,33 @@ export function ChipToggleRow({
   }[];
   colors: ReturnType<typeof useColors>;
 }) {
-  return (
-    <View style={colors.s.field.container}>
-      <Text style={[colors.s.field.label, { color: colors.textMuted }]}>
+  return <div className={toTailwind(colors.s.field.container)}>
+      <span className={toTailwind([colors.s.field.label, {
+      color: colors.textMuted
+    }])}>
         {label}
-      </Text>
-      <View style={colors.s.api.row}>
-        {options.map((item) => (
-          <Pressable
-            key={item.key}
-            onPress={item.locked ? undefined : item.onToggle}
-            disabled={item.locked}
-            accessibilityRole="checkbox"
-            accessibilityState={{ checked: item.active, disabled: item.locked }}
-            style={[
-              colors.s.api.chip,
-              {
-                backgroundColor: item.active ? colors.chipActiveBg : 'transparent',
-                borderColor: item.active
-                  ? colors.chipActiveBorder
-                  : colors.chipBorder,
-              },
-              item.locked && { opacity: 0.6 },
-            ]}
-          >
-            <Text
-              style={[
-                colors.s.api.chipText,
-                { color: item.active ? colors.textPrimary : colors.textMuted },
-              ]}
-            >
+      </span>
+      <div className={toTailwind(colors.s.api.row)}>
+        {options.map(item => <button key={item.key} onClick={item.locked ? undefined : item.onToggle} disabled={item.locked} role="checkbox" accessibilityState={{
+        checked: item.active,
+        disabled: item.locked
+      }} className={toTailwind([colors.s.api.chip, {
+        backgroundColor: item.active ? colors.chipActiveBg : 'transparent',
+        borderColor: item.active ? colors.chipActiveBorder : colors.chipBorder
+      }, item.locked && {
+        opacity: 0.6
+      }])}>
+            <span className={toTailwind([colors.s.api.chipText, {
+          color: item.active ? colors.textPrimary : colors.textMuted
+        }])}>
               {item.label}
-            </Text>
-          </Pressable>
-        ))}
-      </View>
-      {hint ? (
-        <Text style={[colors.s.field.label, { color: colors.placeholder }]}>
+            </span>
+          </button>)}
+      </div>
+      {hint ? <span className={toTailwind([colors.s.field.label, {
+      color: colors.placeholder
+    }])}>
           {hint}
-        </Text>
-      ) : null}
-    </View>
-  );
+        </span> : null}
+    </div>;
 }

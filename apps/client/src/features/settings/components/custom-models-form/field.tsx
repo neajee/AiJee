@@ -1,4 +1,4 @@
-import { Input, Text, View } from "@/components/dom";
+import { toTailwind } from "@/styles/to-tailwind";
 import { Fonts } from '@/constants/theme';
 import { useColors } from '../../hooks/use-custom-models-theme';
 
@@ -11,7 +11,7 @@ export function Field({
   placeholder,
   colors,
   mono,
-  autoFocus,
+  autoFocus
 }: {
   label: string;
   value: string;
@@ -21,29 +21,18 @@ export function Field({
   mono?: boolean;
   autoFocus?: boolean;
 }) {
-  return (
-    <View style={colors.s.field.container}>
-      <Text style={[colors.s.field.label, { color: colors.textMuted }]}>
+  return <div className={toTailwind(colors.s.field.container)}>
+      <span className={toTailwind([colors.s.field.label, {
+      color: colors.textMuted
+    }])}>
         {label}
-      </Text>
-      <Input
-        style={[
-          colors.s.field.input,
-          {
-            color: colors.textPrimary,
-            backgroundColor: colors.inputBg,
-            borderColor: colors.borderColor,
-          },
-          mono && { fontFamily: Fonts.mono },
-        ]}
-        value={value}
-        onChangeText={onChangeText}
-        placeholder={placeholder}
-        placeholderTextColor={colors.placeholder}
-        autoCapitalize="none"
-        autoCorrect={false}
-        autoFocus={autoFocus}
-      />
-    </View>
-  );
+      </span>
+      <input className={toTailwind([colors.s.field.input, {
+      color: colors.textPrimary,
+      backgroundColor: colors.inputBg,
+      borderColor: colors.borderColor
+    }, mono && {
+      fontFamily: Fonts.mono
+    }])} value={value} onChangeText={onChangeText} placeholder={placeholder} placeholderTextColor={colors.placeholder} autoCapitalize="none" autoCorrect={false} autoFocus={autoFocus} />
+    </div>;
 }

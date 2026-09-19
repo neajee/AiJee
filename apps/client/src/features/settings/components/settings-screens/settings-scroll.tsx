@@ -1,40 +1,22 @@
+import { toTailwind } from "@/styles/to-tailwind";
 import { type ReactNode } from 'react';
-import { ScrollView, View } from "@/components/dom";
-import { useSafeAreaInsets } from "@/components/dom";
-import {
-  useSettingsContentStyle,
-  useSettingsPalette,
-  useSettingsPhoneLayout,
-} from '@/components/settings-surface';
+import { useSafeAreaInsets } from "@/platform/browser";
+import { useSettingsContentStyle, useSettingsPalette, useSettingsPhoneLayout } from '@/components/settings-surface';
 import { styles } from './style-tokens';
-
-export function SettingsScroll({ children }: { children: ReactNode }) {
+export function SettingsScroll({
+  children
+}: {
+  children: ReactNode;
+}) {
   const insets = useSafeAreaInsets();
   const palette = useSettingsPalette();
   const phone = useSettingsPhoneLayout();
   const contentStyle = useSettingsContentStyle(insets.bottom);
-
-  return (
-    <View style={[styles.screen, { backgroundColor: palette.bg }]}>
-      <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={
-          phone
-            ? contentStyle
-            : {
-                ...contentStyle,
-                maxWidth: '100%',
-                gap: 0,
-                paddingLeft: 0, paddingRight: 0,
-                paddingTop: 0,
-                paddingBottom: 0,
-                flexGrow: 1,
-              }
-        }
-        showsVerticalScrollIndicator={false}
-      >
+  return <div className={toTailwind([styles.screen, {
+    backgroundColor: palette.bg
+  }])}>
+      <div className={toTailwind(styles.scroll)}>
         {children}
-      </ScrollView>
-    </View>
-  );
+      </div>
+    </div>;
 }

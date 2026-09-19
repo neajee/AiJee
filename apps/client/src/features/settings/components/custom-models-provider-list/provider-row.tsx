@@ -1,9 +1,7 @@
-import { Text, View } from "@/components/dom";
-import { Pressable } from "@/components/dom";
+import { toTailwind } from "@/styles/to-tailwind";
 import { providerPageStyles } from '../../utils/custom-models-styles';
 import { ProviderMark } from './provider-mark';
 import type { ProviderRowProps } from './component-types';
-
 export function ProviderRow({
   name,
   id,
@@ -12,54 +10,37 @@ export function ProviderRow({
   colors,
   onPress,
   trailing,
-  disabled,
+  disabled
 }: ProviderRowProps) {
-  const content = (
-    <>
-      {connected ? <View style={[providerPageStyles.statusDot, { backgroundColor: colors.successColor }]} /> : null}
+  const content = <>
+      {connected ? <div className={toTailwind([providerPageStyles.statusDot, {
+      backgroundColor: colors.successColor
+    }])} /> : null}
       <ProviderMark name={name} id={id} colors={colors} />
-      <View style={providerPageStyles.rowCopy}>
-        <Text numberOfLines={1} style={[providerPageStyles.rowName, { color: colors.textPrimary }]}>{name}</Text>
-        {meta ? <Text numberOfLines={1} style={[providerPageStyles.rowMeta, { color: colors.textMuted }]}>{meta}</Text> : null}
-      </View>
-    </>
-  );
-
+      <div className={toTailwind(providerPageStyles.rowCopy)}>
+        <span className={toTailwind([providerPageStyles.rowName, {
+        color: colors.textPrimary
+      }])}>{name}</span>
+        {meta ? <span className={toTailwind([providerPageStyles.rowMeta, {
+        color: colors.textMuted
+      }])}>{meta}</span> : null}
+      </div>
+    </>;
   if (trailing) {
-    return (
-      <View style={[providerPageStyles.row, disabled && { opacity: 0.5 }]}>
-        <Pressable
-          onPress={onPress}
-          disabled={disabled}
-          accessibilityRole="button"
-          accessibilityLabel={name}
-          accessibilityState={{ disabled }}
-          style={({ pressed, hovered, focused }: any) => [
-            providerPageStyles.rowMain,
-            (pressed || hovered || focused) && !disabled && { backgroundColor: colors.pressedBg },
-          ]}
-        >
+    return <div className={toTailwind([providerPageStyles.row, disabled && {
+      opacity: 0.5
+    }])}>
+        <button onClick={onPress} disabled={disabled} role="button" aria-label={name} accessibilityState={{
+        disabled
+      }}>
           {content}
-        </Pressable>
+        </button>
         {trailing}
-      </View>
-    );
+      </div>;
   }
-
-  return (
-    <Pressable
-      onPress={onPress}
-      disabled={disabled}
-      accessibilityRole="button"
-      accessibilityLabel={name}
-      accessibilityState={{ disabled }}
-      style={({ pressed, hovered, focused }: any) => [
-        providerPageStyles.row,
-        (pressed || hovered || focused) && !disabled && { backgroundColor: colors.pressedBg },
-        disabled && { opacity: 0.5 },
-      ]}
-    >
+  return <button onClick={onPress} disabled={disabled} role="button" aria-label={name} accessibilityState={{
+    disabled
+  }}>
       {content}
-    </Pressable>
-  );
+    </button>;
 }

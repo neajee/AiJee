@@ -1,6 +1,5 @@
-import { Text, View } from "@/components/dom";
+import { toTailwind } from "@/styles/to-tailwind";
 import { useState } from "react";
-import { Pressable } from "@/components/dom";
 import { HAIRLINE_WIDTH } from '@/constants/layout';
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { useSettingsPalette } from "@/components/settings-surface";
@@ -10,7 +9,7 @@ import { aboutStyles } from "../utils/about-styles";
 export function ReleaseRow({
   release,
   current,
-  defaultOpen,
+  defaultOpen
 }: {
   release: NonNullable<VersionInfo['timeline']>[number];
   current: boolean;
@@ -19,73 +18,70 @@ export function ReleaseRow({
   const p = useSettingsPalette();
   const [open, setOpen] = useState(defaultOpen);
   const notes = release.notes ?? [];
-  const featureTotal = notes.filter((note) => note.type === 'feature').length;
-  const fixTotal = notes.filter((note) => note.type === 'fix').length;
-  const otherTotal = notes.filter((note) => note.type === 'other').length;
-  const countText =
-    [featureTotal && `${featureTotal} 新功能`, fixTotal && `${fixTotal} 修复`, otherTotal && `${otherTotal} 其他`]
-      .filter(Boolean)
-      .join(' · ') || '无变更记录';
-
-  return (
-    <View>
-      <Pressable
-        onPress={() => setOpen((value) => !value)}
-        accessibilityRole="button"
-        accessibilityLabel={`${release.tag}，发布于 ${formatReleaseTime(release.published_at)}，${countText}`}
-        accessibilityState={{ expanded: open }}
-        style={({ pressed }) => [aboutStyles.releaseHead, (pressed || open) && { backgroundColor: p.pressed }]}
-      >
-        <View style={[aboutStyles.timelineDot, { backgroundColor: current ? p.accent : p.textTertiary }]} />
-        <Text numberOfLines={1} style={[aboutStyles.timelineTag, { color: current ? p.text : p.textSecondary }]}>
+  const featureTotal = notes.filter(note => note.type === 'feature').length;
+  const fixTotal = notes.filter(note => note.type === 'fix').length;
+  const otherTotal = notes.filter(note => note.type === 'other').length;
+  const countText = [featureTotal && `${featureTotal} 新功能`, fixTotal && `${fixTotal} 修复`, otherTotal && `${otherTotal} 其他`].filter(Boolean).join(' · ') || '无变更记录';
+  return <div>
+      <button onClick={() => setOpen(value => !value)} role="button" aria-label={`${release.tag}，发布于 ${formatReleaseTime(release.published_at)}，${countText}`} accessibilityState={{
+      expanded: open
+    }}>
+        <div className={toTailwind([aboutStyles.timelineDot, {
+        backgroundColor: current ? p.accent : p.textTertiary
+      }])} />
+        <span className={toTailwind([aboutStyles.timelineTag, {
+        color: current ? p.text : p.textSecondary
+      }])}>
           {release.tag}
-        </Text>
-        <Text style={[aboutStyles.timelineTime, { color: p.textTertiary }]}>
+        </span>
+        <span className={toTailwind([aboutStyles.timelineTime, {
+        color: p.textTertiary
+      }])}>
           {formatReleaseShort(release.published_at)}
-        </Text>
-        <Text numberOfLines={1} style={[aboutStyles.releaseCount, { color: p.textTertiary }]}>
+        </span>
+        <span className={toTailwind([aboutStyles.releaseCount, {
+        color: p.textTertiary
+      }])}>
           {countText}
-        </Text>
-        {current ? (
-          <View style={[aboutStyles.currentBadge, { backgroundColor: p.tile }]}>
-            <Text style={[aboutStyles.currentBadgeText, { color: p.textSecondary }]}>当前</Text>
-          </View>
-        ) : null}
-        {open ? (
-          <ChevronUp size={14} color={p.textTertiary} strokeWidth={2} />
-        ) : (
-          <ChevronDown size={14} color={p.textTertiary} strokeWidth={2} />
-        )}
-      </Pressable>
-      {open ? (
-        <View style={[aboutStyles.releaseBody, { borderTopWidth: HAIRLINE_WIDTH, borderTopColor: p.separator }]}>
-          {(['feature', 'fix', 'other'] as const).map((type) => {
-            const items = notes.filter((note) => note.type === type);
-            if (!items.length) return null;
-            const label = type === 'feature' ? '新功能' : type === 'fix' ? '修复' : '其他';
-            return (
-              <View key={type} style={aboutStyles.noteGroup}>
-                <Text style={[aboutStyles.noteCat, { color: p.textSecondary }]}>
+        </span>
+        {current ? <div className={toTailwind([aboutStyles.currentBadge, {
+        backgroundColor: p.tile
+      }])}>
+            <span className={toTailwind([aboutStyles.currentBadgeText, {
+          color: p.textSecondary
+        }])}>当前</span>
+          </div> : null}
+        {open ? <ChevronUp size={14} color={p.textTertiary} strokeWidth={2} /> : <ChevronDown size={14} color={p.textTertiary} strokeWidth={2} />}
+      </button>
+      {open ? <div className={toTailwind([aboutStyles.releaseBody, {
+      borderTopWidth: HAIRLINE_WIDTH,
+      borderTopColor: p.separator
+    }])}>
+          {(['feature', 'fix', 'other'] as const).map(type => {
+        const items = notes.filter(note => note.type === type);
+        if (!items.length) return null;
+        const label = type === 'feature' ? '新功能' : type === 'fix' ? '修复' : '其他';
+        return <div key={type} className={toTailwind(aboutStyles.noteGroup)}>
+                <span className={toTailwind([aboutStyles.noteCat, {
+            color: p.textSecondary
+          }])}>
                   {label} · {items.length}
-                </Text>
-                {items.map((note, index) => (
-                  <View key={`${note.commit}-${index}`} style={aboutStyles.noteRow}>
-                    <Text numberOfLines={2} style={[aboutStyles.noteTitle, { color: p.text }]}>
+                </span>
+                {items.map((note, index) => <div key={`${note.commit}-${index}`} className={toTailwind(aboutStyles.noteRow)}>
+                    <span className={toTailwind([aboutStyles.noteTitle, {
+              color: p.text
+            }])}>
                       {note.title}
-                    </Text>
-                    {note.commit ? (
-                      <Text style={[aboutStyles.noteCommit, { color: p.textTertiary }]}>{note.commit}</Text>
-                    ) : null}
-                  </View>
-                ))}
-              </View>
-            );
-          })}
-          {!notes.length ? (
-            <Text style={[aboutStyles.timelineTime, { color: p.textTertiary }]}>无变更记录</Text>
-          ) : null}
-        </View>
-      ) : null}
-    </View>
-  );
+                    </span>
+                    {note.commit ? <span className={toTailwind([aboutStyles.noteCommit, {
+              color: p.textTertiary
+            }])}>{note.commit}</span> : null}
+                  </div>)}
+              </div>;
+      })}
+          {!notes.length ? <span className={toTailwind([aboutStyles.timelineTime, {
+        color: p.textTertiary
+      }])}>无变更记录</span> : null}
+        </div> : null}
+    </div>;
 }

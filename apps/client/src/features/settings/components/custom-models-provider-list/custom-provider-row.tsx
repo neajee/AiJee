@@ -1,77 +1,90 @@
-import { Text, View } from "@/components/dom";
+import { toTailwind } from "@/styles/to-tailwind";
 import { useState } from 'react';
-import { Pressable } from "@/components/dom";
 import { Plus } from 'lucide-react';
 import { API_TYPES, ApiTypeSelector, Field, ModelEntryRow } from '../custom-models-form';
 import { providerPageStyles } from '../../utils/custom-models-styles';
 import { ProviderRow } from './provider-row';
 import type { CustomProviderRowProps } from './component-types';
-
-export function CustomProviderRow({ name, provider, colors, onUpdate, onRemove }: CustomProviderRowProps) {
+export function CustomProviderRow({
+  name,
+  provider,
+  colors,
+  onUpdate,
+  onRemove
+}: CustomProviderRowProps) {
   const [expanded, setExpanded] = useState(false);
   const [hovered, setHovered] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const modelCount = provider.models?.length ?? 0;
-  const apiLabel = API_TYPES.find((item) => item.value === provider.api)?.label ?? provider.api ?? '未设置 API';
-
-  return (
-    <View onPointerEnter={() => setHovered(true)} onPointerLeave={() => { setHovered(false); setMenuOpen(false); }}>
-      <ProviderRow
-        name={name}
-        meta={`${apiLabel} · ${modelCount} 个模型`}
-        colors={colors}
-        onPress={() => setExpanded((value) => !value)}
-        trailing={(hovered || menuOpen) ? (
-          <View style={providerPageStyles.menuAnchor}>
-            <Pressable
-              onPress={(event) => { event.stopPropagation?.(); setMenuOpen((value) => !value); }}
-              accessibilityRole="button"
-              accessibilityLabel={`管理 ${name}`}
-              style={({ pressed }) => [providerPageStyles.moreButton, pressed && { backgroundColor: colors.pressedBg }]}
-            >
-              <Text style={[providerPageStyles.moreText, { color: colors.textSecondary }]}>•••</Text>
-            </Pressable>
-            {menuOpen ? (
-              <Pressable
-                onPress={(event) => { event.stopPropagation?.(); onRemove(); setMenuOpen(false); }}
-                accessibilityRole="button"
-                accessibilityLabel={`删除 ${name}`}
-                style={[providerPageStyles.menu, { backgroundColor: colors.cardBg, borderColor: colors.borderColor }]}
-              >
-                <Text style={[providerPageStyles.menuText, { color: colors.dangerColor }]}>删除服务</Text>
-              </Pressable>
-            ) : null}
-          </View>
-        ) : null}
-      />
-      {expanded ? (
-        <View style={[providerPageStyles.inlinePanel, { borderTopColor: colors.separator }]}>
-          <Field label="Base URL" value={provider.baseUrl ?? ''} onChangeText={(value) => onUpdate({ ...provider, baseUrl: value || undefined })} placeholder="http://localhost:11434/v1" colors={colors} mono />
-          <ApiTypeSelector value={provider.api ?? 'openai-completions'} onChange={(value) => onUpdate({ ...provider, api: value })} colors={colors} />
-          <Field label="API 密钥" value={provider.apiKey ?? ''} onChangeText={(value) => onUpdate({ ...provider, apiKey: value || undefined })} placeholder="可选" colors={colors} />
-          <View style={providerPageStyles.modelEditorHeader}>
-            <Text style={[providerPageStyles.rowMeta, { color: colors.textSecondary }]}>模型</Text>
-            <Pressable onPress={() => onUpdate({ ...provider, models: [...(provider.models ?? []), { id: `model-${modelCount + 1}` }] })} accessibilityRole="button" style={({ pressed }) => [providerPageStyles.addModelButton, { borderColor: colors.borderColor }, pressed && { backgroundColor: colors.pressedBg }]}>
+  const apiLabel = API_TYPES.find(item => item.value === provider.api)?.label ?? provider.api ?? '未设置 API';
+  return <div onPointerEnter={() => setHovered(true)} onPointerLeave={() => {
+    setHovered(false);
+    setMenuOpen(false);
+  }}>
+      <ProviderRow name={name} meta={`${apiLabel} · ${modelCount} 个模型`} colors={colors} onClick={() => setExpanded(value => !value)} trailing={hovered || menuOpen ? <div className={toTailwind(providerPageStyles.menuAnchor)}>
+            <button onClick={event => {
+        event.stopPropagation?.();
+        setMenuOpen(value => !value);
+      }} role="button" aria-label={`管理 ${name}`}>
+              <span className={toTailwind([providerPageStyles.moreText, {
+          color: colors.textSecondary
+        }])}>•••</span>
+            </button>
+            {menuOpen ? <button onClick={event => {
+        event.stopPropagation?.();
+        onRemove();
+        setMenuOpen(false);
+      }} role="button" aria-label={`删除 ${name}`} className={toTailwind([providerPageStyles.menu, {
+        backgroundColor: colors.cardBg,
+        borderColor: colors.borderColor
+      }])}>
+                <span className={toTailwind([providerPageStyles.menuText, {
+          color: colors.dangerColor
+        }])}>删除服务</span>
+              </button> : null}
+          </div> : null} />
+      {expanded ? <div className={toTailwind([providerPageStyles.inlinePanel, {
+      borderTopColor: colors.separator
+    }])}>
+          <Field label="Base URL" value={provider.baseUrl ?? ''} onChangeText={value => onUpdate({
+        ...provider,
+        baseUrl: value || undefined
+      })} placeholder="http://localhost:11434/v1" colors={colors} mono />
+          <ApiTypeSelector value={provider.api ?? 'openai-completions'} onChange={value => onUpdate({
+        ...provider,
+        api: value
+      })} colors={colors} />
+          <Field label="API 密钥" value={provider.apiKey ?? ''} onChangeText={value => onUpdate({
+        ...provider,
+        apiKey: value || undefined
+      })} placeholder="可选" colors={colors} />
+          <div className={toTailwind(providerPageStyles.modelEditorHeader)}>
+            <span className={toTailwind([providerPageStyles.rowMeta, {
+          color: colors.textSecondary
+        }])}>模型</span>
+            <button onClick={() => onUpdate({
+          ...provider,
+          models: [...(provider.models ?? []), {
+            id: `model-${modelCount + 1}`
+          }]
+        })} role="button">
               <Plus size={14} color={colors.textSecondary} strokeWidth={2} />
-              <Text style={[providerPageStyles.linkText, { color: colors.textSecondary }]}>添加模型</Text>
-            </Pressable>
-          </View>
-          {(provider.models ?? []).map((model, index) => (
-            <ModelEntryRow
-              key={`${model.id}-${index}`}
-              model={model}
-              colors={colors}
-              isLast={index === modelCount - 1}
-              onUpdate={(next) => {
-                const models = [...(provider.models ?? [])];
-                models[index] = next;
-                onUpdate({ ...provider, models });
-              }}
-              onRemove={() => onUpdate({ ...provider, models: (provider.models ?? []).filter((_, itemIndex) => itemIndex !== index) })}
-            />
-          ))}
-        </View>
-      ) : null}
-    </View>
-  );
+              <span className={toTailwind([providerPageStyles.linkText, {
+            color: colors.textSecondary
+          }])}>添加模型</span>
+            </button>
+          </div>
+          {(provider.models ?? []).map((model, index) => <ModelEntryRow key={`${model.id}-${index}`} model={model} colors={colors} isLast={index === modelCount - 1} onUpdate={next => {
+        const models = [...(provider.models ?? [])];
+        models[index] = next;
+        onUpdate({
+          ...provider,
+          models
+        });
+      }} onRemove={() => onUpdate({
+        ...provider,
+        models: (provider.models ?? []).filter((_, itemIndex) => itemIndex !== index)
+      })} />)}
+        </div> : null}
+    </div>;
 }

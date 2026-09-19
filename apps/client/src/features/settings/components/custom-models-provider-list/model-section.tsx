@@ -1,15 +1,20 @@
-import { Text, View } from "@/components/dom";
-
+import { toTailwind } from "@/styles/to-tailwind";
 import { providerPageStyles } from '../../utils/custom-models-styles';
 import type { ModelSectionProps } from './component-types';
-
-export function ModelSection({ title, children, colors }: ModelSectionProps) {
-  return (
-    <View style={providerPageStyles.section}>
-      <Text style={[providerPageStyles.sectionTitle, { color: colors.textSecondary }]}>{title}</Text>
-      <View style={[providerPageStyles.rows, { borderColor: colors.separator, backgroundColor: colors.cardBg }]}>
+export function ModelSection({
+  title,
+  children,
+  colors
+}: ModelSectionProps) {
+  return <div className={toTailwind(providerPageStyles.section)}>
+      <span className={toTailwind([providerPageStyles.sectionTitle, {
+      color: colors.textSecondary
+    }])}>{title}</span>
+      <div className={toTailwind([providerPageStyles.rows, {
+      borderColor: colors.separator,
+      backgroundColor: colors.cardBg
+    }])}>
         {children}
-      </View>
-    </View>
-  );
+      </div>
+    </div>;
 }
