@@ -1,12 +1,10 @@
 import { createContext, useContext, type ReactNode } from "react";
-
 export interface DiffTab {
   id: string;
   toolName: "edit" | "write";
   path: string;
   fileName: string;
 }
-
 interface DiffPanelContextValue {
   isOpen: boolean;
   tabs: DiffTab[];
@@ -17,7 +15,6 @@ interface DiffPanelContextValue {
   closeTab: (id: string) => void;
   close: () => void;
 }
-
 const NOOP_CTX: DiffPanelContextValue = {
   isOpen: false,
   tabs: [],
@@ -26,33 +23,23 @@ const NOOP_CTX: DiffPanelContextValue = {
   selectTab: () => {},
   autoAddTab: () => {},
   closeTab: () => {},
-  close: () => {},
+  close: () => {}
 };
-
 const DiffPanelContext = createContext<DiffPanelContextValue>(NOOP_CTX);
-
 export function useDiffPanel(): DiffPanelContextValue {
   return useContext(DiffPanelContext);
 }
-
 export function useDiffPanelOpen(): boolean {
   return useContext(DiffPanelContext).isOpen;
 }
-
 export function DiffPanelProvider({
-  children,
+  children
 }: {
   messages?: unknown[];
   children: ReactNode;
 }) {
-  return (
-    <DiffPanelContext.Provider value={NOOP_CTX}>
+  return <DiffPanelContext.Provider value={NOOP_CTX}>
       {children}
-    </DiffPanelContext.Provider>
-  );
+    </DiffPanelContext.Provider>;
 }
-
-export function useAutoOpenDiffTab(
-  _tab: DiffTab | null,
-  _isRunning: boolean,
-) {}
+export function useAutoOpenDiffTab(_tab: DiffTab | null, _isRunning: boolean) {}

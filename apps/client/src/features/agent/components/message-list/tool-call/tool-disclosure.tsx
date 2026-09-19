@@ -1,13 +1,7 @@
-import { View } from "@/components/dom";
+import { toTailwind } from "@/styles/to-tailwind";
 import { memo, type ReactNode } from "react";
-import { Pressable } from "@/components/dom";
 import { ChevronRight } from "lucide-react";
-import Animated, {
-  Easing,
-  useAnimatedStyle,
-  useDerivedValue,
-  withTiming,
-} from "@/components/dom";
+import Animated, { Easing, useAnimatedStyle, useDerivedValue, withTiming } from "@/platform/animation";
 import { Colors } from "@/constants/theme";
 import { HAIRLINE_WIDTH } from "@/constants/layout";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
@@ -19,9 +13,7 @@ import { AnimatedCollapse } from "../animated-collapse";
  * surrounding collapse never needs a second, drifting magic number.
  */
 export const TOOL_BODY_MAX_HEIGHT = 260;
-
 const CHEVRON_SIZE = 11;
-
 interface ToolHeaderProps {
   expanded: boolean;
   /** When false the row renders inert: no chevron, no press feedback. */
@@ -45,46 +37,35 @@ export const ToolHeader = memo(function ToolHeader({
   isDark,
   accessibilityLabel,
   alignTop = false,
-  children,
+  children
 }: ToolHeaderProps) {
   const colors = useThemeTokens();
-  const rotate = useDerivedValue(
-    () =>
-      withTiming(expanded ? 90 : 0, {
-        duration: 180,
-        easing: Easing.out(Easing.cubic),
-      }),
-    [expanded],
-  );
+  const rotate = useDerivedValue(() => withTiming(expanded ? 90 : 0, {
+    duration: 180,
+    easing: Easing.out(Easing.cubic)
+  }), [expanded]);
   const chevronStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${rotate.value}deg` }],
+    transform: [{
+      rotate: `${rotate.value}deg`
+    }]
   }));
-
   const row = [styles.header, alignTop && styles.headerTop];
-
   if (!expandable) {
-    return <View style={row}>{children}</View>;
+    return <div className={toTailwind(row)}>{children}</div>;
   }
-
-  return (
-    <Pressable
-      onPress={onToggle}
-      accessibilityRole="button"
-      accessibilityLabel={accessibilityLabel}
-      accessibilityState={{ expanded }}
-      hitSlop={{ top: 6, bottom: 6, left: 4, right: 8 }}
-      style={({ pressed }) => [...row, pressed && styles.headerPressed]}
-    >
+  return <button onClick={onToggle} role="button" aria-label={accessibilityLabel} accessibilityState={{
+    expanded
+  }} hitSlop={{
+    top: 6,
+    bottom: 6,
+    left: 4,
+    right: 8
+  }}>
       {children}
-      <Animated.View style={[styles.chevron, alignTop && styles.chevronTop, chevronStyle]}>
-        <ChevronRight
-          size={CHEVRON_SIZE}
-          color={colors.textTertiary}
-          strokeWidth={2}
-        />
-      </Animated.View>
-    </Pressable>
-  );
+      <div className={toTailwind([styles.chevron, alignTop && styles.chevronTop, chevronStyle])}>
+        <ChevronRight size={CHEVRON_SIZE} color={colors.textTertiary} strokeWidth={2} />
+      </div>
+    </button>;
 });
 
 /**
@@ -94,16 +75,14 @@ export const ToolHeader = memo(function ToolHeader({
  */
 export function ToolBody({
   expanded,
-  children,
+  children
 }: {
   expanded: boolean;
   children: ReactNode;
 }) {
-  return (
-    <AnimatedCollapse expanded={expanded}>
-      <View style={styles.body}>{children}</View>
-    </AnimatedCollapse>
-  );
+  return <AnimatedCollapse expanded={expanded}>
+      <div className={toTailwind(styles.body)}>{children}</div>
+    </AnimatedCollapse>;
 }
 
 /**
@@ -113,54 +92,49 @@ export function ToolBody({
 export function ToolSurface({
   isDark,
   padded = true,
-  children,
+  children
 }: {
   isDark: boolean;
   padded?: boolean;
   children: ReactNode;
 }) {
   const colors = useThemeTokens();
-  return (
-    <View
-      style={[
-        styles.surface,
-        padded && styles.surfacePadded,
-        { backgroundColor: colors.surfaceRaised, borderColor: colors.border },
-      ]}
-    >
+  return <div className={toTailwind([styles.surface, padded && styles.surfacePadded, {
+    backgroundColor: colors.surfaceRaised,
+    borderColor: colors.border
+  }])}>
       {children}
-    </View>
-  );
+    </div>;
 }
-
 const styles = {
   header: {
     flexDirection: "row",
     alignItems: "center",
     gap: 6,
-    paddingTop: 4, paddingBottom: 4,
+    paddingTop: 4,
+    paddingBottom: 4
   },
   headerTop: {
-    alignItems: "flex-start",
+    alignItems: "flex-start"
   },
   headerPressed: {
-    opacity: 0.6,
+    opacity: 0.6
   },
   chevron: {
-    flexShrink: 0,
+    flexShrink: 0
   },
   chevronTop: {
-    marginTop: 3,
+    marginTop: 3
   },
   body: {
-    paddingTop: 6,
+    paddingTop: 6
   },
   surface: {
     borderRadius: 6,
     borderWidth: HAIRLINE_WIDTH,
-    overflow: "hidden",
+    overflow: "hidden"
   },
   surfacePadded: {
-    padding: 10,
-  },
+    padding: 10
+  }
 } as const;

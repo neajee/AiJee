@@ -1,7 +1,6 @@
-import { Spinner, Text, View } from "@/components/dom";
+import { toTailwind } from "@/styles/to-tailwind";
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
-import { Pressable } from "@/components/dom";
-import Animated, { Easing, FadeIn, useAnimatedStyle, useSharedValue, withTiming } from "@/components/dom";
+import Animated, { Easing, FadeIn, useAnimatedStyle, useSharedValue, withTiming } from "@/platform/animation";
 import { ChevronRight, GitFork } from "lucide-react";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { AssistantMessage, MessageToolbar } from "./assistant-message";
@@ -24,7 +23,7 @@ export const TurnBlock = memo(function TurnBlock({
   isDark,
   active,
   onFork,
-  forkingEntryId,
+  forkingEntryId
 }: {
   turn: TurnListItem;
   isDark: boolean;
@@ -46,18 +45,18 @@ export const TurnBlock = memo(function TurnBlock({
   }, [active]);
   const expanded = override ?? autoExpanded;
   const hasWork = turn.steps.length > 0;
-
   const chevronRotate = useSharedValue(expanded ? 90 : 0);
   useEffect(() => {
     chevronRotate.value = withTiming(expanded ? 90 : 0, {
       duration: 180,
-      easing: Easing.out(Easing.cubic),
+      easing: Easing.out(Easing.cubic)
     });
   }, [expanded, chevronRotate]);
   const chevronStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${chevronRotate.value}deg` }],
+    transform: [{
+      rotate: `${chevronRotate.value}deg`
+    }]
   }));
-
   const toggle = useCallback(() => setOverride(!expanded), [expanded]);
 
   // The action row belongs to the whole turn, so hover is tracked here rather
@@ -67,122 +66,68 @@ export const TurnBlock = memo(function TurnBlock({
   // Only worth deriving once the turn reports it touched something.
   const fileChanges = useMemo(() => {
     if (!turn.fileStats) return [];
-    return collectFileChanges(
-      turn.steps.flatMap((step) => (step.kind === "tools" ? step.toolCalls : [])),
-    );
+    return collectFileChanges(turn.steps.flatMap(step => step.kind === "tools" ? step.toolCalls : []));
   }, [turn.fileStats, turn.steps]);
-
   const elapsedMs = useTurnElapsed(active, turn.startedAt);
   const settledMs = turn.durationMs && turn.durationMs > 0 ? turn.durationMs : null;
   const sections = useMemo(() => groupWorkSteps(turn.steps), [turn.steps]);
-  const label = active
-    ? "Working for"
-    : settledMs
-      ? "Worked for"
-      : "Worked";
-  const timeLabel = active
-    ? formatDuration(Math.max(1000, elapsedMs))
-    : settledMs
-      ? formatDuration(settledMs)
-      : null;
-
+  const label = active ? "Working for" : settledMs ? "Worked for" : "Worked";
+  const timeLabel = active ? formatDuration(Math.max(1000, elapsedMs)) : settledMs ? formatDuration(settledMs) : null;
   const showDivider = hasWork || active || !!settledMs;
   const forkEntryId = turn.final?.entryId ?? turn.sourceEntryId;
-
-  const divider = (
-    <View style={styles.dividerWrap}>
-      <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
-      <View style={styles.dividerCenter}>
-        <Text
-          style={[styles.dividerText, { color: colors.textTertiary }]}
-          numberOfLines={1}
-        >
+  const divider = <div className={toTailwind(styles.dividerWrap)}>
+      <div className={toTailwind([styles.dividerLine, {
+      backgroundColor: colors.border
+    }])} />
+      <div className={toTailwind(styles.dividerCenter)}>
+        <span className={toTailwind([styles.dividerText, {
+        color: colors.textTertiary
+      }])}>
           {label}
-        </Text>
-        {timeLabel && (
-          <Text style={[styles.dividerTime, { color: colors.textTertiary }]}>
+        </span>
+        {timeLabel && <span className={toTailwind([styles.dividerTime, {
+        color: colors.textTertiary
+      }])}>
             {timeLabel}
-          </Text>
-        )}
-        {hasWork && (
-          <Animated.View style={[styles.dividerChevron, chevronStyle]}>
+          </span>}
+        {hasWork && <div className={toTailwind([styles.dividerChevron, chevronStyle])}>
             <ChevronRight size={12} color={colors.textTertiary} strokeWidth={2} />
-          </Animated.View>
-        )}
-      </View>
-      <View style={[styles.dividerLine, { backgroundColor: colors.border }]} />
-    </View>
-  );
-
-  return (
-    <View
-      {...(true
-        ? {
-            onPointerEnter: () => setHovered(true),
-            onPointerLeave: () => setHovered(false),
-          }
-        : {})}
-    >
-      {showDivider &&
-        (hasWork ? (
-          <Pressable
-            onPress={toggle}
-            accessibilityRole="button"
-            accessibilityLabel={
-              expanded ? "Collapse work details" : "Expand work details"
-            }
-          >
+          </div>}
+      </div>
+      <div className={toTailwind([styles.dividerLine, {
+      backgroundColor: colors.border
+    }])} />
+    </div>;
+  return <div {...true ? {
+    onPointerEnter: () => setHovered(true),
+    onPointerLeave: () => setHovered(false)
+  } : {}}>
+      {showDivider && (hasWork ? <button onClick={toggle} role="button" aria-label={expanded ? "Collapse work details" : "Expand work details"}>
             {divider}
-          </Pressable>
-        ) : (
-          divider
-        ))}
+          </button> : divider)}
 
-      {hasWork && expanded && (
-        <Animated.View
-          entering={FadeIn.duration(140)}
-          style={[styles.workLog, { borderLeftColor: colors.border }]}
-        >
-          {sections.map((section) =>
-            section.kind === "activity" ? (
-              <WorkActivityGroup key={section.key} steps={section.steps} isDark={isDark} />
-            ) : (
-              <WorkStepView key={section.key} step={section.step} isDark={isDark} />
-            ),
-          )}
-        </Animated.View>
-      )}
+      {hasWork && expanded && <div entering={FadeIn.duration(140)} className={toTailwind([styles.workLog, {
+      borderLeftColor: colors.border
+    }])}>
+          {sections.map(section => section.kind === "activity" ? <WorkActivityGroup key={section.key} steps={section.steps} isDark={isDark} /> : <WorkStepView key={section.key} step={section.step} isDark={isDark} />)}
+        </div>}
 
       {turn.final && <AssistantMessage message={turn.final} isDark={isDark} />}
-      {turn.aborted && (
-        <Text style={[styles.turnNotice, { color: colors.textTertiary }]}>
+      {turn.aborted && <span className={toTailwind([styles.turnNotice, {
+      color: colors.textTertiary
+    }])}>
           Stopped
-        </Text>
-      )}
-      {turn.fileStats && (
-        <TurnSummary stats={turn.fileStats} changes={fileChanges} isDark={isDark} />
-      )}
+        </span>}
+      {turn.fileStats && <TurnSummary stats={turn.fileStats} changes={fileChanges} isDark={isDark} />}
       {/* Last in the turn: the answer, then what it changed, then the actions. */}
-      {turn.final && !turn.final.isStreaming && (turn.final.text || turn.final.errorMessage) && (
-        <View style={styles.turnToolbar}>
+      {turn.final && !turn.final.isStreaming && (turn.final.text || turn.final.errorMessage) && <div className={toTailwind(styles.turnToolbar)}>
           <MessageToolbar message={turn.final} isDark={isDark} hovered={hovered} />
-          {forkEntryId && onFork && (
-            <Pressable
-              onPress={() => onFork(forkEntryId)}
-              disabled={active || !!forkingEntryId}
-              accessibilityRole="button"
-              accessibilityLabel="Fork from this reply"
-              style={styles.actionButton}
-            >
-              {forkingEntryId === forkEntryId ? (
-                <Spinner size="small" color={colors.textTertiary} style={{ width: 12, height: 12 }} />
-              ) : (
-                <GitFork size={14} color={colors.textTertiary} strokeWidth={1.8} />
-              )}
-            </Pressable>
-          )}
-        </View>
-      )}
-    </View>
-  );
+          {forkEntryId && onFork && <button onClick={() => onFork(forkEntryId)} disabled={active || !!forkingEntryId} role="button" aria-label="Fork from this reply" className={toTailwind(styles.actionButton)}>
+              {forkingEntryId === forkEntryId ? <span size="small" color={colors.textTertiary} className={toTailwind({
+          width: 12,
+          height: 12
+        })} /> : <GitFork size={14} color={colors.textTertiary} strokeWidth={1.8} />}
+            </button>}
+        </div>}
+    </div>;
 });

@@ -1,14 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { FlatList, type NativeScrollEvent, type NativeSyntheticEvent } from "@/components/dom";
+import { type NativeScrollEvent, type NativeSyntheticEvent } from "@/types/dom";
+import { VirtualList } from "@/components/ui/virtual-list";
 import { useAgentSession } from "@aijee/client-sdk";
 import type { ChatMessage } from "../agent-types";
 import { buildListItems, reconcileItems, type ListItem } from "../utils/turns";
-
 export interface MessageListProps {
   sessionId: string;
   onForked?: (sessionId: string) => void;
 }
-
 const SCROLL_THRESHOLD = 200;
 const HISTORY_PREFETCH_DISTANCE = 400;
 const ALIGN_SETTLE_MS = 220;
@@ -16,11 +15,21 @@ const ALIGN_TIMEOUT_MS = 4000;
 const PIN_SUPPRESS_MS = 160;
 const ANIMATED_SCROLL_MS = 420;
 const SCROLL_UP_EPSILON = 4;
-
-export function useMessageListController({ sessionId, onForked }: MessageListProps) {
+export function useMessageListController({
+  sessionId,
+  onForked
+}: MessageListProps) {
   const listRef = useRef<FlatList<ListItem>>(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
-  const [editing, setEditing] = useState<{ entryId: string; text: string; images?: Array<{ type: "image"; data: string; mimeType: string }> } | null>(null);
+  const [editing, setEditing] = useState<{
+    entryId: string;
+    text: string;
+    images?: Array<{
+      type: "image";
+      data: string;
+      mimeType: string;
+    }>;
+  } | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [forkingEntryId, setForkingEntryId] = useState<string | null>(null);
   /**
@@ -29,7 +38,6 @@ export function useMessageListController({ sessionId, onForked }: MessageListPro
    * stream was half of the jitter.
    */
   const autoFollowRef = useRef(true);
-
   const session = useAgentSession(sessionId);
   const messages = session.messages as ChatMessage[];
   const isStreaming = session.isStreaming;
@@ -37,7 +45,10 @@ export function useMessageListController({ sessionId, onForked }: MessageListPro
     if (!editing || !editing.text.trim() || isStreaming) return;
     setActionError(null);
     try {
-      await session.prompt(editing.text, { fromEntryId: editing.entryId, images: editing.images });
+      await session.prompt(editing.text, {
+        fromEntryId: editing.entryId,
+        images: editing.images
+      });
       setEditing(null);
     } catch (error) {
       setActionError(error instanceof Error ? error.message : "Failed to edit message");
@@ -67,7 +78,6 @@ export function useMessageListController({ sessionId, onForked }: MessageListPro
   // Keep the native anchor only during an actual prepend. Leaving it enabled
   // for the whole session makes it compete with bottom-follow during streaming.
   const historyAnchor = session.isLoadingOlderMessages;
-
   const prevMessageCountRef = useRef(messages.length);
   /**
    * True until the list has been dragged to the newest message and the content
@@ -90,7 +100,6 @@ export function useMessageListController({ sessionId, onForked }: MessageListPro
   const lastOffsetRef = useRef(0);
   /** A pin issued mid-drag fights the finger; touch always wins. */
   const draggingRef = useRef(false);
-
   const itemsRef = useRef<ListItem[]>([]);
   const items = useMemo(() => {
     const next = reconcileItems(itemsRef.current, buildListItems(messages));
@@ -119,17 +128,17 @@ export function useMessageListController({ sessionId, onForked }: MessageListPro
     pinFrameRef.current = requestAnimationFrame(() => {
       pinFrameRef.current = null;
       pinUntilRef.current = Date.now() + PIN_SUPPRESS_MS;
-      listRef.current?.scrollToEnd({ animated: false });
+      listRef.current?.scrollToEnd({
+        animated: false
+      });
     });
   }, []);
-
   const cancelPin = useCallback(() => {
     if (pinFrameRef.current !== null) {
       cancelAnimationFrame(pinFrameRef.current);
       pinFrameRef.current = null;
     }
   }, []);
-
   useEffect(() => {
     // The opening align owns the offset until it settles.
     if (!autoFollowRef.current || aligningRef.current) return;
@@ -137,14 +146,12 @@ export function useMessageListController({ sessionId, onForked }: MessageListPro
     prevMessageCountRef.current = messages.length;
     if (countChanged) pinToBottom();
   }, [messages.length, pinToBottom]);
-
   const clearAlignTimer = useCallback(() => {
     if (alignSettleRef.current) {
       clearTimeout(alignSettleRef.current);
       alignSettleRef.current = null;
     }
   }, []);
-
   const finishAlign = useCallback(() => {
     clearAlignTimer();
     aligningRef.current = false;
@@ -158,28 +165,30 @@ export function useMessageListController({ sessionId, onForked }: MessageListPro
    * content height stops moving. */
   const alignToLatest = useCallback(() => {
     if (!aligningRef.current || !session.isReady || items.length === 0) return;
-
     if (alignDeadlineRef.current === null) {
       alignDeadlineRef.current = Date.now() + ALIGN_TIMEOUT_MS;
     }
-
-    listRef.current?.scrollToEnd({ animated: false });
+    listRef.current?.scrollToEnd({
+      animated: false
+    });
     // A second pass after layout catches the rows this frame just measured.
     requestAnimationFrame(() => {
-      if (aligningRef.current) listRef.current?.scrollToEnd({ animated: false });
+      if (aligningRef.current) listRef.current?.scrollToEnd({
+        animated: false
+      });
     });
-
     clearAlignTimer();
     if (Date.now() > alignDeadlineRef.current) {
       finishAlign();
       return;
     }
     alignSettleRef.current = setTimeout(() => {
-      listRef.current?.scrollToEnd({ animated: false });
+      listRef.current?.scrollToEnd({
+        animated: false
+      });
       finishAlign();
     }, ALIGN_SETTLE_MS);
   }, [clearAlignTimer, finishAlign, items.length, session.isReady]);
-
   useEffect(() => {
     alignToLatest();
   }, [alignToLatest]);
@@ -209,70 +218,61 @@ export function useMessageListController({ sessionId, onForked }: MessageListPro
     }
     if (autoFollowRef.current) pinToBottom();
   }, [alignToLatest, pinToBottom]);
-
   const sessionRef = useRef(session);
   sessionRef.current = session;
-
   const handleLoadMore = useCallback(() => {
     const s = sessionRef.current;
     if (s.hasMoreMessages && !s.isLoadingOlderMessages) {
       s.loadOlderMessages();
     }
   }, []);
+  const handleScroll = useCallback((e: NativeSyntheticEvent<NativeScrollEvent>) => {
+    const {
+      contentOffset,
+      contentSize,
+      layoutMeasurement
+    } = e.nativeEvent;
+    const distanceFromBottom = contentSize.height - layoutMeasurement.height - contentOffset.y;
+    const offset = contentOffset.y;
+    const scrolledUp = offset < lastOffsetRef.current - SCROLL_UP_EPSILON;
+    lastOffsetRef.current = offset;
+    if (aligningRef.current) {
+      // Our own offset. Record the height so the first reader-driven scroll
+      // after the align cannot immediately read as "new content at the top".
+      lastPrefetchHeightRef.current = contentSize.height;
+      return;
+    }
 
-  const handleScroll = useCallback(
-    (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-      const { contentOffset, contentSize, layoutMeasurement } = e.nativeEvent;
-      const distanceFromBottom =
-        contentSize.height - layoutMeasurement.height - contentOffset.y;
-      const offset = contentOffset.y;
-      const scrolledUp = offset < lastOffsetRef.current - SCROLL_UP_EPSILON;
-      lastOffsetRef.current = offset;
+    // A pin only ever moves the offset toward the bottom, so an upward move is
+    // the reader even inside the suppression window; anything else in that
+    // window is the echo of our own scroll and must be ignored.
+    if (!scrolledUp && Date.now() < pinUntilRef.current) return;
+    const isAwayFromBottom = distanceFromBottom > SCROLL_THRESHOLD;
+    if (autoFollowRef.current === isAwayFromBottom) {
+      autoFollowRef.current = !isAwayFromBottom;
+      // Leaving the bottom cancels the pin already queued for this frame,
+      // otherwise the reader's scroll-up is undone before they see it.
+      if (isAwayFromBottom) cancelPin();
+    }
+    setShowScrollButton(prev => prev === isAwayFromBottom ? prev : isAwayFromBottom);
 
-      if (aligningRef.current) {
-        // Our own offset. Record the height so the first reader-driven scroll
-        // after the align cannot immediately read as "new content at the top".
-        lastPrefetchHeightRef.current = contentSize.height;
-        return;
-      }
-
-      // A pin only ever moves the offset toward the bottom, so an upward move is
-      // the reader even inside the suppression window; anything else in that
-      // window is the echo of our own scroll and must be ignored.
-      if (!scrolledUp && Date.now() < pinUntilRef.current) return;
-
-      const isAwayFromBottom = distanceFromBottom > SCROLL_THRESHOLD;
-      if (autoFollowRef.current === isAwayFromBottom) {
-        autoFollowRef.current = !isAwayFromBottom;
-        // Leaving the bottom cancels the pin already queued for this frame,
-        // otherwise the reader's scroll-up is undone before they see it.
-        if (isAwayFromBottom) cancelPin();
-      }
-      setShowScrollButton((prev) => (prev === isAwayFromBottom ? prev : isAwayFromBottom));
-
-      // Older history is prepended at the top. Derive this from every scroll
-      // event instead of onEndReached, whose initial fire can happen before the
-      // history request reports that another page is available.
-      const distanceFromOldest = offset;
-      if (
-        !autoFollowRef.current &&
-        distanceFromOldest <= HISTORY_PREFETCH_DISTANCE &&
-        contentSize.height !== lastPrefetchHeightRef.current
-      ) {
-        lastPrefetchHeightRef.current = contentSize.height;
-        handleLoadMore();
-      }
-    },
-    [handleLoadMore, cancelPin],
-  );
-
+    // Older history is prepended at the top. Derive this from every scroll
+    // event instead of onEndReached, whose initial fire can happen before the
+    // history request reports that another page is available.
+    const distanceFromOldest = offset;
+    if (!autoFollowRef.current && distanceFromOldest <= HISTORY_PREFETCH_DISTANCE && contentSize.height !== lastPrefetchHeightRef.current) {
+      lastPrefetchHeightRef.current = contentSize.height;
+      handleLoadMore();
+    }
+  }, [handleLoadMore, cancelPin]);
   const scrollToBottom = useCallback(() => {
     finishAlign();
     // Reader-initiated, so animation is a cue rather than a competitor.
-    listRef.current?.scrollToEnd({ animated: true });
+    listRef.current?.scrollToEnd({
+      animated: true
+    });
     pinUntilRef.current = Date.now() + ANIMATED_SCROLL_MS;
   }, [finishAlign]);
-
   const handleScrollBeginDrag = useCallback(() => {
     draggingRef.current = true;
     cancelPin();
@@ -281,29 +281,35 @@ export function useMessageListController({ sessionId, onForked }: MessageListPro
     // was meant to break out of.
     if (aligningRef.current) finishAlign();
   }, [finishAlign, cancelPin]);
-
   const handleScrollEndDrag = useCallback(() => {
     draggingRef.current = false;
   }, []);
-
-
   const startEditing = useCallback((message: ChatMessage) => {
     if (!message.entryId) return;
     setActionError(null);
     setEditing({
       entryId: message.entryId,
       text: message.text,
-      ...(message.attachments?.length
-        ? { images: message.attachments.map(({ data, mimeType }) => ({ type: "image" as const, data, mimeType })) }
-        : {}),
+      ...(message.attachments?.length ? {
+        images: message.attachments.map(({
+          data,
+          mimeType
+        }) => ({
+          type: "image" as const,
+          data,
+          mimeType
+        }))
+      } : {})
     });
   }, []);
   const changeEditingText = useCallback((text: string) => {
-    setEditing((current) => current ? { ...current, text } : current);
+    setEditing(current => current ? {
+      ...current,
+      text
+    } : current);
   }, []);
   const cancelEditing = useCallback(() => setEditing(null), []);
   const clearActionError = useCallback(() => setActionError(null), []);
-
   return {
     session,
     messages,
@@ -328,8 +334,7 @@ export function useMessageListController({ sessionId, onForked }: MessageListPro
     handleContentSizeChange,
     handleScrollBeginDrag,
     handleScrollEndDrag,
-    scrollToBottom,
+    scrollToBottom
   };
 }
-
 export type MessageListController = ReturnType<typeof useMessageListController>;

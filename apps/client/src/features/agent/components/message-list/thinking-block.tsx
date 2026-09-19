@@ -1,26 +1,16 @@
-import { Text, View } from "@/components/dom";
+import { toTailwind } from "@/styles/to-tailwind";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Pressable } from "@/components/dom";
 import { Brain, ChevronRight } from "lucide-react";
-import Animated, {
-  Easing,
-  useAnimatedStyle,
-  useSharedValue,
-  withRepeat,
-  withSequence,
-  withTiming,
-} from "@/components/dom";
+import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from "@/platform/animation";
 import { Colors, Fonts } from "@/constants/theme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { AnimatedCollapse } from "./animated-collapse";
 import { formatDuration } from "../../utils/turns";
-
 interface ThinkingBlockProps {
   text: string;
   isStreaming?: boolean;
   isDark: boolean;
 }
-
 const BREATH_DURATION = 900;
 const BREATH_MIN_OPACITY = 0.45;
 
@@ -34,17 +24,15 @@ function lastLineOf(text: string): string {
   }
   return "";
 }
-
 export const ThinkingBlock = memo(function ThinkingBlock({
   text,
   isStreaming,
-  isDark,
+  isDark
 }: ThinkingBlockProps) {
   const colors = useThemeTokens();
   const [expanded, setExpanded] = useState(false);
-
   const toggle = useCallback(() => {
-    setExpanded((prev) => !prev);
+    setExpanded(prev => !prev);
   }, []);
 
   // Breathing label instead of animated dots: runs on the UI thread, so
@@ -52,34 +40,33 @@ export const ThinkingBlock = memo(function ThinkingBlock({
   const breath = useSharedValue(1);
   useEffect(() => {
     if (!isStreaming) {
-      breath.value = withTiming(1, { duration: 200 });
+      breath.value = withTiming(1, {
+        duration: 200
+      });
       return;
     }
-    breath.value = withRepeat(
-      withSequence(
-        withTiming(BREATH_MIN_OPACITY, {
-          duration: BREATH_DURATION,
-          easing: Easing.inOut(Easing.ease),
-        }),
-        withTiming(1, {
-          duration: BREATH_DURATION,
-          easing: Easing.inOut(Easing.ease),
-        }),
-      ),
-      -1,
-    );
+    breath.value = withRepeat(withSequence(withTiming(BREATH_MIN_OPACITY, {
+      duration: BREATH_DURATION,
+      easing: Easing.inOut(Easing.ease)
+    }), withTiming(1, {
+      duration: BREATH_DURATION,
+      easing: Easing.inOut(Easing.ease)
+    })), -1);
   }, [isStreaming, breath]);
-  const breathStyle = useAnimatedStyle(() => ({ opacity: breath.value }));
-
+  const breathStyle = useAnimatedStyle(() => ({
+    opacity: breath.value
+  }));
   const chevronRotate = useSharedValue(expanded ? 90 : 0);
   useEffect(() => {
     chevronRotate.value = withTiming(expanded ? 90 : 0, {
       duration: 180,
-      easing: Easing.out(Easing.cubic),
+      easing: Easing.out(Easing.cubic)
     });
   }, [expanded, chevronRotate]);
   const chevronStyle = useAnimatedStyle(() => ({
-    transform: [{ rotate: `${chevronRotate.value}deg` }],
+    transform: [{
+      rotate: `${chevronRotate.value}deg`
+    }]
   }));
 
   // Only report a duration we actually observed: history loaded from the
@@ -96,77 +83,52 @@ export const ThinkingBlock = memo(function ThinkingBlock({
       startedAt.current = null;
     }
   }, [isStreaming]);
-
-  const peek = useMemo(
-    () => (isStreaming && !expanded ? lastLineOf(text) : ""),
-    [isStreaming, expanded, text],
-  );
-
+  const peek = useMemo(() => isStreaming && !expanded ? lastLineOf(text) : "", [isStreaming, expanded, text]);
   if (!text && !isStreaming) return null;
-
-  const label = isStreaming
-    ? "Thinking"
-    : durationMs && durationMs >= 1000
-      ? `Thought for ${formatDuration(durationMs)}`
-      : "Thought";
+  const label = isStreaming ? "Thinking" : durationMs && durationMs >= 1000 ? `Thought for ${formatDuration(durationMs)}` : "Thought";
 
   // While streaming and folded, the row *is* the live tail: icon, the line the
   // model is on, and the disclosure. Two rows (a label plus a preview) spent a
   // whole line saying "Thinking", which the moving text already says.
   const headline = peek || label;
-
-  return (
-    <View>
-      <Pressable
-        onPress={toggle}
-        disabled={!text}
-        accessibilityRole="button"
-        accessibilityLabel={expanded ? "Collapse thinking" : "Expand thinking"}
-        accessibilityState={{ expanded }}
-        style={styles.header}
-      >
-        <Animated.View style={breathStyle}>
+  return <div>
+      <button onClick={toggle} disabled={!text} role="button" aria-label={expanded ? "Collapse thinking" : "Expand thinking"} accessibilityState={{
+      expanded
+    }} className={toTailwind(styles.header)}>
+        <div className={toTailwind(breathStyle)}>
           <Brain size={12} color={colors.textTertiary} strokeWidth={1.8} />
-        </Animated.View>
-        <Animated.Text
-          style={[
-            styles.label,
-            peek ? styles.peekText : null,
-            { color: colors.textTertiary },
-            peek ? null : breathStyle,
-          ]}
-          numberOfLines={1}
-          ellipsizeMode="tail"
-        >
+        </div>
+        <span className={toTailwind([styles.label, peek ? styles.peekText : null, {
+        color: colors.textTertiary
+      }, peek ? null : breathStyle])} ellipsizeMode="tail">
           {headline}
-        </Animated.Text>
-        {!!text && (
-          <Animated.View style={chevronStyle}>
+        </span>
+        {!!text && <div className={toTailwind(chevronStyle)}>
             <ChevronRight size={11} color={colors.textTertiary} strokeWidth={2} />
-          </Animated.View>
-        )}
-      </Pressable>
+          </div>}
+      </button>
 
       <AnimatedCollapse expanded={expanded}>
-        <Text style={[styles.text, { color: colors.textSecondary }]} selectable>
+        <span className={toTailwind([styles.text, {
+        color: colors.textSecondary
+      }])} selectable>
           {text}
-        </Text>
+        </span>
       </AnimatedCollapse>
-    </View>
-  );
+    </div>;
 });
-
 const styles = {
   header: {
     flexDirection: "row",
     alignItems: "center",
     gap: 5,
-    paddingTop: 4, paddingBottom: 4,
+    paddingTop: 4,
+    paddingBottom: 4
   },
   label: {
     fontSize: 12,
     fontFamily: Fonts.sansSemiBold,
-    fontWeight: "600",
+    fontWeight: "600"
   },
   /** The live tail reads as prose, so it drops the label's weight. */
   peekText: {
@@ -174,13 +136,13 @@ const styles = {
     fontFamily: Fonts.sans,
     fontWeight: "400",
     lineHeight: 18,
-    opacity: 0.85,
+    opacity: 0.85
   },
   text: {
     fontSize: 12,
     lineHeight: 18,
     fontFamily: Fonts.sans,
     paddingTop: 2,
-    paddingBottom: 6,
-  },
+    paddingBottom: 6
+  }
 } as const;

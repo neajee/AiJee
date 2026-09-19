@@ -1,13 +1,11 @@
-import { ScrollView, Text, View } from "@/components/dom";
+import { toTailwind } from "@/styles/to-tailwind";
 import { memo, useCallback, useRef, useState } from "react";
-import { type ScrollView as RNScrollView } from "@/components/dom";
 import { Colors, Fonts } from "@/constants/theme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import type { ToolCallInfo } from "../agent-types";
 import { parseToolArguments, truncateOutput } from "../../../utils/message-list";
 import { ToolBody, ToolHeader, ToolSurface } from "./tool-disclosure";
 import { ToolResultImages } from "./tool-result-images";
-
 interface BashToolCallProps {
   tc: ToolCallInfo;
   isDark: boolean;
@@ -20,114 +18,98 @@ interface BashToolCallProps {
  * runaway `cat` cannot render megabytes into the list.
  */
 const BASH_OUTPUT_MAX_HEIGHT = 420;
-
 export const BashToolCall = memo(function BashToolCall({
   tc,
-  isDark,
+  isDark
 }: BashToolCallProps) {
   const colors = useThemeTokens();
   // Results stay collapsed by default, even while the tool is running.
   const [expanded, setExpanded] = useState(false);
-  const toggle = useCallback(() => setExpanded((p) => !p), []);
+  const toggle = useCallback(() => setExpanded(p => !p), []);
   // While streaming, the panel tracks the tail of the output so the reader
   // always sees the newest lines; dragging inside the panel stops the chase.
   const scrollRef = useRef<RNScrollView>(null);
   const followTailRef = useRef(true);
   const handleOutputGrowth = useCallback(() => {
     if (expanded && followTailRef.current) {
-      scrollRef.current?.scrollToEnd({ animated: false });
+      scrollRef.current?.scrollToEnd({
+        animated: false
+      });
     }
   }, [expanded]);
   const stopFollowing = useCallback(() => {
     followTailRef.current = false;
   }, []);
-
   const parsed = parseToolArguments(tc.arguments);
-  const rawCommand = (parsed.command as string) || "";
+  const rawCommand = parsed.command as string || "";
   const cdMatch = rawCommand.match(/^cd\s+(.+?)\s*&&\s*(.+)/);
   const command = cdMatch ? cdMatch[2]!.trim() : rawCommand;
   const cdPath = cdMatch ? cdMatch[1]!.trim() : undefined;
   const output = tc.result || tc.partialResult || "";
-  const { text: displayOutput, truncated } = truncateOutput(output);
+  const {
+    text: displayOutput,
+    truncated
+  } = truncateOutput(output);
   const hasOutput = !!displayOutput;
-
-  return (
-    <View>
-      <ToolHeader
-        expanded={expanded}
-        expandable={hasOutput}
-        onToggle={toggle}
-        isDark={isDark}
-        accessibilityLabel={`${expanded ? "Collapse" : "Expand"} output of ${command || "bash"}`}
-      >
-        <Text
-          style={[styles.ranLabel, { color: colors.textSecondary }]}
-          numberOfLines={1}
-          ellipsizeMode="tail"
-        >
-          Ran <Text style={[styles.command, { color: colors.text }]}>{command || "bash"}</Text>
-          {cdPath ? (
-            <Text>
+  return <div>
+      <ToolHeader expanded={expanded} expandable={hasOutput} onToggle={toggle} isDark={isDark} aria-label={`${expanded ? "Collapse" : "Expand"} output of ${command || "bash"}`}>
+        <span className={toTailwind([styles.ranLabel, {
+        color: colors.textSecondary
+      }])} ellipsizeMode="tail">
+          Ran <span className={toTailwind([styles.command, {
+          color: colors.text
+        }])}>{command || "bash"}</span>
+          {cdPath ? <span>
               {" in "}
-              <Text style={[styles.command, { color: colors.text }]}>{cdPath}</Text>
-            </Text>
-          ) : null}
-        </Text>
+              <span className={toTailwind([styles.command, {
+            color: colors.text
+          }])}>{cdPath}</span>
+            </span> : null}
+        </span>
       </ToolHeader>
 
-      {hasOutput && (
-        <ToolBody expanded={expanded}>
+      {hasOutput && <ToolBody expanded={expanded}>
           <ToolSurface isDark={isDark}>
-            <ScrollView
-              ref={scrollRef}
-              style={styles.scroll}
-              nestedScrollEnabled
-              showsVerticalScrollIndicator
-              onContentSizeChange={handleOutputGrowth}
-              onScrollBeginDrag={stopFollowing}
-            >
-              <Text style={[styles.outputText, { color: colors.textSecondary }]} selectable>
+            <div ref={scrollRef} className={toTailwind(styles.scroll)} nestedScrollEnabled onContentSizeChange={handleOutputGrowth} onScrollBeginDrag={stopFollowing}>
+              <span className={toTailwind([styles.outputText, {
+            color: colors.textSecondary
+          }])} selectable>
                 {displayOutput}
-              </Text>
-              {truncated && (
-                <Text style={[styles.truncatedText, { color: colors.textTertiary }]}>
+              </span>
+              {truncated && <span className={toTailwind([styles.truncatedText, {
+            color: colors.textTertiary
+          }])}>
                   … output truncated
-                </Text>
-              )}
-            </ScrollView>
+                </span>}
+            </div>
           </ToolSurface>
-        </ToolBody>
-      )}
+        </ToolBody>}
 
-      {tc.resultImages && tc.resultImages.length > 0 && (
-        <ToolResultImages images={tc.resultImages} isDark={isDark} />
-      )}
-    </View>
-  );
+      {tc.resultImages && tc.resultImages.length > 0 && <ToolResultImages images={tc.resultImages} isDark={isDark} />}
+    </div>;
 });
-
 const styles = {
   ranLabel: {
     fontSize: 12,
     fontFamily: Fonts.sans,
-    flexShrink: 1,
+    flexShrink: 1
   },
   command: {
     fontSize: 12,
-    fontFamily: Fonts.mono,
+    fontFamily: Fonts.mono
   },
   scroll: {
-    maxHeight: BASH_OUTPUT_MAX_HEIGHT,
+    maxHeight: BASH_OUTPUT_MAX_HEIGHT
   },
   outputText: {
     fontSize: 11,
     lineHeight: 16,
-    fontFamily: Fonts.mono,
+    fontFamily: Fonts.mono
   },
   truncatedText: {
     fontSize: 10,
     fontFamily: Fonts.mono,
     fontStyle: "italic",
-    marginTop: 6,
-  },
+    marginTop: 6
+  }
 } as const;

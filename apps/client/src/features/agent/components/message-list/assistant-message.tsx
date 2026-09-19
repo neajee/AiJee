@@ -1,21 +1,14 @@
-import { Text, View } from "@/components/dom";
+import { toTailwind } from "@/styles/to-tailwind";
 import { memo, useCallback, useEffect, useState } from "react";
-import { Pressable } from "@/components/dom";
 import * as Clipboard from "@/platform/clipboard";
 import { Copy } from "lucide-react";
-import Animated, {
-  useSharedValue,
-  useAnimatedStyle,
-  withTiming,
-  Easing,
-} from "@/components/dom";
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing } from "@/platform/animation";
 import { Colors, Fonts } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import type { ChatMessage } from "../agent-types";
 import { AssistantMarkdown } from "./assistant-markdown";
 import { StreamingCursor } from "./streaming-cursor";
-
 interface AssistantMessageProps {
   message: ChatMessage;
   isDark: boolean;
@@ -28,58 +21,43 @@ interface AssistantMessageProps {
  * the decision lives here next to the toolbar it gates.
  */
 export function hasMessageActions(message: ChatMessage) {
-  return (
-    !message.isStreaming &&
-    message.stopReason === "stop" &&
-    (!!message.text || !!message.errorMessage)
-  );
+  return !message.isStreaming && message.stopReason === "stop" && (!!message.text || !!message.errorMessage);
 }
-
 export const AssistantMessage = memo(function AssistantMessage({
   message,
-  isDark,
+  isDark
 }: AssistantMessageProps) {
   const colorScheme = useColorScheme() ?? "light";
   const colors = useThemeTokens();
-
   const hasText = !!message.text;
   const hasError = !!message.errorMessage;
   const isStreaming = !!message.isStreaming;
-
-  return (
-    <View style={styles.container}>
-      {hasText && (
-        <View style={styles.textBlock}>
+  return <div className={toTailwind(styles.container)}>
+      {hasText && <div className={toTailwind(styles.textBlock)}>
           <AssistantMarkdown text={message.text} isStreaming={isStreaming} />
-        </View>
-      )}
+        </div>}
 
-      {hasError && (
-        <View
-          style={[
-            styles.errorBlock,
-            { backgroundColor: isDark ? "rgba(255,69,58,0.08)" : "rgba(255,59,48,0.05)" },
-          ]}
-        >
-          <Text style={[styles.errorText, { color: colors.destructive }]}>
+      {hasError && <div className={toTailwind([styles.errorBlock, {
+      backgroundColor: isDark ? "rgba(255,69,58,0.08)" : "rgba(255,59,48,0.05)"
+    }])}>
+          <span className={toTailwind([styles.errorText, {
+        color: colors.destructive
+      }])}>
             {message.errorMessage}
-          </Text>
-        </View>
-      )}
+          </span>
+        </div>}
 
-      {isStreaming && !hasText && (
-        <StreamingCursor color={colors.textTertiary} />
-      )}
-    </View>
-  );
+      {isStreaming && !hasText && <StreamingCursor color={colors.textTertiary} />}
+    </div>;
 });
-
-const FADE = { duration: 150, easing: Easing.out(Easing.cubic) };
-
+const FADE = {
+  duration: 150,
+  easing: Easing.out(Easing.cubic)
+};
 export const MessageToolbar = memo(function MessageToolbar({
   message,
   isDark,
-  hovered,
+  hovered
 }: {
   message: ChatMessage;
   isDark: boolean;
@@ -87,80 +65,75 @@ export const MessageToolbar = memo(function MessageToolbar({
 }) {
   const colors = useThemeTokens();
   const [copied, setCopied] = useState(false);
-
   const opacity = useSharedValue(0);
   useEffect(() => {
     opacity.value = withTiming(hovered ? 1 : 0, FADE);
   }, [hovered, opacity]);
-  const animStyle = useAnimatedStyle(() => ({ opacity: opacity.value }));
-
+  const animStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value
+  }));
   const handleCopy = useCallback(async () => {
     if (!message.text) return;
     await Clipboard.setStringAsync(message.text);
     setCopied(true);
     setTimeout(() => setCopied(false), 1500);
   }, [message.text]);
-
-  return (
-    <>
-      <View style={styles.toolbarWrap}>
-        <Animated.View style={[styles.toolbar, animStyle]}>
-          <View style={styles.toolbarBtns}>
-            <Pressable
-              onPress={handleCopy}
-              style={[styles.toolbarBtn, copied && { backgroundColor: colors.surfaceRaised }]}
-              hitSlop={4}
-            >
-              {copied ? (
-                <Text style={[styles.copiedText, { color: colors.textTertiary }]}>✓</Text>
-              ) : (
-                <Copy size={13} color={colors.textTertiary} strokeWidth={1.8} />
-              )}
-            </Pressable>
-          </View>
-        </Animated.View>
-      </View>
-    </>
-  );
+  return <>
+      <div className={toTailwind(styles.toolbarWrap)}>
+        <div className={toTailwind([styles.toolbar, animStyle])}>
+          <div className={toTailwind(styles.toolbarBtns)}>
+            <button onClick={handleCopy} className={toTailwind([styles.toolbarBtn, copied && {
+            backgroundColor: colors.surfaceRaised
+          }])} hitSlop={4}>
+              {copied ? <span className={toTailwind([styles.copiedText, {
+              color: colors.textTertiary
+            }])}>✓</span> : <Copy size={13} color={colors.textTertiary} strokeWidth={1.8} />}
+            </button>
+          </div>
+        </div>
+      </div>
+    </>;
 });
-
-
 const styles = {
   container: {
-    paddingLeft: 16, paddingRight: 16,
-    paddingTop: 4, paddingBottom: 4,
-    gap: 12,
+    paddingLeft: 16,
+    paddingRight: 16,
+    paddingTop: 4,
+    paddingBottom: 4,
+    gap: 12
   },
   textBlock: {},
   errorBlock: {
     borderRadius: 6,
-    paddingLeft: 10, paddingRight: 10,
-    paddingTop: 6, paddingBottom: 6,
+    paddingLeft: 10,
+    paddingRight: 10,
+    paddingTop: 6,
+    paddingBottom: 6
   },
   errorText: {
     fontSize: 12,
     lineHeight: 18,
-    fontFamily: Fonts.sans,
+    fontFamily: Fonts.sans
   },
   toolbar: {},
   toolbarBtns: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 2,
+    gap: 2
   },
   toolbarBtn: {
     width: 26,
     height: 26,
     borderRadius: 6,
     alignItems: "center",
-    justifyContent: "center",
+    justifyContent: "center"
   },
   copiedText: {
     fontSize: 12,
-    fontFamily: Fonts.sans,
+    fontFamily: Fonts.sans
   },
   toolbarWrap: {
     position: "relative",
-    zIndex: 20,
-  },
+    zIndex: 20
+  }
 } as const;

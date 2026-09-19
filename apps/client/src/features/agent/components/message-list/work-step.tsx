@@ -1,45 +1,33 @@
-import { View } from "@/components/dom";
+import { toTailwind } from "@/styles/to-tailwind";
 import { memo } from "react";
-import { Text } from "@/components/dom";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { AssistantMarkdown } from "./assistant-markdown";
 import { ToolCallGroup } from "./tool-call";
 import { ThinkingBlock } from "./thinking-block";
 import type { WorkStep } from "../../utils/turns";
 import { styles } from "./style-tokens";
-
 export const WorkStepView = memo(function WorkStepView({
   step,
-  isDark,
+  isDark
 }: {
   step: WorkStep;
   isDark: boolean;
 }) {
   const colors = useThemeTokens();
-
   switch (step.kind) {
     case "thinking":
-      return (
-        <ThinkingBlock text={step.text} isStreaming={step.streaming} isDark={isDark} />
-      );
+      return <ThinkingBlock text={step.text} isStreaming={step.streaming} isDark={isDark} />;
     case "text":
-      return (
-        <View style={styles.stepText}>
+      return <div className={toTailwind(styles.stepText)}>
           <AssistantMarkdown text={step.text} />
-        </View>
-      );
+        </div>;
     case "error":
-      return (
-        <Text style={[styles.stepError, { color: colors.destructive }]}>
+      return <span className={toTailwind([styles.stepError, {
+        color: colors.destructive
+      }])}>
           {step.text}
-        </Text>
-      );
+        </span>;
     case "tools":
-      return (
-        <ToolCallGroup
-          toolCalls={step.toolCalls}
-          isDark={isDark}
-        />
-      );
+      return <ToolCallGroup toolCalls={step.toolCalls} isDark={isDark} />;
   }
 });

@@ -1,5 +1,4 @@
-import type { Animated } from "@/components/dom";
-
+import { Animated } from "@/platform/animation";
 export interface ConnectionStatusBannerViewProps {
   bottomPad: number;
   heightAnim: Animated.Value;

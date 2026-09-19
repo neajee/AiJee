@@ -1,8 +1,7 @@
-import { Spinner, Text, View } from "@/components/dom";
-import { Animated, Pressable } from "@/components/dom";
+import { toTailwind } from "@/styles/to-tailwind";
+import { Animated } from "@/platform/animation";
 import { styles } from './style-tokens';
 import type { ConnectionStatusBannerViewProps } from './component-types';
-
 export function ConnectionStatusBannerView({
   bottomPad,
   heightAnim,
@@ -12,42 +11,27 @@ export function ConnectionStatusBannerView({
   isAttemptInFlight,
   isWaitingToRetry,
   message,
-  onRetry,
+  onRetry
 }: ConnectionStatusBannerViewProps) {
-  return (
-    <Animated.View style={[styles.strip, { height: heightAnim, paddingBottom: bottomPad }]}>
-      <View style={[styles.content, isCompact && styles.contentCompact]}>
-        <Text style={styles.text} numberOfLines={isCompact ? 2 : 1}>
+  return <div className={toTailwind([styles.strip, {
+    height: heightAnim,
+    paddingBottom: bottomPad
+  }])}>
+      <div className={toTailwind([styles.content, isCompact && styles.contentCompact])}>
+        <span className={toTailwind(styles.text)}>
           {message}
-        </Text>
-        <Pressable
-          accessibilityRole="button"
-          accessibilityState={{ busy: isAttemptInFlight, disabled: isAttemptInFlight }}
-          disabled={isAttemptInFlight}
-          onPress={onRetry}
-          style={({ pressed }) => [
-            styles.retryButton,
-            isReconnecting && styles.retryButtonBusy,
-            isAttemptInFlight && styles.retryButtonDisabled,
-            pressed && styles.retryButtonPressed,
-          ]}
-        >
-          <View style={styles.retryButtonContent}>
-            {isAttemptInFlight ? (
-              <Spinner size="small" color="#A22E26" style={styles.retrySpinner} />
-            ) : null}
-            <Text style={styles.retryButtonText}>
-              {hasConnectionIssue
-                ? isWaitingToRetry
-                  ? 'Retry now'
-                  : isAttemptInFlight
-                    ? 'Retrying…'
-                    : 'Retry'
-                : 'Dismiss'}
-            </Text>
-          </View>
-        </Pressable>
-      </View>
-    </Animated.View>
-  );
+        </span>
+        <button role="button" accessibilityState={{
+        busy: isAttemptInFlight,
+        disabled: isAttemptInFlight
+      }} disabled={isAttemptInFlight} onClick={onRetry}>
+          <div className={toTailwind(styles.retryButtonContent)}>
+            {isAttemptInFlight ? <span size="small" color="#A22E26" className={toTailwind(styles.retrySpinner)} /> : null}
+            <span className={toTailwind(styles.retryButtonText)}>
+              {hasConnectionIssue ? isWaitingToRetry ? 'Retry now' : isAttemptInFlight ? 'Retrying…' : 'Retry' : 'Dismiss'}
+            </span>
+          </div>
+        </button>
+      </div>
+    </div>;
 }

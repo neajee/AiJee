@@ -1,16 +1,14 @@
-import { View } from "@/components/dom";
+import { toTailwind } from "@/styles/to-tailwind";
 import { memo } from "react";
-import { Text } from "@/components/dom";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { basename, relativePath, type TurnFileChange } from "../../utils/message-list";
 import { styles } from "./style-tokens";
-
 export const FileChangeRow = memo(function FileChangeRow({
   change,
   root,
   addColor,
   removeColor,
-  isDark,
+  isDark
 }: {
   change: TurnFileChange;
   root: string | null;
@@ -23,28 +21,28 @@ export const FileChangeRow = memo(function FileChangeRow({
   const shown = relativePath(change.path, root);
   const name = basename(shown);
   const dir = shown.slice(0, shown.length - name.length);
-
-  return (
-    <View style={styles.fileRow}>
-      <Text
-        style={[styles.fileKind, { color: created ? addColor : colors.textTertiary }]}
-        accessibilityLabel={created ? "created" : "edited"}
-      >
+  return <div className={toTailwind(styles.fileRow)}>
+      <span className={toTailwind([styles.fileKind, {
+      color: created ? addColor : colors.textTertiary
+    }])} aria-label={created ? "created" : "edited"}>
         {created ? "A" : "M"}
-      </Text>
+      </span>
       {/* Head-truncated with a dimmed directory: the filename is what is read. */}
-      <Text style={styles.filePath} numberOfLines={1} ellipsizeMode="head">
-        {dir ? <Text style={{ color: colors.textTertiary }}>{dir}</Text> : null}
-        <Text style={{ color: colors.text }}>{name}</Text>
-      </Text>
-      <View style={styles.fileCounts}>
-        {change.added > 0 && (
-          <Text style={[styles.fileCount, { color: addColor }]}>+{change.added}</Text>
-        )}
-        {change.removed > 0 && (
-          <Text style={[styles.fileCount, { color: removeColor }]}>{"−"}{change.removed}</Text>
-        )}
-      </View>
-    </View>
-  );
+      <span className={toTailwind(styles.filePath)} ellipsizeMode="head">
+        {dir ? <span className={toTailwind({
+        color: colors.textTertiary
+      })}>{dir}</span> : null}
+        <span className={toTailwind({
+        color: colors.text
+      })}>{name}</span>
+      </span>
+      <div className={toTailwind(styles.fileCounts)}>
+        {change.added > 0 && <span className={toTailwind([styles.fileCount, {
+        color: addColor
+      }])}>+{change.added}</span>}
+        {change.removed > 0 && <span className={toTailwind([styles.fileCount, {
+        color: removeColor
+      }])}>{"−"}{change.removed}</span>}
+      </div>
+    </div>;
 });

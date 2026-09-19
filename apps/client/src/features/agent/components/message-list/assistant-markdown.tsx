@@ -4,7 +4,6 @@ import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { useAppSettingsStore } from "@/features/settings/store";
 import { useStableMarkdown } from "../../hooks/use-stable-markdown";
 import { createMarkedOptions } from "../../theme";
-
 interface AssistantMarkdownProps {
   text: string;
   isStreaming?: boolean;
@@ -16,11 +15,11 @@ interface AssistantMarkdownProps {
  */
 export const AssistantMarkdown = memo(function AssistantMarkdown({
   text,
-  isStreaming,
+  isStreaming
 }: AssistantMarkdownProps) {
   const colorScheme = useColorScheme() ?? "light";
   const tokens = useThemeTokens();
-  const codeFontSize = useAppSettingsStore((s) => s.codeFontSize);
+  const codeFontSize = useAppSettingsStore(s => s.codeFontSize);
   const options = createMarkedOptions(tokens, colorScheme, codeFontSize);
   const elements = useStableMarkdown(text, options, isStreaming);
   return <>{elements}</>;

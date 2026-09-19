@@ -1,12 +1,10 @@
-import { Text, View } from "@/components/dom";
+import { toTailwind } from "@/styles/to-tailwind";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
-import { Pressable } from "@/components/dom";
 import * as Clipboard from "@/platform/clipboard";
 import { Check, Copy } from "lucide-react";
 import { Colors, Fonts } from "@/constants/theme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { CodePreview } from "./code-preview";
-
 interface MarkdownCodeBlockProps {
   code: string;
   language?: string;
@@ -24,72 +22,53 @@ interface MarkdownCodeBlockProps {
 export const MarkdownCodeBlock = memo(function MarkdownCodeBlock({
   code,
   language,
-  isDark,
+  isDark
 }: MarkdownCodeBlockProps) {
   const colors = useThemeTokens();
   const [copied, setCopied] = useState(false);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  useEffect(
-    () => () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    },
-    [],
-  );
-
+  useEffect(() => () => {
+    if (timerRef.current) clearTimeout(timerRef.current);
+  }, []);
   const handleCopy = useCallback(async () => {
     await Clipboard.setStringAsync(code);
     setCopied(true);
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => setCopied(false), 1500);
   }, [code]);
-
   const label = (language || "").trim().toLowerCase();
-
-  return (
-    <View
-      style={[
-        styles.container,
-        // borderStrong, not border: the block also appears nested inside tool
-        // surfaces that already use surfaceRaised, where a 7% hairline vanishes.
-        { backgroundColor: colors.surfaceRaised, borderColor: colors.borderStrong },
-      ]}
-    >
-      <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <Text style={[styles.language, { color: colors.textTertiary }]} numberOfLines={1}>
+  return <div className={toTailwind([styles.container,
+  // borderStrong, not border: the block also appears nested inside tool
+  // surfaces that already use surfaceRaised, where a 7% hairline vanishes.
+  {
+    backgroundColor: colors.surfaceRaised,
+    borderColor: colors.borderStrong
+  }])}>
+      <div className={toTailwind([styles.header, {
+      borderBottomColor: colors.border
+    }])}>
+        <span className={toTailwind([styles.language, {
+        color: colors.textTertiary
+      }])}>
           {label}
-        </Text>
-        <Pressable
-          onPress={handleCopy}
-          hitSlop={6}
-          accessibilityRole="button"
-          accessibilityLabel={copied ? "Code copied" : "Copy code"}
-          style={({ pressed }) => [
-            styles.copyBtn,
-            pressed && { backgroundColor: colors.border },
-          ]}
-        >
-          {copied ? (
-            <Check size={13} color={colors.textSecondary} strokeWidth={1.8} />
-          ) : (
-            <Copy size={13} color={colors.textTertiary} strokeWidth={1.8} />
-          )}
-        </Pressable>
-      </View>
+        </span>
+        <button onClick={handleCopy} hitSlop={6} role="button" aria-label={copied ? "Code copied" : "Copy code"}>
+          {copied ? <Check size={13} color={colors.textSecondary} strokeWidth={1.8} /> : <Copy size={13} color={colors.textTertiary} strokeWidth={1.8} />}
+        </button>
+      </div>
 
-      <View style={styles.body}>
+      <div className={toTailwind(styles.body)}>
         <CodePreview code={code} language={language} isDark={isDark} showLineNumbers={false} bare />
-      </View>
-    </View>
-  );
+      </div>
+    </div>;
 });
-
 const styles = {
   container: {
-    marginTop: 6, marginBottom: 6,
+    marginTop: 6,
+    marginBottom: 6,
     borderRadius: 8,
     borderWidth: 0.5,
-    overflow: "hidden",
+    overflow: "hidden"
   },
   header: {
     flexDirection: "row",
@@ -98,23 +77,24 @@ const styles = {
     height: 28,
     paddingLeft: 12,
     paddingRight: 6,
-    borderBottomWidth: 0.5,
+    borderBottomWidth: 0.5
   },
   language: {
     flexShrink: 1,
     fontSize: 11,
     lineHeight: 16,
     fontFamily: Fonts.mono,
-    letterSpacing: 0.3,
+    letterSpacing: 0.3
   },
   copyBtn: {
     width: 24,
     height: 24,
     alignItems: "center",
     justifyContent: "center",
-    borderRadius: 4,
+    borderRadius: 4
   },
   body: {
-    paddingTop: 8, paddingBottom: 8,
-  },
+    paddingTop: 8,
+    paddingBottom: 8
+  }
 } as const;

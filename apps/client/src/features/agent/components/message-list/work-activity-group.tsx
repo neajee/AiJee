@@ -1,26 +1,20 @@
-import { View } from "@/components/dom";
+import { toTailwind } from "@/styles/to-tailwind";
 import { memo, useEffect, useMemo, useState } from "react";
-import { Text } from "@/components/dom";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { formatTurnAction, summarizeTurnActions, type WorkStep } from "../../utils/turns";
 import { isToolActive } from "../../utils/message-list";
 import { ToolBody, ToolHeader } from "./tool-call/tool-disclosure";
 import { WorkStepView } from "./work-step";
 import { styles } from "./style-tokens";
-
 export const WorkActivityGroup = memo(function WorkActivityGroup({
   steps,
-  isDark,
+  isDark
 }: {
   steps: WorkStep[];
   isDark: boolean;
 }) {
   const colors = useThemeTokens();
-  const running = steps.some((step) =>
-    step.kind === "thinking"
-      ? step.streaming
-      : step.kind === "tools" && step.toolCalls.some(isToolActive),
-  );
+  const running = steps.some(step => step.kind === "thinking" ? step.streaming : step.kind === "tools" && step.toolCalls.some(isToolActive));
   const [override, setOverride] = useState<boolean | null>(null);
   /**
    * Auto-open once, when work starts, and stay open for the rest of the turn.
@@ -34,32 +28,19 @@ export const WorkActivityGroup = memo(function WorkActivityGroup({
   }, [running]);
   const expanded = override ?? autoExpanded;
   const actions = useMemo(() => summarizeTurnActions(steps), [steps]);
-  const label = actions.length
-    ? actions.map(formatTurnAction).join(" · ")
-    : running
-      ? "Thinking"
-      : "Thought";
-
-  return (
-    <View style={styles.activityGroup}>
-      <ToolHeader
-        expanded={expanded}
-        expandable
-        onToggle={() => setOverride(!expanded)}
-        isDark={isDark}
-        accessibilityLabel={`${expanded ? "Collapse" : "Expand"} ${label}`}
-      >
-        <Text style={[styles.activityLabel, { color: colors.textSecondary }]} numberOfLines={1}>
+  const label = actions.length ? actions.map(formatTurnAction).join(" · ") : running ? "Thinking" : "Thought";
+  return <div className={toTailwind(styles.activityGroup)}>
+      <ToolHeader expanded={expanded} expandable onToggle={() => setOverride(!expanded)} isDark={isDark} aria-label={`${expanded ? "Collapse" : "Expand"} ${label}`}>
+        <span className={toTailwind([styles.activityLabel, {
+        color: colors.textSecondary
+      }])}>
           {label}
-        </Text>
+        </span>
       </ToolHeader>
       <ToolBody expanded={expanded}>
-        <View style={styles.activityBody}>
-          {steps.map((step) => (
-            <WorkStepView key={step.key} step={step} isDark={isDark} />
-          ))}
-        </View>
+        <div className={toTailwind(styles.activityBody)}>
+          {steps.map(step => <WorkStepView key={step.key} step={step} isDark={isDark} />)}
+        </div>
       </ToolBody>
-    </View>
-  );
+    </div>;
 });

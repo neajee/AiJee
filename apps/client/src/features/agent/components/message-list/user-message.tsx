@@ -1,12 +1,10 @@
-import { Image, Input, ScrollView, Text, View } from "@/components/dom";
+import { toTailwind } from "@/styles/to-tailwind";
 import { memo, useEffect, useMemo, useState } from "react";
-import { Pressable } from "@/components/dom";
 import { Check, ChevronDown, Pencil, X } from "lucide-react";
 import { Colors, Fonts } from "@/constants/theme";
 import { HAIRLINE_WIDTH } from "@/constants/layout";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import type { ChatMessage } from "../agent-types";
-
 interface UserMessageProps {
   message: ChatMessage;
   isDark: boolean;
@@ -17,18 +15,24 @@ interface UserMessageProps {
   onCancelEdit?: () => void;
   onSubmitEdit?: () => void;
 }
-
 const COLLAPSE_AFTER_LINES = 12;
 const COLLAPSE_AFTER_CHARS = 1600;
-
-function previewText(text: string): { preview: string; collapsible: boolean } {
+function previewText(text: string): {
+  preview: string;
+  collapsible: boolean;
+} {
   const lines = text.split("\n");
   const collapsible = lines.length > COLLAPSE_AFTER_LINES || text.length > COLLAPSE_AFTER_CHARS;
-  if (!collapsible) return { preview: text, collapsible: false };
+  if (!collapsible) return {
+    preview: text,
+    collapsible: false
+  };
   const preview = lines.slice(0, COLLAPSE_AFTER_LINES).join("\n");
-  return { preview: `${preview.slice(0, COLLAPSE_AFTER_CHARS)}\n…`, collapsible: true };
+  return {
+    preview: `${preview.slice(0, COLLAPSE_AFTER_CHARS)}\n…`,
+    collapsible: true
+  };
 }
-
 export const UserMessage = memo(function UserMessage({
   message,
   isDark,
@@ -37,14 +41,16 @@ export const UserMessage = memo(function UserMessage({
   onEdit,
   onChangeEdit,
   onCancelEdit,
-  onSubmitEdit,
+  onSubmitEdit
 }: UserMessageProps) {
   const colors = useThemeTokens();
   const attachments = message.attachments ?? [];
-  const images = attachments.filter((a) => a.type === "image" && !!a.data);
-  const { preview, collapsible } = useMemo(() => previewText(message.text), [message.text]);
+  const images = attachments.filter(a => a.type === "image" && !!a.data);
+  const {
+    preview,
+    collapsible
+  } = useMemo(() => previewText(message.text), [message.text]);
   const [expanded, setExpanded] = useState(false);
-
   useEffect(() => setExpanded(false), [message.id, message.text]);
   useEffect(() => {
     if (false) return;
@@ -52,125 +58,149 @@ export const UserMessage = memo(function UserMessage({
     window.addEventListener("blur", collapse);
     return () => window.removeEventListener("blur", collapse);
   }, []);
-
-  return (
-    <View style={styles.container}>
-      <View style={[styles.bubble, { backgroundColor: colors.surfaceRaised }]}>
-        {images.length > 0 && (
-          <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            style={styles.images}
-            contentContainerStyle={styles.imagesContent}
-          >
-            {images.map((img) => (
-              <Image
-                key={img.id}
-                source={{ uri: `data:${img.mimeType || "image/png"};base64,${img.data}` }}
-                style={styles.image}
-                resizeMode="cover"
-              />
-            ))}
-          </ScrollView>
-        )}
-        {editing ? (
-          <>
-            <Input
-              autoFocus
-              multiline
-              value={editText}
-              onChangeText={onChangeEdit}
-              style={[styles.editor, { color: colors.text, borderColor: colors.border }]}
-              selectionColor={colors.tint}
-            />
-            <View style={styles.editActions}>
-              <Pressable onPress={onCancelEdit} accessibilityLabel="Cancel edit" style={styles.editButton}>
+  return <div className={toTailwind(styles.container)}>
+      <div className={toTailwind([styles.bubble, {
+      backgroundColor: colors.surfaceRaised
+    }])}>
+        {images.length > 0 && <div horizontal className={toTailwind(styles.images)}>
+            {images.map(img => <img key={img.id} src={{
+          uri: `data:${img.mimeType || "image/png"};base64,${img.data}`
+        }} className={toTailwind(styles.image)} resizeMode="cover" />)}
+          </div>}
+        {editing ? <>
+            <input autoFocus multiline value={editText} onChangeText={onChangeEdit} className={toTailwind([styles.editor, {
+          color: colors.text,
+          borderColor: colors.border
+        }])} selectionColor={colors.tint} />
+            <div className={toTailwind(styles.editActions)}>
+              <button onClick={onCancelEdit} aria-label="Cancel edit" className={toTailwind(styles.editButton)}>
                 <X size={14} color={colors.textTertiary} />
-              </Pressable>
-              <Pressable onPress={onSubmitEdit} disabled={!editText.trim()} accessibilityLabel="Send edited message" style={[styles.editButton, { backgroundColor: colors.tint }]}>
+              </button>
+              <button onClick={onSubmitEdit} disabled={!editText.trim()} aria-label="Send edited message" className={toTailwind([styles.editButton, {
+            backgroundColor: colors.tint
+          }])}>
                 <Check size={14} color={colors.background} />
-              </Pressable>
-            </View>
-          </>
-        ) : !!message.text && (
-          <>
-            <Text style={[styles.text, { color: colors.text }]} selectable>
+              </button>
+            </div>
+          </> : !!message.text && <>
+            <span className={toTailwind([styles.text, {
+          color: colors.text
+        }])} selectable>
               {expanded || !collapsible ? message.text : preview}
-            </Text>
-            {collapsible && (
-              <View style={styles.disclosureRow}>
-                <View style={[styles.disclosureLine, { backgroundColor: colors.border }]} />
-                <Pressable
-                  onPress={() => setExpanded((value) => !value)}
-                  accessibilityRole="button"
-                  accessibilityLabel={expanded ? "收起长消息" : "展开长消息"}
-                  style={({ pressed }) => [styles.disclosure, pressed && styles.disclosurePressed]}
-                >
-                  <Text style={[styles.disclosureText, { color: colors.textTertiary }]}>{expanded ? "收起" : "展开全文"}</Text>
-                  <ChevronDown size={12} color={colors.textTertiary} style={expanded && styles.disclosureIconExpanded} />
-                </Pressable>
-                <View style={[styles.disclosureLine, { backgroundColor: colors.border }]} />
-              </View>
-            )}
-          </>
-        )}
-      </View>
-      {!editing && onEdit && (
-        <Pressable onPress={onEdit} accessibilityRole="button" accessibilityLabel="Edit message" style={styles.editTrigger}>
+            </span>
+            {collapsible && <div className={toTailwind(styles.disclosureRow)}>
+                <div className={toTailwind([styles.disclosureLine, {
+            backgroundColor: colors.border
+          }])} />
+                <button onClick={() => setExpanded(value => !value)} role="button" aria-label={expanded ? "收起长消息" : "展开长消息"}>
+                  <span className={toTailwind([styles.disclosureText, {
+              color: colors.textTertiary
+            }])}>{expanded ? "收起" : "展开全文"}</span>
+                  <ChevronDown size={12} color={colors.textTertiary} className={toTailwind(expanded && styles.disclosureIconExpanded)} />
+                </button>
+                <div className={toTailwind([styles.disclosureLine, {
+            backgroundColor: colors.border
+          }])} />
+              </div>}
+          </>}
+      </div>
+      {!editing && onEdit && <button onClick={onEdit} role="button" aria-label="Edit message" className={toTailwind(styles.editTrigger)}>
           <Pencil size={13} color={colors.textTertiary} strokeWidth={1.8} />
-        </Pressable>
-      )}
-    </View>
-  );
+        </button>}
+    </div>;
 });
-
 const styles = {
   container: {
     alignItems: "flex-end",
-    paddingLeft: 16, paddingRight: 16,
-    paddingTop: 4, paddingBottom: 4,
+    paddingLeft: 16,
+    paddingRight: 16,
+    paddingTop: 4,
+    paddingBottom: 4
   },
   bubble: {
-    paddingLeft: 14, paddingRight: 14,
-    paddingTop: 10, paddingBottom: 10,
-    maxWidth: "85%",
+    paddingLeft: 14,
+    paddingRight: 14,
+    paddingTop: 10,
+    paddingBottom: 10,
+    maxWidth: "85%"
   },
   images: {
-    marginBottom: 6,
+    marginBottom: 6
   },
   imagesContent: {
     gap: 6,
-    flexDirection: "row",
+    flexDirection: "row"
   },
   image: {
     width: 72,
     height: 72,
-    borderRadius: 8,
+    borderRadius: 8
   },
   text: {
     fontSize: 14,
     lineHeight: 20,
-    fontFamily: Fonts.sans,
+    fontFamily: Fonts.sans
   },
-  disclosureRow: { flexDirection: "row", alignItems: "center", gap: 9, marginTop: 10 },
-  disclosureLine: { height: HAIRLINE_WIDTH, flex: 1 },
-  disclosure: { flexDirection: "row", alignItems: "center", gap: 4, minHeight: 24, paddingLeft: 2 , paddingRight: 2 },
-  disclosurePressed: { opacity: 0.68 },
-  disclosureText: { fontSize: 12, fontFamily: Fonts.sansMedium },
-  disclosureIconExpanded: { transform: [{ rotate: "180deg" }] },
+  disclosureRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 9,
+    marginTop: 10
+  },
+  disclosureLine: {
+    height: HAIRLINE_WIDTH,
+    flex: 1
+  },
+  disclosure: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    minHeight: 24,
+    paddingLeft: 2,
+    paddingRight: 2
+  },
+  disclosurePressed: {
+    opacity: 0.68
+  },
+  disclosureText: {
+    fontSize: 12,
+    fontFamily: Fonts.sansMedium
+  },
+  disclosureIconExpanded: {
+    transform: [{
+      rotate: "180deg"
+    }]
+  },
   editor: {
     minWidth: 220,
     minHeight: 64,
     maxHeight: 180,
     borderWidth: HAIRLINE_WIDTH,
     borderRadius: 8,
-    paddingLeft: 9, paddingRight: 9,
-    paddingTop: 7, paddingBottom: 7,
+    paddingLeft: 9,
+    paddingRight: 9,
+    paddingTop: 7,
+    paddingBottom: 7,
     fontSize: 14,
     lineHeight: 20,
-    fontFamily: Fonts.sans,
+    fontFamily: Fonts.sans
   },
-  editActions: { flexDirection: "row", justifyContent: "flex-end", gap: 6, marginTop: 6 },
-  editButton: { width: 26, height: 26, borderRadius: 6, alignItems: "center", justifyContent: "center" },
-  editTrigger: { marginTop: 2, padding: 5, opacity: 0.75 },
+  editActions: {
+    flexDirection: "row",
+    justifyContent: "flex-end",
+    gap: 6,
+    marginTop: 6
+  },
+  editButton: {
+    width: 26,
+    height: 26,
+    borderRadius: 6,
+    alignItems: "center",
+    justifyContent: "center"
+  },
+  editTrigger: {
+    marginTop: 2,
+    padding: 5,
+    opacity: 0.75
+  }
 } as const;

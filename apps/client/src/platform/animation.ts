@@ -4,9 +4,17 @@ const operation = (value: any) => ({ value, start: (done?: (result: { finished: 
 export const Animated: any = { Value: class { value: number; constructor(value: number) { this.value = value; } interpolate = () => this.value; }, timing: operation, spring: operation, sequence: operation, parallel: operation, loop: operation, delay: operation, multiply: (a: any, b: number) => (a?.value ?? a) * b, subtract: (a: any, b: number) => (a?.value ?? a) - b };
 export default Animated;
 export const Easing: any = { cubic: (value: number) => value, out: (value: any) => value, linear: (value: number) => value };
+export const FadeIn: any = { duration: () => FadeIn };
+export const FadeOut: any = { duration: () => FadeOut };
+export const LinearTransition: any = { duration: () => LinearTransition, springify: () => LinearTransition };
 export const useAnimatedStyle = (factory: () => any) => useMemo(factory, [factory]);
 export const useSharedValue = <T,>(value: T) => ({ value });
 export const withTiming = <T,>(value: T) => value;
+export const withRepeat = <T,>(value: T) => value;
+export const withSequence = <T,>(...values: T[]) => values.at(-1);
+export const withDelay = <T,>(_delay: number, value: T) => value;
+export const useDerivedValue = (factory: () => any) => ({ value: factory() });
+export const interpolate = (value: number, input: number[], output: number[]) => output[input.indexOf(value)] ?? output[0];
 export const runOnJS = (fn: Function) => fn;
 export const Gesture = { Pan: () => ({ onUpdate() { return this; }, onEnd() { return this; }, activeOffsetY() { return this; } }) };
 export const PanResponder = { create: (_config: unknown) => ({ panHandlers: {} }) };

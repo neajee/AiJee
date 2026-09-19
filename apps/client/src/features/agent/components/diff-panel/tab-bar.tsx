@@ -1,7 +1,4 @@
-import { View } from "@/components/dom";
-
 import type { DiffTab } from "./context";
-
 interface DiffTabBarProps {
   tabs: DiffTab[];
   activeTabId: string | null;
@@ -9,7 +6,6 @@ interface DiffTabBarProps {
   onClose: (id: string) => void;
   isDark: boolean;
 }
-
 export function DiffTabBar(_props: DiffTabBarProps) {
-  return <View />;
+  return <div />;
 }

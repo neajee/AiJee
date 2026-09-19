@@ -1,24 +1,53 @@
-import { Text, View } from "@/components/dom";
+import { toTailwind } from "@/styles/to-tailwind";
 import { memo, useEffect, useRef, useState } from 'react';
-import { Animated, Pressable } from "@/components/dom";
+import { Animated } from "@/platform/animation";
 import { useThemeTokens } from '@/hooks/use-theme-tokens';
 import type { ToolCallInfo } from '../agent-types';
 import { isToolActive } from '../../../utils/message-list';
 import { ToolBody, ToolHeader } from './tool-disclosure';
 import { formatSingleLine } from '../../../utils/tool-call-grouping';
 import { styles } from './style-tokens';
-
 const MAX_VISIBLE = 5;
-const GROUP_LABELS: Record<string, { before: string; after: string; activeBefore?: string }> = {
-  read: { before: 'Explored ', activeBefore: 'Exploring ', after: ' files' },
-  search: { before: '', after: ' web searches' },
-  scrape: { before: 'Scraped ', after: ' pages' },
-  crawl: { before: 'Crawled ', after: ' sites' },
-  download: { before: '', after: ' downloads' },
-  subagent: { before: 'Ran ', after: ' agents' },
+const GROUP_LABELS: Record<string, {
+  before: string;
+  after: string;
+  activeBefore?: string;
+}> = {
+  read: {
+    before: 'Explored ',
+    activeBefore: 'Exploring ',
+    after: ' files'
+  },
+  search: {
+    before: '',
+    after: ' web searches'
+  },
+  scrape: {
+    before: 'Scraped ',
+    after: ' pages'
+  },
+  crawl: {
+    before: 'Crawled ',
+    after: ' sites'
+  },
+  download: {
+    before: '',
+    after: ' downloads'
+  },
+  subagent: {
+    before: 'Ran ',
+    after: ' agents'
+  }
 };
-
-export const GroupedToolCalls = memo(function GroupedToolCalls({ toolName, calls, isDark }: { toolName: string; calls: ToolCallInfo[]; isDark: boolean }) {
+export const GroupedToolCalls = memo(function GroupedToolCalls({
+  toolName,
+  calls,
+  isDark
+}: {
+  toolName: string;
+  calls: ToolCallInfo[];
+  isDark: boolean;
+}) {
   const colors = useThemeTokens();
   const [expanded, setExpanded] = useState(false);
   const [showAll, setShowAll] = useState(false);
@@ -30,38 +59,65 @@ export const GroupedToolCalls = memo(function GroupedToolCalls({ toolName, calls
       setExpanded(true);
     }
   }, [activeCall]);
-  const base = GROUP_LABELS[toolName] ?? { before: '', after: ` ${toolName} calls` };
-  const visible = expanded ? (showAll ? calls : calls.slice(0, MAX_VISIBLE)) : [];
-  return (
-    <View>
-      <ToolHeader expanded={expanded} expandable onToggle={() => setExpanded((value) => !value)} isDark={isDark} accessibilityLabel={`${expanded ? 'Collapse' : 'Expand'} ${calls.length} ${toolName} calls`}>
-        <View style={styles.labelRow}>
-          <Text style={[styles.groupLabel, { color: colors.text }]}>{activeCall ? (base.activeBefore ?? base.before) : base.before}</Text>
-          <AnimatedNumber value={calls.length} style={[styles.groupLabel, { color: colors.text }]} />
-          <Text style={[styles.groupLabel, { color: colors.text }]}>{toolName === 'read' ? ' files' : base.after}</Text>
-        </View>
+  const base = GROUP_LABELS[toolName] ?? {
+    before: '',
+    after: ` ${toolName} calls`
+  };
+  const visible = expanded ? showAll ? calls : calls.slice(0, MAX_VISIBLE) : [];
+  return <div>
+      <ToolHeader expanded={expanded} expandable onToggle={() => setExpanded(value => !value)} isDark={isDark} aria-label={`${expanded ? 'Collapse' : 'Expand'} ${calls.length} ${toolName} calls`}>
+        <div className={toTailwind(styles.labelRow)}>
+          <span className={toTailwind([styles.groupLabel, {
+          color: colors.text
+        }])}>{activeCall ? base.activeBefore ?? base.before : base.before}</span>
+          <AnimatedNumber value={calls.length} className={toTailwind([styles.groupLabel, {
+          color: colors.text
+        }])} />
+          <span className={toTailwind([styles.groupLabel, {
+          color: colors.text
+        }])}>{toolName === 'read' ? ' files' : base.after}</span>
+        </div>
       </ToolHeader>
       <ToolBody expanded={expanded}>
-        <View style={styles.expandedList}>
-          {visible.map((call) => <View key={call.id} style={styles.expandedItem}><Text style={[styles.expandedItemText, { color: colors.textSecondary }]} numberOfLines={1}>{formatSingleLine(call)}</Text></View>)}
-          {calls.length > MAX_VISIBLE && !showAll && <Pressable style={({ pressed }) => [styles.showMoreBtn, pressed && styles.showMorePressed]} accessibilityRole="button" onPress={() => setShowAll(true)}><Text style={[styles.showMoreText, { color: colors.textTertiary }]}>Show {calls.length - MAX_VISIBLE} more…</Text></Pressable>}
-        </View>
+        <div className={toTailwind(styles.expandedList)}>
+          {visible.map(call => <div key={call.id} className={toTailwind(styles.expandedItem)}><span className={toTailwind([styles.expandedItemText, {
+            color: colors.textSecondary
+          }])}>{formatSingleLine(call)}</span></div>)}
+          {calls.length > MAX_VISIBLE && !showAll && <button role="button" onClick={() => setShowAll(true)}><span className={toTailwind([styles.showMoreText, {
+            color: colors.textTertiary
+          }])}>Show {calls.length - MAX_VISIBLE} more…</span></button>}
+        </div>
       </ToolBody>
-    </View>
-  );
+    </div>;
 });
-
-function AnimatedNumber({ value, style }: { value: number; style?: any }) {
+function AnimatedNumber({
+  value,
+  style
+}: {
+  value: number;
+  style?: any;
+}) {
   const opacity = useRef(new Animated.Value(1)).current;
   const [display, setDisplay] = useState(value);
   const previous = useRef(value);
   useEffect(() => {
     if (value === previous.current) return;
     previous.current = value;
-    Animated.timing(opacity, { toValue: 0, duration: 80, useNativeDriver: true }).start(() => {
+    Animated.timing(opacity, {
+      toValue: 0,
+      duration: 80,
+      useNativeDriver: true
+    }).start(() => {
       setDisplay(value);
-      Animated.timing(opacity, { toValue: 1, duration: 120, useNativeDriver: true }).start();
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration: 120,
+        useNativeDriver: true
+      }).start();
     });
   }, [opacity, value]);
-  return <Animated.Text style={[style, { opacity, fontVariant: ['tabular-nums'] }]}>{display}</Animated.Text>;
+  return <span className={toTailwind([style, {
+    opacity,
+    fontVariant: ['tabular-nums']
+  }])}>{display}</span>;
 }

@@ -1,72 +1,60 @@
-import { View } from "@/components/dom";
+import { toTailwind } from "@/styles/to-tailwind";
 import { memo, useCallback, useState } from "react";
-import { Text } from "@/components/dom";
 import { Colors, Fonts } from "@/constants/theme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import type { ToolCallInfo } from "../agent-types";
 import { basename, isToolActive, parseToolArguments, countLines } from "../../../utils/message-list";
 import { CodePreview } from "../code-preview";
 import { ToolBody, ToolHeader, TOOL_BODY_MAX_HEIGHT } from "./tool-disclosure";
-
 interface WriteToolCallProps {
   tc: ToolCallInfo;
   isDark: boolean;
 }
-
 export const WriteToolCall = memo(function WriteToolCall({
   tc,
-  isDark,
+  isDark
 }: WriteToolCallProps) {
   const colors = useThemeTokens();
   const active = isToolActive(tc);
   // Results stay collapsed by default, even while the tool is running.
   const [expanded, setExpanded] = useState(false);
-  const toggle = useCallback(() => setExpanded((p) => !p), []);
-
+  const toggle = useCallback(() => setExpanded(p => !p), []);
   const parsed = parseToolArguments(tc.arguments);
-  const filePath = (parsed.path as string) || "";
+  const filePath = parsed.path as string || "";
   const fileName = basename(filePath);
-  const content = (parsed.content as string) || "";
+  const content = parsed.content as string || "";
   const addedLines = countLines(content);
   const hasContent = !!content;
   const title = active ? "Writing" : "Wrote";
-
-  return (
-    <View>
-      <ToolHeader
-        expanded={expanded}
-        expandable={hasContent}
-        onToggle={toggle}
-        isDark={isDark}
-        accessibilityLabel={`${expanded ? "Collapse" : "Expand"} contents of ${fileName || "file"}`}
-      >
-        <Text style={[styles.fileName, { color: colors.textSecondary }]} numberOfLines={1}>
+  return <div>
+      <ToolHeader expanded={expanded} expandable={hasContent} onToggle={toggle} isDark={isDark} aria-label={`${expanded ? "Collapse" : "Expand"} contents of ${fileName || "file"}`}>
+        <span className={toTailwind([styles.fileName, {
+        color: colors.textSecondary
+      }])}>
           {title} {fileName || filePath || "file"}
-        </Text>
-        {addedLines > 0 && (
-          <Text style={[styles.metaAdd, { color: isDark ? "#3FB950" : "#1A7F37" }]}>
+        </span>
+        {addedLines > 0 && <span className={toTailwind([styles.metaAdd, {
+        color: isDark ? "#3FB950" : "#1A7F37"
+      }])}>
             +{addedLines}
-          </Text>
-        )}
+          </span>}
       </ToolHeader>
 
       <ToolBody expanded={expanded && hasContent}>
         <CodePreview code={content} isDark={isDark} maxHeight={TOOL_BODY_MAX_HEIGHT} />
       </ToolBody>
-    </View>
-  );
+    </div>;
 });
-
 const styles = {
   fileName: {
     fontSize: 12,
     fontFamily: Fonts.sansMedium,
     fontWeight: "500",
-    flexShrink: 1,
+    flexShrink: 1
   },
   metaAdd: {
     fontSize: 10,
     fontFamily: Fonts.mono,
-    flexShrink: 0,
-  },
+    flexShrink: 0
+  }
 } as const;
