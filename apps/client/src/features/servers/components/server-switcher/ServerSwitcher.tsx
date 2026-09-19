@@ -1,13 +1,10 @@
+import { toTailwind } from "@/styles/to-tailwind";
 import { Check, ChevronDown, Settings } from 'lucide-react';
-import { Pressable } from "@/components/dom";
-import { ScrollView, Text, View } from "@/components/dom";
-
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useThemeTokens } from '@/hooks/use-theme-tokens';
 import { PiLogo } from '@/components/pi-logo';
 import { useServerSwitcherController } from '../../hooks/use-server-switcher-controller';
 import { styles } from './style-tokens';
-
 export function ServerSwitcher() {
   const colors = useThemeTokens();
   const isDark = (useColorScheme() ?? 'light') === 'dark';
@@ -19,7 +16,7 @@ export function ServerSwitcher() {
     popoverVisible,
     setPopoverVisible,
     switchingId,
-    handleSwitchServer,
+    handleSwitchServer
   } = useServerSwitcherController();
   const textPrimary = isDark ? '#fefdfd' : colors.text;
   const textMuted = isDark ? '#cdc8c5' : colors.textTertiary;
@@ -27,59 +24,60 @@ export function ServerSwitcher() {
   const borderColor = isDark ? '#3b3a39' : 'rgba(0,0,0,0.12)';
   const hoverBg = isDark ? '#333' : '#F5F5F5';
   const iconBg = isDark ? '#fefdfd' : '#1a1a1a';
-  return (
-    <View style={styles.root} {...({ 'data-server-popover': true } as any)}>
-      <Pressable
-        onPress={() => setPopoverVisible((value) => !value)}
-        accessibilityRole="button"
-        accessibilityLabel="Switch server"
-        style={({ pressed, hovered }: any) => [styles.trigger, (pressed || hovered) && { backgroundColor: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)' }]}
-      >
-        <View style={[styles.serverIcon, { backgroundColor: iconBg }]}>
+  return <div className={toTailwind(styles.root)} {...{
+    'data-server-popover': true
+  } as any}>
+      <button onClick={() => setPopoverVisible(value => !value)} role="button" aria-label="Switch server">
+        <div className={toTailwind([styles.serverIcon, {
+        backgroundColor: iconBg
+      }])}>
           <PiLogo size={14} color={isDark ? '#1a1a1a' : '#fff'} />
-        </View>
-        <Text style={[styles.serverName, { color: textPrimary }]} numberOfLines={1}>{activeServer?.name ?? 'No Server'}</Text>
+        </div>
+        <span className={toTailwind([styles.serverName, {
+        color: textPrimary
+      }])}>{activeServer?.name ?? 'No Server'}</span>
         <ChevronDown size={12} color={textMuted} strokeWidth={2} />
-      </Pressable>
-      {popoverVisible && (
-        <View style={[styles.popover, { backgroundColor: popoverBg, borderColor }]}>
-          <View style={styles.popoverHeader}><Text style={[styles.popoverTitle, { color: textMuted }]}>Servers</Text></View>
-          <ScrollView style={styles.popoverList} bounces={false}>
-            {servers.map((server) => {
-              const isActive = server.id === activeServerId;
-              const isSwitching = server.id === switchingId;
-              return (
-                <Pressable
-                  key={server.id}
-                  onPress={() => void handleSwitchServer(server)}
-                  disabled={isSwitching}
-                  style={({ pressed, hovered }: any) => [
-                    styles.popoverItem,
-                    isActive && { backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.04)' },
-                    (pressed || hovered) && { backgroundColor: hoverBg },
-                  ]}
-                >
-                  <View style={[styles.popoverItemIcon, { backgroundColor: iconBg }]}><PiLogo size={10} color={isDark ? '#1a1a1a' : '#fff'} /></View>
-                  <View style={styles.popoverItemInfo}>
-                    <Text style={[styles.popoverItemName, { color: textPrimary }]} numberOfLines={1}>{server.name}</Text>
-                    <Text style={[styles.popoverItemAddress, { color: textMuted }]} numberOfLines={1}>{server.address}</Text>
-                  </View>
+      </button>
+      {popoverVisible && <div className={toTailwind([styles.popover, {
+      backgroundColor: popoverBg,
+      borderColor
+    }])}>
+          <div className={toTailwind(styles.popoverHeader)}><span className={toTailwind([styles.popoverTitle, {
+          color: textMuted
+        }])}>Servers</span></div>
+          <div className={toTailwind(styles.popoverList)}>
+            {servers.map(server => {
+          const isActive = server.id === activeServerId;
+          const isSwitching = server.id === switchingId;
+          return <button key={server.id} onClick={() => void handleSwitchServer(server)} disabled={isSwitching}>
+                  <div className={toTailwind([styles.popoverItemIcon, {
+              backgroundColor: iconBg
+            }])}><PiLogo size={10} color={isDark ? '#1a1a1a' : '#fff'} /></div>
+                  <div className={toTailwind(styles.popoverItemInfo)}>
+                    <span className={toTailwind([styles.popoverItemName, {
+                color: textPrimary
+              }])}>{server.name}</span>
+                    <span className={toTailwind([styles.popoverItemAddress, {
+                color: textMuted
+              }])}>{server.address}</span>
+                  </div>
                   {isActive && <Check size={14} color="#34C759" strokeWidth={2.5} />}
-                </Pressable>
-              );
-            })}
-          </ScrollView>
-          <View style={[styles.popoverFooter, { borderTopColor: borderColor }]}>
-            <Pressable
-              onPress={() => { setPopoverVisible(false); router.push('/settings/servers'); }}
-              style={({ pressed, hovered }: any) => [styles.popoverFooterBtn, (pressed || hovered) && { backgroundColor: hoverBg }]}
-            >
+                </button>;
+        })}
+          </div>
+          <div className={toTailwind([styles.popoverFooter, {
+        borderTopColor: borderColor
+      }])}>
+            <button onClick={() => {
+          setPopoverVisible(false);
+          router.push('/settings/servers');
+        }}>
               <Settings size={13} color={textMuted} strokeWidth={1.8} />
-              <Text style={[styles.popoverFooterText, { color: textMuted }]}>管理服务器</Text>
-            </Pressable>
-          </View>
-        </View>
-      )}
-    </View>
-  );
+              <span className={toTailwind([styles.popoverFooterText, {
+            color: textMuted
+          }])}>管理服务器</span>
+            </button>
+          </div>
+        </div>}
+    </div>;
 }

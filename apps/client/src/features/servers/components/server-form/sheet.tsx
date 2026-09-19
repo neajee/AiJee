@@ -1,25 +1,19 @@
-import { ScrollView, Spinner, Text, View } from "@/components/dom";
+import { toTailwind } from "@/styles/to-tailwind";
 import { useCallback, useEffect, useState } from 'react';
-import { Keyboard, Modal, Pressable, useWindowDimensions } from "@/components/dom";
-import { useSafeAreaInsets } from "@/components/dom";
-import Animated, {
-  Easing,
-  runOnJS,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
-} from "@/components/dom";
-import { Gesture, GestureDetector } from "@/components/dom";
-
+import { Keyboard, useWindowDimensions } from "@/platform/browser";
+import { useSafeAreaInsets } from "@/platform/browser";
+import Animated, { Easing, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from "@/platform/animation";
+import { Gesture } from "@/platform/animation";
 import { Colors } from '@/constants/theme';
 import { ABSOLUTE_FILL_STYLE } from '@/constants/layout';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { ServerFormFields } from './fields';
 import { formStyles, SHEET_HEIGHT, sheetStyles } from './style-tokens';
 import type { ServerFormProps } from './component-types';
-
-const TIMING_CONFIG = { duration: 280, easing: Easing.out(Easing.cubic) };
-
+const TIMING_CONFIG = {
+  duration: 280,
+  easing: Easing.out(Easing.cubic)
+};
 export function ServerFormSheet({
   visible,
   onClose,
@@ -27,10 +21,12 @@ export function ServerFormSheet({
   initial,
   isDark,
   loading,
-  error,
+  error
 }: ServerFormProps) {
   const insets = useSafeAreaInsets();
-  const { height: windowHeight } = useWindowDimensions();
+  const {
+    height: windowHeight
+  } = useWindowDimensions();
   const colorScheme = useColorScheme() ?? 'light';
   const colors = Colors[colorScheme];
   const [name, setName] = useState('');
@@ -44,7 +40,6 @@ export function ServerFormSheet({
   const keyboardInset = Math.max(0, keyboardHeight - insets.bottom);
   const maxVisibleSheetHeight = Math.max(280, windowHeight - keyboardInset - insets.top - 12);
   const canSave = Boolean(name.trim() && address.trim() && !loading);
-
   useEffect(() => {
     if (visible) {
       setName(initial?.name ?? '');
@@ -57,13 +52,12 @@ export function ServerFormSheet({
       setKeyboardHeight(0);
     }
   }, [initial, overlayOpacity, translateY, visible]);
-
   useEffect(() => {
     if (true || false) {
       setKeyboardHeight(0);
       return;
     }
-    const showSub = Keyboard.addListener('keyboardWillShow', (event) => {
+    const showSub = Keyboard.addListener('keyboardWillShow', event => {
       if (visible) setKeyboardHeight(event.endCoordinates.height);
     });
     const hideSub = Keyboard.addListener('keyboardWillHide', () => setKeyboardHeight(0));
@@ -72,112 +66,85 @@ export function ServerFormSheet({
       hideSub.remove();
     };
   }, [visible]);
-
   const dismiss = useCallback(() => {
     translateY.value = withTiming(SHEET_HEIGHT, TIMING_CONFIG);
     overlayOpacity.value = withTiming(0, TIMING_CONFIG, () => runOnJS(onClose)());
   }, [onClose, overlayOpacity, translateY]);
-
-  const panGesture = Gesture.Pan()
-    .enabled(!loading)
-    .onUpdate((event) => {
-      if (event.translationY > 0) translateY.value = event.translationY;
-    })
-    .onEnd((event) => {
-      if (event.translationY > 100 || event.velocityY > 500) {
-        runOnJS(dismiss)();
-      } else {
-        translateY.value = withTiming(0, TIMING_CONFIG);
-      }
-    });
+  const panGesture = Gesture.Pan().enabled(!loading).onUpdate(event => {
+    if (event.translationY > 0) translateY.value = event.translationY;
+  }).onEnd(event => {
+    if (event.translationY > 100 || event.velocityY > 500) {
+      runOnJS(dismiss)();
+    } else {
+      translateY.value = withTiming(0, TIMING_CONFIG);
+    }
+  });
   const sheetStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: translateY.value }],
+    transform: [{
+      translateY: translateY.value
+    }]
   }));
   const overlayStyle = useAnimatedStyle(() => ({
     opacity: overlayOpacity.value,
-    pointerEvents: overlayOpacity.value > 0 ? ('auto' as const) : ('none' as const),
+    pointerEvents: overlayOpacity.value > 0 ? 'auto' as const : 'none' as const
   }));
-
-  return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="none"
-      onRequestClose={() => {
-        if (!loading) dismiss();
-      }}
-    >
-      <View style={sheetStyles.root}>
-        <Animated.View style={[sheetStyles.overlay, { backgroundColor: colors.overlay }, overlayStyle]}>
-          <Pressable style={ABSOLUTE_FILL_STYLE} onPress={loading ? undefined : dismiss} />
-        </Animated.View>
-        <View style={[sheetStyles.keyboardAvoider, { paddingBottom: keyboardInset }]}>
-          <GestureDetector gesture={panGesture}>
-            <Animated.View
-              style={[
-                sheetStyles.sheet,
-                {
-                  backgroundColor: sheetBg,
-                  paddingBottom: keyboardHeight > 0 ? 12 : sheetBottomPadding,
-                  maxHeight: Math.min(SHEET_HEIGHT, maxVisibleSheetHeight),
-                },
-                sheetStyle,
-              ]}
-            >
-              <View style={sheetStyles.handleBar}>
-                <View style={[sheetStyles.handle, { backgroundColor: colors.sheetHandle }]} />
-              </View>
-              <View style={sheetStyles.sheetHeader}>
-                <Text style={[sheetStyles.sheetTitle, { color: textPrimary }]}>
+  return <div visible={visible} transparent animationType="none" onRequestClose={() => {
+    if (!loading) dismiss();
+  }}>
+      <div className={toTailwind(sheetStyles.root)}>
+        <div className={toTailwind([sheetStyles.overlay, {
+        backgroundColor: colors.overlay
+      }, overlayStyle])}>
+          <button className={toTailwind(ABSOLUTE_FILL_STYLE)} onClick={loading ? undefined : dismiss} />
+        </div>
+        <div className={toTailwind([sheetStyles.keyboardAvoider, {
+        paddingBottom: keyboardInset
+      }])}>
+          <div>
+            <div className={toTailwind([sheetStyles.sheet, {
+            backgroundColor: sheetBg,
+            paddingBottom: keyboardHeight > 0 ? 12 : sheetBottomPadding,
+            maxHeight: Math.min(SHEET_HEIGHT, maxVisibleSheetHeight)
+          }, sheetStyle])}>
+              <div className={toTailwind(sheetStyles.handleBar)}>
+                <div className={toTailwind([sheetStyles.handle, {
+                backgroundColor: colors.sheetHandle
+              }])} />
+              </div>
+              <div className={toTailwind(sheetStyles.sheetHeader)}>
+                <span className={toTailwind([sheetStyles.sheetTitle, {
+                color: textPrimary
+              }])}>
                   {initial ? 'Edit Server' : 'Add Server'}
-                </Text>
-              </View>
-              <ScrollView
-                contentContainerStyle={sheetStyles.sheetContent}
-                showsVerticalScrollIndicator={false}
-                keyboardShouldPersistTaps="handled"
-              >
-                <ServerFormFields
-                  name={name}
-                  setName={setName}
-                  address={address}
-                  setAddress={setAddress}
-                  isDark={isDark}
-                />
-                {error && (
-                  <Text style={[formStyles.errorText, { color: isDark ? '#FF453A' : '#FF3B30' }]}>
+                </span>
+              </div>
+              <div keyboardShouldPersistTaps="handled">
+                <ServerFormFields name={name} setName={setName} address={address} setAddress={setAddress} isDark={isDark} />
+                {error && <span className={toTailwind([formStyles.errorText, {
+                color: isDark ? '#FF453A' : '#FF3B30'
+              }])}>
                     {error}
-                  </Text>
-                )}
-                <Pressable
-                  onPress={() => {
-                    if (canSave) onSave({ name: name.trim(), address: address.trim() });
-                  }}
-                  style={[
-                    sheetStyles.sheetSaveBtn,
-                    { backgroundColor: isDark ? '#fefdfd' : '#1a1a1a' },
-                    !canSave && { opacity: 0.4 },
-                  ]}
-                  disabled={!canSave}
-                >
-                  {loading ? (
-                    <Spinner size="small" color={isDark ? '#1a1a1a' : '#fff'} />
-                  ) : (
-                    <Text
-                      style={[
-                        sheetStyles.sheetSaveBtnText,
-                        { color: isDark ? '#1a1a1a' : '#fff' },
-                      ]}
-                    >
+                  </span>}
+                <button onClick={() => {
+                if (canSave) onSave({
+                  name: name.trim(),
+                  address: address.trim()
+                });
+              }} className={toTailwind([sheetStyles.sheetSaveBtn, {
+                backgroundColor: isDark ? '#fefdfd' : '#1a1a1a'
+              }, !canSave && {
+                opacity: 0.4
+              }])} disabled={!canSave}>
+                  {loading ? <span size="small" color={isDark ? '#1a1a1a' : '#fff'} /> : <span className={toTailwind([sheetStyles.sheetSaveBtnText, {
+                  color: isDark ? '#1a1a1a' : '#fff'
+                }])}>
                       {initial ? 'Save & Connect' : 'Add & Connect'}
-                    </Text>
-                  )}
-                </Pressable>
-              </ScrollView>
-            </Animated.View>
-          </GestureDetector>
-        </View>
-      </View>
-    </Modal>
-  );
+                    </span>}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>;
 }

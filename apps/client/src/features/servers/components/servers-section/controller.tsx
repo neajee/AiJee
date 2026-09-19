@@ -1,7 +1,12 @@
 import { useServersController } from "../../hooks/use-servers-controller";
 import { ServersView } from "./ServersSection";
-
-export function ServersSection({ isDark, variant = "settings" }: { isDark: boolean; variant?: "settings" | "onboarding" }) {
+export function ServersSection({
+  isDark,
+  variant = "settings"
+}: {
+  isDark: boolean;
+  variant?: "settings" | "onboarding";
+}) {
   const controller = useServersController();
   return <ServersView controller={controller} isDark={isDark} variant={variant} />;
 }

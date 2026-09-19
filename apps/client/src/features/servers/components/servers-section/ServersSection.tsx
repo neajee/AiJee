@@ -1,5 +1,4 @@
-import { Modal, Pressable } from "@/components/dom";
-import { Image, Spinner, Text, View } from "@/components/dom";
+import { toTailwind } from "@/styles/to-tailwind";
 import { Copy, Pencil, Plus, QrCode, RefreshCw, Trash2, X } from "lucide-react";
 import * as Clipboard from "@/platform/clipboard";
 import { Fonts } from "@/constants/theme";
@@ -10,230 +9,210 @@ import { ServerFormModal } from "../server-form";
 import { FooterAction, MenuAction, ServerRow } from "./rows";
 import { styles } from "./style-tokens";
 import type { ServersController } from "../../hooks/use-servers-controller";
-
-export function ServersView({ controller, isDark, variant }: { controller: ServersController; isDark: boolean; variant: "settings" | "onboarding" }) {
+export function ServersView({
+  controller,
+  isDark,
+  variant
+}: {
+  controller: ServersController;
+  isDark: boolean;
+  variant: "settings" | "onboarding";
+}) {
   const m = useSettingsMetrics();
   const p = useSettingsPalette();
   const {
-    router, servers, activeServerId, formVisible, editingServer, loginLoading, loginError, qrVisible, connecting, failedServerId,
-    lastConnected, menuServerId, menuPosition, refreshingCode, codeDialog, setFormVisible, setQrVisible, setMenuServerId, setMenuPosition, setCodeDialog,
-    logoutFromServer, handleAdd, handleEdit, handleDelete, handleShowCode, handleRefreshCode, handleConnect, handleSave,
+    router,
+    servers,
+    activeServerId,
+    formVisible,
+    editingServer,
+    loginLoading,
+    loginError,
+    qrVisible,
+    connecting,
+    failedServerId,
+    lastConnected,
+    menuServerId,
+    menuPosition,
+    refreshingCode,
+    codeDialog,
+    setFormVisible,
+    setQrVisible,
+    setMenuServerId,
+    setMenuPosition,
+    setCodeDialog,
+    logoutFromServer,
+    handleAdd,
+    handleEdit,
+    handleDelete,
+    handleShowCode,
+    handleRefreshCode,
+    handleConnect,
+    handleSave
   } = controller;
-  const modals = (
-    <>
-      <ServerFormModal
-        visible={formVisible}
-        onClose={() => {
-          if (!loginLoading) setFormVisible(false);
-        }}
-        onSave={handleSave}
-        initial={editingServer}
-        isDark={isDark}
-        loading={loginLoading}
-        error={loginError}
-      />
-      <QrScanner
-        visible={qrVisible}
-        onClose={() => setQrVisible(false)}
-        onNeedNewWorkspace={() => router.replace("/")}
-      />
-    </>
-  );
+  const modals = <>
+      <ServerFormModal visible={formVisible} onClose={() => {
+      if (!loginLoading) setFormVisible(false);
+    }} onSave={handleSave} initial={editingServer} isDark={isDark} loading={loginLoading} error={loginError} />
+      <QrScanner visible={qrVisible} onClose={() => setQrVisible(false)} onNeedNewWorkspace={() => router.replace("/")} />
+    </>;
 
   // First run: a list with an empty card and two action rows says less than one
   // clear invitation to connect.
   if (variant === "onboarding" && servers.length === 0) {
-    return (
-      <View style={styles.welcome}>
-        <View style={styles.welcomeContent}>
-          <View
-            style={[
-              styles.welcomeIcon,
-              { backgroundColor: isDark ? "#fefdfd" : "#1a1a1a" },
-            ]}
-          >
+    return <div className={toTailwind(styles.welcome)}>
+        <div className={toTailwind(styles.welcomeContent)}>
+          <div className={toTailwind([styles.welcomeIcon, {
+          backgroundColor: isDark ? "#fefdfd" : "#1a1a1a"
+        }])}>
             <PiLogo size={36} color={isDark ? "#1a1a1a" : "#fff"} />
-          </View>
-          <Text
-            style={[styles.welcomeTitle, { color: p.text }]}
-          >
+          </div>
+          <span className={toTailwind([styles.welcomeTitle, {
+          color: p.text
+        }])}>
             欢迎使用 AiJee
-          </Text>
-          <Text style={[styles.welcomeDesc, { color: p.textTertiary }]}>
+          </span>
+          <span className={toTailwind([styles.welcomeDesc, {
+          color: p.textTertiary
+        }])}>
             连接到运行 AiJee 的设备，{"\n"}
             使用设备授权后即可打开工作区。
-          </Text>
-          <View style={styles.welcomeButtons}>
-            <Pressable
-              onPress={() => setQrVisible(true)}
-              style={({ pressed }) => [
-                styles.welcomeButton,
-                { borderWidth: 0.5, borderColor: p.border },
-                pressed && { opacity: 0.7 },
-              ]}
-            >
+          </span>
+          <div className={toTailwind(styles.welcomeButtons)}>
+            <button onClick={() => setQrVisible(true)}>
               <QrCode size={16} color={p.text} strokeWidth={2} />
-              <Text style={[styles.welcomeButtonText, { color: p.text }]}>
+              <span className={toTailwind([styles.welcomeButtonText, {
+              color: p.text
+            }])}>
                 扫描授权码
-              </Text>
-            </Pressable>
-            <Pressable
-              onPress={handleAdd}
-              style={({ pressed }) => [
-                styles.welcomeButton,
-                { backgroundColor: isDark ? "#fefdfd" : "#1a1a1a" },
-                pressed && { opacity: 0.7 },
-              ]}
-            >
+              </span>
+            </button>
+            <button onClick={handleAdd}>
               <Plus size={16} color={isDark ? "#1a1a1a" : "#fff"} strokeWidth={2} />
-              <Text
-                style={[
-                  styles.welcomeButtonText,
-                  { color: isDark ? "#1a1a1a" : "#fff" },
-                ]}
-              >
+              <span className={toTailwind([styles.welcomeButtonText, {
+              color: isDark ? "#1a1a1a" : "#fff"
+            }])}>
                 添加服务器
-              </Text>
-            </Pressable>
-          </View>
-        </View>
+              </span>
+            </button>
+          </div>
+        </div>
         {modals}
-      </View>
-    );
+      </div>;
   }
-
-  return (
-    <View style={[styles.content, { gap: m.groupGap }]}>
-      <View style={styles.sectionHeading}>
-        <Text style={[styles.sectionTitle, { color: p.textSecondary }]}>我的设备 ({servers.length})</Text>
-        <Text style={[styles.sectionCaption, { color: p.textTertiary }]}>设备令牌仅保存在本机，不会同步</Text>
-      </View>
-      <View style={[styles.serverCard, { backgroundColor: p.card, borderColor: p.separator }]}>
-        {servers.length === 0 ? (
-          <View
-            style={{
-              paddingLeft: m.gutter, paddingRight: m.gutter,
-              paddingTop: m.rowPaddingV + 4, paddingBottom: m.rowPaddingV + 4,
-            }}
-          >
-            <Text
-              style={{
-                fontSize: m.descSize,
-                fontFamily: Fonts.sans,
-                color: p.textTertiary,
-              }}
-            >
+  return <div className={toTailwind([styles.content, {
+    gap: m.groupGap
+  }])}>
+      <div className={toTailwind(styles.sectionHeading)}>
+        <span className={toTailwind([styles.sectionTitle, {
+        color: p.textSecondary
+      }])}>我的设备 ({servers.length})</span>
+        <span className={toTailwind([styles.sectionCaption, {
+        color: p.textTertiary
+      }])}>设备令牌仅保存在本机，不会同步</span>
+      </div>
+      <div className={toTailwind([styles.serverCard, {
+      backgroundColor: p.card,
+      borderColor: p.separator
+    }])}>
+        {servers.length === 0 ? <div className={toTailwind({
+        paddingLeft: m.gutter,
+        paddingRight: m.gutter,
+        paddingTop: m.rowPaddingV + 4,
+        paddingBottom: m.rowPaddingV + 4
+      })}>
+            <span className={toTailwind({
+          fontSize: m.descSize,
+          fontFamily: Fonts.sans,
+          color: p.textTertiary
+        })}>
               尚未添加服务器。
-            </Text>
-          </View>
-        ) : (
-          servers.map((server, idx) => (
-            <ServerRow
-              key={server.id}
-              server={server}
-              isActive={server.id === activeServerId}
-              isConnecting={connecting === server.id}
-              isFailed={failedServerId === server.id}
-              lastConnectedAt={lastConnected[server.id]}
-              isLast={idx === servers.length - 1}
-              onPress={() => handleConnect(server)}
-              onShowCode={handleShowCode}
-              onToggleMenu={(measure) => {
-                if (menuServerId === server.id) {
-                  setMenuServerId(null);
-                  setMenuPosition(null);
-                  return;
-                }
-                measure((x, y, width, height) => {
-                  setMenuPosition({ left: Math.max(12, x + width - 220), top: y + height + 6 });
-                  setMenuServerId(server.id);
-                });
-              }}
-            />
-          ))
-        )}
-        <FooterAction icon={Plus} label="添加服务器" onPress={handleAdd} isFirst />
-        <FooterAction icon={QrCode} label="扫描授权码" onPress={() => setQrVisible(true)} isLast />
-      </View>
+            </span>
+          </div> : servers.map((server, idx) => <ServerRow key={server.id} server={server} isActive={server.id === activeServerId} isConnecting={connecting === server.id} isFailed={failedServerId === server.id} lastConnectedAt={lastConnected[server.id]} isLast={idx === servers.length - 1} onClick={() => handleConnect(server)} onShowCode={handleShowCode} onToggleMenu={measure => {
+        if (menuServerId === server.id) {
+          setMenuServerId(null);
+          setMenuPosition(null);
+          return;
+        }
+        measure((x, y, width, height) => {
+          setMenuPosition({
+            left: Math.max(12, x + width - 220),
+            top: y + height + 6
+          });
+          setMenuServerId(server.id);
+        });
+      }} />)}
+        <FooterAction icon={Plus} label="添加服务器" onClick={handleAdd} isFirst />
+        <FooterAction icon={QrCode} label="扫描授权码" onClick={() => setQrVisible(true)} isLast />
+      </div>
 
-      <ServerFormModal
-        visible={formVisible}
-        onClose={() => {
-          if (!loginLoading) setFormVisible(false);
-        }}
-        onSave={handleSave}
-        initial={editingServer}
-        isDark={isDark}
-        loading={loginLoading}
-        error={loginError}
-      />
-      <QrScanner
-        visible={qrVisible}
-        onClose={() => setQrVisible(false)}
-        onNeedNewWorkspace={() => router.replace("/")}
-      />
-      <Modal transparent visible={!!menuServerId} animationType="fade" onRequestClose={() => setMenuServerId(null)}>
-        <Pressable style={styles.menuBackdrop} onPress={() => { setMenuServerId(null); setMenuPosition(null); }} accessibilityLabel="关闭服务器操作菜单">
+      <ServerFormModal visible={formVisible} onClose={() => {
+      if (!loginLoading) setFormVisible(false);
+    }} onSave={handleSave} initial={editingServer} isDark={isDark} loading={loginLoading} error={loginError} />
+      <QrScanner visible={qrVisible} onClose={() => setQrVisible(false)} onNeedNewWorkspace={() => router.replace("/")} />
+      <div transparent visible={!!menuServerId} animationType="fade" onRequestClose={() => setMenuServerId(null)}>
+        <button className={toTailwind(styles.menuBackdrop)} onClick={() => {
+        setMenuServerId(null);
+        setMenuPosition(null);
+      }} aria-label="关闭服务器操作菜单">
           {(() => {
-            const server = servers.find((entry) => entry.id === menuServerId);
-            if (!server) return null;
-            return (
-              <Pressable style={[styles.menuSheet, menuPosition, { backgroundColor: p.card, borderColor: p.border }]} onPress={(event) => event.stopPropagation()}>
-                <MenuAction icon={Pencil} label="编辑" onPress={() => { setMenuServerId(null); handleEdit(server); }} color={p.text} />
-                <MenuAction icon={X} label="断开连接" onPress={() => { setMenuServerId(null); logoutFromServer(server.id); }} color={p.text} />
-                <View style={[styles.menuDivider, { backgroundColor: p.separator }]} />
-                <MenuAction icon={Trash2} label="删除" onPress={() => { setMenuServerId(null); handleDelete(server); }} color={p.destructive} />
-              </Pressable>
-            );
-          })()}
-        </Pressable>
-      </Modal>
-      <Modal visible={!!codeDialog} transparent animationType="fade" onRequestClose={() => setCodeDialog(null)}>
-        <Pressable style={styles.codeBackdrop} onPress={() => setCodeDialog(null)} accessibilityLabel="关闭授权对话框">
-          <Pressable
-            style={[styles.codeDialog, { backgroundColor: p.card }]}
-            onPress={(e) => e.stopPropagation()}
-          >
-            <View style={styles.codeHeader}>
-              <Text style={[styles.codeTitle, { color: p.text }]}>设备授权二维码</Text>
-              <Pressable
-                onPress={() => setCodeDialog(null)}
-                accessibilityLabel="关闭授权二维码"
-                hitSlop={8}
-                style={styles.closeCodeButton}
-              >
+          const server = servers.find(entry => entry.id === menuServerId);
+          if (!server) return null;
+          return <button className={toTailwind([styles.menuSheet, menuPosition, {
+            backgroundColor: p.card,
+            borderColor: p.border
+          }])} onClick={event => event.stopPropagation()}>
+                <MenuAction icon={Pencil} label="编辑" onClick={() => {
+              setMenuServerId(null);
+              handleEdit(server);
+            }} color={p.text} />
+                <MenuAction icon={X} label="断开连接" onClick={() => {
+              setMenuServerId(null);
+              logoutFromServer(server.id);
+            }} color={p.text} />
+                <div className={toTailwind([styles.menuDivider, {
+              backgroundColor: p.separator
+            }])} />
+                <MenuAction icon={Trash2} label="删除" onClick={() => {
+              setMenuServerId(null);
+              handleDelete(server);
+            }} color={p.destructive} />
+              </button>;
+        })()}
+        </button>
+      </div>
+      <div visible={!!codeDialog} transparent animationType="fade" onRequestClose={() => setCodeDialog(null)}>
+        <button className={toTailwind(styles.codeBackdrop)} onClick={() => setCodeDialog(null)} aria-label="关闭授权对话框">
+          <button className={toTailwind([styles.codeDialog, {
+          backgroundColor: p.card
+        }])} onClick={e => e.stopPropagation()}>
+            <div className={toTailwind(styles.codeHeader)}>
+              <span className={toTailwind([styles.codeTitle, {
+              color: p.text
+            }])}>设备授权二维码</span>
+              <button onClick={() => setCodeDialog(null)} aria-label="关闭授权二维码" hitSlop={8} className={toTailwind(styles.closeCodeButton)}>
                 <X size={18} color={p.textTertiary} />
-              </Pressable>
-            </View>
-            {codeDialog && <Image source={{ uri: codeDialog.image }} style={styles.codeImage} />}
-            <View style={styles.codeRow}>
-              <Text style={[styles.codeLabel, { color: p.textTertiary }]}>授权码</Text>
-              <Text selectable style={[styles.codeValue, { color: p.text }]}>{codeDialog?.code}</Text>
-              <Pressable
-                onPress={() => codeDialog && Clipboard.setStringAsync(codeDialog.url)}
-                accessibilityLabel="复制完整地址"
-                accessibilityHint="复制设备连接地址"
-                style={styles.copyUrlButton}
-              >
+              </button>
+            </div>
+            {codeDialog && <img src={{
+            uri: codeDialog.image
+          }} className={toTailwind(styles.codeImage)} />}
+            <div className={toTailwind(styles.codeRow)}>
+              <span className={toTailwind([styles.codeLabel, {
+              color: p.textTertiary
+            }])}>授权码</span>
+              <span selectable className={toTailwind([styles.codeValue, {
+              color: p.text
+            }])}>{codeDialog?.code}</span>
+              <button onClick={() => codeDialog && Clipboard.setStringAsync(codeDialog.url)} aria-label="复制完整地址" accessibilityHint="复制设备连接地址" className={toTailwind(styles.copyUrlButton)}>
                 <Copy size={18} color={p.text} />
-              </Pressable>
-              <Pressable
-                onPress={handleRefreshCode}
-                disabled={refreshingCode}
-                accessibilityLabel="刷新授权码"
-                accessibilityHint="生成新授权码并更新当前设备令牌"
-                style={styles.copyUrlButton}
-              >
-                {refreshingCode ? (
-                  <Spinner size="small" color={p.text} />
-                ) : (
-                  <RefreshCw size={18} color={p.text} />
-                )}
-              </Pressable>
-            </View>
-          </Pressable>
-        </Pressable>
-      </Modal>
-    </View>
-  );
+              </button>
+              <button onClick={handleRefreshCode} disabled={refreshingCode} aria-label="刷新授权码" accessibilityHint="生成新授权码并更新当前设备令牌" className={toTailwind(styles.copyUrlButton)}>
+                {refreshingCode ? <span size="small" color={p.text} /> : <RefreshCw size={18} color={p.text} />}
+              </button>
+            </div>
+          </button>
+        </button>
+      </div>
+    </div>;
 }
