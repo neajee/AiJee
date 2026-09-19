@@ -1,6 +1,5 @@
-import { ScrollView, Text, View } from "@/components/dom";
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Linking, Pressable, useWindowDimensions } from "@/components/dom";
+import { Linking, useWindowDimensions } from "@/platform/browser";
 import { Download, ExternalLink, X } from 'lucide-react';
 import { usePiClient } from '@aijee/client-sdk';
 import type { MarketplacePackage } from '@aijee/client-sdk';
@@ -15,7 +14,7 @@ import { Notice, PrimaryButton } from './shared';
 export function PackageDetail({
   pkg,
   onClose,
-  onInstalled,
+  onInstalled
 }: {
   pkg: MarketplacePackage | null;
   onClose: () => void;
@@ -25,8 +24,9 @@ export function PackageDetail({
   const m = useSettingsMetrics();
   const p = useSettingsPalette();
   const phone = useSettingsPhoneLayout();
-  const { height: screenHeight } = useWindowDimensions();
-
+  const {
+    height: screenHeight
+  } = useWindowDimensions();
   const [installing, setInstalling] = useState(false);
   const [failure, setFailure] = useState<string | null>(null);
   const nameRef = useRef<string | null>(null);
@@ -38,9 +38,7 @@ export function PackageDetail({
     setInstalling(false);
     setFailure(null);
   }, [pkg]);
-
   const target = pkg?.version || 'latest';
-
   const install = useCallback(async () => {
     if (!pkg) return;
     setInstalling(true);
@@ -52,7 +50,7 @@ export function PackageDetail({
         version: target,
         scope: 'user',
         lock_version: true,
-        workspace_id: null,
+        workspace_id: null
       });
       onInstalled(result.output || '安装完成');
     } catch (e) {
@@ -61,101 +59,84 @@ export function PackageDetail({
       setInstalling(false);
     }
   }, [client, pkg, target, onInstalled]);
-
   if (!pkg) return null;
-
   const maxHeight = Math.min(screenHeight - 64, 680);
-
-  return (
-    <AppModal
-      visible
-      onClose={onClose}
-      contentStyle={[
-        styles.dialog,
-        {
-          backgroundColor: p.card,
-          borderColor: p.border,
-          borderRadius: phone ? 0 : m.cardRadius + 4,
-          width: phone ? '100%' : 560,
-          height: phone ? '100%' : undefined,
-          maxHeight: phone ? undefined : maxHeight,
-        },
-      ]}
-    >
-        <View
-          style={[
-            styles.dialogInner,
-          ]}
-        >
-          <View style={[styles.dialogHeader, { borderBottomColor: p.separator, padding: m.gutter }]}>
-            <View style={styles.dialogTitleCol}>
-              <Text
-                style={[styles.dialogTitle, { color: p.text, fontSize: m.labelSize + 2 }]}
-                numberOfLines={1}
-              >
+  return <AppModal visible onClose={onClose} contentStyle={[styles.dialog, {
+    backgroundColor: p.card,
+    borderColor: p.border,
+    borderRadius: phone ? 0 : m.cardRadius + 4,
+    width: phone ? '100%' : 560,
+    height: phone ? '100%' : undefined,
+    maxHeight: phone ? undefined : maxHeight
+  }]}>
+        <div style={[styles.dialogInner]}>
+          <div style={[styles.dialogHeader, {
+        borderBottomColor: p.separator,
+        padding: m.gutter
+      }]}>
+            <div style={styles.dialogTitleCol}>
+              <span style={[styles.dialogTitle, {
+            color: p.text,
+            fontSize: m.labelSize + 2
+          }]}>
                 {pkg.name}
-              </Text>
-              <Text style={[styles.meta, { color: p.textTertiary }]}>
+              </span>
+              <span style={[styles.meta, {
+            color: p.textTertiary
+          }]}>
                 v{pkg.version}
                 {pkg.author ? ` · ${pkg.author}` : ''}
                 {pkg.package_types.length ? ` · ${pkg.package_types.join('、')}` : ''}
-              </Text>
-            </View>
-            <Pressable
-              onPress={onClose}
-              accessibilityRole="button"
-              accessibilityLabel="关闭"
-              hitSlop={8}
-              style={({ pressed, hovered }: any) => [
-                styles.iconButton,
-                hovered && { backgroundColor: p.pressed },
-                pressed && { opacity: 0.6 },
-              ]}
-            >
+              </span>
+            </div>
+            <button onClick={onClose} role="button" aria-label="关闭" hitSlop={8} style={({
+          pressed,
+          hovered
+        }: any) => [styles.iconButton, hovered && {
+          backgroundColor: p.pressed
+        }, pressed && {
+          opacity: 0.6
+        }]}>
               <X size={16} color={p.textSecondary} strokeWidth={2} />
-            </Pressable>
-          </View>
+            </button>
+          </div>
 
-          <ScrollView
-            contentContainerStyle={{ padding: m.gutter, gap: 14 }}
-            showsVerticalScrollIndicator={false}
-          >
-            <Text style={{ color: p.textSecondary, fontSize: m.valueSize, lineHeight: m.valueSize * 1.5 }}>
+          <div>
+            <span style={{
+          color: p.textSecondary,
+          fontSize: m.valueSize,
+          lineHeight: m.valueSize * 1.5
+        }}>
               {pkg.description || '作者未提供介绍'}
-            </Text>
+            </span>
 
             {failure ? <Notice text={failure} tone="error" /> : null}
 
-          </ScrollView>
+          </div>
 
-          <View style={[styles.dialogFooter, { borderTopColor: p.separator, padding: m.gutter }]}>
-            {pkg.repository || pkg.homepage ? (
-              <Pressable
-                onPress={() => Linking.openURL((pkg.repository ?? pkg.homepage)!)}
-                accessibilityRole="link"
-                accessibilityLabel="打开仓库"
-                style={({ pressed, hovered }: any) => [
-                  styles.linkButton,
-                  hovered && { backgroundColor: p.pressed },
-                  pressed && { opacity: 0.6 },
-                ]}
-              >
+          <div style={[styles.dialogFooter, {
+        borderTopColor: p.separator,
+        padding: m.gutter
+      }]}>
+            {pkg.repository || pkg.homepage ? <button onClick={() => Linking.openURL((pkg.repository ?? pkg.homepage)!)} role="link" aria-label="打开仓库" style={({
+          pressed,
+          hovered
+        }: any) => [styles.linkButton, hovered && {
+          backgroundColor: p.pressed
+        }, pressed && {
+          opacity: 0.6
+        }]}>
                 <ExternalLink size={13} color={p.textSecondary} strokeWidth={1.8} />
-                <Text style={{ fontSize: m.descSize, fontFamily: Fonts.sans, color: p.textSecondary }}>
+                <span style={{
+            fontSize: m.descSize,
+            fontFamily: Fonts.sans,
+            color: p.textSecondary
+          }}>
                   仓库
-                </Text>
-              </Pressable>
-            ) : (
-              <View />
-            )}
-            <PrimaryButton
-              label="安装"
-              icon={Download}
-              busy={installing}
-              onPress={() => void install()}
-            />
-          </View>
-        </View>
-    </AppModal>
-  );
+                </span>
+              </button> : <div />}
+            <PrimaryButton label="安装" icon={Download} busy={installing} onClick={() => void install()} />
+          </div>
+        </div>
+    </AppModal>;
 }
