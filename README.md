@@ -13,20 +13,12 @@ AiJee 是面向 [Pi Coding Agent](https://github.com/badlogic/pi-mono/) 的多�
 3. 输入或扫描 AiJee Runtime终端中的连接信息。
 4. 配对完成后即可创建工作区和 Coding Session。
 
-### Pi 插件
-
-AiJee可以通过Pi插件自动启动本地SDK Runtime：
-
-```bash
-pi install npm:aijee
-```
-
 架构规范见[架构规范](docs/spec/architecture.md)，SDK适配见[引擎适配约定](docs/spec/engines.md)。
 
 ## 架构
 
 ```text
-apps/client / apps/desktop → packages/ui → packages/client-sdk
+apps/client / apps/desktop → packages/ui → packages/client-sdk → packages/protocol
 apps/server → packages/engine → Pi SDK
 ```
 
@@ -38,8 +30,8 @@ apps/client/app                  Web平台路由与桌面视图入口
 apps/client/desktop              Web / Electron同簇视图
 apps/desktop                     Electron 外壳与Server发现
 packages/engine                  统一引擎抽象与适配器
-packages/api-contract            OpenAPI协议唯一源头
-packages/client-sdk              生成客户端与薄封装
+packages/protocol                跨端共享类型契约（DTO/事件/路由）
+packages/client-sdk              原生fetch客户端与状态hooks
 packages/ui                      跨端组件、状态与数据hooks
 ```
 

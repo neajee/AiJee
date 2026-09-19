@@ -104,9 +104,9 @@ else {
       const port = runtimePort.port;
       url = `http://127.0.0.1:${port}`;
       if (!runtimePort.reused) {
-        const runtimePackage = require.resolve("aijee/bin/aijee.cjs");
-        const runtime = app.isPackaged ? join(__dirname, "../dist-runtime/aijee.mjs") : runtimePackage;
-        server = spawn(process.execPath, [runtime, "serve", "--host", "127.0.0.1", "--port", String(port)], {
+        const runtime = app.isPackaged ? join(__dirname, "../dist-runtime/aijee.mjs") : join(__dirname, "../../server/src/bin/aijee.ts");
+        const runtimeArgs = app.isPackaged ? [runtime] : ["--experimental-strip-types", runtime];
+        server = spawn(process.execPath, [...runtimeArgs, "serve", "--host", "127.0.0.1", "--port", String(port)], {
           stdio: "inherit",
           env: {
             ...process.env,

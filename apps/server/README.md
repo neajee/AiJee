@@ -1,22 +1,28 @@
-# AiJee Pi Package
+# AiJee Runtime
 
-Install the plugin from Pi:
+Embedded Pi SDK runtime and HTTP/SSE server for AiJee.
+
+## Run
 
 ```bash
-pi install npm:aijee
+yarn runtime:start
 ```
 
-Then use these commands in Pi:
+Or directly:
+
+```bash
+node --experimental-strip-types src/main.ts serve
+```
+
+The runtime checks `http://127.0.0.1:10088/api/health` and serves the API,
+auth, sessions and product services under `src/`. Set `AIJEE_SERVER_URL` to
+point a client at another AiJee host.
+
+## CLI
 
 ```text
-/aijee         start or reuse the local Pi SDK runtime
-/aijee-status  check runtime health
-/aijee-stop    stop the runtime owned by this Pi session
+aijee serve           start the runtime
+aijee auth reset      reset authentication and revoke devices
 ```
 
-The plugin checks `http://127.0.0.1:10088/api/health`, then starts or reuses the
-embedded Pi SDK runtime in this package. Set `AIJEE_SERVER_URL` to connect to
-another AiJee host; only loopback URLs are started automatically.
-
-The Pi extension entry is `src/extension/index.ts`; API, auth, sessions and
-product services live under `src/`.
+API, auth, sessions and product services live under `src/`.
