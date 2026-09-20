@@ -18,13 +18,13 @@ export function SectionHeader({
     </div>;
 }
 export function HeaderAction({
-  onPress,
+  onClick,
   label,
   disabled,
   children,
   isDark
 }: {
-  onPress: () => void;
+  onClick: () => void;
   label: string;
   disabled?: boolean;
   children: ReactNode;
@@ -32,7 +32,7 @@ export function HeaderAction({
 }) {
   const [hovered, setHovered] = useState(false);
   const hoverBg = isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.04)";
-  return <button onClick={onPress} disabled={disabled} aria-label={label} onHoverIn={() => setHovered(true)} onHoverOut={() => setHovered(false)}>
+  return <button onClick={onClick} disabled={disabled} aria-label={label} onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)}>
       {children}
     </button>;
 }
@@ -41,14 +41,14 @@ export function HeaderAction({
 export function SidebarRow({
   icon,
   label,
-  onPress,
+  onClick,
   isActive = false,
   disabled = false,
   isDark
 }: {
   icon: ReactNode;
   label: string;
-  onPress: () => void;
+  onClick: () => void;
   isActive?: boolean;
   disabled?: boolean;
   isDark: boolean;
@@ -57,7 +57,7 @@ export function SidebarRow({
   const [hovered, setHovered] = useState(false);
   const hoverBg = isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.035)";
   const activeBg = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)";
-  return <button onClick={onPress} disabled={disabled} onHoverIn={() => setHovered(true)} onHoverOut={() => setHovered(false)}>
+  return <button onClick={onClick} disabled={disabled} onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)}>
       <div className="flex flex-col">{icon}</div>
       <span>
         {label}

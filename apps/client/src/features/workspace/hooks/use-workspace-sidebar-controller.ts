@@ -7,7 +7,7 @@ import { useWorkspaceStore } from '@/features/workspace/store';
 import { useGitStatus } from '@aijee/client-sdk';
 import type { WorkspacePaneTab } from './workspace-pane-context';
 import { COLLAPSED_WIDTH, COLLAPSE_DURATION, DEFAULT_SCOPE, PANEL_DEFAULT, PANEL_MAX, PANEL_MAX_FRACTION, PANEL_MIN, SIDEBAR_COLLAPSED_KEY, SIDEBAR_WIDTH_KEY, clampWidth, getScope, parseStoredWidth, scopedKey } from '../utils/workspace-sidebar';
-import type { WorkspaceSidebarProps } from '../components/workspace-sidebar/types';
+import type { WorkspaceSidebarProps } from '../components/workspace-sidebar/component-types';
 async function loadStoredWidth(scope: string) {
   const key = scopedKey(SIDEBAR_WIDTH_KEY, scope);
   try {

@@ -1,5 +1,5 @@
 import { isAbortReason } from "@aijee/client-sdk";
-import type { ChatMessage, MessageUsageInfo, ToolCallInfo } from "../agent-types";
+import type { ChatMessage, MessageUsageInfo, ToolCallInfo } from "../component-types";
 
 export function extractTextFromContent(content: any[] | undefined): string {
   if (!Array.isArray(content)) return "";

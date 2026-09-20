@@ -125,7 +125,7 @@ function NarrowModelSheetComponent({
                 <X size={16} color={theme.textMuted} strokeWidth={2} />
               </button>}
           </div>
-          <div className="flex flex-col" keyboardShouldPersistTaps="handled">
+          <div className="flex flex-col">
             {providers.map(provider => <div key={provider.name}>
                 <span className={"  text-foreground"}>
                   {provider.name}

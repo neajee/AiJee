@@ -1,5 +1,5 @@
 import { memo, useCallback, useState } from "react";
-import type { ToolResultImage } from "../agent-types";
+import type { ToolResultImage } from "../../../component-types.ts";
 interface ToolResultImagesProps {
   images: ToolResultImage[];
   isDark: boolean;

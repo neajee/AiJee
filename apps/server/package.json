@@ -28,7 +28,7 @@
   "dependencies": {
     "@aijee/engine": "workspace:*",
     "@aijee/protocol": "workspace:*",
-    "@earendil-works/pi-coding-agent": "0.84.4",
+    "@earendil-works/pi-coding-agent": "0.86.0",
     "undici": "^8.9.0",
     "ws": "^8.21.3"
   },

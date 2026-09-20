@@ -1,21 +1,18 @@
 /**
- * Writes dist/releases.json — a build-time snapshot of release tags plus a
- * changelog per release.
+ * Writes dist/releases.json — a build-time snapshot of release tags plus
+ * conventional-commit notes per tag.
  *
- * Sources, in priority order:
- *   1. CHANGELOG.md at the repo root, parsed per `## <version>` block
- *      (hand-written descriptions win over commit subjects).
- *   2. git log between consecutive tags, classified by conventional-commit
- *      type; the oldest tag reads the full history before it.
+ * Source: git log between consecutive tags, classified by conventional-commit
+ * type; the oldest tag reads the full history before it.
  *
  * The runtime reads this file instead of shelling out to `git`, so packaged
- * builds (desktop, npm) get a version timeline + changelog even though no
- * .git directory ships with them. `dist/` is copied verbatim into
+ * builds (desktop, npm) get a version timeline even though no .git directory
+ * ships with them. `dist/` is copied verbatim into
  * apps/server/public by prepare-web-assets.cjs, so the snapshot travels with
  * the web assets.
  */
 import { execFileSync } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -32,15 +29,7 @@ function run(...args) {
   }
 }
 
-// ─── Changelog classification ─────────────────────────────────
-
-const CHANGELOG_TYPES = new Map([
-  ["added", "feature"],
-  ["fixed", "fix"],
-  ["breaking", "feature"],
-  ["changed", "other"],
-  ["removed", "other"],
-]);
+// ─── Commit classification ────────────────────────────────────
 
 /** `feat(scope)!: subject` / `fix：主题`; full-width `：` tolerated. */
 function classifySubject(subject) {
@@ -52,37 +41,6 @@ function classifySubject(subject) {
   if (bang || type === "feat" || type === "feature") return { type: "feature", title: title.trim(), scope: scope || null };
   if (type === "fix" || type === "bugfix" || type === "bug") return { type: "fix", title: title.trim(), scope: scope || null };
   return { type: "other", title: trimmed, scope: null };
-}
-
-/** Parse CHANGELOG.md into a Map<version-without-v, notes[]>. */
-function parseChangelogFile() {
-  const path = resolve(root, "CHANGELOG.md");
-  if (!existsSync(path)) return null;
-  let text;
-  try { text = readFileSync(path, "utf8"); } catch { return null; }
-  const byVersion = new Map();
-  let current = null;
-  let currentType = "other";
-  for (const line of text.split(/\r?\n/)) {
-    const h2 = line.match(/^##\s+(?:\[)?v?([0-9]+\.[0-9]+\.[0-9]+)(?:\])?/i);
-    if (h2) {
-      current = h2[1];
-      currentType = "other";
-      byVersion.set(current, []);
-      continue;
-    }
-    if (!current) continue;
-    const h3 = line.match(/^###\s+(.+)/);
-    if (h3) {
-      currentType = CHANGELOG_TYPES.get(h3[1].trim().toLowerCase()) ?? "other";
-      continue;
-    }
-    const item = line.match(/^\s*[-*]\s+(.+)/);
-    if (item && item[1].trim()) {
-      byVersion.get(current)?.push({ type: currentType, title: item[1].trim(), scope: null, commit: null });
-    }
-  }
-  return byVersion;
 }
 
 function commitsFor(tag, prev) {
@@ -100,8 +58,6 @@ function commitsFor(tag, prev) {
 
 // ─── Snapshot ─────────────────────────────────────────────────
 
-const changelog = parseChangelogFile();
-
 const refs = run("for-each-ref", "--sort=-creatordate", "--format=%(refname:short)|%(creatordate:iso-strict)|%(objectname:short)", "refs/tags");
 const tags = refs
   ? refs
@@ -115,11 +71,7 @@ const tags = refs
   : [];
 
 const timeline = tags.map((release, index) => {
-  const base = release.tag.replace(/^v/i, "");
-  const handWritten = changelog ? changelog.get(base) ?? changelog.get(release.tag) : null;
-  const notes = handWritten && handWritten.some((note) => note.title)
-    ? handWritten
-    : commitsFor(release.tag, index < tags.length - 1 ? tags[index + 1].tag : null);
+  const notes = commitsFor(release.tag, index < tags.length - 1 ? tags[index + 1].tag : null);
   return { ...release, notes };
 });
 

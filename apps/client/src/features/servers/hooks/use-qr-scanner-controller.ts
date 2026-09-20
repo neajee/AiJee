@@ -8,7 +8,7 @@ import {
   parseConnectUrl,
   type ConnectParams,
 } from '../utils/parse-connect-url';
-import type { QrScannerProps, QrScannerControllerState, QrScannerStep } from '../components/qr-scanner/types';
+import type { QrScannerProps, QrScannerControllerState, QrScannerStep } from '../components/qr-scanner/component-types';
 
 export function useQrScannerController({ visible, onClose, baseUrl }: Pick<QrScannerProps, 'visible' | 'onClose'> & { baseUrl?: string }): QrScannerControllerState {
   const [scanned, setScanned] = useState(false);

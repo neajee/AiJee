@@ -66,7 +66,7 @@ export function ChangesTab({
       }, {
         text: "Discard",
         style: "destructive",
-        onPress: () => onDiscard(paths)
+        onClick: () => onDiscard(paths)
       }]);
     }
   }, [onDiscard]);

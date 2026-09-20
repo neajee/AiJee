@@ -2,11 +2,13 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "target": "ES2022",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "moduleResolution": "Bundler",
     "jsx": "react-jsx",
     "strict": false,
-    "noCheck": true,
+    "strictNullChecks": true,
+    "noImplicitAny": false,
     "allowImportingTsExtensions": true,
     "paths": {
       "@/*": [

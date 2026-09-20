@@ -26,7 +26,7 @@ export const COLOR_TOKENS = {
 } as const;
 
 export const DARK_COLOR_TOKENS = {
-  background: '#161616',
+  background: '#151515',
   surfaceRaised: '#202020',
   surface: '#292929',
   text: '#F2F2F2',

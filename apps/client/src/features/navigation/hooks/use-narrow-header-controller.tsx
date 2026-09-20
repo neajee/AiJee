@@ -10,7 +10,7 @@ import { usePreviewStore } from '@/features/preview/store';
 import { useTasksStore } from '@/features/tasks/store';
 import { useGitStatus, useNestedRepos } from '@aijee/client-sdk';
 import { remotesToLinks, type RemoteLink } from '@/features/workspace/utils/git-remote-url';
-import type { NarrowHeaderBarProps } from '../components/narrow-header-bar/types';
+import type { NarrowHeaderBarProps } from '../components/narrow-header-bar/component-types';
 import type { NarrowHeaderActionItem } from '@/features/navigation/components/narrow-header-actions-sheet';
 const EMPTY_TARGETS: never[] = [];
 export function useNarrowHeaderController(props: NarrowHeaderBarProps) {
@@ -53,7 +53,7 @@ export function useNarrowHeaderController(props: NarrowHeaderBarProps) {
       key: 'git',
       label: 'Git changes',
       icon: <GitBranch size={18} color={textPrimary} strokeWidth={1.8} />,
-      onPress: () => {
+      onClick: () => {
         closeMore();
         props.onGitPress();
       }
@@ -63,7 +63,7 @@ export function useNarrowHeaderController(props: NarrowHeaderBarProps) {
         key: 'preview',
         label: 'Preview',
         icon: <Globe size={18} color={textPrimary} strokeWidth={1.8} />,
-        onPress: () => {
+        onClick: () => {
           closeMore();
           props.onPreviewPress?.();
         }
@@ -74,7 +74,7 @@ export function useNarrowHeaderController(props: NarrowHeaderBarProps) {
         key: 'tasks',
         label: 'Tasks',
         icon: <Play size={18} color={textPrimary} strokeWidth={1.8} />,
-        onPress: () => {
+        onClick: () => {
           closeMore();
           props.onTasksPress?.();
         }
@@ -85,7 +85,7 @@ export function useNarrowHeaderController(props: NarrowHeaderBarProps) {
         key: 'task-output',
         label: 'Task output',
         icon: <Play size={18} color={textPrimary} strokeWidth={1.8} />,
-        onPress: () => {
+        onClick: () => {
           closeMore();
           props.onTaskOutputPress?.();
         }
@@ -96,7 +96,7 @@ export function useNarrowHeaderController(props: NarrowHeaderBarProps) {
         key: 'remote',
         label: `Open in ${firstLink.label}`,
         icon: <ExternalLink size={18} color={textPrimary} strokeWidth={1.8} />,
-        onPress: () => {
+        onClick: () => {
           closeMore();
           void Linking.openURL(firstLink.browserUrl);
         }

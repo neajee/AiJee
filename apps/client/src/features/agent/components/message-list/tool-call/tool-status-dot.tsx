@@ -1,6 +1,6 @@
 import { memo, useEffect } from "react";
 import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming, Easing } from "@/styles/motion";
-import type { ToolCallInfo } from "../agent-types";
+import type { ToolCallInfo } from "../../../component-types.ts";
 interface ToolStatusDotProps {
   status: ToolCallInfo["status"];
   size?: number;

@@ -93,16 +93,16 @@ function InstalledPackageCard({
 function InstalledAction({
   label,
   destructive = false,
-  onPress
+  onClick
 }: {
   label: string;
   destructive?: boolean;
-  onPress: () => void;
+  onClick: () => void;
 }) {
   const m = useSettingsMetrics();
   const p = useSettingsPalette();
   const color = destructive ? p.destructive : p.textSecondary;
-  return <button onClick={onPress} role="button" aria-label={label} className="inline-flex items-center">
+  return <button onClick={onClick} role="button" aria-label={label} className="inline-flex items-center">
       <span className={"text-[var(--desc-size)] font-sans"}>{label}</span>
     </button>;
 }

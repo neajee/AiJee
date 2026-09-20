@@ -26,7 +26,7 @@ export interface ProviderRowProps {
   meta?: string | null;
   connected?: boolean;
   colors: CustomModelsColors;
-  onPress?: () => void;
+  onClick?: () => void;
   trailing?: ReactNode;
   disabled?: boolean;
 }

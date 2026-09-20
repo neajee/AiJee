@@ -41,7 +41,7 @@ export function EditWorkspaceDialog({
             <button className={"  pb-0"} onClick={event => event.stopPropagation()}>
               <div className="flex flex-col"><div /></div>
               <span>Edit Workspace</span>
-              <div className="flex flex-col" keyboardShouldPersistTaps="handled">
+              <div className="flex flex-col">
                 <EditWorkspaceForm {...formProps} />
               </div>
             </button>

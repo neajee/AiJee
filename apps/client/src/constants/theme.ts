@@ -51,11 +51,11 @@ const PRESET_COLORS: Record<ThemePreset, { light: Partial<ThemeTokens>; dark: Pa
   },
   codex: {
     light: { background: '#FFFFFF', surfaceRaised: '#F5F5F5', surface: '#FFFFFF', text: '#1A1C1F', textSecondary: '#5F6368', textTertiary: '#7A8087', code: '#F5F5F5', codeText: '#1A1C1F' },
-    dark: { background: '#181818', surfaceRaised: '#222222', surface: '#252525', text: '#FFFFFF', textSecondary: '#B8B8B8', textTertiary: '#858585', code: '#121212', codeText: '#F3F3F3' },
+    dark: { background: '#151515', surfaceRaised: '#222222', surface: '#252525', text: '#FFFFFF', textSecondary: '#B8B8B8', textTertiary: '#858585', code: '#121212', codeText: '#F3F3F3' },
   },
   vercel: {
     light: { background: '#FFFFFF', surfaceRaised: '#F5F5F5', surface: '#FFFFFF', text: '#171717', textSecondary: '#666666', textTertiary: '#888888', code: '#F5F5F5', codeText: '#171717' },
-    dark: { background: '#000000', surfaceRaised: '#111111', surface: '#181818', text: '#EDEDED', textSecondary: '#A1A1A1', textTertiary: '#666666', code: '#111111', codeText: '#EDEDED' },
+    dark: { background: '#151515', surfaceRaised: '#111111', surface: '#181818', text: '#EDEDED', textSecondary: '#A1A1A1', textTertiary: '#666666', code: '#111111', codeText: '#EDEDED' },
   },
 };
 

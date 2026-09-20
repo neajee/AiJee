@@ -6,7 +6,7 @@ import {
   groupWorkSteps,
   summarizeTurnActions,
 } from "../features/agent/utils/turns.ts";
-import type { ChatMessage, ToolCallInfo } from "../features/agent/types.ts";
+import type { ChatMessage, ToolCallInfo } from "../features/agent/component-types.ts";
 
 function tool(name: string, status: ToolCallInfo["status"] = "complete"): ToolCallInfo {
   return { id: `${name}-${Math.random()}`, name, arguments: "{}", status };

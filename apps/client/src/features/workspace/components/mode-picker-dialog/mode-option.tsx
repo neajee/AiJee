@@ -8,7 +8,7 @@ interface ModeOptionProps {
   selectedBorder: string;
   textPrimary: string;
   textMuted: string;
-  onPress: () => void;
+  onClick: () => void;
 }
 export function ModeOption({
   mode,
@@ -18,14 +18,14 @@ export function ModeOption({
   selectedBorder,
   textPrimary,
   textMuted,
-  onPress
+  onClick
 }: ModeOptionProps) {
   const parts: string[] = [];
   if (mode?.model) parts.push(mode.model);
   if (mode?.thinking_level) parts.push(`thinking: ${mode.thinking_level}`);
   const extensionCount = Array.isArray(mode?.extensions) ? mode.extensions.length : 0;
   if (extensionCount) parts.push(`${extensionCount} ext`);
-  return <button onClick={onPress}>
+  return <button onClick={onClick}>
       <div className="flex flex-col">
         <div className="flex flex-col">
           {mode ? <span>{mode.name}</span> : <><CircleOff size={14} color={textMuted} strokeWidth={1.8} /><span>Default</span></>}

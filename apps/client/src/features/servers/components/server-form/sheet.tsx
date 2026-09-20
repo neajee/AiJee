@@ -103,7 +103,7 @@ export function ServerFormSheet({
                   {initial ? 'Edit Server' : 'Add Server'}
                 </span>
               </div>
-              <div keyboardShouldPersistTaps="handled">
+              <div>
                 <ServerFormFields name={name} setName={setName} address={address} setAddress={setAddress} isDark={isDark} />
                 {error && <span>
                     {error}

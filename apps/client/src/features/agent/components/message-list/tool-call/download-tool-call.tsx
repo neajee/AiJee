@@ -1,7 +1,7 @@
 import { memo } from "react";
 import { Colors, Fonts } from "@/constants/theme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
-import type { ToolCallInfo } from "../agent-types";
+import type { ToolCallInfo } from "../../../component-types.ts";
 import { parseToolArguments } from "../../../utils/message-list";
 interface DownloadToolCallProps {
   tc: ToolCallInfo;

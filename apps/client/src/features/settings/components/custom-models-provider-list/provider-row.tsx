@@ -7,7 +7,7 @@ export function ProviderRow({
   meta,
   connected,
   colors,
-  onPress,
+  onClick,
   trailing,
   disabled
 }: ProviderRowProps) {
@@ -21,13 +21,13 @@ export function ProviderRow({
     </>;
   if (trailing) {
     return <div className={"  opacity-[0.5]"}>
-        <button onClick={onPress} disabled={disabled} role="button" aria-label={name}>
+        <button onClick={onClick} disabled={disabled} role="button" aria-label={name}>
           {content}
         </button>
         {trailing}
       </div>;
   }
-  return <button onClick={onPress} disabled={disabled} role="button" aria-label={name}>
+  return <button onClick={onClick} disabled={disabled} role="button" aria-label={name}>
       {content}
     </button>;
 }

@@ -12,7 +12,7 @@ packageJson.version = version;
 delete packageJson.devDependencies;
 delete packageJson.scripts;
 delete packageJson.dependencies?.["@aijee/engine"];
-packageJson.dependencies = { ...(packageJson.dependencies ?? {}), "@earendil-works/pi-coding-agent": "0.84.3" };
+packageJson.dependencies = { ...(packageJson.dependencies ?? {}), "@earendil-works/pi-coding-agent": "0.86.0" };
 await mkdir(destination, { recursive: true });
 await writeFile(join(destination, "package.json"), `${JSON.stringify(packageJson, null, 2)}\n`);
 await cp(join(root, "apps/server/README.md"), join(destination, "README.md"));

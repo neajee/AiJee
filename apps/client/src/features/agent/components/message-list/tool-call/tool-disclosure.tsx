@@ -19,7 +19,7 @@ interface ToolHeaderProps {
   expandable: boolean;
   onToggle: () => void;
   isDark: boolean;
-  accessibilityLabel: string;
+  "aria-label": string;
   /** Multi-line headers (subagent) need the chevron pinned to the first line. */
   alignTop?: boolean;
   children: ReactNode;
@@ -34,7 +34,7 @@ export const ToolHeader = memo(function ToolHeader({
   expandable,
   onToggle,
   isDark,
-  accessibilityLabel,
+  "aria-label": ariaLabel,
   alignTop = false,
   children
 }: ToolHeaderProps) {
@@ -52,7 +52,7 @@ export const ToolHeader = memo(function ToolHeader({
   if (!expandable) {
     return <div className="flex flex-col">{children}</div>;
   }
-  return <button onClick={onToggle} role="button" aria-label={accessibilityLabel}>
+  return <button onClick={onToggle} role="button" aria-label={ariaLabel}>
       {children}
       <div>
         <ChevronRight size={CHEVRON_SIZE} color={colors.textTertiary} strokeWidth={2} />

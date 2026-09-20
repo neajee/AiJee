@@ -5,7 +5,7 @@ import {
   isToolActive,
   truncateOutput,
 } from "../features/agent/utils/message-list.ts";
-import type { ToolCallInfo } from "../features/agent/types.ts";
+import type { ToolCallInfo } from "../features/agent/component-types.ts";
 
 test("parses a heredoc command whose body has unescaped quotes", () => {
   const raw = `{"command":"cat > /tmp/dbg.ts << 'EOF'\nlet a = "hello";\nEOF"}`;

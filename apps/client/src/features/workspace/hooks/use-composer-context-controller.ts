@@ -6,7 +6,7 @@ import { useServersStore, type Server } from '@/features/servers/store';
 import { useAuthStore } from '@/features/auth/store';
 import { usePiClient, useGitStatus } from '@aijee/client-sdk';
 import type { GitBranch as GitBranchInfo } from '@aijee/client-sdk';
-import type { DropdownKind } from '../components/composer-context-bar/types';
+import type { DropdownKind } from '../components/composer-context-bar/component-types';
 export function useComposerContextController() {
   const router = useRouter();
   const client = usePiClient();

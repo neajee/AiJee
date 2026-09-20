@@ -2,16 +2,16 @@ import type { ReactNode } from 'react';
 interface RailButtonProps {
   label: string;
   active: boolean;
-  onPress: () => void;
+  onClick: () => void;
   children: ReactNode;
 }
 export function RailButton({
   label,
   active,
-  onPress,
+  onClick,
   children
 }: RailButtonProps) {
-  return <button role="button" aria-label={label} onClick={onPress}>
+  return <button role="button" aria-label={label} onClick={onClick}>
       {children}
     </button>;
 }

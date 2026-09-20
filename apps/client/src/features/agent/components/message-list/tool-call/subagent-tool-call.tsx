@@ -2,7 +2,7 @@ import { memo, useCallback, useMemo, useState } from "react";
 import { Colors, Fonts } from "@/constants/theme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { useAppSettingsStore } from "@/features/settings/store";
-import type { ToolCallInfo } from "../agent-types";
+import type { ToolCallInfo } from "../../../component-types.ts";
 import { useStableMarkdown } from "../../../hooks/use-stable-markdown";
 import { createMarkedOptions } from "../../../theme";
 import { isToolActive, parseToolArguments } from "../../../utils/message-list";
@@ -70,7 +70,7 @@ export const SubagentToolCall = memo(function SubagentToolCall({
 
       <ToolBody expanded={expanded && hasDetail}>
         <ToolSurface isDark={isDark}>
-          <div className="flex flex-col" nestedScrollEnabled>
+          <div className="flex flex-col">
             {recentTools.length > 0 && <div className="flex flex-col">
                 <span className={"  text-text-tertiary"}>Steps</span>
                 {recentTools.map((step, i) => <span key={i} className={"  text-text-secondary"}>

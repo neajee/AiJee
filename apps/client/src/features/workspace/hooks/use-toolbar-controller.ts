@@ -6,7 +6,7 @@ import { matchesModelSearch } from '../utils/prompt-input-search';
 import { usePromptTheme } from '@/components/surface-theme/use-prompt-theme';
 import { useAppMode } from '@/hooks/use-app-mode';
 import type { AgentMode } from '@/features/agent/mode';
-import type { ToolbarController, ToolbarProps, DropdownType, EffortOption } from '../components/prompt-input/toolbar/types';
+import type { ToolbarController, ToolbarProps, DropdownType, EffortOption } from '../components/prompt-input/toolbar/component-types';
 import { TOOLBAR_CONTROL_HEIGHT } from '../utils/toolbar-styles';
 const SHOW_TASK_SELECTOR = false;
 const SHOW_MODE_TOGGLE = false;

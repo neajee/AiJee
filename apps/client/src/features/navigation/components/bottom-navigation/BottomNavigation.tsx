@@ -45,15 +45,15 @@ export function BottomNavigation() {
 function BottomBarIcon({
   icon,
   isActive,
-  onPress
+  onClick
 }: {
   icon: React.ComponentProps<typeof MaterialIcons>['name'];
   isActive: boolean;
-  onPress: () => void;
+  onClick: () => void;
 }) {
   const colorScheme = useColorScheme() ?? 'light';
   const colors = useThemeTokens();
-  return <button onClick={onPress}>
+  return <button onClick={onClick}>
       <MaterialIcons name={icon} size={22} color={isActive ? colors.text : colors.icon} />
     </button>;
 }

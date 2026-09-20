@@ -10,7 +10,7 @@ export function SessionRow({
   session,
   isSelected,
   hasUnread,
-  onPress,
+  onClick,
   onRename,
   onArchive,
   isDark
@@ -18,7 +18,7 @@ export function SessionRow({
   session: SessionListItem;
   isSelected: boolean;
   hasUnread: boolean;
-  onPress: () => void;
+  onClick: () => void;
   onRename: (name: string) => Promise<void>;
   onArchive: () => Promise<void>;
   isDark: boolean;
@@ -67,7 +67,7 @@ export function SessionRow({
   return <div onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)}>
       {editing ? <div className="flex flex-col">{status}<input autoFocus value={draft} onChange={event => setDraft(event.target.value)} onKeyDown={event => event.key === "Enter" && (() => void commitRename())(event)} onKeyPress={event => {
         if (event.nativeEvent.key === 'Escape') setEditing(false);
-      }} editable={busy !== 'rename'} maxLength={200} className={"  font-sans"} /></div> : <button onClick={onPress}>{status}<span className={"  font-sans"}>{title}</span></button>}
+      }} editable={busy !== 'rename'} maxLength={200} className={"  font-sans"} /></div> : <button onClick={onClick}>{status}<span className={"  font-sans"}>{title}</span></button>}
       {showActions && !editing && <div className="flex flex-col">
         <RowAction label="重命名对话" onClick={() => setEditing(true)} isDark={isDark}><Pencil size={11} color={colors.textTertiary} strokeWidth={1.8} /></RowAction>
         <RowAction label="归档对话" onClick={() => void handleArchive()} isDark={isDark}>{busy === 'archive' ? <span className={"w-[10px] h-[10px]" + " size-3 animate-spin"} /> : <ArchiveIcon size={11} color={colors.textTertiary} strokeWidth={1.8} />}</RowAction>

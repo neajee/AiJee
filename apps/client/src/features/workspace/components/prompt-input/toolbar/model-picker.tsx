@@ -40,7 +40,7 @@ export function ModelPicker({
           setPopoverIndex(0);
         })(event.target.value)} onKeyPress={handleSearchKeyPress} aria-label="Search models" />
           </div>
-          <div ref={modelScrollRef} className="flex flex-col" keyboardShouldPersistTaps="handled">
+          <div ref={modelScrollRef} className="flex flex-col">
             {providers.length === 0 && <span className={"  text-text-secondary"}>{hasModels ? 'No models found' : 'Loading models…'}</span>}
             {providers.map(provider => <div key={provider.name} role="none">
               <span className={"  text-foreground"} role="header">{provider.name}</span>

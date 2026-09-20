@@ -1,5 +1,5 @@
 import { memo, useMemo } from 'react';
-import type { ToolCallInfo } from '../agent-types';
+import type { ToolCallInfo } from '../../../component-types.ts';
 import { BashToolCall } from './bash-tool-call';
 import { ReadToolCall } from './read-tool-call';
 import { WriteToolCall } from './write-tool-call';

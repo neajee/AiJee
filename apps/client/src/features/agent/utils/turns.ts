@@ -1,4 +1,4 @@
-import type { ChatMessage, ToolCallInfo, TurnFileStats } from "../agent-types";
+import type { ChatMessage, ToolCallInfo, TurnFileStats } from "../component-types";
 
 /**
  * One entry of a turn's work history. Steps hold references to the original

@@ -4,7 +4,7 @@ import type {
   AgentSessionEvent,
 } from "@earendil-works/pi-coding-agent";
 import { adaptAgentEvent } from "./event-adapter.ts";
-import type { ImageAttachment, JsonObject, JsonValue, ModelDescriptor, PromptInput, SessionDescriptor, SessionEntry, SessionEventListener, SessionStats, ToolDescriptor } from "../../core/types.ts";
+import type { CacheWarmingMode, ImageAttachment, JsonObject, JsonValue, ModelDescriptor, PromptInput, SessionDescriptor, SessionEntry, SessionEventListener, SessionStats, ToolDescriptor } from "../../core/types.ts";
 import type { EngineSession } from "../../core/session.ts";
 import { piCapabilities } from "./capabilities.ts";
 
@@ -113,6 +113,38 @@ export class PiSession implements EngineSession {
   commands(): JsonValue[] { return this.session.extensionRunner.getRegisteredCommands() as unknown as JsonValue[]; }
   async reloadResources(): Promise<void> {
     await this.session.reload();
+  }
+
+  productCapabilities(): JsonObject {
+    const model = this.session.model;
+    const settings = this.runtime.services.settingsManager;
+    return {
+      cacheWarming: {
+        mode: settings.getCacheWarmingMode(),
+        status: (this.session.cacheWarmingStatus ?? null) as unknown as JsonValue,
+      },
+      compaction: settings.getCompactionSettings(model ? { provider: model.provider, id: model.id } : undefined) as unknown as JsonValue,
+      prompt: {
+        activeToolNames: this.session.getActiveToolNames(),
+        hasSystemPrompt: this.session.systemPrompt.length > 0,
+        systemPromptLength: this.session.systemPrompt.length,
+        isIdle: this.session.isIdle,
+        isCompacting: this.session.isCompacting,
+      },
+      retry: {
+        ...settings.getRetrySettings(),
+        attempt: this.session.retryAttempt,
+      },
+    };
+  }
+
+  setCacheWarmingMode(mode: CacheWarmingMode): void {
+    this.runtime.services.settingsManager.setCacheWarmingMode(mode);
+    this.session.setCacheWarmingMode(mode);
+  }
+
+  setActiveTools(toolNames: string[]): void {
+    this.session.setActiveToolsByName(toolNames);
   }
 
   async newSession(): Promise<SessionDescriptor> {

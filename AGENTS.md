@@ -19,7 +19,7 @@ AiJee/
 │   │   ├── screens/
 │   │   └── components/
 │   └── platform config
-├── packages/ui/            # Shared product UI, themes and feature modules
+├── apps/client/ui/         # App-internal product UI, themes and feature modules
 │   ├── features/           # Feature modules (UI + shared state)
 │   │   ├── agent/          # Agent message list, extension UI, store
 │   │   ├── auth/            # Auth store (zustand + SecureStore)

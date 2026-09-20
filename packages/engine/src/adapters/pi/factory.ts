@@ -4,6 +4,7 @@ import {
   createAgentSessionServices,
   getAgentDir,
   SessionManager,
+  VERSION,
   type AgentSessionRuntime,
   type CreateAgentSessionRuntimeFactory,
 } from "@earendil-works/pi-coding-agent";
@@ -36,7 +37,7 @@ export function createPiEngineAdapter(): EngineAdapter {
     id: "pi",
     capabilities: piCapabilities,
     probe: () => true,
-    describe: () => ({ id: "pi", version: "0.84.4", embedded: true }),
+    describe: () => ({ id: "pi", version: VERSION, embedded: true }),
     async createSession(input) {
       return new PiSession(await createPiRuntime(input), input.cwd);
     },

@@ -3,7 +3,7 @@ import { Check, ChevronDown, Pencil, X } from "lucide-react";
 import { Colors, Fonts } from "@/constants/theme";
 import { HAIRLINE_WIDTH } from "@/constants/layout";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
-import type { ChatMessage } from "../agent-types";
+import type { ChatMessage } from "../../component-types.ts";
 interface UserMessageProps {
   message: ChatMessage;
   isDark: boolean;

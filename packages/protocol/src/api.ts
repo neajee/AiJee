@@ -144,6 +144,16 @@ export type AgentSetThinkingRequest = {
     session_id: string;
 };
 
+export type AgentProductCapabilities = {
+    cacheWarming: { mode: "off" | "streaming" | "idle"; status: Record<string, unknown> | null };
+    compaction: { enabled: boolean; reserveTokens: number; keepRecentTokens: number };
+    prompt: { activeToolNames: string[]; hasSystemPrompt: boolean; systemPromptLength: number; isIdle: boolean; isCompacting: boolean };
+    retry: { enabled: boolean; maxRetries: number; baseDelayMs: number; maxAgentDelayMs: number; attempt: number };
+};
+
+export type AgentSetCacheWarmingModeRequest = { mode: "off" | "streaming" | "idle"; session_id: string };
+export type AgentSetActiveToolsRequest = { session_id: string; tool_names: string[] };
+
 export type AgentSwitchSessionRequest = {
     sessionPath: string;
     session_id: string;

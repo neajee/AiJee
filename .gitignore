@@ -27,6 +27,9 @@ npm-debug.*
 yarn-debug.*
 yarn-error.*
 .playwright-cli/
+.playwright-mcp/
+test-results/
+output/playwright/
 
 # macOS
 .DS_Store

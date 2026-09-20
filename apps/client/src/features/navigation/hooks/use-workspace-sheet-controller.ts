@@ -5,7 +5,7 @@ import { Gesture } from "@/styles/motion";
 import type { PagerHandle } from '@/platform/pager';
 import { useWorkspaceStore } from '@/features/workspace/store';
 import { useSheetHeight } from './use-sheet-height';
-import type { WorkspaceSheetProps } from '../components/workspace-sheet/types';
+import type { WorkspaceSheetProps } from '../components/workspace-sheet/component-types';
 const TIMING_CONFIG = {
   duration: 280,
   easing: Easing.out(Easing.cubic)

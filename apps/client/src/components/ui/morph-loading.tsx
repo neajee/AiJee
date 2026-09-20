@@ -5,7 +5,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 type LoadingSize = 'sm' | 'md' | 'lg';
 interface MorphLoadingProps {
   size?: LoadingSize;
-  style?: React.CSSProperties<React.CSSProperties>;
+  style?: React.CSSProperties;
 }
 const SIZES: Record<LoadingSize, number> = {
   sm: 64,
@@ -29,19 +29,16 @@ function MorphBlock({
       easing: Easing.inOut(Easing.ease)
     }), -1, false);
   }, [index, progress]);
-  const animatedStyle = useAnimatedStyle(() => {
+  const animatedStyle = useAnimatedStyle((): React.CSSProperties => {
     const points = OFFSETS[index];
     const inputRange = [0, 0.25, 0.5, 0.75, 1];
-    const values = <T extends number,>(column: number) => [...points.map(point => point[column] as T), points[0][column] as T];
+    const values = (column: number) => [...points.map(point => point[column]), points[0][column]];
+    const x = interpolate(progress.value, inputRange, values(0)) * scale;
+    const y = interpolate(progress.value, inputRange, values(1)) * scale;
+    const s = interpolate(progress.value, inputRange, values(2));
     return {
       borderRadius: `${interpolate(progress.value, inputRange, values(3))}%`,
-      transform: [{
-        translateX: interpolate(progress.value, inputRange, values(0)) * scale
-      }, {
-        translateY: interpolate(progress.value, inputRange, values(1)) * scale
-      }, {
-        scale: interpolate(progress.value, inputRange, values(2))
-      }]
+      transform: `translate(${x}px, ${y}px) scale(${s})`
     };
   });
   return <div className="absolute size-4" style={{ backgroundColor: color, ...animatedStyle }} />;

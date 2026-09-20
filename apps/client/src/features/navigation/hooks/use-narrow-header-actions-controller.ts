@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from "@/platform/browser";
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useThemeTokens } from '@/hooks/use-theme-tokens';
 import { NARROW_HEADER_ACTIONS_SHEET_HEIGHT } from '../utils/narrow-header-actions';
-import type { NarrowHeaderActionsSheetProps, NarrowHeaderActionsSheetViewProps } from '../components/narrow-header-actions-sheet/types';
+import type { NarrowHeaderActionsSheetProps, NarrowHeaderActionsSheetViewProps } from '../components/narrow-header-actions-sheet/component-types';
 const TIMING_CONFIG = {
   duration: 280,
   easing: Easing.out(Easing.cubic)

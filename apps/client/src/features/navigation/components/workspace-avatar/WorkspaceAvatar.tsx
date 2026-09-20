@@ -12,7 +12,7 @@ interface WorkspaceAvatarProps {
   color: string;
   isActive: boolean;
   hasNotification: boolean;
-  onPress: () => void;
+  onClick: () => void;
   layout?: 'vertical' | 'horizontal';
 }
 function getLighterColor(hex: string): string {
@@ -29,7 +29,7 @@ export function WorkspaceAvatar({
   color,
   isActive,
   hasNotification,
-  onPress,
+  onClick,
   layout = 'vertical'
 }: WorkspaceAvatarProps) {
   const colorScheme = useColorScheme() ?? 'light';
@@ -42,7 +42,7 @@ export function WorkspaceAvatar({
   const letterColor = getLighterColor(color);
   return <div>
       <div className="flex flex-col">
-        <button onClick={onPress} role="button" aria-label={title}>
+        <button onClick={onClick} role="button" aria-label={title}>
           <div>
             <span>{initial}</span>
           </div>

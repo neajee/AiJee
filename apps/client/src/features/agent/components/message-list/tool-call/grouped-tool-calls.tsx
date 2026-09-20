@@ -1,7 +1,7 @@
 import { memo, useEffect, useRef, useState } from 'react';
 import { Animated } from "@/styles/motion";
 import { useThemeTokens } from '@/hooks/use-theme-tokens';
-import type { ToolCallInfo } from '../agent-types';
+import type { ToolCallInfo } from '../../../component-types.ts';
 import { isToolActive } from '../../../utils/message-list';
 import { ToolBody, ToolHeader } from './tool-disclosure';
 import { formatSingleLine } from '../../../utils/tool-call-grouping';

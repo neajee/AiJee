@@ -29,6 +29,9 @@ export type CreateSessionInput = {
 
 export type SessionEventListener = (event: AgentEvent) => void;
 
+export type CacheWarmingMode = "off" | "streaming" | "idle";
+export type SessionProductCapabilities = JsonObject;
+
 /** One base64 image attachment on a user message. */
 export type ImageAttachment = {
   type: "image";

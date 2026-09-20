@@ -4,7 +4,7 @@ import { useWorkspaceStore } from '../store';
 import { useGitStatus, useGitLog, useFileDiff } from '@aijee/client-sdk';
 import { useWorkspacePaneRequest } from './workspace-pane-context';
 import type { Tab } from '../utils/changes-panel';
-import type { ChangesPanelProps, SelectedFile } from '../components/changes-panel/types';
+import type { ChangesPanelProps, SelectedFile } from '../components/changes-panel/component-types';
 
 export function useChangesPanelController({
   extraTabs,

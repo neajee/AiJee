@@ -18,7 +18,7 @@ AiJee 是面向 [Pi Coding Agent](https://github.com/badlogic/pi-mono/) 的多�
 ## 架构
 
 ```text
-apps/client / apps/desktop → packages/ui → packages/client-sdk → packages/protocol
+apps/client / apps/desktop → apps/client/ui → packages/client-sdk → packages/protocol
 apps/server → packages/engine → Pi SDK
 ```
 
@@ -32,7 +32,7 @@ apps/desktop                     Electron 外壳与Server发现
 packages/engine                  统一引擎抽象与适配器
 packages/protocol                跨端共享类型契约（DTO/事件/路由）
 packages/client-sdk              原生fetch客户端与状态hooks
-packages/ui                      跨端组件、状态与数据hooks
+apps/client/ui                   App内部组件、状态与数据hooks
 ```
 
 Web与桌面端共享同一URL结构，`apps/client` 作为 Web / 桌面 Renderer。

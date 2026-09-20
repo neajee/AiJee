@@ -4,7 +4,7 @@ import { Animated } from "@/styles/motion";
 import { Maximize2, X } from 'lucide-react';
 import { useThemeTokens } from '@/hooks/use-theme-tokens';
 import { CodePreview } from '../../code-preview';
-import type { ToolCallInfo } from '../agent-types';
+import type { ToolCallInfo } from '../../../../component-types.ts';
 import { ToolBody, ToolHeader, TOOL_BODY_MAX_HEIGHT } from '../tool-disclosure';
 import { useEditToolCallController } from '../../../../hooks/use-edit-tool-call-controller';
 export const EditToolCall = memo(function EditToolCall({

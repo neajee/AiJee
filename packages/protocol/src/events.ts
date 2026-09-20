@@ -5,8 +5,8 @@ export type AgentStreamEvent =
   | { type: "agent_start" }
   | { type: "agent_end"; messages: AgentMessage[]; willRetry?: boolean }
   | { type: "agent_settled" }
-  | { type: "turn_start" }
-  | { type: "turn_end"; message?: AssistantMessage; toolResults?: ToolResultMessage[] }
+  | { type: "turn_start"; turnIndex?: number; timestamp?: number }
+  | { type: "turn_end"; message?: AssistantMessage; toolResults?: ToolResultMessage[]; turnIndex?: number; timestamp?: number }
   | { type: "message_start"; message: AssistantMessage }
   | { type: "message_update"; assistantMessageEvent: MessageDelta; usage?: import("./messages.ts").UsageInfo; message?: AssistantMessage }
   | { type: "message_end"; message: AssistantMessage }
@@ -17,6 +17,9 @@ export type AgentStreamEvent =
   | { type: "compaction_end"; reason?: "manual" | "threshold" | "overflow"; result?: CompactionResult | null; aborted: boolean; willRetry: boolean; errorMessage?: string }
   | { type: "bash_execution_update"; id?: string; delta: string }
   | { type: "queue_update"; steering: string[]; followUp: string[] }
+  | { type: "entry_appended"; entry: Record<string, unknown> }
+  | { type: "session_info_changed"; name?: string }
+  | { type: "thinking_level_changed"; level: string }
   | { type: "summarization_retry_scheduled"; attempt: number; maxAttempts: number; delayMs: number; errorMessage: string }
   | { type: "summarization_retry_attempt_start"; source: "compaction" | "branchSummary"; reason?: "manual" | "threshold" | "overflow" }
   | { type: "summarization_retry_finished" }

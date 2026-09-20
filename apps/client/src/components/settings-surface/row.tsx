@@ -25,7 +25,7 @@ export function SettingsRow({
   label,
   description,
   right,
-  onPress,
+  onClick,
   isLast,
   tone,
   accessibilityLabel
@@ -34,7 +34,7 @@ export function SettingsRow({
   label: string;
   description?: string;
   right?: ReactNode;
-  onPress?: () => void;
+  onClick?: () => void;
   isLast?: boolean;
   tone?: 'default' | 'destructive';
   accessibilityLabel?: string;
@@ -48,7 +48,7 @@ export function SettingsRow({
       {description ? <span className={"text-[var(--desc-size)] font-sans leading-[0] text-left"}>{description}</span> : null}</div>
     {right}
   </div>;
-  return <div>{onPress ? <button onClick={onPress} role="button" aria-label={accessibilityLabel ?? label}>{body}</button> : body}{!isLast ? <div className="h-px ml-[var(--gutter)] bg-border" /> : null}</div>;
+  return <div>{onClick ? <button onClick={onClick} role="button" aria-label={accessibilityLabel ?? label}>{body}</button> : body}{!isLast ? <div className="h-px ml-[var(--gutter)] bg-border" /> : null}</div>;
 }
 export function SettingsSwitch({
   value,

@@ -1,5 +1,5 @@
 import { isAbortReason } from "@aijee/client-sdk";
-import type { AgentConnectionState, ChatMessage, StreamEvent, ToolCallInfo } from "../agent-types";
+import type { AgentConnectionState, ChatMessage, StreamEvent, ToolCallInfo } from "../component-types";
 import { parsePendingExtensionUiRequest, type PendingExtensionUiRequest } from "../extension-ui";
 import { extractAgentMode, type AgentMode } from "../mode";
 import { extractTextFromContent, extractUsageInfo, getAssistantErrorMessage } from "./message-converter";

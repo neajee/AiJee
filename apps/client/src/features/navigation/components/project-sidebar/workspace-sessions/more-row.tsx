@@ -2,16 +2,16 @@ import { useState } from 'react';
 import { useThemeTokens } from '@/hooks/use-theme-tokens';
 export function MoreRow({
   label,
-  onPress,
+  onClick,
   disabled
 }: {
   label: string;
-  onPress: () => void;
+  onClick: () => void;
   disabled?: boolean;
 }) {
   const colors = useThemeTokens();
   const [hovered, setHovered] = useState(false);
-  return <button onClick={onPress} disabled={disabled} onHoverIn={() => setHovered(true)} onHoverOut={() => setHovered(false)}>
+  return <button onClick={onClick} disabled={disabled} onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)}>
       <span>{label}</span>
     </button>;
 }

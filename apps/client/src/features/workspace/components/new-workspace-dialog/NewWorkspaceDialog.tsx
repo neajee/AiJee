@@ -85,7 +85,7 @@ export function NewWorkspaceDialogView({
                       {item.path}
                     </span>
                   </button>)}
-              </div> : <VirtualList<PathCompletion> ref={suggestionsRef} data={suggestions} keyExtractor={item => item.path} className="flex flex-col" keyboardShouldPersistTaps="handled" nestedScrollEnabled scrollEnabled={suggestions.length > 4} getItemLayout={(_data, index) => ({
+              </div> : <VirtualList<PathCompletion> ref={suggestionsRef} data={suggestions} keyExtractor={item => item.path} className="flex flex-col" nestedScrollEnabled getItemLayout={(_data, index) => ({
           length: 40,
           offset: 40 * index,
           index
@@ -140,7 +140,7 @@ export function NewWorkspaceDialogView({
                 <div />
               </div>
               <span>新建项目</span>
-              <div className="flex flex-col" keyboardShouldPersistTaps="handled">
+              <div className="flex flex-col">
                 {formContent}
               </div>
             </button>

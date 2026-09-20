@@ -12,7 +12,7 @@ interface SelectProps<T extends string = string> {
   placeholder?: string;
   disabled?: boolean;
   compact?: boolean;
-  style?: React.CSSProperties<React.CSSProperties>;
+  style?: React.CSSProperties;
 }
 export function Select<T extends string = string>({
   value,

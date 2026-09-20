@@ -5,7 +5,7 @@ import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing } from "
 import { Colors, Fonts } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
-import type { ChatMessage } from "../agent-types";
+import type { ChatMessage } from "../../component-types.ts";
 import { AssistantMarkdown } from "./assistant-markdown";
 import { StreamingCursor } from "./streaming-cursor";
 interface AssistantMessageProps {

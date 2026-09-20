@@ -110,7 +110,7 @@ features/<feature>/components/<MajorComponent>/
 
 ### UI样式体系
 
-Web统一使用Tamagui作为布局、文本与滚动原语。`apps/client/tamagui.config.ts`共用`packages/ui/constants/theme-static.ts`；运行时主题预设与字号仍通过`useThemeTokens`注入语义样式。组件样式以Tamagui可消费的静态对象和主题值表达，禁止新增StyleSheet样式工厂。
+Web统一使用Tamagui作为布局、文本与滚动原语。`apps/client/tamagui.config.ts`共用`apps/client/ui/constants/theme-static.ts`；运行时主题预设与字号仍通过`useThemeTokens`注入语义样式。组件样式以Tamagui可消费的静态对象和主题值表达，禁止新增StyleSheet样式工厂。
 
 运行时状态保存在`~/.aijee/`：工作区、模式、会话索引和任务日志均可在重启后恢复；会话激活时才由`SessionRegistry`按其磁盘session file重建。文件、Git和任务cwd必须位于已配置工作区内。
 

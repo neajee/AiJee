@@ -64,6 +64,36 @@ test("serves the SDK runtime health and workspace contract", async () => {
   }
 });
 
+test("exposes Pi product capabilities through the stable SDK routes", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "aijee-product-sdk-"));
+  const registry = new SessionRegistry(async (input) => {
+    const session = fakeSession("product-session", { cwd: input.cwd });
+    (session as any).productCapabilities = () => ({ cacheWarming: { mode: "streaming", status: null }, compaction: { enabled: true, reserveTokens: 100, keepRecentTokens: 200 }, prompt: { activeToolNames: ["read"], hasSystemPrompt: true, systemPromptLength: 6, isIdle: true, isCompacting: false }, retry: { enabled: true, maxRetries: 2, baseDelayMs: 10, maxAgentDelayMs: 100, attempt: 0 } });
+    (session as any).setCacheWarmingMode = (mode: string) => { (session as any).lastCacheWarmingMode = mode; };
+    (session as any).setActiveTools = (toolNames: string[]) => { (session as any).lastActiveTools = toolNames; };
+    return session;
+  });
+  const server = new AiJeeHttpServer(new AiJeeRuntime(registry), join(directory, "runtime.json"));
+  await server.listen(0, "0.0.0.0");
+  try {
+    const token = await authorize(server);
+    const headers = { "Content-Type": "application/json", Authorization: `Bearer ${token}` };
+    const created = await fetch(`${server.url()}/api/workspaces`, { method: "POST", headers, body: JSON.stringify({ name: "AiJee", path: directory }) });
+    const workspaceId = (await created.json() as { data: { id: string } }).data.id;
+    const opened = await fetch(`${server.url()}/api/agent/sessions`, { method: "POST", headers, body: JSON.stringify({ workspace_id: workspaceId }) });
+    const sessionId = (await opened.json() as { data: { session_id: string } }).data.session_id;
+
+    const capabilities = await fetch(`${server.url()}/api/agent/product-capabilities`, { method: "POST", headers, body: JSON.stringify({ session_id: sessionId }) });
+    assert.equal(capabilities.status, 200);
+    assert.equal((await capabilities.json() as { data: { cacheWarming: { mode: string } } }).data.cacheWarming.mode, "streaming");
+    assert.equal((await fetch(`${server.url()}/api/agent/set-cache-warming-mode`, { method: "POST", headers, body: JSON.stringify({ session_id: sessionId, mode: "idle" }) })).status, 200);
+    assert.equal((await fetch(`${server.url()}/api/agent/set-active-tools`, { method: "POST", headers, body: JSON.stringify({ session_id: sessionId, tool_names: ["read", "edit"] }) })).status, 200);
+  } finally {
+    await server.close();
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
 test("reuses a hidden draft session and publishes it only after the first prompt", async () => {
   const directory = await mkdtemp(join(tmpdir(), "aijee-draft-"));
   const messages: unknown[] = [];

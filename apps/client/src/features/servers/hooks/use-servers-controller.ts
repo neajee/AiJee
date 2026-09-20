@@ -66,7 +66,7 @@ export function useServersController() {
       }, {
         text: "移除",
         style: "destructive",
-        onPress: doDelete
+        onClick: doDelete
       }]);
     }
   }, [removeServer, logoutFromServer]);

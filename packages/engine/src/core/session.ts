@@ -1,5 +1,5 @@
 import type { EngineCapabilities } from "./capabilities.ts";
-import type { AgentEvent, ImageAttachment, JsonObject, JsonValue, ModelDescriptor, PromptInput, SessionDescriptor, SessionEntry, SessionEventListener, SessionStats, ToolDescriptor } from "./types.ts";
+import type { AgentEvent, CacheWarmingMode, ImageAttachment, JsonObject, JsonValue, ModelDescriptor, PromptInput, SessionDescriptor, SessionEntry, SessionEventListener, SessionStats, ToolDescriptor } from "./types.ts";
 
 export type SessionMode = "all" | "one-at-a-time";
 
@@ -40,6 +40,9 @@ export interface EngineSession {
   exportHtml(outputPath?: string): Promise<string>;
   commands(): JsonValue[];
   reloadResources?(): Promise<void>;
+  productCapabilities?(): JsonObject;
+  setCacheWarmingMode?(mode: CacheWarmingMode): void;
+  setActiveTools?(toolNames: string[]): void;
   newSession(): Promise<SessionDescriptor>;
   switchSession(sessionFile: string): Promise<SessionDescriptor>;
   dispose(): Promise<void>;

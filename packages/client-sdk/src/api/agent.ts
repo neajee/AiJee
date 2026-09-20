@@ -5,7 +5,7 @@ import type {
   MarketplacePackage, PackageSearchResponse, PackageOperationRequest, OperationResult, TaskInfo, TasksConfig,
   TaskLogs, TaskDefinition, AgentMode, CustomModelsConfig, CustomProvider, FsListResponse, FsReadResponse,
   FsEntry, FsUploadResponse, PathCompletion, SessionHistoryResponse, SessionListItem, AgentStateData,
-  CompactionResult, ImageContent, ModelInfo,
+  AgentProductCapabilities, CompactionResult, ImageContent, ModelInfo,
 } from "@aijee/protocol";
 import type { BuiltinProvider, CustomModelsConfigResult } from "../types";
 import { ApiTransport, unwrapResult } from "./transport";
@@ -372,6 +372,21 @@ export async function getCommands(transport: ApiTransport, sessionId: string): P
     });
     return unwrapResult(result);
   }
+export async function getProductCapabilities(transport: ApiTransport, sessionId: string): Promise<AgentProductCapabilities> {
+    const result = await transport.request("getProductCapabilities", { body: { session_id: sessionId } });
+    return unwrapResult<AgentProductCapabilities>(result);
+  }
+
+export async function setCacheWarmingMode(transport: ApiTransport, sessionId: string, mode: "off" | "streaming" | "idle"): Promise<void> {
+    const result = await transport.request("setCacheWarmingMode", { body: { session_id: sessionId, mode } });
+    unwrapResult(result);
+  }
+
+export async function setActiveTools(transport: ApiTransport, sessionId: string, toolNames: string[]): Promise<void> {
+    const result = await transport.request("setActiveTools", { body: { session_id: sessionId, tool_names: toolNames } });
+    unwrapResult(result);
+  }
+
 export async function extensionUiResponse(transport: ApiTransport, params: {
     sessionId: string;
     id: string;

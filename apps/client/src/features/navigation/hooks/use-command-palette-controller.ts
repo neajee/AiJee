@@ -4,7 +4,7 @@ import { useRouter } from '@/hooks/router';
 import { MessageSquare } from 'lucide-react';
 import { useWorkspaceStore } from '@/features/workspace/store';
 import { usePiClient, type SessionListItem } from '@aijee/client-sdk';
-import type { CommandPaletteProps, CommandItem } from '../components/command-palette/types';
+import type { CommandPaletteProps, CommandItem } from '../components/command-palette/component-types';
 interface WorkspaceSession extends SessionListItem {
   workspaceId: string;
   workspaceTitle: string;

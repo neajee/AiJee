@@ -19,11 +19,11 @@ const MORPH_MS = 140;
 interface SeamToggleProps {
   /** Which way the panel moves when pressed. */
   chevron: "left" | "right";
-  onPress: () => void;
+  onClick: () => void;
   label: string;
   /** Web only: lets the pill count as part of the seam's hover target. */
-  onHoverIn?: () => void;
-  onHoverOut?: () => void;
+  onPointerEnter?: () => void;
+  onPointerLeave?: () => void;
 }
 
 /**
@@ -40,10 +40,10 @@ interface SeamToggleProps {
  */
 export function SeamToggle({
   chevron,
-  onPress,
+  onClick,
   label,
-  onHoverIn,
-  onHoverOut
+  onPointerEnter,
+  onPointerLeave
 }: SeamToggleProps) {
   const colorScheme = useColorScheme() ?? "light";
   const colors = useThemeTokens();
@@ -66,17 +66,17 @@ export function SeamToggle({
   const activeBorder = isDark ? "rgba(255,255,255,0.10)" : "rgba(0,0,0,0.10)";
   const handleIn = () => {
     if (isWeb) setActive(true);
-    onHoverIn?.();
+    onPointerEnter?.();
   };
   const handleOut = () => {
     if (isWeb) setActive(false);
-    onHoverOut?.();
+    onPointerLeave?.();
   };
   const webHoverProps = isWeb ? {
     onMouseEnter: handleIn,
     onMouseLeave: handleOut
   } : {};
-  return <button onClick={onPress} role="button" aria-label={label} {...{
+  return <button onClick={onClick} role="button" aria-label={label} {...{
     title: label
   }} {...webHoverProps}
   // The mark is small; the hit area is the whole seam segment plus slop.

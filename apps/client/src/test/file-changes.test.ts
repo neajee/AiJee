@@ -4,7 +4,7 @@ import {
   collectFileChanges,
   relativePath,
 } from "../features/agent/utils/message-list.ts";
-import type { ToolCallInfo } from "../features/agent/types.ts";
+import type { ToolCallInfo } from "../features/agent/component-types.ts";
 
 function tool(partial: Partial<ToolCallInfo>): ToolCallInfo {
   return {

@@ -6,7 +6,7 @@ import { useColors } from '../../hooks/use-custom-models-theme';
 export function Field({
   label,
   value,
-  onChangeText,
+  onChange,
   placeholder,
   colors,
   mono,
@@ -14,7 +14,7 @@ export function Field({
 }: {
   label: string;
   value: string;
-  onChangeText: (v: string) => void;
+  onChange: (v: string) => void;
   placeholder?: string;
   colors: ReturnType<typeof useColors>;
   mono?: boolean;
@@ -24,6 +24,6 @@ export function Field({
       <span className={"  text-text-secondary"}>
         {label}
       </span>
-      <input className={"  text-foreground bg-background border-border font-mono"} value={value} onChange={event => onChangeText(event.target.value)} placeholder={placeholder} autoFocus={autoFocus} />
+      <input className={"  text-foreground bg-background border-border font-mono"} value={value} onChange={event => onChange(event.target.value)} placeholder={placeholder} autoFocus={autoFocus} />
     </div>;
 }

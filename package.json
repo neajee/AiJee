@@ -18,5 +18,8 @@
     "web:build": "yarn workspace @aijee/client build && node scripts/write-releases-snapshot.mjs && node scripts/prepare-web-assets.cjs",
     "release:snapshot": "node scripts/write-releases-snapshot.mjs",
     "build:prod": "yarn web:build && yarn runtime:check"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0"
   }
 }

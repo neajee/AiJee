@@ -47,7 +47,7 @@ export function CommandPalette({
             <Search size={16} color={textMuted} strokeWidth={2} />
             <input ref={inputRef} value={search} onChange={event => setSearch(event.target.value)} onKeyPress={handleKeyPress} placeholder="搜索对话…" />
           </div>
-          <div ref={scrollRef} className="flex flex-col" keyboardShouldPersistTaps="handled">
+          <div ref={scrollRef} className="flex flex-col">
             <div ref={scrollContentRef}>
               {sessionsLoading ? <div className="flex flex-col">
                   <span className="size-3 animate-spin" />
@@ -86,14 +86,14 @@ export function CommandPalette({
 }
 function AnimatedOverlay({
   animation,
-  onPress
+  onClick
 }: {
   animation: {
     value: number;
   };
-  onPress: () => void;
+  onClick: () => void;
 }) {
   return <div className={"  opacity-100"}>
-      <button className="inline-flex items-center" onClick={onPress} />
+      <button className="inline-flex items-center" onClick={onClick} />
     </div>;
 }

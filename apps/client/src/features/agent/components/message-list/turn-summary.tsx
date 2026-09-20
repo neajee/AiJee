@@ -1,7 +1,7 @@
 import { memo, useCallback, useMemo, useState } from "react";
 import { useWorkspaceStore } from "@/features/workspace/store";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
-import type { TurnFileStats } from "../agent-types";
+import type { TurnFileStats } from "../../component-types.ts";
 import { basename, relativePath, type TurnFileChange } from "../../utils/message-list";
 import { ToolBody, ToolHeader, ToolSurface } from "./tool-call/tool-disclosure";
 import { FileChangeRow } from "./file-change-row";
@@ -73,7 +73,7 @@ export const TurnSummary = memo(function TurnSummary({
         {expandable && <ToolBody expanded={expanded}>
             <div
         // A turn can touch dozens of files; cap it like any tool body.
-        nestedScrollEnabled scrollEnabled={ordered.length > SUMMARY_SCROLL_AFTER}>
+       >
               {ordered.map(change => <FileChangeRow key={change.path} change={change} root={root} addColor={addColor} removeColor={removeColor} isDark={isDark} />)}
             </div>
           </ToolBody>}

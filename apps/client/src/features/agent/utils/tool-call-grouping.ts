@@ -1,4 +1,4 @@
-import type { ToolCallInfo } from '../agent-types';
+import type { ToolCallInfo } from '../component-types';
 import { basename, parseToolArguments, toolDisplayName } from './message-list';
 
 const NEVER_GROUP = new Set(['bash', 'write', 'edit', 'subagent']);

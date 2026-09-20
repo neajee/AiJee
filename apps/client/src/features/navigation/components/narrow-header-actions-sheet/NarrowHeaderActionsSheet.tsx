@@ -36,7 +36,7 @@ export function NarrowHeaderActionsSheetView({
         </div>
 
         <div className="flex flex-col">
-          {items.map((item, index) => <button key={item.key} onClick={item.onPress} role="button" aria-label={item.label}>
+          {items.map((item, index) => <button key={item.key} onClick={item.onClick} role="button" aria-label={item.label}>
               <div className="flex flex-col">{item.icon}</div>
               <span>{item.label}</span>
             </button>)}

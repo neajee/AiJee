@@ -53,7 +53,7 @@ export function SessionPage({
         </button>
       </div>
 
-      <div className="flex flex-col" nestedScrollEnabled>
+      <div className="flex flex-col">
         {isLoading ? <span className={"mt-[24px]"} /> : sessions.length === 0 ? <span>No sessions yet</span> : sessions.map(session => <AnimatedListItem key={session.id}>
               <button onClick={() => onSessionPress(session.id)}>
                 <SessionActivityIndicator sessionId={session.id} color={textMuted} />

@@ -111,6 +111,9 @@ export async function dispatchRoute(ctx: RouteContext, request: IncomingMessage,
   if (request.method === "POST" && url.pathname === "/api/agent/fork-messages") return ctx.sessionCommand(request, response, (session: any) => ({ messages: session.forkMessages() }), "fork");
   if (request.method === "POST" && url.pathname === "/api/agent/last-assistant-text") return ctx.sessionCommand(request, response, (session: any) => ({ text: session.lastAssistantText() }));
   if (request.method === "POST" && url.pathname === "/api/agent/commands") return ctx.sessionCommand(request, response, (session: any) => ({ commands: session.commands() }), "extensions");
+  if (request.method === "POST" && url.pathname === "/api/agent/product-capabilities") return ctx.sessionCommand(request, response, (session: any) => session.productCapabilities?.() ?? {}, "extensions");
+  if (request.method === "POST" && url.pathname === "/api/agent/set-active-tools") return ctx.mutateSession(request, response, (session: any, body: any) => session.setActiveTools?.(Array.isArray(body.tool_names) ? body.tool_names.map(String) : []), "tools");
+  if (request.method === "POST" && url.pathname === "/api/agent/set-cache-warming-mode") return ctx.mutateSession(request, response, (session: any, body: any) => session.setCacheWarmingMode?.(String(body.mode)), "compaction");
   if (request.method === "POST" && url.pathname === "/api/agent/extension-ui-response") return ctx.error(response, 501, "Extension UI responses are not implemented");
   if (request.method === "POST" && url.pathname === "/api/agent/state") return ctx.sessionCommand(request, response, (session: any) => session.state());
   if (request.method === "POST" && url.pathname === "/api/agent/messages") return ctx.sessionCommand(request, response, (session: any) => ({ messages: session.messages() }));

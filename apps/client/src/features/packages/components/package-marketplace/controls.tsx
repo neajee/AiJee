@@ -33,19 +33,19 @@ export function Segmented({
 }
 export function SearchField({
   value,
-  onChangeText,
+  onChange,
   onSubmit
 }: {
   value: string;
-  onChangeText: (v: string) => void;
+  onChange: (v: string) => void;
   onSubmit: () => void;
 }) {
   const m = useSettingsMetrics();
   const p = useSettingsPalette();
   return <div className={"  rounded-[var(--tile-radius)]"}>
       <Search size={14} color={p.textTertiary} strokeWidth={1.8} />
-      <input value={value} onChange={event => onChangeText(event.target.value)} onKeyDown={event => event.key === "Enter" && onSubmit(event)} placeholder="搜索插件名称或关键词" aria-label="搜索插件" className={"  text-[var(--value-size)]"} />
-      {value ? <button onClick={() => onChangeText('')} role="button" aria-label="清空搜索" className="inline-flex items-center">
+      <input value={value} onChange={event => onChange(event.target.value)} onKeyDown={event => event.key === "Enter" && onSubmit(event)} placeholder="搜索插件名称或关键词" aria-label="搜索插件" className={"  text-[var(--value-size)]"} />
+      {value ? <button onClick={() => onChange('')} role="button" aria-label="清空搜索" className="inline-flex items-center">
           <X size={13} color={p.textTertiary} strokeWidth={2} />
         </button> : null}
     </div>;
@@ -53,15 +53,15 @@ export function SearchField({
 export function Chip({
   label,
   active,
-  onPress
+  onClick
 }: {
   label: string;
   active: boolean;
-  onPress: () => void;
+  onClick: () => void;
 }) {
   const m = useSettingsMetrics();
   const p = useSettingsPalette();
-  return <button onClick={onPress} role="button" aria-label={label} className="inline-flex items-center">
+  return <button onClick={onClick} role="button" aria-label={label} className="inline-flex items-center">
       <span className={"text-[var(--desc-size)] font-sans"}>
         {label}
       </span>
@@ -73,16 +73,16 @@ export function Chip({
 export function PackageCard({
   pkg,
   single,
-  onPress
+  onClick
 }: {
   pkg: MarketplacePackage;
   /** Narrow viewport: one card per row instead of a wrapping grid. */
   single: boolean;
-  onPress: () => void;
+  onClick: () => void;
 }) {
   const m = useSettingsMetrics();
   const p = useSettingsPalette();
-  return <button onClick={onPress} role="button" aria-label={`${pkg.name} 详情`} className="inline-flex items-center">
+  return <button onClick={onClick} role="button" aria-label={`${pkg.name} 详情`} className="inline-flex items-center">
       <div className="flex flex-col">
         <span className={"  text-[var(--label-size)]"}>
           {pkg.name}

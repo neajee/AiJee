@@ -23,7 +23,7 @@ export function FileRow({
   isSelected,
   diffContent,
   diffLoading,
-  onPress,
+  onClick,
   textPrimary,
   textMuted,
   hoverBg,
@@ -37,7 +37,7 @@ export function FileRow({
   isSelected?: boolean;
   diffContent?: string | null;
   diffLoading?: boolean;
-  onPress?: () => void;
+  onClick?: () => void;
   textPrimary: string;
   textMuted: string;
   hoverBg: string;
@@ -64,7 +64,7 @@ export function FileRow({
     onPointerEnter: () => setHovered(true),
     onPointerLeave: () => setHovered(false)
   } : {}}>
-      <button onClick={onPress} {...{
+      <button onClick={onClick} {...{
       title: path
     }} aria-label={`${path} (${status})`}>
         <FileTypeBadge path={path} fallbackColor={textMuted} />

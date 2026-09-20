@@ -1,7 +1,7 @@
 import { memo, useCallback, useState } from "react";
 import { Colors, Fonts } from "@/constants/theme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
-import type { ToolCallInfo } from "../agent-types";
+import type { ToolCallInfo } from "../../../component-types.ts";
 import { toolDisplayName } from "../../../utils/message-list";
 import { ToolBody, ToolHeader, ToolSurface, TOOL_BODY_MAX_HEIGHT } from "./tool-disclosure";
 import { ToolResultImages } from "./tool-result-images";
@@ -32,7 +32,7 @@ export const GenericToolCall = memo(function GenericToolCall({
 
       <ToolBody expanded={expanded && hasResult}>
         <ToolSurface isDark={isDark}>
-          <div className="flex flex-col" nestedScrollEnabled>
+          <div className="flex flex-col">
             <span className={"  text-text-secondary"}>
               {resultText}
             </span>

@@ -2,7 +2,7 @@ import type React from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { VirtualList } from "@/components/ui/virtual-list";
 import { useAgentSession } from "@aijee/client-sdk";
-import type { ChatMessage } from "../agent-types";
+import type { ChatMessage } from "../component-types";
 import { buildListItems, reconcileItems, type ListItem } from "../utils/turns";
 export interface MessageListProps {
   sessionId: string;

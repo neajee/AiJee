@@ -42,7 +42,7 @@ export function ServerRow({
   isFailed,
   lastConnectedAt,
   isLast,
-  onPress,
+  onClick,
   onShowCode,
   onToggleMenu
 }: {
@@ -52,7 +52,7 @@ export function ServerRow({
   isFailed: boolean;
   lastConnectedAt?: number;
   isLast: boolean;
-  onPress: () => void;
+  onClick: () => void;
   onShowCode: () => void;
   onToggleMenu: (measure: (callback: (x: number, y: number, width: number, height: number) => void) => void) => void;
 }) {
@@ -76,7 +76,7 @@ export function ServerRow({
   };
   return <div className="flex flex-col">
       {isActive ? <div /> : null}
-      <button onClick={onPress} onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)} role="button" aria-label={`连接到 ${server.name}，${status.label}`}>
+      <button onClick={onClick} onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)} role="button" aria-label={`连接到 ${server.name}，${status.label}`}>
       <ConnectionStatusDot label={status.label} color={status.color} connecting={isConnecting} />
       <div className={"flex items-center justify-center w-[30px] h-[30px] rounded-[8px]"}>
         {isConnecting ? <span className="size-3 animate-spin" /> : <PiLogo size={16} color={p.textSecondary} />}
@@ -102,18 +102,18 @@ export function ServerRow({
 export function FooterAction({
   icon: Icon,
   label,
-  onPress,
+  onClick,
   isLast = false,
   isFirst = false
 }: {
   icon: any;
   label: string;
-  onPress: () => void;
+  onClick: () => void;
   isLast?: boolean;
   isFirst?: boolean;
 }) {
   const p = useSettingsPalette();
-  return <button onClick={onPress} role="button" aria-label={label}>
+  return <button onClick={onClick} role="button" aria-label={label}>
       {isFirst ? <div /> : null}
       <Icon size={16} color={p.textSecondary} strokeWidth={1.8} />
       <span>{label}</span>
@@ -122,13 +122,13 @@ export function FooterAction({
 export function MenuAction({
   icon: Icon,
   label,
-  onPress,
+  onClick,
   color
 }: {
   icon: any;
   label: string;
-  onPress: () => void;
+  onClick: () => void;
   color: string;
 }) {
-  return <button onClick={onPress} role="button" aria-label={label}><Icon size={16} color={color} strokeWidth={1.8} /><span>{label}</span></button>;
+  return <button onClick={onClick} role="button" aria-label={label}><Icon size={16} color={color} strokeWidth={1.8} /><span>{label}</span></button>;
 }

@@ -96,7 +96,7 @@ export const TurnBlock = memo(function TurnBlock({
             {divider}
           </button> : divider)}
 
-      {hasWork && expanded && <div entering={FadeIn.duration(140)}>
+      {hasWork && expanded && <div>
           {sections.map(section => section.kind === "activity" ? <WorkActivityGroup key={section.key} steps={section.steps} isDark={isDark} /> : <WorkStepView key={section.key} step={section.step} isDark={isDark} />)}
         </div>}
 

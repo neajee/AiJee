@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useWindowDimensions } from "@/platform/browser";
 import { useGitStatus, useNestedRepos } from '@aijee/client-sdk';
 import { remotesToLinks, type RemoteLink } from '@/features/workspace/utils/git-remote-url';
-import type { WorkspaceContextMenuProps } from '../components/workspace-context-menu/types';
+import type { WorkspaceContextMenuProps } from '../components/workspace-context-menu/component-types';
 export const MENU_WIDTH = 170;
 const ITEM_HEIGHT = 33;
 const MENU_PADDING = 8;

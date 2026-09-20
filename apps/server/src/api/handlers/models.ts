@@ -54,16 +54,9 @@ export async function saveBuiltinProviderKey(ctx: HandlerContext, providerId: st
   }
 
 
-export async function removeBuiltinProviderKey(ctx: HandlerContext, providerId: string): Promise<void> {
-    let root: Record<string, unknown> = {};
-    try { const raw = await readFile(ctx.piAuthPath, "utf8"); if (raw.trim()) { const parsed: unknown = JSON.parse(raw); if (!isObject(parsed)) throw new HttpError(422, "~/.pi/agent/auth.json must contain an object"); root = parsed; } }
-    catch (error) { if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error; }
-    if (!(providerId in root)) return;
-    delete root[providerId];
-    await mkdir(dirname(ctx.piAuthPath), { recursive: true });
-    const temporary = `${ctx.piAuthPath}.${randomUUID()}.tmp`;
-    await writeFile(temporary, `${JSON.stringify(root, null, 2)}\n`, "utf8");
-    await rename(temporary, ctx.piAuthPath);
+export async function removeBuiltinProviderKey(_ctx: HandlerContext, providerId: string): Promise<void> {
+    const runtime = await ModelRuntime.create({ signal: AbortSignal.timeout(15_000) });
+    await runtime.removeRuntimeApiKey(providerId);
   }
 
 
@@ -177,22 +170,9 @@ export async function writePiModelsRoot(ctx: HandlerContext, root: Record<string
   }
 
 
-export async function saveApiKey(ctx: HandlerContext, providerId: string, key: string): Promise<void> {
-    let root: Record<string, unknown> = {};
-    try {
-      const raw = await readFile(ctx.piAuthPath, "utf8");
-      if (raw.trim()) {
-        const parsed: unknown = JSON.parse(raw);
-        if (!isObject(parsed)) throw new HttpError(422, "~/.pi/agent/auth.json must contain an object");
-        root = parsed;
-      }
-    } catch (error) {
-      if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
-    }
-    await mkdir(dirname(ctx.piAuthPath), { recursive: true });
-    const temporary = `${ctx.piAuthPath}.${randomUUID()}.tmp`;
-    await writeFile(temporary, `${JSON.stringify({ ...root, [providerId]: { type: "api_key", key } }, null, 2)}\n`, "utf8");
-    await rename(temporary, ctx.piAuthPath);
+export async function saveApiKey(_ctx: HandlerContext, providerId: string, key: string): Promise<void> {
+    const runtime = await ModelRuntime.create({ signal: AbortSignal.timeout(15_000) });
+    await runtime.setRuntimeApiKey(providerId, key.trim());
   }
 
 

@@ -4,7 +4,7 @@ export interface NarrowHeaderActionItem {
   key: string;
   label: string;
   icon: ReactNode;
-  onPress: () => void;
+  onClick: () => void;
 }
 export interface NarrowHeaderActionsSheetProps {
   visible: boolean;
@@ -21,8 +21,8 @@ export interface NarrowHeaderActionsSheetViewProps {
   rowBorder: string;
   overlayColor: string;
   handleColor: string;
-  sheetStyle: React.CSSProperties<React.CSSProperties>;
-  overlayStyle: React.CSSProperties<React.CSSProperties>;
+  sheetStyle: React.CSSProperties;
+  overlayStyle: React.CSSProperties;
   panGesture: unknown;
   onDismiss: () => void;
 }

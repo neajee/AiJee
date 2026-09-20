@@ -57,15 +57,15 @@ function MenuItem({
   label,
   color,
   hoverBg,
-  onPress
+  onClick
 }: {
   icon: MenuIcon;
   label: string;
   color: string;
   hoverBg: string;
-  onPress: () => void;
+  onClick: () => void;
 }) {
-  return <button onClick={onPress} aria-label={label}>
+  return <button onClick={onClick} aria-label={label}>
       <Icon size={14} color={color} strokeWidth={1.8} />
       <span>{label}</span>
     </button>;

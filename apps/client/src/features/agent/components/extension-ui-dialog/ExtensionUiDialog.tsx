@@ -40,7 +40,7 @@ export function ExtensionUiView({
           </button>
         </div>
 
-        {request.method === "select" && <div className="flex flex-col" keyboardShouldPersistTaps="handled">
+        {request.method === "select" && <div className="flex flex-col">
             {request.options.map(option => {
           const isSelected = selectedOption === option;
           return <button key={`${request.id}-${option}`} onClick={() => setSelectedOption(option)}>

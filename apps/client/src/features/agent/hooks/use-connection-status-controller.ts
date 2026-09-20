@@ -3,7 +3,7 @@ import { useWindowDimensions } from "@/platform/browser";
 import { Animated } from "@/styles/motion";
 import { useSafeAreaInsets } from "@/platform/browser";
 import { useConnection } from '@aijee/client-sdk';
-import type { ConnectionStatusBannerViewProps } from '../components/connection-status-banner/types';
+import type { ConnectionStatusBannerViewProps } from '../components/connection-status-banner/component-types';
 export function useConnectionStatusController(): ConnectionStatusBannerViewProps & {
   mounted: boolean;
 } {

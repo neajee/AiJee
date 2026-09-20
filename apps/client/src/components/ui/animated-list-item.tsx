@@ -6,7 +6,7 @@ export function AnimatedListItem({
 }: {
   children: ReactNode;
 }) {
-  return <div layout={ITEM_LAYOUT} entering={FadeIn.duration(180)} exiting={FadeOut.duration(140)}>
+  return <div layout={ITEM_LAYOUT}>
       {children}
     </div>;
 }

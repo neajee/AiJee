@@ -68,7 +68,7 @@ export function AgentActionButton({
   label,
   icon: Icon,
   updating,
-  onPress
+  onClick
 }: {
   label: string;
   icon: ComponentType<{
@@ -77,11 +77,11 @@ export function AgentActionButton({
     strokeWidth?: number;
   }>;
   updating: boolean;
-  onPress: () => void;
+  onClick: () => void;
 }) {
   const m = useSettingsMetrics();
   const p = useSettingsPalette();
-  return <button onClick={onPress} disabled={updating} role="button" aria-label={`${label} Pi agent`}>
+  return <button onClick={onClick} disabled={updating} role="button" aria-label={`${label} Pi agent`}>
       {updating ? <span className="size-3 animate-spin" /> : <>
           <Icon size={13} color={p.onAccent} strokeWidth={2.2} />
           <span className={"  text-accent-content"}>{label}</span>

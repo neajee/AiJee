@@ -38,3 +38,35 @@ test("fork rebinds events to the replacement Pi session", async () => {
 
   assert.deepEqual(received, ["new_session_event"]);
 });
+
+test("exposes Pi 0.86 product capabilities through an engine-neutral snapshot", () => {
+  const source = eventSource();
+  const piSession = {
+    ...source.session,
+    model: { provider: "openai", id: "gpt-6" },
+    cacheWarmingStatus: { state: "scheduled", nextWarmAt: 123 },
+    systemPrompt: "system",
+    isIdle: true,
+    isCompacting: false,
+    retryAttempt: 2,
+    getActiveToolNames: () => ["read", "bash"],
+  };
+  const runtime = {
+    session: piSession,
+    services: {
+      settingsManager: {
+        getCacheWarmingMode: () => "streaming",
+        getCompactionSettings: () => ({ enabled: true, reserveTokens: 16_384, keepRecentTokens: 20_000 }),
+        getRetrySettings: () => ({ enabled: true, maxRetries: 3, baseDelayMs: 1000, maxAgentDelayMs: 60_000 }),
+      },
+    },
+  } as unknown as AgentSessionRuntime;
+
+  const session = new PiSession(runtime, "/tmp/project");
+  assert.deepEqual(session.productCapabilities(), {
+    cacheWarming: { mode: "streaming", status: { state: "scheduled", nextWarmAt: 123 } },
+    compaction: { enabled: true, reserveTokens: 16_384, keepRecentTokens: 20_000 },
+    prompt: { activeToolNames: ["read", "bash"], hasSystemPrompt: true, systemPromptLength: 6, isIdle: true, isCompacting: false },
+    retry: { enabled: true, maxRetries: 3, baseDelayMs: 1000, maxAgentDelayMs: 60_000, attempt: 2 },
+  });
+});

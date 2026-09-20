@@ -1,7 +1,7 @@
 import { memo, useCallback, useRef, useState } from "react";
 import { Colors, Fonts } from "@/constants/theme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
-import type { ToolCallInfo } from "../agent-types";
+import type { ToolCallInfo } from "../../../component-types.ts";
 import { parseToolArguments, truncateOutput } from "../../../utils/message-list";
 import { ToolBody, ToolHeader, ToolSurface } from "./tool-disclosure";
 import { ToolResultImages } from "./tool-result-images";
@@ -63,7 +63,7 @@ export const BashToolCall = memo(function BashToolCall({
 
       {hasOutput && <ToolBody expanded={expanded}>
           <ToolSurface isDark={isDark}>
-            <div ref={scrollRef} className="flex flex-col" nestedScrollEnabled onContentSizeChange={handleOutputGrowth} onScrollBeginDrag={stopFollowing}>
+            <div ref={scrollRef} className="flex flex-col">
               <span className={"  text-text-secondary"}>
                 {displayOutput}
               </span>

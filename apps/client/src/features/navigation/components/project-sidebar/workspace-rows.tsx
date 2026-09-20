@@ -10,7 +10,7 @@ export function WorkspaceRow({
   isOpen,
   isRunning,
   hasUnread,
-  onPress,
+  onClick,
   onNewSession,
   onMenu,
   onLongPress,
@@ -24,7 +24,7 @@ export function WorkspaceRow({
   /** A turn finished here and hasn't been looked at. */
   hasUnread: boolean;
   /** Left click folds and unfolds; opening a project happens by session. */
-  onPress: () => void;
+  onClick: () => void;
   onNewSession: () => void;
   /** Viewport coordinates to anchor the actions menu to. */
   onMenu: (x: number, y: number) => void;
@@ -57,7 +57,7 @@ export function WorkspaceRow({
      * `pointerenter`/`pointerleave` don't fire for movement between children.
      */
     <div onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)}>
-      <button onClick={onPress} onLongPress={onLongPress} delayLongPress={400} aria-label={isOpen ? `收起 ${workspace.title}` : `展开 ${workspace.title}`}>
+      <button onClick={onClick} onLongPress={onLongPress} delayLongPress={400} aria-label={isOpen ? `收起 ${workspace.title}` : `展开 ${workspace.title}`}>
         <div className="flex flex-col">
           <Folder size={15} color={colors.text} strokeWidth={1.8} />
         </div>
@@ -70,7 +70,7 @@ export function WorkspaceRow({
         {showActions && <RowAction label={`在 ${workspace.title} 中新建对话`} onClick={onNewSession} isDark={isDark}>
             <SquarePen size={13} color={colors.textTertiary} strokeWidth={1.8} />
           </RowAction>}
-        {showActions && <div ref={moreRef} collapsable={false}>
+        {showActions && <div ref={moreRef}>
             <RowAction label={`${workspace.title} 的更多操作`} onClick={openMenu} isDark={isDark}>
               <MoreHorizontal size={14} color={colors.textTertiary} strokeWidth={1.8} />
             </RowAction>
@@ -85,12 +85,12 @@ export function WorkspaceRow({
 /** A small square button that sits beside a row's main pressable. */
 export function RowAction({
   label,
-  onPress,
+  onClick,
   children,
   isDark
 }: {
   label: string;
-  onPress: () => void;
+  onClick: () => void;
   children: ReactNode;
   isDark: boolean;
 }) {
@@ -98,8 +98,8 @@ export function RowAction({
   const hoverBg = isDark ? "rgba(255,255,255,0.09)" : "rgba(0,0,0,0.07)";
   return <button onClick={e => {
     e.stopPropagation();
-    onPress();
-  }} aria-label={label} onHoverIn={() => setHovered(true)} onHoverOut={() => setHovered(false)}>
+    onClick();
+  }} aria-label={label} onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)}>
       {children}
     </button>;
 }

@@ -1,11 +1,11 @@
 export function IconButton({
-  onPress,
+  onClick,
   title,
   icon,
   disabled,
   style
 }: {
-  onPress: () => void;
+  onClick: () => void;
   title: string;
   icon: React.ReactNode;
   disabled?: boolean;
@@ -13,7 +13,7 @@ export function IconButton({
 }) {
   return <button onClick={e => {
     e.stopPropagation?.();
-    if (!disabled) onPress();
+    if (!disabled) onClick();
   }} disabled={disabled} aria-label={title} role="button" {...{
     title
   }}>

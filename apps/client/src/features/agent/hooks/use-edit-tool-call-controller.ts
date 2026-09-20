@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from 'react';
 import { useWindowDimensions } from "@/platform/browser";
 import { Animated, Easing } from "@/styles/motion";
-import type { ToolCallInfo } from '../agent-types';
+import type { ToolCallInfo } from '../component-types';
 import { basename, isToolActive, parseToolArguments } from '../utils/message-list';
 function detectLanguage(fileName: string, filePath: string) {
   const lower = (fileName || filePath).toLowerCase();

@@ -29,7 +29,7 @@ export const CodePreview = memo(function CodePreview({
     diffMeta: colors.skill
   }), [colors, isDark]);
   return <div className={"  bg-surface-raised border-border"}>
-      <div className={"max-h-0"} nestedScrollEnabled>
+      <div className={"max-h-0"}>
         <div horizontal>
           <div>
             {lines.map((line, index) => {

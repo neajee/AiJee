@@ -1,9 +1,9 @@
 import { useEffect, useState, type ReactNode } from "react";
 export const Alert = {
   alert(title: string, message?: string, buttons?: Array<{
-    onPress?: () => void;
+    onClick?: () => void;
   }>) {
-    if (window.confirm([title, message].filter(Boolean).join("\n"))) buttons?.[0]?.onPress?.();
+    if (window.confirm([title, message].filter(Boolean).join("\n"))) buttons?.[0]?.onClick?.();
   }
 };
 export const Linking = {
@@ -52,7 +52,9 @@ export const StyleSheet = {
 };
 export const LayoutAnimation = {
   configureNext: (_config?: unknown, callback?: () => void) => callback?.(),
-  create: () => ({})
+  create: (_duration?: number, _type?: string, _property?: string) => ({}),
+  Types: { easeInEaseOut: "easeInEaseOut", linear: "linear", keyboard: "keyboard" },
+  Properties: { opacity: "opacity" }
 };
 export const SafeAreaProvider = ({
   children

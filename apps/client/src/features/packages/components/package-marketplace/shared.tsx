@@ -23,7 +23,7 @@ export function PrimaryButton({
   label,
   icon: Icon,
   busy,
-  onPress
+  onClick
 }: {
   label: string;
   icon?: React.ComponentType<{
@@ -32,11 +32,11 @@ export function PrimaryButton({
     strokeWidth?: number;
   }>;
   busy?: boolean;
-  onPress: () => void;
+  onClick: () => void;
 }) {
   const m = useSettingsMetrics();
   const p = useSettingsPalette();
-  return <button onClick={onPress} disabled={busy} role="button" aria-label={label} className="inline-flex items-center">
+  return <button onClick={onClick} disabled={busy} role="button" aria-label={label} className="inline-flex items-center">
       {busy ? <span className="size-3 animate-spin" /> : <>
           {Icon ? <Icon size={13} color={p.onAccent} strokeWidth={2.2} /> : null}
           <span className={"text-[var(--desc-size)] font-sans"}>
@@ -47,14 +47,14 @@ export function PrimaryButton({
 }
 export function SecondaryButton({
   label,
-  onPress
+  onClick
 }: {
   label: string;
-  onPress: () => void;
+  onClick: () => void;
 }) {
   const m = useSettingsMetrics();
   const p = useSettingsPalette();
-  return <button onClick={onPress} role="button" aria-label={label} className="inline-flex items-center">
+  return <button onClick={onClick} role="button" aria-label={label} className="inline-flex items-center">
       <span className={"text-[var(--desc-size)] font-sans"}>
         {label}
       </span>

@@ -72,6 +72,9 @@ export class ApiClient {
   readonly exportHtml: Delegate<typeof agent.exportHtml> = (...args) => agent.exportHtml(this.transport, ...args);
   readonly setSessionName: Delegate<typeof agent.setSessionName> = (...args) => agent.setSessionName(this.transport, ...args);
   readonly getCommands: Delegate<typeof agent.getCommands> = (...args) => agent.getCommands(this.transport, ...args);
+  readonly getProductCapabilities: Delegate<typeof agent.getProductCapabilities> = (...args) => agent.getProductCapabilities(this.transport, ...args);
+  readonly setCacheWarmingMode: Delegate<typeof agent.setCacheWarmingMode> = (...args) => agent.setCacheWarmingMode(this.transport, ...args);
+  readonly setActiveTools: Delegate<typeof agent.setActiveTools> = (...args) => agent.setActiveTools(this.transport, ...args);
   readonly extensionUiResponse: Delegate<typeof agent.extensionUiResponse> = (...args) => agent.extensionUiResponse(this.transport, ...args);
   readonly createChatSession: Delegate<typeof chat.createChatSession> = (...args) => chat.createChatSession(this.transport, ...args);
   readonly listChatSessions: Delegate<typeof chat.listChatSessions> = (...args) => chat.listChatSessions(this.transport, ...args);
