@@ -1,7 +1,5 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { useState, type ReactNode } from "react";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
-import { styles } from "./style-tokens";
 export function SectionHeader({
   title,
   actions,
@@ -12,10 +10,8 @@ export function SectionHeader({
   isDark: boolean;
 }) {
   const colors = useThemeTokens();
-  return <div className={toTailwind(styles.sectionHeader)}>
-      <span className={toTailwind([styles.sectionTitle, {
-      color: colors.textTertiary
-    }])}>
+  return <div className={""}>
+      <span className={"" + " " + ""}>
         {title}
       </span>
       {actions}
@@ -62,10 +58,8 @@ export function SidebarRow({
   const hoverBg = isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.035)";
   const activeBg = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)";
   return <button onClick={onPress} disabled={disabled} onHoverIn={() => setHovered(true)} onHoverOut={() => setHovered(false)}>
-      <div className={toTailwind(styles.rowIcon)}>{icon}</div>
-      <span className={toTailwind([styles.rowLabel, {
-      color: isActive ? colors.text : colors.textSecondary
-    }])}>
+      <div className={""}>{icon}</div>
+      <span className={"" + " " + ""}>
         {label}
       </span>
     </button>;

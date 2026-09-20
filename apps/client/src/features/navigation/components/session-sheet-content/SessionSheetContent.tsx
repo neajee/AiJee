@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { type ReactNode } from 'react';
 import { SquarePen, RefreshCw } from 'lucide-react';
 import { Fonts } from '@/constants/theme';
@@ -50,16 +49,12 @@ export function SessionSheetContent({
   const textMuted = isDark ? '#cdc8c5' : '#999999';
   const textSecondary = isDark ? '#f1ece8' : '#666666';
   const btnBg = isDark ? '#252525' : '#F0F0F0';
-  return <div className={toTailwind(styles.container)}>
-      <div className={toTailwind(styles.header)}>
-        <div className={toTailwind(styles.headerRow)}>
-          <div className={toTailwind(styles.headerText)}>
-            <span className={toTailwind([styles.title, {
-            color: textPrimary
-          }])}>{title}</span>
-            {subtitle ? <span className={toTailwind([styles.subtitle, {
-            color: textSecondary
-          }])}>
+  return <div className={""}>
+      <div className={""}>
+        <div className={""}>
+          <div className={""}>
+            <span className={"" + " " + ""}>{title}</span>
+            {subtitle ? <span className={"" + " " + ""}>
                 {subtitle}
               </span> : null}
           </div>
@@ -69,34 +64,24 @@ export function SessionSheetContent({
         </div>
       </div>
 
-      <div className={toTailwind(styles.actions)}>
+      <div className={""}>
         <button onClick={onNew} disabled={createPending}>
           {createPending ? <span size={14 as any} color={textPrimary} /> : <SquarePen size={14 as any} color={textPrimary} strokeWidth={1.8} />}
-          <span className={toTailwind([styles.newButtonText, {
-          color: textPrimary
-        }])}>{newButtonLabel}</span>
+          <span className={"" + " " + ""}>{newButtonLabel}</span>
         </button>
       </div>
 
-      <div className={toTailwind(styles.list)}>
-        {isLoading ? <span className={toTailwind({
-        marginTop: 24
-      })} /> : sessions.length === 0 ? <span className={toTailwind([styles.emptyText, {
-        color: textMuted
-      }])}>{emptyLabel}</span> : sessions.map(session => <AnimatedListItem key={session.id}>
+      <div className={""}>
+        {isLoading ? <span className={"mt-[24px]"} /> : sessions.length === 0 ? <span className={"" + " " + ""}>{emptyLabel}</span> : sessions.map(session => <AnimatedListItem key={session.id}>
               <button onClick={() => onSelect(session.id)}>
                 <SessionActivityIndicator sessionId={session.id} color={textMuted} />
-                <span className={toTailwind([styles.sessionTitle, {
-            color: textPrimary
-          }])}>
+                <span className={"" + " " + ""}>
                   {session.display_name ?? session.id}
                 </span>
               </button>
             </AnimatedListItem>)}
         {hasNextPage && <button onClick={onLoadMore} disabled={isFetchingNextPage}>
-            {isFetchingNextPage ? <span size="small" /> : <span className={toTailwind([styles.loadMoreText, {
-          color: textMuted
-        }])}>Load more</span>}
+            {isFetchingNextPage ? <span size="small" /> : <span className={"" + " " + ""}>Load more</span>}
           </button>}
       </div>
 

@@ -1,11 +1,9 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { useCallback, useRef, useState, type ReactNode } from "react";
 import { Folder, MoreHorizontal, SquarePen } from "lucide-react";
 import { Fonts } from "@/constants/theme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import type { Workspace } from "@/features/workspace/types";
 import { MENU_WIDTH } from "../workspace-context-menu";
-import { styles } from "./style-tokens";
 export function WorkspaceRow({
   workspace,
   isSelected,
@@ -58,22 +56,17 @@ export function WorkspaceRow({
      * exist while hovering would vanish the moment the cursor reached them.
      * `pointerenter`/`pointerleave` don't fire for movement between children.
      */
-    <div className={toTailwind([styles.row, hovered && {
-      backgroundColor: hoverBg
-    }])} onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)}>
+    <div className={"" + " " + (hovered ? "" : "")} onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)}>
       <button onClick={onPress} onLongPress={onLongPress} delayLongPress={400} aria-label={isOpen ? `收起 ${workspace.title}` : `展开 ${workspace.title}`}>
-        <div className={toTailwind(styles.rowIcon)}>
+        <div className={""}>
           <Folder size={15} color={colors.text} strokeWidth={1.8} />
         </div>
-        <span className={toTailwind([styles.rowLabel, {
-          color: isSelected ? colors.text : colors.textSecondary,
-          fontFamily: isSelected ? Fonts.sansMedium : Fonts.sans
-        }])}>
+        <span className={"" + " " + "font-sans"}>
           {workspace.title}
         </span>
       </button>
 
-      <div className={toTailwind(styles.rowActions)}>
+      <div className={""}>
         {showActions && <RowAction label={`在 ${workspace.title} 中新建对话`} onClick={onNewSession} isDark={isDark}>
             <SquarePen size={13} color={colors.textTertiary} strokeWidth={1.8} />
           </RowAction>}
@@ -83,9 +76,7 @@ export function WorkspaceRow({
             </RowAction>
           </div>}
 
-        {!showActions && !isRunning && hasUnread && <div className={toTailwind([styles.dot, {
-          backgroundColor: isDark ? "#3FB950" : "#1A7F37"
-        }])} />}
+        {!showActions && !isRunning && hasUnread && <div className={"" + " " + ""} />}
       </div>
     </div>
   );

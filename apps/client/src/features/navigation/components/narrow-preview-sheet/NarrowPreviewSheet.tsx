@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { useCallback, useEffect } from "react";
 import { useSafeAreaInsets } from "@/platform/browser";
 import Animated, { Easing, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from "@/platform/animation";
@@ -74,30 +73,19 @@ export function NarrowPreviewSheet({
   }));
   return <div {...false ? {
     pointerEvents: visible ? "auto" as const : "none" as const
-  } : {}} className={toTailwind([styles.root, true && {
-    pointerEvents: visible ? "auto" : "none"
-  } as any])}>
-      <div className={toTailwind([styles.overlay, {
-      backgroundColor: colors.overlay
-    }, overlayStyle])}>
-        <button className={toTailwind(ABSOLUTE_FILL_STYLE)} onClick={dismiss} />
+  } : {}} className={"" + " " + (true ? "" : "")}>
+      <div className={"" + " " + "" + " " + ""}>
+        <button className={""} onClick={dismiss} />
       </div>
 
-      <div className={toTailwind([styles.sheet, {
-      backgroundColor: isDark ? "#1e1e1e" : "#FFFFFF",
-      paddingBottom: insets.bottom,
-      height: sheetHeight,
-      maxHeight: sheetHeight
-    }, sheetStyle])}>
+      <div className={"" + " " + "pb-[bottom] h-[0] max-h-[0]" + " " + ""}>
         <div>
-          <div className={toTailwind(styles.handleBar)}>
-            <div className={toTailwind([styles.handle, {
-            backgroundColor: colors.sheetHandle
-          }])} />
+          <div className={""}>
+            <div className={"" + " " + ""} />
           </div>
         </div>
 
-        <div className={toTailwind(styles.content)}>
+        <div className={""}>
           <PreviewPanel sessionId={sessionId} />
         </div>
       </div>

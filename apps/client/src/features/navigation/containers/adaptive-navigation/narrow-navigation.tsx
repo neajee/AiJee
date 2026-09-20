@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import type { ReactNode } from 'react';
 import { NarrowHeaderBar } from '../../components/narrow-header-bar';
 import { WorkspaceSheet } from '../../components/workspace-sheet';
@@ -8,7 +7,6 @@ import { NarrowPreviewSheet } from '../../components/narrow-preview-sheet';
 import { ConnectionStatusBanner } from '@/features/agent/components/connection-status-banner';
 import { TasksSheet } from '@/features/tasks/components/tasks-sheet';
 import { TaskOutputSheet } from '@/features/tasks/components/task-output-sheet';
-import { styles } from './style-tokens';
 import type { useAdaptiveNavigationController } from './use-adaptive-navigation-controller';
 type Controller = ReturnType<typeof useAdaptiveNavigationController>;
 export function NarrowNavigation({
@@ -41,14 +39,10 @@ export function NarrowNavigation({
     openGit,
     openPreview
   } = controller;
-  return <div className={toTailwind([styles.narrowContainer, {
-    backgroundColor: colors.background
-  }])}>
-      <div className={toTailwind([styles.narrowSafeArea, {
-      backgroundColor: colors.background
-    }])} edges={['top']}>
+  return <div className={"" + " " + ""}>
+      <div className={"" + " " + ""} edges={['top']}>
         {hasServer && <NarrowHeaderBar onWorkspacePress={() => setSheetVisible(true)} onFilesPress={openFiles} onGitPress={openGit} onPreviewPress={openPreview} onTasksPress={() => setTasksSheetVisible(true)} onTaskOutputPress={() => setTaskOutputSheetVisible(true)} />}
-        <div className={toTailwind(styles.narrowContent)}>{children}</div>
+        <div className={""}>{children}</div>
         {hasServer && <ConnectionStatusBanner />}
       </div>
       {hasServer && isCodeMode && <>

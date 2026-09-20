@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import MaterialIcons from '@/platform/icons';
 import { useRouter, usePathname } from '@/platform/router-adapter';
 import { useSafeAreaInsets } from "@/platform/browser";
@@ -30,21 +29,15 @@ export function BottomNavigation() {
       color: WorkspaceColors[workspaces.length % WorkspaceColors.length]
     });
   };
-  return <div className={toTailwind([styles.bar, {
-    backgroundColor: colors.background,
-    paddingBottom: insets.bottom,
-    borderTopColor: colors.border
-  }])}>
-      <div horizontal className={toTailwind(styles.workspaceScroll)}>
+  return <div className={"" + " " + "pb-[bottom]"}>
+      <div horizontal className={""}>
         {workspaces.map(ws => <WorkspaceAvatar key={ws.id} title={ws.title} color={ws.color} isActive={ws.id === selectedWorkspaceId} hasNotification={ws.hasNotifications} onClick={() => handleWorkspacePress(ws.id)} layout="horizontal" />)}
         <AddWorkspaceButton onClick={handleAddWorkspace} layout="horizontal" />
       </div>
 
-      <div className={toTailwind([styles.dividerVertical, {
-      backgroundColor: colors.border
-    }])} />
+      <div className={"" + " " + ""} />
 
-      <div className={toTailwind(styles.fixedItems)}>
+      <div className={""}>
         <BottomBarIcon icon="settings" isActive={isSettingsActive} onClick={() => router.push('/settings')} />
       </div>
     </div>;

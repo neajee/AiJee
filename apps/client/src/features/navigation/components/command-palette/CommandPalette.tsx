@@ -1,11 +1,9 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { Animated } from "@/platform/animation";
 import { Search } from 'lucide-react';
 import { ABSOLUTE_FILL_STYLE } from '@/constants/layout';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useThemeTokens } from '@/hooks/use-theme-tokens';
 import { useCommandPaletteController } from '../../hooks/use-command-palette-controller';
-import { styles } from './style-tokens';
 import type { CommandPaletteProps } from './component-types';
 export function CommandPalette({
   visible,
@@ -42,39 +40,24 @@ export function CommandPalette({
   if (!visible) return null;
   let flatIndex = 0;
   return <div visible transparent animationType="none" onRequestClose={handleClose}>
-      <div className={toTailwind(styles.root)}>
+      <div className={""}>
         <AnimatedOverlay animation={overlayAnim} onClick={handleClose} />
-        <div className={toTailwind([styles.palette, {
-        backgroundColor: bg,
-        borderColor,
-        transform: [{
-          scale: scaleAnim
-        }],
-        opacity: overlayAnim
-      }])}>
-          <div className={toTailwind([styles.searchRow, {
-          borderBottomColor: borderColor
-        }])}>
+        <div className={"" + " " + "opacity-[null]"}>
+          <div className={"" + " " + ""}>
             <Search size={16} color={textMuted} strokeWidth={2} />
-            <input ref={inputRef} className={toTailwind([styles.searchInput, {
-            color: textPrimary
-          }])} value={search} onChangeText={setSearch} onKeyPress={handleKeyPress} placeholder="搜索对话…" placeholderTextColor={textDim} autoCapitalize="none" autoCorrect={false} returnKeyType="go" />
+            <input ref={inputRef} className={"" + " " + ""} value={search} onChangeText={setSearch} onKeyPress={handleKeyPress} placeholder="搜索对话…" placeholderTextColor={textDim} autoCapitalize="none" autoCorrect={false} returnKeyType="go" />
           </div>
-          <div ref={scrollRef} className={toTailwind(styles.results)} keyboardShouldPersistTaps="handled">
+          <div ref={scrollRef} className={""} keyboardShouldPersistTaps="handled">
             <div ref={scrollContentRef}>
-              {sessionsLoading ? <div className={toTailwind(styles.emptyState)}>
+              {sessionsLoading ? <div className={""}>
                   <span size="small" color={textMuted} />
-                </div> : sections.length === 0 ? <div className={toTailwind(styles.emptyState)}>
-                  <span className={toTailwind([styles.emptyText, {
-                color: textDim
-              }])}>
+                </div> : sections.length === 0 ? <div className={""}>
+                  <span className={"" + " " + ""}>
                     {search.trim() ? '没有匹配的对话' : '暂无最近对话'}
                   </span>
                 </div> : null}
               {sections.map(section => <div key={section.title}>
-                  <span className={toTailwind([styles.sectionHeader, {
-                color: textDim
-              }])}>{section.title}</span>
+                  <span className={"" + " " + ""}>{section.title}</span>
                   {section.items.map(item => {
                 const index = flatIndex++;
                 const isSelected = index === selectedIndex;
@@ -83,21 +66,15 @@ export function CommandPalette({
                   itemRefs.current[index] = ref as any;
                 }} onClick={item.onSelect}>
                         <Icon size={15} color={isSelected ? textPrimary : textMuted} strokeWidth={1.8} />
-                        <div className={toTailwind(styles.itemText)}>
-                          <span className={toTailwind([styles.itemLabel, {
-                      color: textPrimary
-                    }])}>
+                        <div className={""}>
+                          <span className={"" + " " + ""}>
                             {item.label}
                           </span>
-                          {item.description && <span className={toTailwind([styles.itemDesc, {
-                      color: textMuted
-                    }])}>
+                          {item.description && <span className={"" + " " + ""}>
                               {item.description}
                             </span>}
                         </div>
-                        {isSelected && <span className={toTailwind([styles.enterHint, {
-                    color: textDim
-                  }])}>{'\u21B5'}</span>}
+                        {isSelected && <span className={"" + " " + ""}>{'\u21B5'}</span>}
                       </button>;
               })}
                 </div>)}
@@ -116,9 +93,7 @@ function AnimatedOverlay({
   };
   onPress: () => void;
 }) {
-  return <div className={toTailwind([styles.overlay, {
-    opacity: animation
-  }])}>
-      <button className={toTailwind(ABSOLUTE_FILL_STYLE)} onClick={onPress} />
+  return <div className={"" + " " + "opacity-[null]"}>
+      <button className={""} onClick={onPress} />
     </div>;
 }

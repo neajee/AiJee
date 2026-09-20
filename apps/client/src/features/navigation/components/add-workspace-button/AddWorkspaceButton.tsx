@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { Plus } from 'lucide-react';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -13,7 +12,7 @@ export function AddWorkspaceButton({
 }: AddWorkspaceButtonProps) {
   const colorScheme = useColorScheme() ?? 'light';
   const colors = useThemeTokens();
-  return <div className={toTailwind([styles.wrapper, layout === 'vertical' ? styles.wrapperVertical : styles.wrapperHorizontal])}>
+  return <div className={"" + " " + (layout === 'vertical' ? "" : "")}>
       <button onClick={onPress} role="button" aria-label="Add workspace">
         <Plus size={20} color={colors.iconMuted} strokeWidth={1.8} />
       </button>

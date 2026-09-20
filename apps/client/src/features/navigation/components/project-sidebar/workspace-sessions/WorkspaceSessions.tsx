@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { useEffect, useState } from 'react';
 import { useWorkspaceStore } from '@/features/workspace/store';
 import { useWorkspaceSessions as useSessions } from '@aijee/client-sdk';
@@ -7,7 +6,6 @@ import { useThemeTokens } from '@/hooks/use-theme-tokens';
 import { SessionRow } from './session-row';
 import { MoreRow } from './more-row';
 import { SESSION_PREVIEW_COUNT } from '../constants';
-import { styles } from '../style-tokens';
 export function WorkspaceSessions({
   workspaceId,
   selectedSessionId,
@@ -42,10 +40,8 @@ export function WorkspaceSessions({
   useEffect(() => {
     if (forcedOpen) setShowAll(true);
   }, [forcedOpen]);
-  if (isLoading) return <span size="small" className={toTailwind(styles.sessionLoading)} />;
-  if (sessions.length === 0) return <span className={toTailwind([styles.sessionEmpty, {
-    color: colors.textTertiary
-  }])}>暂无对话</span>;
+  if (isLoading) return <span size="small" className={""} />;
+  if (sessions.length === 0) return <span className={"" + " " + ""}>暂无对话</span>;
   const expanded = showAll || forcedOpen;
   const visible = expanded ? sessions : sessions.slice(0, SESSION_PREVIEW_COUNT);
   const foldedCount = sessions.length - visible.length;

@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useThemeTokens } from '@/hooks/use-theme-tokens';
@@ -41,33 +40,22 @@ export function WorkspaceAvatar({
   const activeBorderColor = isDark ? '#ede8e4' : '#1A1A1A';
   const innerBorderColor = isDark ? '#3b3a39' : 'rgba(0,0,0,0.1)';
   const letterColor = getLighterColor(color);
-  return <div className={toTailwind([styles.container, isVertical ? styles.vertical : styles.horizontal])}>
-      <div className={toTailwind(styles.avatarWrap)}>
+  return <div className={"" + " " + (isVertical ? "" : "")}>
+      <div className={""}>
         <button onClick={onPress} role="button" aria-label={title} accessibilityState={{
         selected: isActive
       }}>
-          <div className={toTailwind([styles.innerAvatar, {
-          backgroundColor: color,
-          borderColor: innerBorderColor
-        }])}>
-            <span className={toTailwind([styles.initial, {
-            color: letterColor
-          }])}>{initial}</span>
+          <div className={"" + " " + ""}>
+            <span className={"" + " " + ""}>{initial}</span>
           </div>
         </button>
 
-        {hasNotification && <div className={toTailwind([styles.dotRing, {
-        backgroundColor: colors.background
-      }])}>
-            <div className={toTailwind([styles.dotInner, {
-          backgroundColor: colors.notificationDot
-        }])} />
+        {hasNotification && <div className={"" + " " + ""}>
+            <div className={"" + " " + ""} />
           </div>}
       </div>
 
-      {!isVertical && isActive && <div className={toTailwind([styles.indicatorBottom, {
-      backgroundColor: colors.activeIndicator
-    }])} />}
+      {!isVertical && isActive && <div className={"" + " " + ""} />}
     </div>;
 }
 const styles = {

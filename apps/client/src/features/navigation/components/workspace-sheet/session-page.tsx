@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { useCallback, useState } from 'react';
 import { usePathname, useRouter } from '@/platform/router-adapter';
 import { SquarePen, RefreshCw } from 'lucide-react';
@@ -7,7 +6,6 @@ import { useThemeTokens } from '@/hooks/use-theme-tokens';
 import { useWorkspaceSessions as useSessions } from '@aijee/client-sdk';
 import { SessionActivityIndicator } from '@/features/workspace/components/session-activity-indicator';
 import { AnimatedListItem } from '@/components/ui/animated-list-item';
-import { styles } from './style-tokens';
 import type { SessionPageProps } from './component-types';
 export function SessionPage({
   workspaceId,
@@ -40,50 +38,32 @@ export function SessionPage({
     onDismiss();
     setCreatePending(false);
   }, [createPending, onDismiss, router, workspaceId]);
-  return <div className={toTailwind(styles.pageContent)}>
-      <div className={toTailwind(styles.sessionsHeader)}>
-        <span className={toTailwind([styles.sessionsTitle, {
-        color: textPrimary
-      }])}>Sessions</span>
+  return <div className={""}>
+      <div className={""}>
+        <span className={"" + " " + ""}>Sessions</span>
         <button onClick={() => refetch()} disabled={isRefetching}>
-          {isRefetching ? <span size="small" color={textMuted} className={toTailwind({
-          width: 13,
-          height: 13
-        })} /> : <RefreshCw size={13} color={textMuted} strokeWidth={1.8} />}
+          {isRefetching ? <span size="small" color={textMuted} className={"w-[13px] h-[13px]"} /> : <RefreshCw size={13} color={textMuted} strokeWidth={1.8} />}
         </button>
       </div>
 
-      <div className={toTailwind(styles.actions)}>
+      <div className={""}>
         <button onClick={handleNewSession} disabled={createPending}>
-          {createPending ? <span size="small" color={textPrimary} className={toTailwind({
-          width: 14,
-          height: 14
-        })} /> : <SquarePen size={14} color={textPrimary} strokeWidth={1.8} />}
-          <span className={toTailwind([styles.newSessionText, {
-          color: textPrimary
-        }])}>New session</span>
+          {createPending ? <span size="small" color={textPrimary} className={"w-[14px] h-[14px]"} /> : <SquarePen size={14} color={textPrimary} strokeWidth={1.8} />}
+          <span className={"" + " " + ""}>New session</span>
         </button>
       </div>
 
-      <div className={toTailwind(styles.sessionList)} nestedScrollEnabled>
-        {isLoading ? <span className={toTailwind({
-        marginTop: 24
-      })} /> : sessions.length === 0 ? <span className={toTailwind([styles.emptyText, {
-        color: textMuted
-      }])}>No sessions yet</span> : sessions.map(session => <AnimatedListItem key={session.id}>
+      <div className={""} nestedScrollEnabled>
+        {isLoading ? <span className={"mt-[24px]"} /> : sessions.length === 0 ? <span className={"" + " " + ""}>No sessions yet</span> : sessions.map(session => <AnimatedListItem key={session.id}>
               <button onClick={() => onSessionPress(session.id)}>
                 <SessionActivityIndicator sessionId={session.id} color={textMuted} />
-                <span className={toTailwind([styles.sessionTitle, {
-            color: textPrimary
-          }])}>
+                <span className={"" + " " + ""}>
                   {session.display_name ?? session.id}
                 </span>
               </button>
             </AnimatedListItem>)}
         {hasNextPage && <button onClick={() => fetchNextPage()} disabled={isFetchingNextPage}>
-            {isFetchingNextPage ? <span size="small" /> : <span className={toTailwind([styles.loadMoreText, {
-          color: textMuted
-        }])}>Load more</span>}
+            {isFetchingNextPage ? <span size="small" /> : <span className={"" + " " + ""}>Load more</span>}
           </button>}
       </div>
     </div>;

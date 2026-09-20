@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { useCallback } from "react";
 import { PackageOpen, Plus, Settings, SquarePen } from "lucide-react";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
@@ -10,7 +9,6 @@ import type { Workspace } from "@/features/workspace/types";
 import { HeaderAction, SectionHeader, SidebarRow } from "./navigation-rows";
 import { WorkspaceRow } from "./workspace-rows";
 import { WorkspaceSessions } from "./workspace-sessions";
-import { styles } from "./style-tokens";
 import type { ProjectSidebarController } from "../../hooks/use-project-sidebar-controller";
 export function ProjectSidebarView({
   controller
@@ -63,26 +61,18 @@ export function ProjectSidebarView({
         {isOpen && <WorkspaceSessions workspaceId={workspace.id} selectedSessionId={isSelected ? selectedSessionId : null} onSelect={handleSelectSession} onArchived={handleArchivedSession} isDark={isDark} />}
       </div>;
   }, [activityByWorkspace, handleArchivedSession, handleContextMenu, handleLongPress, handleMenuAt, handleNewSessionIn, handleSelectSession, handleToggleWorkspace, isDark, overrides, selectedSessionId, selectedWorkspaceId]);
-  return <div className={toTailwind([styles.container, {
-    backgroundColor: colors.background
-  }])}>
-      <div className={toTailwind([styles.serverRow, {
-      borderBottomColor: colors.border
-    }])}><SidebarHeader /></div>
-      <div className={toTailwind(styles.top)}>
+  return <div className={"" + " " + ""}>
+      <div className={"" + " " + ""}><SidebarHeader /></div>
+      <div className={""}>
         <SidebarRow icon={<SquarePen size={15} color={colors.text} strokeWidth={1.8} />} label="新对话" onClick={handleNewSession} isDark={isDark} />
         <SidebarRow icon={<PackageOpen size={15} color={colors.textSecondary} strokeWidth={1.8} />} label="插件" isActive={pathname.startsWith("/packages")} onClick={() => router.push("/packages" as any)} isDark={isDark} />
       </div>
-      <div className={toTailwind(styles.scroll)}>
+      <div className={""}>
         {pinned.length > 0 && <><SectionHeader title="置顶" isDark={isDark} />{pinned.map(renderWorkspace)}</>}
         <SectionHeader title="项目" isDark={isDark} actions={<HeaderAction onClick={() => setShowNewDialog(true)} label="添加项目" isDark={isDark}><Plus size={13} color={colors.textTertiary} strokeWidth={2} /></HeaderAction>} />
-        {rest.length === 0 && pinned.length === 0 ? <span className={toTailwind([styles.empty, {
-        color: colors.textTertiary
-      }])}>暂无项目</span> : rest.map(renderWorkspace)}
+        {rest.length === 0 && pinned.length === 0 ? <span className={"" + " " + ""}>暂无项目</span> : rest.map(renderWorkspace)}
       </div>
-      <div className={toTailwind([styles.footer, {
-      borderTopColor: colors.border
-    }])}>
+      <div className={"" + " " + ""}>
         <SidebarRow icon={<Settings size={15} color={colors.textSecondary} strokeWidth={1.8} />} label="设置" isActive={pathname.startsWith("/settings")} onClick={() => router.push("/settings")} isDark={isDark} />
       </div>
       <NewWorkspaceDialog visible={showNewDialog} onClose={() => setShowNewDialog(false)} />
@@ -98,25 +88,14 @@ export function ProjectSidebarView({
       visible: false
     }))} />
       <div visible={!!deleteWorkspace} transparent animationType="fade" onRequestClose={() => setDeleteWorkspace(null)}>
-        <button className={toTailwind(styles.deleteOverlay)} onClick={() => setDeleteWorkspace(null)}>
-          <button role="alert" className={toTailwind([styles.deleteDialog, {
-          backgroundColor: colors.surfaceRaised,
-          borderColor: colors.borderStrong
-        }])} onClick={event => event.stopPropagation()}>
-            <span className={toTailwind([styles.deleteTitle, {
-            color: colors.text
-          }])}>删除项目？</span>
-            <span className={toTailwind([styles.deleteDescription, {
-            color: colors.textSecondary
-          }])}>“{deleteWorkspace?.title}” 将从 AiJee 移除。</span>
-            <span className={toTailwind([styles.deleteHint, {
-            color: colors.textTertiary
-          }])}>本地目录和其中的对话文件不会被删除。</span>
-            <div className={toTailwind(styles.deleteActions)}>
-              <button onClick={() => setDeleteWorkspace(null)}><span className={toTailwind([styles.deleteCancelText, {
-                color: colors.text
-              }])}>取消</span></button>
-              <button onClick={confirmDelete}><span className={toTailwind(styles.deleteConfirmText)}>删除项目</span></button>
+        <button className={""} onClick={() => setDeleteWorkspace(null)}>
+          <button role="alert" className={"" + " " + ""} onClick={event => event.stopPropagation()}>
+            <span className={"" + " " + ""}>删除项目？</span>
+            <span className={"" + " " + ""}>“{deleteWorkspace?.title}” 将从 AiJee 移除。</span>
+            <span className={"" + " " + ""}>本地目录和其中的对话文件不会被删除。</span>
+            <div className={""}>
+              <button onClick={() => setDeleteWorkspace(null)}><span className={"" + " " + ""}>取消</span></button>
+              <button onClick={confirmDelete}><span className={""}>删除项目</span></button>
             </div>
           </button>
         </button>
