@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { type ViewStyle, type StyleProp } from "@/types/dom";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 export interface SelectOption<T extends string = string> {
@@ -30,30 +29,8 @@ export function Select<T extends string = string>({
   const border = tokens.borderStrong;
   const mutedColor = tokens.textTertiary;
   if (true) {
-    return <div className={toTailwind([wrapperStyle, style])}>
-        <select value={value} disabled={disabled} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => onChange(e.target.value as T)} className={toTailwind({
-        width: "100%",
-        fontFamily: tokens.uiFont,
-        fontSize: compact ? 12 : 13,
-        color: value ? textColor : mutedColor,
-        backgroundColor: bg,
-        border: `0.633px solid ${border}`,
-        borderRadius: 6,
-        appearance: "none",
-        outline: "none",
-        boxSizing: "border-box",
-        minHeight: compact ? 28 : 36,
-        paddingLeft: compact ? 8 : 10,
-        paddingRight: compact ? 28 : 32,
-        paddingTop: compact ? 5 : 8,
-        paddingBottom: compact ? 5 : 8,
-        cursor: disabled ? "not-allowed" : "pointer",
-        opacity: disabled ? 0.5 : 1,
-        backgroundImage: `linear-gradient(45deg, transparent 50%, ${mutedColor} 50%), linear-gradient(135deg, ${mutedColor} 50%, transparent 50%)`,
-        backgroundPosition: "calc(100% - 13px) 12px, calc(100% - 9px) 12px",
-        backgroundSize: "4px 4px, 4px 4px",
-        backgroundRepeat: "no-repeat"
-      } as React.CSSProperties)}>
+    return <div className={"" + " " + ""}>
+        <select value={value} disabled={disabled} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => onChange(e.target.value as T)} className={""}>
           {placeholder && <option value="" disabled>
               {placeholder}
             </option>}
@@ -63,11 +40,8 @@ export function Select<T extends string = string>({
         </select>
       </div>;
   }
-  return <div className={toTailwind([wrapperStyle, style])}>
-      <div className={toTailwind([nativeTriggerStyle, {
-      backgroundColor: bg,
-      borderColor: border
-    }, disabled && disabledStyle])}>
+  return <div className={"" + " " + ""}>
+      <div className={"" + " " + "" + " " + (disabled ? "" : "")}>
         </div>
     </div>;
 }

@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "@/platform/router-adapter";
@@ -59,19 +58,12 @@ export default function WorkIndex() {
     }
   }, [client, router]);
   const editorBg = colors.background;
-  return <div className={toTailwind([styles.container, {
-    backgroundColor: colors.background,
-    paddingBottom: isWideScreen ? 0 : insets.bottom
-  }])}>
-      <div className={toTailwind([styles.editorColumn, {
-      backgroundColor: editorBg
-    }])}>
-        <div className={toTailwind(styles.centerStack)}>
-          {sending ? <div className={toTailwind(styles.sendingContainer)}>
+  return <div className={"" + " " + "pb-[0]"}>
+      <div className={"" + " " + ""}>
+        <div className={""}>
+          {sending ? <div className={""}>
               <span size="small" color={colors.textSecondary} />
-              <span className={toTailwind([styles.sendingText, {
-            color: colors.textSecondary
-          }])}>
+              <span className={"" + " " + ""}>
                 Starting Work…
               </span>
             </div> : <WorkspaceHero />}

@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import type { ReactNode } from 'react';
 import { type StyleProp, type ViewStyle } from "@/types/dom";
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -18,13 +17,9 @@ export function AppModal({
   const isDark = (useColorScheme() ?? 'light') === 'dark';
   const contentStyles = Array.isArray(contentStyle) ? contentStyle : contentStyle ? [contentStyle] : [];
   return <div visible={visible} transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent>
-      <div className={toTailwind(rootStyle)}>
-        <button className={toTailwind([backdropStyle, {
-        backgroundColor: isDark ? 'rgba(6, 8, 12, 0.64)' : 'rgba(20, 24, 30, 0.28)'
-      }])} onClick={closeOnBackdrop ? onClose : undefined} aria-label="关闭弹窗" />
-        <button className={toTailwind([contentStyleBase, {
-        backgroundColor: isDark ? 'rgba(24, 26, 30, 0.96)' : 'rgba(250, 251, 253, 0.92)'
-      }, ...contentStyles])} onClick={event => event.stopPropagation()}>
+      <div className={""}>
+        <button className={"" + " " + ""} onClick={closeOnBackdrop ? onClose : undefined} aria-label="关闭弹窗" />
+        <button className={"" + " " + "" + " " + ""} onClick={event => event.stopPropagation()}>
           {children}
         </button>
       </div>

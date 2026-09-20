@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { type ViewProps } from "@/types/dom";
 import { useThemeColor } from '@/hooks/use-theme-color';
 export type ThemedViewProps = ViewProps & {
@@ -15,7 +14,5 @@ export function ThemedView({
     light: lightColor,
     dark: darkColor
   }, 'background');
-  return <div className={toTailwind([{
-    backgroundColor
-  }, style])} {...otherProps} />;
+  return <div className={"" + " " + ""} {...otherProps} />;
 }

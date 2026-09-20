@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AppState } from "@/platform/browser";
@@ -38,59 +37,23 @@ function StartupScreen({
   onSecondaryPress?: () => void;
 }) {
   const colors = useThemeTokens();
-  return <div className={toTailwind({
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 24,
-    backgroundColor: colors.background
-  })}>
-      <div className={toTailwind({
-      width: '100%',
-      maxWidth: 420,
-      paddingLeft: 24,
-      paddingRight: 24,
-      paddingTop: 28,
-      paddingBottom: 28,
-      borderRadius: 24,
-      borderWidth: 1,
-      backgroundColor: colors.surface,
-      borderColor: colors.borderStrong
-    })}>
-        <span className={toTailwind({
-        fontFamily: Fonts.sansSemiBold,
-        fontSize: 24,
-        lineHeight: 30,
-        color: colors.text
-      })}>
+  return <div className={"flex-1 justify-center items-center p-[24px]"}>
+      <div className={"w-full max-w-[420px] pl-[24px] pr-[24px] pt-[28px] pb-[28px] rounded-[24px] border"}>
+        <span className={"font-sans text-[24px] leading-[30px]"}>
           {title}
         </span>
-        <span className={toTailwind({
-        marginTop: 10,
-        fontFamily: Fonts.sans,
-        fontSize: 15,
-        lineHeight: 22,
-        color: colors.textSecondary
-      })}>
+        <span className={"mt-[10px] font-sans text-[15px] leading-[22px]"}>
           {description}
         </span>
 
         {primaryLabel && onPrimaryPress ? <button onClick={onPrimaryPress}>
-            <span className={toTailwind({
-          fontFamily: Fonts.sansSemiBold,
-          fontSize: 15,
-          color: colors.onAccent
-        })}>
+            <span className={"font-sans text-[15px]"}>
               {primaryLabel}
             </span>
           </button> : null}
 
         {secondaryLabel && onSecondaryPress ? <button onClick={onSecondaryPress}>
-            <span className={toTailwind({
-          fontFamily: Fonts.sansMedium,
-          fontSize: 15,
-          color: colors.text
-        })}>
+            <span className={"font-sans text-[15px]"}>
               {secondaryLabel}
             </span>
           </button> : null}
@@ -103,40 +66,13 @@ function UnconnectedNotice({
   onAddDevice: () => void;
 }) {
   const colors = useThemeTokens();
-  return <div className={toTailwind({
-    flex: 1,
-    padding: 16,
-    backgroundColor: colors.background
-  })}>
-      <div className={toTailwind({
-      alignSelf: 'center',
-      width: '100%',
-      maxWidth: 760,
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      gap: 16,
-      paddingLeft: 18,
-      paddingRight: 18,
-      paddingTop: 14,
-      paddingBottom: 14,
-      borderRadius: 12,
-      backgroundColor: colors.surfaceRaised
-    })}>
-        <span className={toTailwind({
-        flex: 1,
-        fontFamily: Fonts.sans,
-        fontSize: 14,
-        color: colors.text
-      })}>
+  return <div className={"flex-1 p-[16px]"}>
+      <div className={"self-center w-full max-w-[760px] flex-row items-center justify-between gap-[16px] pl-[18px] pr-[18px] pt-[14px] pb-[14px] rounded-[12px]"}>
+        <span className={"flex-1 font-sans text-[14px]"}>
           未连接 AiJee 设备。连接后即可同步工作区与会话。
         </span>
         <button onClick={onAddDevice}>
-          <span className={toTailwind({
-          fontFamily: Fonts.sansSemiBold,
-          fontSize: 14,
-          color: colors.onAccent
-        })}>添加设备</span>
+          <span className={"font-sans text-[14px]"}>添加设备</span>
         </button>
       </div>
     </div>;
@@ -259,12 +195,7 @@ export default function AppLayout() {
     };
   }, [serversLoaded, bootstrapReady, authLoaded, activeServerId, servers, hasToken, activateServer, switchServer, fetchWorkspaces, retryNonce]);
   if (!serversLoaded || !authLoaded || !bootstrapReady || status === 'loading') {
-    return <div className={toTailwind({
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: colors.background
-    })}>
+    return <div className={"flex-1 justify-center items-center"}>
         <MorphLoading size="lg" />
       </div>;
   }

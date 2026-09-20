@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { createFileRoute } from "@tanstack/react-router";
 import { Redirect } from "@/platform/router-adapter";
 import { useServersStore } from "@/features/servers/store";
@@ -14,11 +13,7 @@ export default function AppIndex() {
   const selectedWorkspaceId = useWorkspaceStore(s => s.selectedWorkspaceId);
   const workspaceLoading = useWorkspaceStore(s => s.loading);
   if (!serversLoaded || !bootstrapReady || !authLoaded || workspaceLoading) {
-    return <div className={toTailwind({
-      flex: 1,
-      justifyContent: "center",
-      alignItems: "center"
-    })}>
+    return <div className={"flex-1 justify-center items-center"}>
         <MorphLoading size="lg" />
       </div>;
   }

@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { useEffect } from 'react';
 import { type StyleProp, type ViewStyle } from "@/types/dom";
 import Animated, { Easing, interpolate, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from "@/platform/animation";
@@ -45,9 +44,7 @@ function MorphBlock({
       }]
     };
   });
-  return <div className={toTailwind([blockStyle, {
-    backgroundColor: color
-  }, animatedStyle])} />;
+  return <div className={"" + " " + "" + " " + ""} />;
 }
 export default function MorphLoading({
   size = 'md',
@@ -57,10 +54,7 @@ export default function MorphLoading({
   const dimension = SIZES[size];
   const scale = dimension / SIZES.md;
   const color = colorScheme === 'dark' ? '#FFFFFF' : '#000000';
-  return <div className={toTailwind([containerStyle, {
-    width: dimension,
-    height: dimension
-  }, style])}>
+  return <div className={"" + " " + "w-[0] h-[0]" + " " + ""}>
       {[0, 1, 2, 3].map(index => <MorphBlock key={index} index={index} color={color} scale={scale} />)}
     </div>;
 }

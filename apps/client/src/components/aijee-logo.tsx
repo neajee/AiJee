@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { ImageStyle, StyleProp } from "@/types/dom"; // The adaptive-icon monochrome asset is a 1024² canvas where the mark only
 // occupies the middle ~61% (alpha bbox 200..823). Scaling the box by this
 // factor makes the *rendered mark* match the requested optical size instead of
@@ -23,9 +22,5 @@ export function AiJeeLogo({
   return <img src={MARK}
   // `tintColor` as a prop (not a style) is the form supported on both
   // DOM compatibility layer.
-  tintColor={color} resizeMode="contain" className={toTailwind([{
-    width: box,
-    height: box,
-    opacity
-  }, style])} accessibilityIgnoresInvertColors accessible={false} />;
+  tintColor={color} resizeMode="contain" className={"w-[0] h-[0] opacity-[null]" + " " + ""} accessibilityIgnoresInvertColors accessible={false} />;
 }

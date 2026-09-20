@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { createFileRoute } from "@tanstack/react-router";
 import { useSafeAreaInsets } from "@/platform/browser";
 import { Fonts } from "@/constants/theme";
@@ -21,19 +20,13 @@ export default function ServersScreen() {
   const isDark = colorScheme === "dark";
   const p = useSettingsPalette();
   const empty = useServersStore(s => s.servers.length === 0);
-  return <div className={toTailwind([styles.safeArea, {
-    backgroundColor: p.bg
-  }])} edges={["top", "left", "right"]}>
-      {empty ? <ServersSection isDark={isDark} variant="onboarding" /> : <div className={toTailwind(styles.scroll)}>
-          <div className={toTailwind(styles.inner)}>
+  return <div className={"" + " " + ""} edges={["top", "left", "right"]}>
+      {empty ? <ServersSection isDark={isDark} variant="onboarding" /> : <div className={""}>
+          <div className={""}>
             {/* This route can render outside the app shell, so it carries its
                 own title instead of relying on a header bar. */}
-            <span className={toTailwind([styles.title, {
-          color: p.text
-        }])}>连接</span>
-            <span className={toTailwind([styles.subtitle, {
-          color: p.textTertiary
-        }])}>
+            <span className={"" + " " + ""}>连接</span>
+            <span className={"" + " " + ""}>
               选择要连接的 AiJee 电脑。
             </span>
             <ServersSection isDark={isDark} />

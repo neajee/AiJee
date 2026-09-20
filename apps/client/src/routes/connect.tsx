@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "@/platform/router-adapter";
@@ -97,30 +96,17 @@ export default function DirectConnectScreen() {
     done: "Redirecting to your workspace.",
     error: error ?? "Unable to complete the direct login flow."
   };
-  return <div className={toTailwind([styles.screen, {
-    backgroundColor: colors.background
-  }])}>
-      <div className={toTailwind([styles.card, {
-      backgroundColor: colors.surface,
-      borderColor: colors.borderStrong
-    }])}>
-        {status === "error" ? <div className={toTailwind([styles.badge, {
-        backgroundColor: colors.destructive + '22'
-      }])} /> : <span size="large" color={status === "done" ? colors.success : colors.text} />}
-        <span className={toTailwind([styles.title, {
-        color: colors.text
-      }])}>
+  return <div className={"" + " " + ""}>
+      <div className={"" + " " + ""}>
+        {status === "error" ? <div className={"" + " " + ""} /> : <span size="large" color={status === "done" ? colors.success : colors.text} />}
+        <span className={"" + " " + ""}>
           {titleByStatus[status]}
         </span>
-        <span className={toTailwind([styles.description, {
-        color: colors.textSecondary
-      }])}>
+        <span className={"" + " " + ""}>
           {descriptionByStatus[status]}
         </span>
         {status === "error" && <button onClick={() => router.replace("/servers")}>
-            <span className={toTailwind([styles.buttonText, {
-          color: colors.onAccent
-        }])}>
+            <span className={"" + " " + ""}>
               Go to Servers
             </span>
           </button>}

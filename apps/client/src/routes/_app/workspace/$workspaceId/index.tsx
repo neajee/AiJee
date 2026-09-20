@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { createFileRoute } from "@tanstack/react-router";
 import { useLocalSearchParams, useRouter } from "@/platform/router-adapter";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -109,22 +108,15 @@ export default function WorkspaceScreen() {
   }, [workspaceId, modesLoaded, sending, ensureSession, client, router]);
   const clearAlert = useCallback(() => setAlertMessage(null), []);
   const editorBg = colors.background;
-  return <div className={toTailwind([styles.container, {
-    backgroundColor: colors.background,
-    paddingBottom: isWideScreen ? 0 : insets.bottom
-  }])}>
-      <div className={toTailwind(styles.upperRow)}>
-        <div className={toTailwind([styles.editorColumn, {
-        backgroundColor: editorBg
-      }])}>
+  return <div className={"" + " " + "pb-[0]"}>
+      <div className={""}>
+        <div className={"" + " " + ""}>
           {/* Hero and composer are one vertically centred group, so the mark,
               the greeting and the input read as a single focal block. */}
-          <div className={toTailwind(styles.centerStack)}>
-            {sending ? <div className={toTailwind(styles.sendingContainer)}>
+          <div className={""}>
+            {sending ? <div className={""}>
                 <span size="small" color={colors.textSecondary} />
-                <span className={toTailwind([styles.sendingText, {
-              color: colors.textSecondary
-            }])}>
+                <span className={"" + " " + ""}>
                   Starting session…
                 </span>
               </div> : <WorkspaceHero />}
@@ -137,10 +129,7 @@ export default function WorkspaceScreen() {
           </div>
         </div>
         {isWideScreen && <WorkspaceSidebar storageScope="start" defaultCollapsed locked>
-            <div className={toTailwind({
-          flex: 1,
-          backgroundColor: editorBg
-        })}>
+            <div className={"flex-1"}>
               <WorkspaceRightPane sessionId={preSessionId} />
             </div>
           </WorkspaceSidebar>}

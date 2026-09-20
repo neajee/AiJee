@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { createFileRoute } from "@tanstack/react-router";
 import { useLocalSearchParams, useRouter } from "@/platform/router-adapter";
 import { useCallback, useEffect, useState } from "react";
@@ -76,14 +75,11 @@ export default function WorkSessionScreen() {
   const clearAlert = useCallback(() => setAlertMessage(null), []);
   const isDark = colorScheme === "dark";
   const hasMessages = messages.length > 0;
-  return <div className={toTailwind([styles.container, {
-    backgroundColor: isDark ? "#121212" : colors.background,
-    paddingBottom: isWideScreen ? 0 : insets.bottom
-  }])}>
-      <div className={toTailwind(styles.editorColumn)}>
+  return <div className={"" + " " + "pb-[0]"}>
+      <div className={""}>
         {agentSession.isReady && hasMessages && sessionId ? <MessageList key={sessionId} sessionId={sessionId} onForked={nextSessionId => {
         router.replace(`/work/${nextSessionId}`);
-      }} /> : agentSession.isLoading || !agentSession.isReady && sessionId ? <ChatShimmer /> : <div className={toTailwind(styles.emptyCenter)} />}
+      }} /> : agentSession.isLoading || !agentSession.isReady && sessionId ? <ChatShimmer /> : <div className={""} />}
         <ExtensionUiDialog sessionId={sessionId} request={agentSession.pendingExtensionUiRequest as LegacyPendingUiRequest | null} />
         <PromptInput sessionId={sessionId} onSend={handleSend} isStreaming={agentSession.isStreaming} onAbort={handleAbort} sessionReady={agentSession.isReady} disabled={inputBlockedByConnection || !!agentSession.pendingExtensionUiRequest} allowTypingWhileDisabled={!inputBlockedByConnection} stackedAbove={!!agentSession.pendingExtensionUiRequest} errorMessage={alertMessage} onClearError={clearAlert} />
       </div>

@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { type TextProps } from "@/types/dom";
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Fonts } from '@/constants/theme';
@@ -18,9 +17,7 @@ export function ThemedText({
     light: lightColor,
     dark: darkColor
   }, 'text');
-  return <span className={toTailwind([{
-    color
-  }, typeStyles[type], style])} {...rest} />;
+  return <span className={"" + " " + "" + " " + ""} {...rest} />;
 }
 const typeStyles = {
   default: {

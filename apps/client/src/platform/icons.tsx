@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 export default function MaterialIcons({
   name,
   size = 24,
@@ -8,8 +7,5 @@ export default function MaterialIcons({
   size?: number;
   color?: string;
 }) {
-  return <span className={toTailwind({
-    fontSize: size,
-    color
-  })}>{name === "close" ? "×" : "•"}</span>;
+  return <span className={"text-[0]"}>{name === "close" ? "×" : "•"}</span>;
 }

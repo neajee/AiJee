@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { useEffect, useRef, useState } from "react";
 import { Animated, Easing } from "@/platform/animation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -86,36 +85,10 @@ export function SeamToggle({
     bottom: 10,
     left: 10,
     right: 10
-  }} className={toTailwind(hitStyle)}>
-      <div pointerEvents="none" className={toTailwind([markStyle, {
-      width: anim.interpolate({
-        inputRange: [0, 1],
-        outputRange: [REST_WIDTH, ACTIVE_WIDTH]
-      }),
-      height: anim.interpolate({
-        inputRange: [0, 1],
-        outputRange: [REST_HEIGHT, ACTIVE_HEIGHT]
-      }),
-      borderRadius: anim.interpolate({
-        inputRange: [0, 1],
-        outputRange: [REST_WIDTH / 2, ACTIVE_WIDTH / 2]
-      }),
-      backgroundColor: anim.interpolate({
-        inputRange: [0, 1],
-        outputRange: [restColor, activeColor]
-      }),
-      borderColor: anim.interpolate({
-        inputRange: [0, 1],
-        outputRange: ["rgba(0,0,0,0)", activeBorder]
-      })
-    }])}>
+  }} className={""}>
+      <div pointerEvents="none" className={"" + " " + "w-[0] h-[0] rounded-[0]"}>
         {/* Held back until the bar has some width to hold it. */}
-        <div className={toTailwind({
-        opacity: anim.interpolate({
-          inputRange: [0, 0.55, 1],
-          outputRange: [0, 0, 1]
-        })
-      })}>
+        <div className={"opacity-[null]"}>
           <Chevron size={13} color={colors.text} strokeWidth={2} />
         </div>
       </div>
