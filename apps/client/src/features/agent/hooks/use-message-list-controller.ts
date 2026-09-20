@@ -1,5 +1,5 @@
+import type React from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { type NativeScrollEvent, type NativeSyntheticEvent } from "@/types/dom";
 import { VirtualList } from "@/components/ui/virtual-list";
 import { useAgentSession } from "@aijee/client-sdk";
 import type { ChatMessage } from "../agent-types";
@@ -226,7 +226,7 @@ export function useMessageListController({
       s.loadOlderMessages();
     }
   }, []);
-  const handleScroll = useCallback((e: NativeSyntheticEvent<NativeScrollEvent>) => {
+  const handleScroll = useCallback((e: React.SyntheticEvent<React.UIEvent>) => {
     const {
       contentOffset,
       contentSize,

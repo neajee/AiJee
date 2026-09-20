@@ -1,7 +1,7 @@
-import { type TextProps } from "@/types/dom";
+import type React from "react";
 import { useThemeColor } from '@/hooks/use-theme-color';
 import { Fonts } from '@/constants/theme';
-export type ThemedTextProps = TextProps & {
+export type ThemedTextProps = React.HTMLAttributes<HTMLSpanElement> & {
   lightColor?: string;
   darkColor?: string;
   type?: 'default' | 'title' | 'defaultSemiBold' | 'subtitle' | 'link';

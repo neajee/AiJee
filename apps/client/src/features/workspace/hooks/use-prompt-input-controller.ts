@@ -1,7 +1,7 @@
+import type React from "react";
 import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { Keyboard, LayoutAnimation } from "@/platform/browser";
 import { Animated } from "@/styles/motion";
-import { NativeSyntheticEvent, TextInput, TextInputKeyPressEventData } from "@/types/dom";
 import * as DocumentPicker from '@/platform/files';
 import { File as ExpoFile } from '@/platform/files';
 import { useQuery } from '@tanstack/react-query';
@@ -25,7 +25,7 @@ const BUILTIN_COMMANDS: SlashCommand[] = [{
   name: "compact",
   description: "Compact conversation history"
 }];
-type PromptKeyPressEventData = TextInputKeyPressEventData & {
+type PromptKeyPressEventData = React.KeyboardEvent & {
   shiftKey?: boolean;
   isComposing?: boolean;
   keyCode?: number;
@@ -79,7 +79,7 @@ export function usePromptInputController({
   const {
     isWideScreen
   } = useResponsiveLayout();
-  const inputRef = useRef<TextInput>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   const shouldAnimateEntry = !sessionId;
   const isStartingSession = !!sessionId && !sessionReady;
   const canComposeWhileDisabled = allowTypingWhileDisabled && isStartingSession;
@@ -521,7 +521,7 @@ export function usePromptInputController({
   }, [handlePaste, inputDisabled]);
 
   // --- Keyboard nav for slash commands ---
-  const handleKeyPress = useCallback((e: NativeSyntheticEvent<PromptKeyPressEventData>) => {
+  const handleKeyPress = useCallback((e: React.SyntheticEvent<PromptKeyPressEventData>) => {
     const {
       key,
       shiftKey,

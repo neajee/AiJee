@@ -1,5 +1,5 @@
+import type React from "react";
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { type NativeSyntheticEvent, TextInput, type TextInputKeyPressEventData } from "@/types/dom";
 import { api } from '@aijee/client-sdk';
 import { useWorkspaceStore } from '../store';
 import type { Workspace } from '../types';
@@ -7,7 +7,7 @@ export function useEditWorkspaceController(visible: boolean, workspace: Workspac
   const fetchWorkspaces = useWorkspaceStore(s => s.fetchWorkspaces);
   const [name, setName] = useState('');
   const [saving, setSaving] = useState(false);
-  const nameRef = useRef<TextInput>(null);
+  const nameRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
     if (visible && workspace) {
       setName(workspace.title);
@@ -30,7 +30,7 @@ export function useEditWorkspaceController(visible: boolean, workspace: Workspac
     setSaving(false);
     onClose();
   }, [fetchWorkspaces, name, onClose, saving, workspace]);
-  const handleKeyPress = useCallback((event: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
+  const handleKeyPress = useCallback((event: React.SyntheticEvent<React.KeyboardEvent>) => {
     if (event.nativeEvent.key === 'Enter' && name.trim()) {
       event.preventDefault?.();
       void handleSave();

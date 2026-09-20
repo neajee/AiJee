@@ -1,4 +1,5 @@
-import { ImageStyle, StyleProp } from "@/types/dom"; // The adaptive-icon monochrome asset is a 1024² canvas where the mark only
+import type React from "react";
+// The adaptive-icon monochrome asset is a 1024² canvas where the mark only
 // occupies the middle ~61% (alpha bbox 200..823). Scaling the box by this
 // factor makes the *rendered mark* match the requested optical size instead of
 // the padded canvas.
@@ -10,7 +11,7 @@ interface AiJeeLogoProps {
   /** Tint applied to the monochrome mark. Omit to keep the asset as-is. */
   color?: string;
   opacity?: number;
-  style?: StyleProp<ImageStyle>;
+  style?: React.CSSProperties<React.CSSProperties>;
 }
 export function AiJeeLogo({
   size = 56,

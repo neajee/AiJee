@@ -1,4 +1,3 @@
-import { ScrollView } from "@/types/dom";
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter } from '@/hooks/router';
 import Animated, { Easing, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from "@/styles/motion";
@@ -29,7 +28,7 @@ export function useWorkspaceSheetController({
   const selectWorkspace = useWorkspaceStore(s => s.selectWorkspace);
   const getLastSession = useWorkspaceStore(s => s.getLastSession);
   const pagerRef = useRef<PagerHandle>(null);
-  const stripScrollRef = useRef<ScrollView>(null);
+  const stripScrollRef = useRef<HTMLDivElement>(null);
   const selectedIndex = workspaces.findIndex(w => w.id === selectedWorkspaceId);
   useEffect(() => {
     if (visible) {

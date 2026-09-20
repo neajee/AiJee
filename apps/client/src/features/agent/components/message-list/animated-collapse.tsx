@@ -1,5 +1,5 @@
+import type React from "react";
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
-import { LayoutChangeEvent } from "@/types/dom";
 import Animated, { Easing, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from "@/styles/motion";
 interface AnimatedCollapseProps {
   expanded: boolean;
@@ -23,7 +23,7 @@ export function AnimatedCollapse({
     if (!contentHeight) return 0;
     return maxHeight ? Math.min(contentHeight, maxHeight) : contentHeight;
   }, [contentHeight, maxHeight]);
-  const handleLayout = useCallback((event: LayoutChangeEvent) => {
+  const handleLayout = useCallback((event: React.SyntheticEvent) => {
     const nextHeight = event.nativeEvent.layout.height;
     setContentHeight(prev => Math.abs(prev - nextHeight) < 1 ? prev : nextHeight);
   }, []);

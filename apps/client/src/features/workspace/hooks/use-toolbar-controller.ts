@@ -1,6 +1,6 @@
+import type React from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Animated } from "@/styles/motion";
-import { NativeSyntheticEvent, TextInput, TextInputKeyPressEventData, type ScrollView as RNScrollView, type View as RNView } from "@/types/dom";
 import { buildThinkingLevelOptions, thinkingLevelLabel, type FlatModel, type ThinkingPreference } from '../utils/prompt-input';
 import { matchesModelSearch } from '../utils/prompt-input-search';
 import { usePromptTheme } from '@/components/surface-theme/use-prompt-theme';
@@ -26,9 +26,9 @@ export function useToolbarController({
 }: ToolbarProps): ToolbarController {
   const theme = usePromptTheme();
   const appMode = useAppMode();
-  const modelScrollRef = useRef<RNScrollView | null>(null);
-  const modelSearchRef = useRef<TextInput | null>(null);
-  const toolbarRef = useRef<RNView | null>(null);
+  const modelScrollRef = useRef<HTMLDivElement | null>(null);
+  const modelSearchRef = useRef<HTMLInputElement | null>(null);
+  const toolbarRef = useRef<HTMLDivElement | null>(null);
   const models = config.models;
   const agentState = config.state;
   const configError = config.error;
@@ -168,7 +168,7 @@ export function useToolbarController({
       return type;
     });
   }, [flatModels, currentModel, effortOptions, thinkingPreference, inputRef]);
-  const handleSearchKeyPress = useCallback((event: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
+  const handleSearchKeyPress = useCallback((event: React.SyntheticEvent<React.KeyboardEvent>) => {
     const key = event.nativeEvent.key;
     const maxIndex = flatModels.length - 1;
     if (key === 'ArrowDown') {

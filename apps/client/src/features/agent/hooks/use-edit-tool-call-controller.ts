@@ -1,8 +1,6 @@
-import { View } from "@/types/dom";
 import { useCallback, useRef, useState } from 'react';
 import { useWindowDimensions } from "@/platform/browser";
 import { Animated, Easing } from "@/styles/motion";
-import { type View as RNView } from "@/types/dom";
 import type { ToolCallInfo } from '../agent-types';
 import { basename, isToolActive, parseToolArguments } from '../utils/message-list';
 function detectLanguage(fileName: string, filePath: string) {
@@ -32,7 +30,7 @@ export function useEditToolCallController(tc: ToolCallInfo) {
     width: Math.max(240, width - 32),
     height: 220
   });
-  const previewRef = useRef<RNView | null>(null);
+  const previewRef = useRef<HTMLDivElement | null>(null);
   const heroProgress = useRef(new Animated.Value(0)).current;
   const parsed = parseToolArguments(tc.arguments);
   const filePath = parsed.path as string || '';

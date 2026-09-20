@@ -1,5 +1,5 @@
+import type React from "react";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { KeyboardAvoidingView, TextInput, type NativeSyntheticEvent, type TextInputKeyPressEventData } from "@/types/dom";
 import { VirtualList } from "@/components/ui/virtual-list";
 import { useSafeAreaInsets } from "@/platform/browser";
 import { Colors, WorkspaceColors } from "@/constants/theme";
@@ -31,8 +31,8 @@ export function useNewWorkspaceController({
   const [suggestionIndex, setSuggestionIndex] = useState(-1);
   const [suggestions, setSuggestions] = useState<PathCompletion[]>([]);
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
-  const pathRef = useRef<TextInput>(null);
-  const nameRef = useRef<TextInput>(null);
+  const pathRef = useRef<HTMLInputElement>(null);
+  const nameRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<FlatList<PathCompletion>>(null);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const textPrimary = isDark ? '#fefdfd' : colors.text;
@@ -171,7 +171,7 @@ export function useNewWorkspaceController({
   }, [path, name, extractName, addWorkspace, workspaceCount, onClose]);
 
   // Keyboard navigation for path suggestions
-  const handlePathKeyPress = useCallback((e: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
+  const handlePathKeyPress = useCallback((e: React.SyntheticEvent<React.KeyboardEvent>) => {
     const key = e.nativeEvent.key;
     if (!showSuggestions || suggestions.length === 0) {
       if (key === 'Enter' && !showSuggestions) {
@@ -203,7 +203,7 @@ export function useNewWorkspaceController({
   }, [showSuggestions, suggestions, suggestionIndex, handleSelectSuggestion]);
 
   // Enter on name field triggers create
-  const handleNameKeyPress = useCallback((e: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
+  const handleNameKeyPress = useCallback((e: React.SyntheticEvent<React.KeyboardEvent>) => {
     if (e.nativeEvent.key === 'Enter' && path.trim()) {
       e.preventDefault?.();
       handleCreate();

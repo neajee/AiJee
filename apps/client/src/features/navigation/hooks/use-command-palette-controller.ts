@@ -1,7 +1,5 @@
-import { ScrollView, View } from "@/types/dom";
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Animated } from "@/styles/motion";
-import { TextInput, type ScrollView as RNScrollView, type View as RNView } from "@/types/dom";
 import { useRouter } from '@/hooks/router';
 import { MessageSquare } from 'lucide-react';
 import { useWorkspaceStore } from '@/features/workspace/store';
@@ -23,10 +21,10 @@ export function useCommandPaletteController({
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [sessions, setSessions] = useState<WorkspaceSession[]>([]);
   const [sessionsLoading, setSessionsLoading] = useState(false);
-  const inputRef = useRef<TextInput>(null);
-  const scrollRef = useRef<RNScrollView>(null);
-  const itemRefs = useRef<Record<number, RNView | null>>({});
-  const scrollContentRef = useRef<RNView>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const itemRefs = useRef<Record<number, HTMLDivElement | null>>({});
+  const scrollContentRef = useRef<HTMLDivElement>(null);
   const overlayAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.96)).current;
   const workspaces = useWorkspaceStore(s => s.workspaces);

@@ -1,11 +1,11 @@
+import type React from "react";
 import { useEffect } from 'react';
-import { type StyleProp, type ViewStyle } from "@/types/dom";
 import Animated, { Easing, interpolate, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from "@/styles/motion";
 import { useColorScheme } from '@/hooks/use-color-scheme';
 type LoadingSize = 'sm' | 'md' | 'lg';
 interface MorphLoadingProps {
   size?: LoadingSize;
-  style?: StyleProp<ViewStyle>;
+  style?: React.CSSProperties<React.CSSProperties>;
 }
 const SIZES: Record<LoadingSize, number> = {
   sm: 64,

@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AppState } from "@/platform/browser";
-import { type AppStateStatus } from "@/types/dom";
 import { Slot, usePathname, useRouter } from '@/hooks/router';
 import { Fonts } from '@/constants/theme';
 import { useThemeTokens } from '@/hooks/use-theme-tokens';
@@ -130,7 +129,7 @@ export default function AppLayout() {
     if (!serverAddress || !accessToken) {
       return;
     }
-    const appStateSubscription = AppState.addEventListener('change', (nextState: AppStateStatus) => {
+    const appStateSubscription = AppState.addEventListener('change', (nextState: "active" | "background" | "inactive") => {
       if (nextState === 'active') {
         syncSessionInBackground();
       }

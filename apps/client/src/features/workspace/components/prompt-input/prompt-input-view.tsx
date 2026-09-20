@@ -1,6 +1,6 @@
+import type React from "react";
 import type { ChangeEvent, RefObject } from 'react';
 import { Animated } from "@/styles/motion";
-import { NativeSyntheticEvent, TextInputKeyPressEventData } from "@/types/dom";
 import { formatAgentModeLabel, type AgentMode } from '@/features/agent/mode';
 import { useCachedAgentConfig } from '@/features/agent/hooks/use-cached-agent-config';
 import type { ThinkingPreference, Attachment, SlashCommand } from '../../utils/prompt-input';
@@ -16,7 +16,7 @@ import { usePromptTheme } from '@/components/surface-theme/use-prompt-theme';
 type QueueBehavior = 'steer' | 'followUp';
 type PromptTheme = ReturnType<typeof usePromptTheme>;
 type AgentConfig = ReturnType<typeof useCachedAgentConfig>;
-type PromptKeyPressEventData = TextInputKeyPressEventData & {
+type PromptKeyPressEventData = React.KeyboardEvent & {
   shiftKey?: boolean;
   isComposing?: boolean;
   keyCode?: number;
@@ -56,7 +56,7 @@ export interface PromptInputViewProps {
   lineCount: number;
   text: string;
   handleTextChange: (value: string) => void;
-  handleKeyPress: (event: NativeSyntheticEvent<PromptKeyPressEventData>) => void;
+  handleKeyPress: (event: React.SyntheticEvent<PromptKeyPressEventData>) => void;
   inputDisabled: boolean;
   sendDisabled: boolean;
   canComposeWhileDisabled: boolean;

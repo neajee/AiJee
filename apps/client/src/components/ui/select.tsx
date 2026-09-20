@@ -1,4 +1,4 @@
-import { type ViewStyle, type StyleProp } from "@/types/dom";
+import type React from "react";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 export interface SelectOption<T extends string = string> {
   value: T;
@@ -12,7 +12,7 @@ interface SelectProps<T extends string = string> {
   placeholder?: string;
   disabled?: boolean;
   compact?: boolean;
-  style?: StyleProp<ViewStyle>;
+  style?: React.CSSProperties<React.CSSProperties>;
 }
 export function Select<T extends string = string>({
   value,

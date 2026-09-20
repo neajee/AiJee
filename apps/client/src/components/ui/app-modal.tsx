@@ -1,5 +1,5 @@
+import type React from "react";
 import type { ReactNode } from 'react';
-import { type StyleProp, type ViewStyle } from "@/types/dom";
 import { useColorScheme } from '@/hooks/use-color-scheme';
 export function AppModal({
   visible,
@@ -11,7 +11,7 @@ export function AppModal({
   visible: boolean;
   onClose: () => void;
   children: ReactNode;
-  contentStyle?: StyleProp<ViewStyle>;
+  contentStyle?: React.CSSProperties<React.CSSProperties>;
   closeOnBackdrop?: boolean;
 }) {
   const isDark = (useColorScheme() ?? 'light') === 'dark';

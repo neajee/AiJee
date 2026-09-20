@@ -1,7 +1,6 @@
 import type { ReactNode, RefObject } from 'react';
 import type { AgentConfigHandle, ModelInfo, AgentStateData } from '@aijee/client-sdk';
 import { Animated } from "@/styles/motion";
-import { ScrollView, TextInput, View } from "@/types/dom";
 import type { AgentMode } from '@/features/agent/mode';
 import type { AppMode } from '@/hooks/use-app-mode';
 import type { FlatModel, ThinkingPreference } from '../../../utils/prompt-input';
@@ -10,7 +9,7 @@ export interface ToolbarProps {
   isWideScreen: boolean;
   onOpenNarrowSheet: (type: 'model' | 'effort') => void;
   onDropdownOpenChange?: (isOpen: boolean) => void;
-  inputRef: RefObject<TextInput | null>;
+  inputRef: RefObject<HTMLInputElement | null>;
   skeleton?: ReactNode;
   modeLabel?: string | null;
   ready?: boolean;
@@ -47,7 +46,7 @@ export interface ToolbarController {
   isWideScreen: boolean;
   onOpenNarrowSheet: (type: 'model' | 'effort') => void;
   onDropdownOpenChange?: (isOpen: boolean) => void;
-  inputRef: RefObject<TextInput | null>;
+  inputRef: RefObject<HTMLInputElement | null>;
   inline: boolean;
   ready: boolean;
   currentModel: ModelInfo | null;
@@ -70,9 +69,9 @@ export interface ToolbarController {
   popoverIndex: number;
   setPopoverIndex: (value: number | ((current: number) => number)) => void;
   toolbarDropdownAnim: Animated.Value;
-  toolbarRef: RefObject<View | null>;
-  modelScrollRef: RefObject<ScrollView | null>;
-  modelSearchRef: RefObject<TextInput | null>;
+  toolbarRef: RefObject<HTMLDivElement | null>;
+  modelScrollRef: RefObject<HTMLDivElement | null>;
+  modelSearchRef: RefObject<HTMLInputElement | null>;
   toggleDropdown: (type: DropdownType) => void;
   handleSelectModel: (provider: string, modelId: string) => void;
   handleSelectThinking: (level: ThinkingPreference) => void;

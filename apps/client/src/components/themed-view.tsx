@@ -1,6 +1,6 @@
-import { type ViewProps } from "@/types/dom";
+import type React from "react";
 import { useThemeColor } from '@/hooks/use-theme-color';
-export type ThemedViewProps = ViewProps & {
+export type ThemedViewProps = React.HTMLAttributes<HTMLDivElement> & {
   lightColor?: string;
   darkColor?: string;
 };

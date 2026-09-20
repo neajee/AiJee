@@ -1,5 +1,4 @@
 import { useCallback } from "react";
-import { type ListRenderItemInfo } from "@/types/dom";
 import { VirtualList } from "@/components/ui/virtual-list";
 import Animated, { FadeIn, FadeOut } from "@/styles/motion";
 import { ArrowDown } from "lucide-react";
@@ -44,7 +43,7 @@ export function MessageListView({
   } = controller;
   const renderItem = useCallback(({
     item
-  }: ListRenderItemInfo<ListItem>) => <ListRow item={item} isDark={isDark} active={item.key === activeTurnKey} editing={editing} onEdit={startEditing} onChangeEdit={changeEditingText} onCancelEdit={cancelEditing} onSubmitEdit={() => void editMessage()} onFork={entryId => void forkFrom(entryId)} forkingEntryId={forkingEntryId} />, [activeTurnKey, cancelEditing, changeEditingText, editMessage, editing, forkFrom, forkingEntryId, isDark, startEditing]);
+  }: { item: ListItem; index: number }) => <ListRow item={item} isDark={isDark} active={item.key === activeTurnKey} editing={editing} onEdit={startEditing} onChangeEdit={changeEditingText} onCancelEdit={cancelEditing} onSubmitEdit={() => void editMessage()} onFork={entryId => void forkFrom(entryId)} forkingEntryId={forkingEntryId} />, [activeTurnKey, cancelEditing, changeEditingText, editMessage, editing, forkFrom, forkingEntryId, isDark, startEditing]);
   const keyExtractor = useCallback((item: ListItem) => item.key, []);
   const listHeader = <div className={"block"}>
       {session.isLoadingOlderMessages ? <div entering={FadeIn.duration(180)} exiting={FadeOut.duration(180)} className={"block"}>

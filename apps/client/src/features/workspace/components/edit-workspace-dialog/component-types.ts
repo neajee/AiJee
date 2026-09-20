@@ -1,6 +1,6 @@
+import type React from "react";
 import type { Workspace } from '../../types';
 import type { RefObject } from 'react';
-import { NativeSyntheticEvent, TextInput, TextInputKeyPressEventData } from "@/types/dom";
 export interface EditWorkspaceDialogProps {
   visible: boolean;
   workspace: Workspace | null;
@@ -20,8 +20,8 @@ export interface EditWorkspaceFormProps {
   setName: (value: string) => void;
   saving: boolean;
   canSave: boolean;
-  nameRef: RefObject<TextInput | null>;
+  nameRef: RefObject<HTMLInputElement | null>;
   handleSave: () => void;
-  handleKeyPress: (event: NativeSyntheticEvent<TextInputKeyPressEventData>) => void;
+  handleKeyPress: (event: React.SyntheticEvent<React.KeyboardEvent>) => void;
   onClose: () => void;
 }

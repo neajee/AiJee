@@ -1,7 +1,5 @@
+import type React from "react";
 import type { ReactNode } from 'react';
-import { PanGesture as PanGestureType } from "@/types/dom";
-import { ViewStyle } from "@/types/dom";
-import { AnimatedStyle } from "@/types/dom";
 export interface NarrowHeaderActionItem {
   key: string;
   label: string;
@@ -23,8 +21,8 @@ export interface NarrowHeaderActionsSheetViewProps {
   rowBorder: string;
   overlayColor: string;
   handleColor: string;
-  sheetStyle: AnimatedStyle<ViewStyle>;
-  overlayStyle: AnimatedStyle<ViewStyle>;
-  panGesture: PanGestureType;
+  sheetStyle: React.CSSProperties<React.CSSProperties>;
+  overlayStyle: React.CSSProperties<React.CSSProperties>;
+  panGesture: unknown;
   onDismiss: () => void;
 }
