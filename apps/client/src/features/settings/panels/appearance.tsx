@@ -93,7 +93,7 @@ function ThemePicker({
   const p = useSettingsPalette();
   const phone = useSettingsPhoneLayout();
   const size = compact ? m.rowMinHeight - 12 : undefined;
-  return <div className={"" + " " + (!compact ? "" : "") + " " + (wide ? "" + " " + "w-[0]" : "") + " " + "rounded-[0]"}>
+  return <div className={"  w-0 rounded-none"}>
       {THEMES.map(({
       key,
       icon: Icon,
@@ -104,7 +104,7 @@ function ThemePicker({
         selected: active
       }} aria-label={`主题：${label}`} hitSlop={4}>
             <Icon size={m.tileIcon + 2} color={active ? compact ? p.text : p.onAccent : p.textTertiary} strokeWidth={active ? 2.2 : 1.8} />
-            {!compact ? <span className={"text-[descSize] font-sans"}>{label}</span> : null}
+            {!compact ? <span className={"text-[var(--desc-size)] font-sans"}>{label}</span> : null}
           </button>;
     })}
     </div>;
@@ -162,13 +162,13 @@ export function AppearancePanel() {
       label: item.label
     }))} onChange={value => update({
       themePreset: value
-    })} compact className={""} />} />
+    })} compact className={"block"} />} />
       <SettingsRow label="强调色" right={<Select value={accentPreset} options={ACCENTS.map(item => ({
       value: item.key,
       label: item.label
     }))} onChange={value => update({
       accentPreset: value
-    })} compact className={""} />} />
+    })} compact className={"block"} />} />
       <SettingsRow label="UI 字号" right={<SizeStepper value={uiFontSize} onChange={value => update({
       uiFontSize: value
     })} min={12} max={18} palette={p} />} />
@@ -190,10 +190,10 @@ function SizeStepper({
   max: number;
   palette: ReturnType<typeof useSettingsPalette>;
 }) {
-  return <div className={"" + " " + ""}>
-      <button onClick={() => onChange(Math.max(min, value - 1))} aria-label="减小字号"><span className={""}>−</span></button>
-      <span className={"" + " " + ""}>{value}px</span>
-      <button onClick={() => onChange(Math.min(max, value + 1))} aria-label="增大字号"><span className={""}>+</span></button>
+  return <div className={" "}>
+      <button onClick={() => onChange(Math.max(min, value - 1))} aria-label="减小字号"><span className={"block"}>−</span></button>
+      <span className={" "}>{value}px</span>
+      <button onClick={() => onChange(Math.min(max, value + 1))} aria-label="增大字号"><span className={"block"}>+</span></button>
     </div>;
 }
 const appearanceStyles = {

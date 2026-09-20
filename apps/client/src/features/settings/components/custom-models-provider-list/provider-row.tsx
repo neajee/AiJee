@@ -12,15 +12,15 @@ export function ProviderRow({
   disabled
 }: ProviderRowProps) {
   const content = <>
-      {connected ? <div className={"" + " " + ""} /> : null}
+      {connected ? <div className={"  bg-success"} /> : null}
       <ProviderMark name={name} id={id} colors={colors} />
-      <div className={""}>
-        <span className={"" + " " + ""}>{name}</span>
-        {meta ? <span className={"" + " " + ""}>{meta}</span> : null}
+      <div className={"block"}>
+        <span className={"  text-foreground"}>{name}</span>
+        {meta ? <span className={"  text-text-secondary"}>{meta}</span> : null}
       </div>
     </>;
   if (trailing) {
-    return <div className={"" + " " + (disabled ? "opacity-[0.5]" : "")}>
+    return <div className={"  opacity-[0.5]"}>
         <button onClick={onPress} disabled={disabled} role="button" aria-label={name} accessibilityState={{
         disabled
       }}>

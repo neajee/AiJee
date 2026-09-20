@@ -20,22 +20,22 @@ export function CustomProviderRow({
     setHovered(false);
     setMenuOpen(false);
   }}>
-      <ProviderRow name={name} meta={`${apiLabel} · ${modelCount} 个模型`} colors={colors} onClick={() => setExpanded(value => !value)} trailing={hovered || menuOpen ? <div className={""}>
+      <ProviderRow name={name} meta={`${apiLabel} · ${modelCount} 个模型`} colors={colors} onClick={() => setExpanded(value => !value)} trailing={hovered || menuOpen ? <div className={"block"}>
             <button onClick={event => {
         event.stopPropagation?.();
         setMenuOpen(value => !value);
       }} role="button" aria-label={`管理 ${name}`}>
-              <span className={"" + " " + ""}>•••</span>
+              <span className={"  text-text-secondary"}>•••</span>
             </button>
             {menuOpen ? <button onClick={event => {
         event.stopPropagation?.();
         onRemove();
         setMenuOpen(false);
-      }} role="button" aria-label={`删除 ${name}`} className={"" + " " + ""}>
-                <span className={"" + " " + ""}>删除服务</span>
+      }} role="button" aria-label={`删除 ${name}`} className={"  bg-card border-border"}>
+                <span className={"  text-destructive"}>删除服务</span>
               </button> : null}
           </div> : null} />
-      {expanded ? <div className={"" + " " + ""}>
+      {expanded ? <div className={" "}>
           <Field label="Base URL" value={provider.baseUrl ?? ''} onChangeText={value => onUpdate({
         ...provider,
         baseUrl: value || undefined
@@ -48,8 +48,8 @@ export function CustomProviderRow({
         ...provider,
         apiKey: value || undefined
       })} placeholder="可选" colors={colors} />
-          <div className={""}>
-            <span className={"" + " " + ""}>模型</span>
+          <div className={"block"}>
+            <span className={"  text-text-secondary"}>模型</span>
             <button onClick={() => onUpdate({
           ...provider,
           models: [...(provider.models ?? []), {
@@ -57,7 +57,7 @@ export function CustomProviderRow({
           }]
         })} role="button">
               <Plus size={14} color={colors.textSecondary} strokeWidth={2} />
-              <span className={"" + " " + ""}>添加模型</span>
+              <span className={"  text-text-secondary"}>添加模型</span>
             </button>
           </div>
           {(provider.models ?? []).map((model, index) => <ModelEntryRow key={`${model.id}-${index}`} model={model} colors={colors} isLast={index === modelCount - 1} onUpdate={next => {

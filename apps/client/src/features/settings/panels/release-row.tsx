@@ -25,39 +25,39 @@ export function ReleaseRow({
       <button onClick={() => setOpen(value => !value)} role="button" aria-label={`${release.tag}，发布于 ${formatReleaseTime(release.published_at)}，${countText}`} accessibilityState={{
       expanded: open
     }}>
-        <div className={"" + " " + ""} />
-        <span className={"" + " " + ""}>
+        <div className={" "} />
+        <span className={" "}>
           {release.tag}
         </span>
-        <span className={"" + " " + ""}>
+        <span className={"  text-text-tertiary"}>
           {formatReleaseShort(release.published_at)}
         </span>
-        <span className={"" + " " + ""}>
+        <span className={"  text-text-tertiary"}>
           {countText}
         </span>
-        {current ? <div className={"" + " " + ""}>
-            <span className={"" + " " + ""}>当前</span>
+        {current ? <div className={"  bg-muted"}>
+            <span className={"  text-text-secondary"}>当前</span>
           </div> : null}
         {open ? <ChevronUp size={14} color={p.textTertiary} strokeWidth={2} /> : <ChevronDown size={14} color={p.textTertiary} strokeWidth={2} />}
       </button>
-      {open ? <div className={"" + " " + ""}>
+      {open ? <div className={" "}>
           {(['feature', 'fix', 'other'] as const).map(type => {
         const items = notes.filter(note => note.type === type);
         if (!items.length) return null;
         const label = type === 'feature' ? '新功能' : type === 'fix' ? '修复' : '其他';
-        return <div key={type} className={""}>
-                <span className={"" + " " + ""}>
+        return <div key={type} className={"block"}>
+                <span className={"  text-text-secondary"}>
                   {label} · {items.length}
                 </span>
-                {items.map((note, index) => <div key={`${note.commit}-${index}`} className={""}>
-                    <span className={"" + " " + ""}>
+                {items.map((note, index) => <div key={`${note.commit}-${index}`} className={"block"}>
+                    <span className={"  text-foreground"}>
                       {note.title}
                     </span>
-                    {note.commit ? <span className={"" + " " + ""}>{note.commit}</span> : null}
+                    {note.commit ? <span className={"  text-text-tertiary"}>{note.commit}</span> : null}
                   </div>)}
               </div>;
       })}
-          {!notes.length ? <span className={"" + " " + ""}>无变更记录</span> : null}
+          {!notes.length ? <span className={"  text-text-tertiary"}>无变更记录</span> : null}
         </div> : null}
     </div>;
 }

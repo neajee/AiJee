@@ -10,8 +10,8 @@ export function SettingsScroll({
   const palette = useSettingsPalette();
   const phone = useSettingsPhoneLayout();
   const contentStyle = useSettingsContentStyle(insets.bottom);
-  return <div className={"" + " " + ""}>
-      <div className={""}>
+  return <div className={"  bg-background"}>
+      <div className={"block"}>
         {children}
       </div>
     </div>;

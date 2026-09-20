@@ -36,13 +36,13 @@ function SettingsDesktopSection({
   const palette = useSettingsPalette();
   const Component = section.Component;
   const inset = metrics.gutter + 6;
-  return <div className={""}>
-      <div className={"" + " " + "pl-[0] pr-[0]"}>
-        <div className={""}>
-          <span className={"" + " " + ""}>{section.title}</span>
+  return <div className={"block"}>
+      <div className={"  pl-0 pr-0"}>
+        <div className={"block"}>
+          <span className={"  text-foreground"}>{section.title}</span>
         </div>
       </div>
-      <div className={""}>
+      <div className={"block"}>
         <SettingsHeadingProvider visible={false}>
           <Component isDark={isDark} />
         </SettingsHeadingProvider>
@@ -62,15 +62,15 @@ function SettingsDetailChrome({
   const metrics = useSettingsMetrics();
   const palette = useSettingsPalette();
   const contentStyle = useSettingsContentStyle(insets.bottom);
-  return <div className={"" + " " + ""}>
-      <div className={"" + " " + ""}>
-        <div className={"" + " " + "pl-[0] pr-[0] max-w-[contentMaxWidth] min-h-[0]"}>
+  return <div className={"  bg-background"}>
+      <div className={" "}>
+        <div className={"  pl-0 pr-0 max-w-[var(--content-max-width)] min-h-0"}>
           <button onClick={onBack} role="button" aria-label="返回设置" hitSlop={8}>
             <ChevronLeft size={metrics.chevronSize + 6} color={palette.text} strokeWidth={2} />
           </button>
-          <span className={"" + " " + "text-[0]"}>{title}</span>
+          <span className={"  text-[0px] text-foreground"}>{title}</span>
         </div>
       </div>
-      <div className={""}>{children}</div>
+      <div className={"block"}>{children}</div>
     </div>;
 }

@@ -5,9 +5,9 @@ export function ModelSection({
   children,
   colors
 }: ModelSectionProps) {
-  return <div className={""}>
-      <span className={"" + " " + ""}>{title}</span>
-      <div className={"" + " " + ""}>
+  return <div className={"block"}>
+      <span className={"  text-text-secondary"}>{title}</span>
+      <div className={"  border-border bg-card"}>
         {children}
       </div>
     </div>;

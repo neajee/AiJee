@@ -84,7 +84,7 @@ export function AgentActionButton({
   return <button onClick={onPress} disabled={updating} role="button" aria-label={`${label} Pi agent`}>
       {updating ? <span size="small" color={p.onAccent} /> : <>
           <Icon size={13} color={p.onAccent} strokeWidth={2.2} />
-          <span className={"" + " " + ""}>{label}</span>
+          <span className={"  text-accent-content"}>{label}</span>
         </>}
     </button>;
 }
@@ -100,9 +100,9 @@ export function AgentBanner({
   // Tinted from the palette rather than fixed iOS colours, so the banner keeps
   // its contrast in both themes.
   const tint = ok ? p.isDark ? 'rgba(63,185,80,0.14)' : 'rgba(26,127,55,0.10)' : p.isDark ? 'rgba(248,81,73,0.14)' : 'rgba(207,34,46,0.10)';
-  return <div className={"" + " " + "ml-[gutter] mr-[gutter]"}>
+  return <div className={"  ml-[var(--gutter)] mr-[var(--gutter)]"}>
       {ok ? <CheckCircle2 size={13} color={p.success} strokeWidth={2} /> : <AlertCircle size={13} color={p.destructive} strokeWidth={2} />}
-      <span className={"" + " " + "text-[descSize]"}>
+      <span className={"  text-[var(--desc-size)]"}>
         {text}
       </span>
     </div>;

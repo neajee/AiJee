@@ -12,15 +12,15 @@ export function ApiTypeSelector({
   onChange: (v: string) => void;
   colors: ReturnType<typeof useColors>;
 }) {
-  return <div className={""}>
-      <span className={"" + " " + ""}>
+  return <div className={"block"}>
+      <span className={"  text-text-secondary"}>
         API 类型
       </span>
-      <div className={""}>
+      <div className={"block"}>
         {API_TYPES.map(item => {
         const isActive = value === item.value;
-        return <button key={item.value} onClick={() => onChange(item.value)} className={"" + " " + ""}>
-              <span className={"" + " " + ""}>
+        return <button key={item.value} onClick={() => onChange(item.value)} className={" "}>
+              <span className={" "}>
                 {item.label}
               </span>
             </button>;

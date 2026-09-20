@@ -24,21 +24,21 @@ export function ChipToggleRow({
   }[];
   colors: ReturnType<typeof useColors>;
 }) {
-  return <div className={""}>
-      <span className={"" + " " + ""}>
+  return <div className={"block"}>
+      <span className={"  text-text-secondary"}>
         {label}
       </span>
-      <div className={""}>
+      <div className={"block"}>
         {options.map(item => <button key={item.key} onClick={item.locked ? undefined : item.onToggle} disabled={item.locked} role="checkbox" accessibilityState={{
         checked: item.active,
         disabled: item.locked
-      }} className={"" + " " + "" + " " + (item.locked ? "opacity-[0.6]" : "")}>
-            <span className={"" + " " + ""}>
+      }} className={"  opacity-[0.6]"}>
+            <span className={" "}>
               {item.label}
             </span>
           </button>)}
       </div>
-      {hint ? <span className={"" + " " + ""}>
+      {hint ? <span className={"  text-muted-foreground"}>
           {hint}
         </span> : null}
     </div>;

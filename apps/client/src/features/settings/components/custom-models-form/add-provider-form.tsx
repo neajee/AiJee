@@ -17,17 +17,17 @@ export function AddProviderForm({
   const [name, setName] = useState('');
   const [baseUrl, setBaseUrl] = useState('');
   const [api, setApi] = useState('openai-completions');
-  return <div className={"" + " " + ""}>
-      <div className={""}>
-        <span className={"" + " " + ""}>
+  return <div className={"  bg-card"}>
+      <div className={"block"}>
+        <span className={"  text-foreground"}>
           新建提供商
         </span>
         <Field label="提供商名称" value={name} onChangeText={setName} placeholder="例如 ollama、lm-studio、my-vllm" colors={colors} autoFocus />
         <Field label="Base URL" value={baseUrl} onChangeText={setBaseUrl} placeholder="http://localhost:11434/v1" colors={colors} mono />
         <ApiTypeSelector value={api} onChange={setApi} colors={colors} />
-        <div className={""}>
+        <div className={"block"}>
           <button onClick={onCancel}>
-            <span className={"" + " " + ""}>
+            <span className={"  text-text-secondary"}>
               取消
             </span>
           </button>
@@ -36,7 +36,7 @@ export function AddProviderForm({
             onAdd(name.trim(), baseUrl.trim(), api);
           }
         }}>
-            <span className={"" + " " + ""}>
+            <span className={" "}>
               添加提供商
             </span>
           </button>

@@ -44,8 +44,8 @@ export function ModelEntryRow({
     return parts.join(' · ');
   }, [model.name, model.contextWindow, model.input, model.reasoning]);
   if (editing) {
-    return <div className={"" + " " + ""}>
-        <div className={""}>
+    return <div className={" "}>
+        <div className={"block"}>
           <div className={"flex-1"}>
             <Field label="模型 ID" value={draft.id} onChangeText={v => setDraft({
             ...draft,
@@ -59,7 +59,7 @@ export function ModelEntryRow({
           })} placeholder="可选" colors={colors} />
           </div>
         </div>
-        <div className={""}>
+        <div className={"block"}>
           <div className={"flex-1"}>
             <Field label="上下文窗口" value={draft.contextWindow?.toString() ?? ''} onChangeText={v => setDraft({
             ...draft,
@@ -98,9 +98,9 @@ export function ModelEntryRow({
           reasoning: draft.reasoning === true ? undefined : true
         })
       }]} />
-        <div className={""}>
+        <div className={"block"}>
           <button onClick={() => setEditing(false)}>
-            <span className={"" + " " + ""}>
+            <span className={" "}>
               取消
             </span>
           </button>
@@ -113,20 +113,20 @@ export function ModelEntryRow({
             setEditing(false);
           }
         }}>
-            <span className={"" + " " + ""}>
+            <span className={" "}>
               保存
             </span>
           </button>
         </div>
       </div>;
   }
-  return <div className={"" + " " + (!isLast ? "" : "")}>
+  return <div className={" "}>
       <Cpu size={colors.roomy ? 14 : 9} color={colors.textMuted} strokeWidth={1.8} />
-      <div className={""}>
-        <span className={"" + " " + ""}>
+      <div className={"block"}>
+        <span className={" "}>
           {model.id}
         </span>
-        {summary ? <span className={"" + " " + ""}>
+        {summary ? <span className={" "}>
             {summary}
           </span> : null}
       </div>

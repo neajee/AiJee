@@ -3,5 +3,5 @@ import type { RowDividerProps } from './component-types';
 export function RowDivider({
   colors
 }: RowDividerProps) {
-  return <div className={"" + " " + ""} />;
+  return <div className={"  bg-muted"} />;
 }

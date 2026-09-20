@@ -20,10 +20,10 @@ export function Field({
   mono?: boolean;
   autoFocus?: boolean;
 }) {
-  return <div className={""}>
-      <span className={"" + " " + ""}>
+  return <div className={"block"}>
+      <span className={"  text-text-secondary"}>
         {label}
       </span>
-      <input className={"" + " " + "" + " " + (mono ? "font-mono" : "")} value={value} onChangeText={onChangeText} placeholder={placeholder} placeholderTextColor={colors.placeholder} autoCapitalize="none" autoCorrect={false} autoFocus={autoFocus} />
+      <input className={"  text-foreground bg-background border-border font-mono"} value={value} onChangeText={onChangeText} placeholder={placeholder} placeholderTextColor={colors.placeholder} autoCapitalize="none" autoCorrect={false} autoFocus={autoFocus} />
     </div>;
 }

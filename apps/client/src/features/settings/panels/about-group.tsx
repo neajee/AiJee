@@ -13,8 +13,8 @@ export function AboutGroup({
   const m = useSettingsMetrics();
   const p = useSettingsPalette();
   return <div className={"gap-[8px]"}>
-      <span className={"" + " " + ""}>{title}</span>
-      <div className={"rounded-[cardRadius] border-[0] overflow-hidden"}>
+      <span className={" "}>{title}</span>
+      <div className={"rounded-[var(--card-radius)] border-0 overflow-hidden"}>
         {children}
       </div>
     </div>;
