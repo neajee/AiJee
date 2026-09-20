@@ -50,7 +50,10 @@ function RootLayout() {
       '--aijee-text': themeTokens.text,
       '--aijee-text-secondary': themeTokens.textSecondary,
       '--aijee-border': themeTokens.border,
+      '--aijee-border-strong': themeTokens.borderStrong,
       '--aijee-accent': themeTokens.accent,
+      '--aijee-hover': palette.pressed,
+      '--aijee-active': palette.tile,
       '--aijee-code-background': themeTokens.code,
       '--aijee-code-text': themeTokens.codeText,
       '--aijee-ui-font-size': `${uiFontSize}px`,
@@ -122,7 +125,7 @@ function RootLayout() {
       }
       const target = await getBootstrapTarget();
       console.info('[aijee/bootstrap] target', target.kind);
-      if (target.kind === 'local') {
+      if (target.kind === 'same-origin') {
         const server = await ensureLocalServer(target.server.address);
         const claim = await claimLocalServer(server);
         console.info('[aijee/bootstrap] local claim', {

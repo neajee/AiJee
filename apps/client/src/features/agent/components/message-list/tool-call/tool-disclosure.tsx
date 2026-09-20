@@ -1,8 +1,5 @@
 import { memo, type ReactNode } from "react";
-import { ChevronRight } from "lucide-react";
-import Animated, { Easing, useAnimatedStyle, useDerivedValue, withTiming } from "@/styles/motion";
-import { Colors } from "@/constants/theme";
-import { HAIRLINE_WIDTH } from "@/constants/layout";
+import { ChevronRight, type LucideIcon } from "lucide-react";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { AnimatedCollapse } from "../animated-collapse";
 
@@ -20,6 +17,8 @@ interface ToolHeaderProps {
   onToggle: () => void;
   isDark: boolean;
   "aria-label": string;
+  /** Leading glyph so every work row shares one text baseline. */
+  icon?: LucideIcon;
   /** Multi-line headers (subagent) need the chevron pinned to the first line. */
   alignTop?: boolean;
   children: ReactNode;
@@ -33,30 +32,20 @@ export const ToolHeader = memo(function ToolHeader({
   expanded,
   expandable,
   onToggle,
-  isDark,
   "aria-label": ariaLabel,
+  icon: Icon,
   alignTop = false,
   children
 }: ToolHeaderProps) {
   const colors = useThemeTokens();
-  const rotate = useDerivedValue(() => withTiming(expanded ? 90 : 0, {
-    duration: 180,
-    easing: Easing.out(Easing.cubic)
-  }), [expanded]);
-  const chevronStyle = useAnimatedStyle(() => ({
-    transform: [{
-      rotate: `${rotate.value}deg`
-    }]
-  }));
-  const row = [styles.header, alignTop && styles.headerTop];
+  const glyph = Icon ? <Icon size={12} strokeWidth={1.8} color={colors.textTertiary} className={`shrink-0 ${alignTop ? 'mt-[3px]' : ''}`} /> : null;
   if (!expandable) {
-    return <div className="flex flex-col">{children}</div>;
+    return <div className="flex min-h-7 items-center gap-1.5 py-1">{glyph}<div className="min-w-0 flex-1">{children}</div></div>;
   }
-  return <button onClick={onToggle} role="button" aria-label={ariaLabel}>
-      {children}
-      <div>
-        <ChevronRight size={CHEVRON_SIZE} color={colors.textTertiary} strokeWidth={2} />
-      </div>
+  return <button className={`flex min-h-7 w-full items-center justify-between gap-1.5 rounded-md py-1 text-left text-xs hover:bg-hover ${alignTop ? 'items-start' : ''}`} onClick={onToggle} role="button" aria-label={ariaLabel}>
+      {glyph}
+      <div className="min-w-0 flex-1">{children}</div>
+      <ChevronRight className={`shrink-0 transition-transform ${alignTop ? 'mt-[3px]' : ''} ${expanded ? 'rotate-90' : ''}`} size={CHEVRON_SIZE} color={colors.textTertiary} strokeWidth={2} />
     </button>;
 });
 
@@ -73,7 +62,7 @@ export function ToolBody({
   children: ReactNode;
 }) {
   return <AnimatedCollapse expanded={expanded}>
-      <div className="flex flex-col">{children}</div>
+      <div className="flex flex-col gap-2 px-2 pb-2">{children}</div>
     </AnimatedCollapse>;
 }
 
@@ -82,7 +71,6 @@ export function ToolBody({
  * transcript, a diff and a subagent log all read as the same kind of object.
  */
 export function ToolSurface({
-  isDark,
   padded = true,
   children
 }: {
@@ -90,40 +78,7 @@ export function ToolSurface({
   padded?: boolean;
   children: ReactNode;
 }) {
-  const colors = useThemeTokens();
-  return <div className={"  bg-surface-raised border-border"}>
+  return <div className={`overflow-hidden rounded-b-md bg-muted ${padded ? 'p-2.5' : ''}`}>
       {children}
     </div>;
 }
-const styles = {
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    paddingTop: 4,
-    paddingBottom: 4
-  },
-  headerTop: {
-    alignItems: "flex-start"
-  },
-  headerPressed: {
-    opacity: 0.6
-  },
-  chevron: {
-    flexShrink: 0
-  },
-  chevronTop: {
-    marginTop: 3
-  },
-  body: {
-    paddingTop: 6
-  },
-  surface: {
-    borderRadius: 6,
-    borderWidth: HAIRLINE_WIDTH,
-    overflow: "hidden"
-  },
-  surfacePadded: {
-    padding: 10
-  }
-} as const;

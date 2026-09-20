@@ -1,8 +1,9 @@
-import { useState } from "react";
-import { Fonts } from "@/constants/theme";
+import { useState, type ReactNode } from "react";
 import { useColorScheme } from "@/hooks/use-color-scheme";
+import { DiffPreview } from "@/features/agent/components/message-list/code-preview";
+import { splitUnifiedDiff } from "@/features/agent/utils/diff";
 import { STATUS_COLORS, statusLabel } from "../../utils/changes-panel";
-import { DiffView } from "./diff-view";
+import { languageOf } from "../../utils/file-tree";
 import { FileTypeBadge } from "../file-type-badge";
 
 /** Reserved on touch, where there is no hover to overlay the actions on. */
@@ -24,10 +25,7 @@ export function FileRow({
   diffContent,
   diffLoading,
   onClick,
-  textPrimary,
   textMuted,
-  hoverBg,
-  dividerColor,
   actions
 }: {
   path: string;
@@ -42,15 +40,13 @@ export function FileRow({
   textMuted: string;
   hoverBg: string;
   dividerColor: string;
-  actions?: React.ReactNode;
+  actions?: ReactNode;
 }) {
   const colorScheme = useColorScheme() ?? "light";
   const isDark = colorScheme === "dark";
-  const isWeb = true;
-  const selectedBg = isDark ? "#1e1e1e" : "#E8E8E8";
   const slash = path.lastIndexOf("/");
   const dir = slash >= 0 ? path.slice(0, slash) : "";
-  const name = slash >= 0 ? path.slice(slash) : path;
+  const name = slash >= 0 ? path.slice(slash + 1) : path;
 
   // Modified is the default state of a working tree, so only the states that
   // change what exists get a letter.
@@ -60,110 +56,37 @@ export function FileRow({
 
   // Hover lives on the wrapper so moving onto an action button keeps it up.
   const [hovered, setHovered] = useState(false);
-  return <div {...isWeb ? {
-    onPointerEnter: () => setHovered(true),
-    onPointerLeave: () => setHovered(false)
-  } : {}}>
-      <button onClick={onClick} {...{
-      title: path
-    }} aria-label={`${path} (${status})`}>
+  const sides = diffContent ? splitUnifiedDiff(diffContent) : null;
+  return <div className="border-b border-border" onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)}>
+      <button onClick={onClick} title={path} aria-label={`${path} (${status})`} className={`relative flex min-h-[30px] w-full items-center gap-1.5 py-1 pl-1 pr-2 text-left hover:bg-hover ${isSelected ? 'bg-active' : ''}`}>
         <FileTypeBadge path={path} fallbackColor={textMuted} />
 
         {/* Only the directory may be cut, and it is cut from its own end so the
             filename beside it always shows whole. */}
-        {dir.length > 0 && <span>
+        {dir.length > 0 && <span className="min-w-0 shrink truncate text-xs text-text-tertiary">
             {dir}
           </span>}
-        <span>
+        <span className="shrink-0 text-xs font-medium text-foreground">
           {name}
         </span>
 
-        {(additions ?? 0) > 0 && <span>+{additions}</span>}
-        {(deletions ?? 0) > 0 && <span>−{deletions}</span>}
-        {showBadge && <span>
+        {(additions ?? 0) > 0 && <span className="shrink-0 font-mono text-meta text-success">+{additions}</span>}
+        {(deletions ?? 0) > 0 && <span className="shrink-0 font-mono text-meta text-destructive">−{deletions}</span>}
+        {showBadge && <span className="ml-1.5 shrink-0 font-mono text-[10.5px]" style={{ color: badgeColor }}>
             {badge}
           </span>}
 
-        <div className="flex flex-col" />
+        <div className="flex-1" />
 
-        {actions && (isWeb ?
-      // Hovering means a pointer, and a pointer means the metadata can be
-      // covered for a moment instead of surrendering 50px on every row.
-      <div>
-              {actions}
-            </div> : <div className="flex flex-col">{actions}</div>)}
+        <div className="flex w-[50px] shrink-0 items-center justify-end gap-0.5">{hovered ? actions : null}</div>
       </button>
 
-      {isSelected && <div>
-          {diffLoading ? <span className={"pt-[12px] pb-[12px]" + " size-3 animate-spin"} /> : diffContent ? <DiffView diff={diffContent} /> : <span>
+      {isSelected && <div className="mx-2 mb-1">
+          {diffLoading ? <div className="flex justify-center py-3">
+              <span className="size-3 animate-spin rounded-full border-2 border-border border-t-text-tertiary" />
+            </div> : sides && (sides.oldValue || sides.newValue) ? <DiffPreview oldValue={sides.oldValue} newValue={sides.newValue} isDark={isDark} maxHeight={300} language={languageOf(path)} title={name} /> : <div className="py-3 text-center text-xs text-text-tertiary">
               No diff available
-            </span>}
+            </div>}
         </div>}
     </div>;
 }
-const styles = {
-  fileRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingLeft: 4,
-    paddingRight: 8,
-    minHeight: 30,
-    borderBottomWidth: 0.633
-  },
-  dirText: {
-    flexShrink: 1,
-    fontSize: 12,
-    fontFamily: Fonts.sans
-  },
-  nameText: {
-    flexShrink: 0,
-    fontSize: 12,
-    fontFamily: Fonts.sansMedium
-  },
-  stat: {
-    marginLeft: 6,
-    fontSize: 11,
-    fontFamily: Fonts.mono
-  },
-  statusBadge: {
-    marginLeft: 6,
-    fontSize: 10.5,
-    fontFamily: Fonts.mono
-  },
-  filler: {
-    flexGrow: 1,
-    flexShrink: 0,
-    minWidth: 8
-  },
-  fileActionsWrap: {
-    width: ROW_ACTIONS_WIDTH,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "flex-end"
-  },
-  fileActionsOverlay: {
-    position: "absolute",
-    right: 0,
-    top: 0,
-    bottom: 0,
-    paddingLeft: 8,
-    paddingRight: 8,
-    flexDirection: "row",
-    alignItems: "center"
-  },
-  diffContainer: {
-    marginLeft: 8,
-    marginRight: 8,
-    marginBottom: 4,
-    borderRadius: 6,
-    overflow: "hidden",
-    maxHeight: 300
-  },
-  diffEmpty: {
-    fontSize: 12,
-    fontFamily: Fonts.sans,
-    textAlign: "center",
-    paddingTop: 12,
-    paddingBottom: 12
-  }
-} as const;

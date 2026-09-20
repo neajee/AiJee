@@ -6,7 +6,7 @@ export function AnimatedListItem({
 }: {
   children: ReactNode;
 }) {
-  return <div layout={ITEM_LAYOUT}>
+  return <div className="transition-all duration-150">
       {children}
     </div>;
 }

@@ -9,7 +9,7 @@ export function gitRemoteToBrowserUrl(remoteUrl: string | null | undefined): {
 } | null {
   if (!remoteUrl) return null;
 
-  let cleaned = remoteUrl.trim();
+  const cleaned = remoteUrl.trim();
 
   // SSH format: git@github.com:user/repo.git
   const sshMatch = cleaned.match(

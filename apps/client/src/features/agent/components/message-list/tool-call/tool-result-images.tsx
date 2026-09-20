@@ -5,8 +5,7 @@ interface ToolResultImagesProps {
   isDark: boolean;
 }
 export const ToolResultImages = memo(function ToolResultImages({
-  images,
-  isDark
+  images
 }: ToolResultImagesProps) {
   const [previewUri, setPreviewUri] = useState<string | null>(null);
   const openPreview = useCallback((uri: string) => setPreviewUri(uri), []);
@@ -30,41 +29,3 @@ export const ToolResultImages = memo(function ToolResultImages({
         </div>}
     </>;
 });
-const styles = {
-  container: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-    marginTop: 6,
-    marginLeft: 12
-  },
-  thumbWrap: {
-    borderRadius: 8,
-    overflow: "hidden",
-    maxWidth: 400,
-    maxHeight: 300
-  },
-  thumb: {
-    width: 320,
-    height: 200,
-    ...(true ? {
-      maxWidth: "100%" as const
-    } : {})
-  },
-  overlay: {
-    flex: 1,
-    backgroundColor: "rgba(0,0,0,0.85)",
-    alignItems: "center",
-    justifyContent: "center"
-  },
-  previewWrap: {
-    width: "90%",
-    height: "80%",
-    alignItems: "center",
-    justifyContent: "center"
-  },
-  previewImage: {
-    width: "100%",
-    height: "100%"
-  }
-} as const;

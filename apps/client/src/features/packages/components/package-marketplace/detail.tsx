@@ -3,9 +3,8 @@ import { Linking, useWindowDimensions } from "@/platform/browser";
 import { Download, ExternalLink, X } from 'lucide-react';
 import { usePiClient } from '@aijee/client-sdk';
 import type { MarketplacePackage } from '@aijee/client-sdk';
-import { Fonts } from '@/constants/theme';
 import { AppModal } from '@/components/ui';
-import { useSettingsMetrics, useSettingsPalette, useSettingsPhoneLayout } from '@/components/settings-surface';
+import { useSettingsPalette, useSettingsPhoneLayout } from '@/components/settings-surface';
 import { Notice, PrimaryButton } from './shared';
 
 // ─── Detail dialog ────────────────────────────────────────────
@@ -20,7 +19,6 @@ export function PackageDetail({
   onInstalled: (output: string) => void;
 }) {
   const client = usePiClient();
-  const m = useSettingsMetrics();
   const p = useSettingsPalette();
   const phone = useSettingsPhoneLayout();
   const {
@@ -60,44 +58,43 @@ export function PackageDetail({
   }, [client, pkg, target, onInstalled]);
   if (!pkg) return null;
   const maxHeight = Math.min(screenHeight - 64, 680);
+  const repoUrl = pkg.repository ?? pkg.homepage;
   return <AppModal visible onClose={onClose} contentStyle={[{
     backgroundColor: p.card,
     borderColor: p.border,
-    borderRadius: phone ? 0 : m.cardRadius + 4,
     width: phone ? '100%' : 560,
+    maxWidth: phone ? '100%' : 560,
     height: phone ? '100%' : undefined,
     maxHeight: phone ? undefined : maxHeight
   }]}>
-        <div className="flex flex-col">
-          <div className={"  p-[var(--gutter)]"}>
-            <div className="flex flex-col">
-              <span className="text-lg font-semibold text-foreground">
+        <div className="flex flex-col gap-4">
+          <div className="flex items-start gap-3 border-b border-border pb-4">
+            <div className="flex min-w-0 flex-1 flex-col gap-[3px]">
+              <span className="truncate font-sans text-[calc(var(--label-size)+2px)] font-semibold text-foreground">
                 {pkg.name}
               </span>
-              <span>
+              <span className="font-sans text-meta text-text-tertiary">
                 v{pkg.version}
                 {pkg.author ? ` · ${pkg.author}` : ''}
                 {pkg.package_types.length ? ` · ${pkg.package_types.join('、')}` : ''}
               </span>
             </div>
-            <button onClick={onClose} role="button" aria-label="关闭" className="inline-flex items-center">
+            <button onClick={onClose} role="button" aria-label="关闭" className="inline-flex size-[26px] shrink-0 items-center justify-center rounded-md transition-colors hover:bg-hover active:opacity-60">
               <X size={16} color={p.textSecondary} strokeWidth={2} />
             </button>
           </div>
 
-          <div>
-            <span className={"text-[var(--value-size)] leading-[0]"}>
+          <div className="flex flex-col gap-3.5">
+            <span className="font-sans text-[var(--value-size)] leading-[1.5] text-text-secondary">
               {pkg.description || '作者未提供介绍'}
             </span>
-
             {failure ? <Notice text={failure} tone="error" /> : null}
-
           </div>
 
-          <div className={"  p-[var(--gutter)]"}>
-            {pkg.repository || pkg.homepage ? <button onClick={() => Linking.openURL((pkg.repository ?? pkg.homepage)!)} role="link" aria-label="打开仓库" className="inline-flex items-center">
+          <div className="flex items-center justify-between gap-3 border-t border-border pt-4">
+            {repoUrl ? <button onClick={() => Linking.openURL(repoUrl)} role="link" aria-label="打开仓库" className="inline-flex items-center gap-1.5 rounded-md px-2 py-1.5 text-text-secondary transition-colors hover:bg-hover active:opacity-60">
                 <ExternalLink size={13} color={p.textSecondary} strokeWidth={1.8} />
-                <span className={"text-[var(--desc-size)] font-sans"}>
+                <span className="font-sans text-[var(--desc-size)]">
                   仓库
                 </span>
               </button> : <div />}

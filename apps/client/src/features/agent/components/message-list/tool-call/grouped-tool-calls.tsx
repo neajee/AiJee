@@ -1,11 +1,18 @@
 import { memo, useEffect, useRef, useState } from 'react';
-import { Animated } from "@/styles/motion";
-import { useThemeTokens } from '@/hooks/use-theme-tokens';
+import { Bot, Download, Files, Search, Wrench, type LucideIcon } from 'lucide-react';
 import type { ToolCallInfo } from '../../../component-types.ts';
 import { isToolActive } from '../../../utils/message-list';
 import { ToolBody, ToolHeader } from './tool-disclosure';
 import { formatSingleLine } from '../../../utils/tool-call-grouping';
 const MAX_VISIBLE = 5;
+const GROUP_ICONS: Record<string, LucideIcon> = {
+  read: Files,
+  search: Search,
+  scrape: Search,
+  crawl: Search,
+  download: Download,
+  subagent: Bot
+};
 const GROUP_LABELS: Record<string, {
   before: string;
   after: string;
@@ -46,7 +53,6 @@ export const GroupedToolCalls = memo(function GroupedToolCalls({
   calls: ToolCallInfo[];
   isDark: boolean;
 }) {
-  const colors = useThemeTokens();
   const [expanded, setExpanded] = useState(false);
   const [showAll, setShowAll] = useState(false);
   const activeCall = calls.find(isToolActive);
@@ -63,46 +69,16 @@ export const GroupedToolCalls = memo(function GroupedToolCalls({
   };
   const visible = expanded ? showAll ? calls : calls.slice(0, MAX_VISIBLE) : [];
   return <div>
-      <ToolHeader expanded={expanded} expandable onToggle={() => setExpanded(value => !value)} isDark={isDark} aria-label={`${expanded ? 'Collapse' : 'Expand'} ${calls.length} ${toolName} calls`}>
-        <div className="flex flex-col">
-          <span className={"  text-foreground"}>{activeCall ? base.activeBefore ?? base.before : base.before}</span>
-          <AnimatedNumber value={calls.length} className={"  text-foreground"} />
-          <span className={"  text-foreground"}>{toolName === 'read' ? ' files' : base.after}</span>
-        </div>
+      <ToolHeader expanded={expanded} expandable onToggle={() => setExpanded(value => !value)} isDark={isDark} icon={GROUP_ICONS[toolName] ?? Wrench} aria-label={`${expanded ? 'Collapse' : 'Expand'} ${calls.length} ${toolName} calls`}>
+        <span className="block truncate text-xs font-semibold text-foreground">
+          {activeCall ? base.activeBefore ?? base.before : base.before}{calls.length}{base.after}
+        </span>
       </ToolHeader>
       <ToolBody expanded={expanded}>
-        <div className="flex flex-col">
-          {visible.map(call => <div key={call.id} className="flex flex-col"><span className={"  text-text-secondary"}>{formatSingleLine(call)}</span></div>)}
-          {calls.length > MAX_VISIBLE && !showAll && <button role="button" onClick={() => setShowAll(true)}><span className={"  text-text-tertiary"}>Show {calls.length - MAX_VISIBLE} more…</span></button>}
+        <div className="flex flex-col gap-1 pl-0.5">
+          {visible.map(call => <div key={call.id} className="flex items-center gap-1.5 py-0.5"><span className="min-w-0 flex-1 truncate text-xs text-text-secondary">{formatSingleLine(call)}</span></div>)}
+          {calls.length > MAX_VISIBLE && !showAll && <button role="button" onClick={() => setShowAll(true)} className="self-start px-1 py-1 text-xs text-text-tertiary hover:opacity-70"><span>Show {calls.length - MAX_VISIBLE} more…</span></button>}
         </div>
       </ToolBody>
     </div>;
 });
-function AnimatedNumber({
-  value,
-  style
-}: {
-  value: number;
-  style?: any;
-}) {
-  const opacity = useRef(new Animated.Value(1)).current;
-  const [display, setDisplay] = useState(value);
-  const previous = useRef(value);
-  useEffect(() => {
-    if (value === previous.current) return;
-    previous.current = value;
-    Animated.timing(opacity, {
-      toValue: 0,
-      duration: 80,
-      useNativeDriver: true
-    }).start(() => {
-      setDisplay(value);
-      Animated.timing(opacity, {
-        toValue: 1,
-        duration: 120,
-        useNativeDriver: true
-      }).start();
-    });
-  }, [opacity, value]);
-  return <span className={"  opacity-100"}>{display}</span>;
-}

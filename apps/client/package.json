@@ -21,6 +21,7 @@
     "marked": "17.0.4",
     "qrcode": "^1.5.4",
     "react": "19.1.0",
+    "react-diff-viewer-continued": "^4.4.0",
     "react-dom": "19.1.0",
     "zustand": "^5.0.12"
   },

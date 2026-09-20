@@ -29,6 +29,8 @@ export interface TurnListItem {
   /** The run was stopped (aborted) instead of finishing on its own. */
   aborted?: boolean;
   durationMs?: number;
+  /** Output tokens per second for the settled turn, when usage is known. */
+  tps?: number;
   fileStats?: TurnFileStats;
   startedAt: number;
   /** Persisted user entry that starts this assistant turn. */
@@ -61,20 +63,34 @@ function buildTurn(msgs: ChatMessage[], requestedAt?: number, sourceEntryId?: st
 
   const steps: WorkStep[] = [];
   let durationMs: number | undefined;
+  let outputTokens = 0;
   let fileStats: TurnFileStats | undefined;
 
   for (let i = 0; i < msgs.length; i++) {
     const msg = msgs[i]!;
     if (durationMs === undefined) durationMs = msg.turnDurationMs;
+    outputTokens += msg.usage?.output ?? 0;
     if (fileStats === undefined) fileStats = msg.turnFileStats;
 
     if (msg.thinking) {
-      steps.push({
-        kind: "thinking",
-        key: `${msg.id}:thinking`,
-        text: msg.thinking,
-        streaming: !!msg.isStreaming && !msg.text,
-      });
+      const streaming = !!msg.isStreaming && !msg.text;
+      const previous = steps[steps.length - 1];
+      // A thought continued across consecutive messages is one block, not a
+      // fresh "Thought" row each time.
+      if (previous && previous.kind === "thinking") {
+        steps[steps.length - 1] = {
+          ...previous,
+          text: previous.text + msg.thinking,
+          streaming: previous.streaming || streaming,
+        };
+      } else {
+        steps.push({
+          kind: "thinking",
+          key: `${msg.id}:thinking`,
+          text: msg.thinking,
+          streaming,
+        });
+      }
     }
     if (i !== finalIdx) {
       if (msg.text) {
@@ -100,6 +116,10 @@ function buildTurn(msgs: ChatMessage[], requestedAt?: number, sourceEntryId?: st
     if (inferred > 0) durationMs = inferred;
   }
 
+  const tps = outputTokens > 0 && durationMs && durationMs > 0
+    ? outputTokens / (durationMs / 1000)
+    : undefined;
+
   return {
     kind: "turn",
     key: `turn:${msgs[0]!.id}`,
@@ -107,6 +127,7 @@ function buildTurn(msgs: ChatMessage[], requestedAt?: number, sourceEntryId?: st
     final: finalIdx >= 0 ? msgs[finalIdx] : undefined,
     ...(aborted ? { aborted: true } : {}),
     durationMs,
+    tps,
     fileStats,
     startedAt: requestedAt ?? msgs[0]!.timestamp,
     ...(sourceEntryId ? { sourceEntryId } : {}),
@@ -161,6 +182,7 @@ function sameItem(a: ListItem, b: ListItem): boolean {
     a.final !== b.final ||
     a.aborted !== b.aborted ||
     a.durationMs !== b.durationMs ||
+    a.tps !== b.tps ||
     a.fileStats !== b.fileStats ||
     a.startedAt !== b.startedAt ||
     a.sourceEntryId !== b.sourceEntryId ||
@@ -314,6 +336,13 @@ export function formatTurnAction(action: TurnAction): string {
     case "agent": return `${action.running ? "Running" : "Ran"} ${action.count} agents`;
     case "other": return `${action.running ? "Using" : "Used"} ${action.count} tools`;
   }
+}
+
+/** Compact output-throughput label, e.g. `42 tok/s` or `3.4 tok/s`. */
+export function formatTps(tps: number): string {
+  if (!Number.isFinite(tps) || tps <= 0) return "";
+  const rounded = tps >= 10 ? Math.round(tps) : Math.round(tps * 10) / 10;
+  return `${rounded} tok/s`;
 }
 
 export function formatDuration(ms: number): string {

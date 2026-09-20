@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { X } from 'lucide-react';
+import { AppModal } from '@/components/ui';
 import { ServerFormFields } from './fields';
 import type { ServerFormProps } from './component-types';
 export function ServerFormDesktopModal({
@@ -19,43 +19,20 @@ export function ServerFormDesktopModal({
       setAddress(initial?.address ?? '');
     }
   }, [initial, visible]);
-  const textPrimary = isDark ? '#fefdfd' : '#1a1a1a';
-  const textMuted = isDark ? '#cdc8c5' : '#888';
-  const cardBg = isDark ? '#1e1e1e' : '#FFFFFF';
-  const borderColor = isDark ? '#3b3a39' : 'rgba(0,0,0,0.08)';
-  const overlayBg = isDark ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.3)';
   const canSave = Boolean(name.trim() && address.trim() && !loading);
-  return <div hidden={!visible}>
-      <button onClick={loading ? undefined : onClose}>
-        <button onClick={() => {}}>
-          <div className="flex flex-col">
-            <span>
-              {initial ? 'Edit Server' : 'Add Server'}
-            </span>
-            <button onClick={onClose} className="inline-flex items-center" disabled={loading}>
-              <X size={18} color={textMuted} strokeWidth={1.8} />
-            </button>
-          </div>
-          <ServerFormFields name={name} setName={setName} address={address} setAddress={setAddress} isDark={isDark} autoFocus />
-          {error && <span>
-              {error}
-            </span>}
-          <div className="flex flex-col">
-            <button onClick={onClose} disabled={loading}>
-              <span>Cancel</span>
-            </button>
-            <button onClick={() => {
+  return <AppModal visible={visible} onClose={loading ? () => undefined : onClose} title={initial ? 'Edit Server' : 'Add Server'} showClose>
+          <div className="flex flex-col gap-5">
+            <ServerFormFields name={name} setName={setName} address={address} setAddress={setAddress} isDark={isDark} autoFocus />
+            {error && <p className="text-sm text-error">{error}</p>}
+            <div className="flex justify-end gap-2">
+              <button className="rounded-md px-3 py-2 text-sm hover:bg-hover disabled:opacity-50" onClick={onClose} disabled={loading}>Cancel</button>
+              <button className="rounded-md bg-primary px-3 py-2 text-sm text-primary-content hover:opacity-90 disabled:opacity-40" onClick={() => {
             if (canSave) onSave({
               name: name.trim(),
               address: address.trim()
             });
-          }} className={"  opacity-[0.4]"} disabled={!canSave}>
-              {loading ? <span className="size-3 animate-spin" /> : <span className={"  text-[#fff]"}>
-                  {initial ? 'Save' : 'Add & Connect'}
-                </span>}
-            </button>
+          }} disabled={!canSave}>{loading ? 'Saving…' : initial ? 'Save' : 'Add & Connect'}</button>
+            </div>
           </div>
-        </button>
-      </button>
-    </div>;
+    </AppModal>;
 }

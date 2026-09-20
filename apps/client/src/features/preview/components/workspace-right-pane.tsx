@@ -1,5 +1,4 @@
 import { memo, useEffect, useState } from "react";
-import { useColorScheme } from "@/hooks/use-color-scheme";
 import { ChangesPanel } from "@/features/workspace/components/changes-panel";
 import { PreviewPanel } from "@/features/preview/components/preview-panel";
 import { usePreviewStore } from "@/features/preview/store";
@@ -20,8 +19,6 @@ const PREVIEW_TAB = [{
 function WorkspaceRightPaneComponent({
   sessionId
 }: WorkspaceRightPaneProps) {
-  const colorScheme = useColorScheme() ?? "light";
-  const isDark = colorScheme === "dark";
   const isDesktopShell = typeof navigator !== "undefined" && navigator.userAgent.includes("AiJeeDesktop/");
   const previewPaneOpen = usePreviewStore(state => sessionId ? state.paneOpenBySession[sessionId] ?? false : false);
   const setPreviewPaneOpen = usePreviewStore(state => state.setPaneOpen);
@@ -29,7 +26,7 @@ function WorkspaceRightPaneComponent({
   useEffect(() => {
     setPreviewActive(previewPaneOpen);
   }, [previewPaneOpen]);
-  return <div>
+  return <div className="flex min-h-0 flex-1 flex-col">
       <ChangesPanel extraTabs={isDesktopShell ? PREVIEW_TAB : undefined} activeExtraTab={isDesktopShell && previewActive ? "preview" : null} onExtraTabChange={isDesktopShell ? key => {
       const open = key === "preview";
       setPreviewActive(open);
@@ -38,8 +35,3 @@ function WorkspaceRightPaneComponent({
     </div>;
 }
 export const WorkspaceRightPane = memo(WorkspaceRightPaneComponent);
-const styles = {
-  container: {
-    flex: 1
-  }
-} as const;

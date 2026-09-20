@@ -1,12 +1,8 @@
 import { memo } from "react";
-import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { basename, relativePath, type TurnFileChange } from "../../utils/message-list";
 export const FileChangeRow = memo(function FileChangeRow({
   change,
-  root,
-  addColor,
-  removeColor,
-  isDark
+  root
 }: {
   change: TurnFileChange;
   root: string | null;
@@ -14,7 +10,6 @@ export const FileChangeRow = memo(function FileChangeRow({
   removeColor: string;
   isDark: boolean;
 }) {
-  const colors = useThemeTokens();
   const created = change.kind === "created";
   const shown = relativePath(change.path, root);
   const name = basename(shown);

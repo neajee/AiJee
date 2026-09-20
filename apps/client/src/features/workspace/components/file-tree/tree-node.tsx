@@ -1,11 +1,9 @@
 import { useCallback } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useFileList, type FsEntry } from '@aijee/client-sdk';
-import { Colors } from '@/constants/theme';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { useThemeTokens } from '@/hooks/use-theme-tokens';
 import { FileTypeBadge } from '../file-type-badge';
 import { applyFilter } from '../../utils/file-tree';
-import type { FileTreeNodeProps } from './component-types';
 import { NODE_INDENT, NODE_STEP } from '../../utils/file-tree-constants';
 export function FileTreeNode({
   entry,
@@ -24,16 +22,7 @@ export function FileTreeNode({
   query: string;
   selectedPath: string | null;
 }) {
-  const colorScheme = useColorScheme() ?? "light";
-  const colors = Colors[colorScheme];
-  const isDark = colorScheme === "dark";
-  const textPrimary = isDark ? "#fefdfd" : colors.text;
-  const textMuted = isDark ? "#cdc8c5" : colors.textTertiary;
-  const hoverBg = isDark ? "#252525" : "#E8E8E8";
-  const selectedBg = isDark ? "#2d2d2d" : "#DEDEDE";
-  // Directories are told apart by the caret and the heavier name alone, so no
-  // saturated folder icon competes with the name; files show their kind.
-  const iconColor = isDark ? "#6f6b69" : "#B0B0B0";
+  const colors = useThemeTokens();
   const expanded = entry.is_dir && expandedDirs.has(entry.path);
   const isSelected = !entry.is_dir && entry.path === selectedPath;
   const handlePress = useCallback(() => {
@@ -44,15 +33,13 @@ export function FileTreeNode({
     }
   }, [entry, onFilePress, onToggleDir]);
   return <div>
-      <button onClick={handlePress} {...{
-      title: entry.path
-    }}>
-        {/* One glyph slot per row, bolt's: a caret for directories, the file's
-            kind for files, so names line up at the same x within a level. */}
-        {entry.is_dir ? <div className="flex flex-col">
-            {expanded ? <ChevronDown size={13} color={textMuted} strokeWidth={2} /> : <ChevronRight size={13} color={textMuted} strokeWidth={2} />}
-          </div> : <FileTypeBadge path={entry.path} fallbackColor={iconColor} />}
-        <span>
+      <button onClick={handlePress} title={entry.path} style={{ paddingLeft: NODE_INDENT + depth * NODE_STEP }} className={`flex min-h-[22px] w-full items-center gap-1.5 py-0.5 pr-1.5 text-left text-[13px] hover:bg-hover ${isSelected ? 'bg-active' : ''}`}>
+        {/* One glyph slot per row: a caret for directories, the file's kind for
+            files, so names line up at the same x within a level. */}
+        <span className="flex w-[22px] shrink-0 items-center justify-center">
+          {entry.is_dir ? expanded ? <ChevronDown size={13} strokeWidth={2} className="text-text-tertiary" /> : <ChevronRight size={13} strokeWidth={2} className="text-text-tertiary" /> : <FileTypeBadge path={entry.path} fallbackColor={colors.textTertiary} />}
+        </span>
+        <span className={`min-w-0 flex-1 truncate ${entry.is_dir ? 'font-medium text-foreground' : isSelected ? 'text-foreground' : 'text-text-secondary'}`}>
           {entry.name}
         </span>
       </button>
@@ -76,20 +63,17 @@ function ExpandedDir({
   query: string;
   selectedPath: string | null;
 }) {
-  const colorScheme = useColorScheme() ?? "light";
-  const isDark = colorScheme === "dark";
-  const textMuted = isDark ? "#cdc8c5" : Colors[colorScheme].textTertiary;
   const {
     entries,
     isLoading
   } = useFileList(dirPath);
   if (isLoading) {
-    return <div className={"pl-0 pt-[4px] pb-[4px]"}>
-        <span className="size-3 animate-spin" />
+    return <div className="flex py-1" style={{ paddingLeft: NODE_INDENT + depth * NODE_STEP }}>
+        <span className="size-3 animate-spin rounded-full border-2 border-border border-t-text-tertiary" />
       </div>;
   }
   if (!entries || entries.length === 0) {
-    return <span className={"  pl-0"}>
+    return <span className="block py-1 text-xs italic text-text-tertiary" style={{ paddingLeft: NODE_INDENT + depth * NODE_STEP }}>
         Empty
       </span>;
   }
@@ -97,7 +81,7 @@ function ExpandedDir({
     if (a.is_dir !== b.is_dir) return a.is_dir ? -1 : 1;
     return a.name.localeCompare(b.name);
   });
-  return <div>
+  return <div className="flex flex-col">
       {sorted.map(entry => <FileTreeNode key={entry.path} entry={entry} depth={depth} onFilePress={onFilePress} expandedDirs={expandedDirs} onToggleDir={onToggleDir} query={query} selectedPath={selectedPath} />)}
     </div>;
 }

@@ -23,8 +23,7 @@ export function useCommandPaletteController({
   const [sessionsLoading, setSessionsLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const itemRefs = useRef<Record<number, HTMLDivElement | null>>({});
-  const scrollContentRef = useRef<HTMLDivElement>(null);
+  const itemRefs = useRef<Record<number, HTMLElement | null>>({});
   const overlayAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.96)).current;
   const workspaces = useWorkspaceStore(s => s.workspaces);
@@ -93,12 +92,15 @@ export function useCommandPaletteController({
   useEffect(() => setSelectedIndex(0), [search]);
   useEffect(() => {
     const itemView = itemRefs.current[selectedIndex];
-    const container = scrollContentRef.current;
-    if (itemView && container) {
-      itemView.measureLayout(container as any, (_x, y) => scrollRef.current?.scrollTo({
-        y: Math.max(0, y - 80),
-        animated: true
-      }), () => {});
+    const container = scrollRef.current;
+    if (!itemView || !container) return;
+    const top = itemView.offsetTop;
+    const bottom = top + itemView.offsetHeight;
+    if (top < container.scrollTop || bottom > container.scrollTop + container.clientHeight) {
+      container.scrollTo({
+        top: Math.max(0, top - container.clientHeight / 2 + itemView.offsetHeight / 2),
+        behavior: 'smooth'
+      });
     }
   }, [selectedIndex]);
   useEffect(() => {
@@ -129,7 +131,7 @@ export function useCommandPaletteController({
     return () => document.removeEventListener('keydown', handler);
   }, [handleClose, visible]);
   const handleKeyPress = useCallback((event: any) => {
-    const key = event.nativeEvent.key;
+    const key = event.nativeEvent?.key ?? event.key;
     if (flatItems.length === 0) {
       if (key === 'Escape') handleClose();
       return;
@@ -156,7 +158,6 @@ export function useCommandPaletteController({
     inputRef,
     scrollRef,
     itemRefs,
-    scrollContentRef,
     overlayAnim,
     scaleAnim,
     handleClose,

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-namespace -- transitional type namespace for the remaining callers. */
 import { useMemo, useReducer, useRef } from "react";
 
 export class AnimatedValue {

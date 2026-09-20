@@ -1,7 +1,4 @@
 import { cloneElement, isValidElement, memo, type ReactElement, type ReactNode } from "react";
-import { Colors } from "@/constants/theme";
-import { HAIRLINE_WIDTH } from "@/constants/layout";
-import { useThemeTokens } from "@/hooks/use-theme-tokens";
 
 /**
  * Markdown tables that fit the message column.
@@ -15,7 +12,6 @@ import { useThemeTokens } from "@/hooks/use-theme-tokens";
 
 /** Above this, columns stop sharing the width and start scrolling. */
 const SCROLL_AFTER_COLUMNS = 4;
-const SCROLLED_COLUMN_WIDTH = 150;
 interface MarkdownTableProps {
   header: ReactNode[][];
   rows: ReactNode[][][];
@@ -26,13 +22,11 @@ function normalizeCellTypography(node: ReactNode): ReactNode {
   if (!isValidElement(node)) return node;
   const element = node as ReactElement<{
     children?: ReactNode;
-    style?: unknown;
+    className?: string;
   }>;
   const children = element.props.children;
   return cloneElement(element, {
-    ...(element.type === Text ? {
-      style: [element.props.style, styles.cellText]
-    } : {}),
+    className: ["text-[13px] leading-[19px]", element.props.className].filter(Boolean).join(" "),
     ...(children === undefined ? {} : {
       children: normalizeCellTypography(children)
     })
@@ -40,18 +34,10 @@ function normalizeCellTypography(node: ReactNode): ReactNode {
 }
 export const MarkdownTable = memo(function MarkdownTable({
   header,
-  rows,
-  isDark
+  rows
 }: MarkdownTableProps) {
-  const colors = useThemeTokens();
   const columnCount = Math.max(header.length, ...rows.map(row => row.length), 1);
   const scrolls = columnCount > SCROLL_AFTER_COLUMNS;
-  const cellStyle = scrolls ? {
-    width: SCROLLED_COLUMN_WIDTH
-  } : {
-    flex: 1,
-    minWidth: 0
-  };
   const table = <div className={"  border-border bg-background"}>
       {header.length > 0 && <div className={"  bg-surface-raised"}>
           {header.map((cell, index) => <div key={index}>
@@ -74,38 +60,3 @@ export const MarkdownTable = memo(function MarkdownTable({
       {table}
     </div>;
 });
-const styles = {
-  wrap: {
-    marginTop: 6,
-    marginBottom: 6
-  },
-  scrollContent: {
-    // Lets a narrow table still fill the column when scrolling is on.
-    minWidth: "100%"
-  },
-  table: {
-    borderWidth: HAIRLINE_WIDTH,
-    borderRadius: 6,
-    overflow: "hidden"
-  },
-  row: {
-    flexDirection: "row",
-    alignItems: "stretch"
-  },
-  cell: {
-    paddingLeft: 10,
-    paddingRight: 10,
-    paddingTop: 7,
-    paddingBottom: 7,
-    justifyContent: "center"
-  },
-  headerText: {
-    fontWeight: "600"
-  },
-  cellText: {
-    fontSize: 13,
-    lineHeight: 19,
-    maxWidth: "100%",
-    alignSelf: "flex-start"
-  }
-} as const;

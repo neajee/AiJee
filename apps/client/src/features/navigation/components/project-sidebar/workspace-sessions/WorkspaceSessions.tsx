@@ -45,7 +45,7 @@ export function WorkspaceSessions({
   const expanded = showAll || forcedOpen;
   const visible = expanded ? sessions : sessions.slice(0, SESSION_PREVIEW_COUNT);
   const foldedCount = sessions.length - visible.length;
-  return <div>
+  return <div className="ml-3 flex flex-col gap-0.5 border-l border-border pl-2">
     {visible.map(session => <AnimatedListItem key={session.id}><SessionRow session={session} isSelected={session.id === selectedSessionId} hasUnread={!!sessionNotifications[session.id]} onClick={() => onSelect(workspaceId, session.id)} onRename={name => renameSession(session.id, name)} onArchive={async () => {
         await archiveSession(session.id);
         onArchived(workspaceId, session.id);

@@ -66,7 +66,7 @@ export class AiJeeHttpServer {
     this.piAuthPath = join(homedir(), ".pi", "agent", "auth.json");
   }
 
-  async listen(port = 10088, host = "127.0.0.1"): Promise<void> {
+  async listen(port = 8081, host = "127.0.0.1"): Promise<void> {
     if (this.server) throw new Error("AiJee runtime server is already running");
     const state = await this.store.load();
     this.localMode = new Set(["127.0.0.1", "localhost", "::1", "[::1]"]).has(host);

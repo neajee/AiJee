@@ -11,7 +11,7 @@ export function MoreRow({
 }) {
   const colors = useThemeTokens();
   const [hovered, setHovered] = useState(false);
-  return <button onClick={onClick} disabled={disabled} onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)}>
-      <span>{label}</span>
+  return <button className="flex h-6 w-full items-center rounded-md px-2 text-left text-xs text-text-secondary hover:bg-hover disabled:opacity-40" onClick={onClick} disabled={disabled} onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)}>
+      <span className="truncate">{label}</span>
     </button>;
 }

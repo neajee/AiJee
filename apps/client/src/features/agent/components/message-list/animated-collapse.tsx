@@ -1,91 +1,24 @@
-import type React from "react";
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
-import Animated, { Easing, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from "@/styles/motion";
+import type { ReactNode } from "react";
 interface AnimatedCollapseProps {
   expanded: boolean;
   maxHeight?: number;
   children: ReactNode;
 }
+
+/**
+ * Height-animated disclosure built on CSS grid rows.
+ *
+ * The previous implementation drove a Reanimated shared value, but the motion
+ * runtime here is a stub: `withTiming(value, config, callback)` returns the
+ * value and drops the callback, so the collapse never completed and expanded
+ * content could not be closed. A `grid-template-rows: 0fr -> 1fr` transition
+ * collapses reliably in the DOM and keeps the open/close motion.
+ */
 export function AnimatedCollapse({
   expanded,
-  maxHeight,
   children
 }: AnimatedCollapseProps) {
-  const [mounted, setMounted] = useState(expanded);
-  // Once an unbounded collapse finishes opening it hands height back to the
-  // layout, so content that keeps growing (streaming text) is not re-animated
-  // on every chunk.
-  const [settled, setSettled] = useState(false);
-  const [contentHeight, setContentHeight] = useState(0);
-  const height = useSharedValue(0);
-  const opacity = useSharedValue(expanded ? 1 : 0);
-  const targetHeight = useMemo(() => {
-    if (!contentHeight) return 0;
-    return maxHeight ? Math.min(contentHeight, maxHeight) : contentHeight;
-  }, [contentHeight, maxHeight]);
-  const handleLayout = useCallback((event: React.SyntheticEvent) => {
-    const nextHeight = event.nativeEvent.layout.height;
-    setContentHeight(prev => Math.abs(prev - nextHeight) < 1 ? prev : nextHeight);
-  }, []);
-  useEffect(() => {
-    if (expanded) setMounted(true);
-  }, [expanded]);
-  useEffect(() => {
-    if (!mounted) return;
-    if (expanded) {
-      if (settled) return;
-      height.value = withTiming(targetHeight, {
-        duration: 220,
-        easing: Easing.out(Easing.cubic)
-      }, finished => {
-        if (finished && !maxHeight) runOnJS(setSettled)(true);
-      });
-      opacity.value = withTiming(1, {
-        duration: 180,
-        easing: Easing.out(Easing.cubic)
-      });
-      return;
-    }
-    setSettled(false);
-    height.value = targetHeight;
-    height.value = withTiming(0, {
-      duration: 280,
-      easing: Easing.inOut(Easing.cubic)
-    }, finished => {
-      if (finished) runOnJS(setMounted)(false);
-    });
-    opacity.value = withTiming(0, {
-      duration: 200,
-      easing: Easing.in(Easing.cubic)
-    });
-  }, [expanded, mounted, settled, maxHeight, targetHeight, height, opacity]);
-  const style = useAnimatedStyle(() => ({
-    height: height.value,
-    opacity: opacity.value
-  }));
-  if (!mounted) return null;
-
-  // Reanimated cannot reliably clear an animated height on RN Web. Once the
-  // opening motion has finished, hand the subtree back to a normal View so
-  // nested disclosures grow the parent layout instead of being clipped.
-  if (expanded && settled) {
-    return <div className="flex flex-col">
-        <div onLayout={handleLayout} className="flex flex-col">
-          {children}
-        </div>
-      </div>;
-  }
-  return <div>
-      <div onLayout={handleLayout} className="flex flex-col">
-        {children}
-      </div>
+  return <div className={`grid transition-[grid-template-rows,opacity] duration-200 ease-out ${expanded ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}>
+      <div className="min-h-0 overflow-hidden" inert={!expanded}>{children}</div>
     </div>;
 }
-const styles = {
-  container: {
-    overflow: "hidden"
-  },
-  content: {
-    width: "100%"
-  }
-} as const;

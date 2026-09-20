@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { usePiClient } from '@aijee/client-sdk';
 import type { MarketplacePackage } from '@aijee/client-sdk';
-import { useSettingsMetrics, useSettingsPalette, useSettingsPhoneLayout } from '@/components/settings-surface';
+import { useSettingsPalette, useSettingsPhoneLayout } from '@/components/settings-surface';
 import { CATEGORIES, SEARCH_DEBOUNCE_MS, type MarketplaceTab } from '../../utils/marketplace-constants';
 import { Segmented, SearchField, Chip, PackageCard } from './controls';
 import { InstalledView } from './installed';
@@ -9,7 +9,6 @@ import { PackageDetail } from './detail';
 import { Notice } from './shared';
 export function PackageMarketplace() {
   const client = usePiClient();
-  const m = useSettingsMetrics();
   const p = useSettingsPalette();
   const phone = useSettingsPhoneLayout();
   const [tab, setTab] = useState<MarketplaceTab>('installed');
@@ -72,14 +71,13 @@ export function PackageMarketplace() {
     setSelected(null);
     setTab('installed');
   }, []);
-  const gutter = phone ? m.gutter : m.gutter + 6;
-  return <div>
-      <div className={"  pl-0 pr-0"}>
-        <div className="flex flex-col">
-          <span className="text-lg font-semibold text-foreground">
+  return <div className={`flex h-full min-h-0 flex-col ${p.isDark ? 'bg-background' : 'bg-surface-raised'}`}>
+      <div className="flex min-h-[52px] items-center justify-between gap-3 border-b border-border px-4 py-2">
+        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+          <span className="font-sans text-[calc(var(--title-size)-4px)] font-semibold text-foreground">
             插件广场
           </span>
-          <span className={"  text-[var(--desc-size)]"}>
+          <span className="font-sans text-[var(--desc-size)] text-text-tertiary">
             从 npm 发现 Pi 的扩展、技能与主题
           </span>
         </div>
@@ -92,24 +90,26 @@ export function PackageMarketplace() {
       }]} value={tab} onChange={value => setTab(value as MarketplaceTab)} />
       </div>
 
-      {tab === 'discover' ? <div className="flex flex-col">
-          <div className={"flex flex-col gap-[10px]"}>
-            <SearchField value={query} onChange={event => setQuery(event.target.value)} onSubmit={() => void search(query, category)} />
-            <div className="flex flex-col">
-              {CATEGORIES.map(item => <Chip key={item.value} label={item.label} active={category === item.value} onClick={() => setCategory(item.value)} />)}
+      {tab === 'discover' ? <div className="min-h-0 flex-1 overflow-y-auto">
+          <div className="flex flex-col gap-[var(--group-gap)] px-4 pb-6 pt-4">
+            <div className="flex flex-col gap-2.5">
+              <SearchField value={query} onChange={setQuery} onSubmit={() => void search(query, category)} />
+              <div className="flex flex-wrap gap-1.5">
+                {CATEGORIES.map(item => <Chip key={item.value} label={item.label} active={category === item.value} onClick={() => setCategory(item.value)} />)}
+              </div>
             </div>
+
+            {error ? <Notice text={error} tone="error" /> : null}
+
+            {loading ? <div className="flex items-center justify-center py-8">
+                <span className="inline-block size-4 animate-spin rounded-full border-2 border-border border-t-text-tertiary" />
+              </div> : items.length === 0 ? <span className="py-2 font-sans text-[var(--desc-size)] text-text-tertiary">
+                没有匹配的插件。
+              </span> : <div className="flex flex-wrap items-stretch gap-3">
+                {items.map(item => <PackageCard key={item.name} pkg={item} single={phone} onClick={() => void openDetail(item)} />)}
+              </div>}
           </div>
-
-          {error ? <Notice text={error} tone="error" /> : null}
-
-          {loading ? <div className="flex flex-col">
-              <span className="size-3 animate-spin" />
-            </div> : items.length === 0 ? <span className={"  text-[var(--desc-size)]"}>
-              没有匹配的插件。
-            </span> : <div className="flex flex-col">
-              {items.map(item => <PackageCard key={item.name} pkg={item} single={phone} onClick={() => void openDetail(item)} />)}
-            </div>}
-        </div> : <InstalledView output={installedOutput} loading={installedLoading} error={error} onRefresh={loadInstalled} gutter={gutter} single={phone} message={installedMessage} />}
+        </div> : <InstalledView output={installedOutput} loading={installedLoading} error={error} onRefresh={loadInstalled} single={phone} message={installedMessage} />}
 
       <PackageDetail pkg={selected} onClose={() => setSelected(null)} onInstalled={handleInstalled} />
     </div>;

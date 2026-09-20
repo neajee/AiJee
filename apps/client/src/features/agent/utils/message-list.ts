@@ -20,7 +20,7 @@ function extractJsonStringValue(raw: string, key: string): string | undefined {
   const keyPattern = new RegExp(`"${key}"\\s*:\\s*"`);
   const match = keyPattern.exec(raw);
   if (!match) return undefined;
-  let start = match.index + match[0].length;
+  const start = match.index + match[0].length;
   let result = "";
   let escaped = false;
   for (let i = start; i < raw.length; i++) {

@@ -22,34 +22,31 @@ export function ServerSwitcher() {
   const borderColor = isDark ? '#3b3a39' : 'rgba(0,0,0,0.12)';
   const hoverBg = isDark ? '#333' : '#F5F5F5';
   const iconBg = isDark ? '#fefdfd' : '#1a1a1a';
-  return <div className="flex flex-col" {...{
+  return <div className="relative flex flex-col" {...{
     'data-server-popover': true
   } as any}>
-      <button onClick={() => setPopoverVisible(value => !value)} role="button" aria-label="Switch server">
-        <div>
+      <button className="flex h-7 w-full items-center gap-2 rounded-md px-1.5 text-left text-sm hover:bg-hover" onClick={() => setPopoverVisible(value => !value)} role="button" aria-label="Switch server">
+        <span className="flex size-5 items-center justify-center rounded bg-foreground">
           <PiLogo size={14} color={isDark ? '#1a1a1a' : '#fff'} />
-        </div>
-        <span>{activeServer?.name ?? 'No Server'}</span>
+        </span>
+        <span className="min-w-0 flex-1 truncate">{activeServer?.name ?? 'No Server'}</span>
         <ChevronDown size={12} color={textMuted} strokeWidth={2} />
       </button>
-      {popoverVisible && <div>
-          <div className="flex flex-col"><span>Servers</span></div>
-          <div className="flex flex-col">
+      {popoverVisible && <div role="menu" aria-label="Server selection" className="absolute left-0 top-full z-50 mt-1 w-56 overflow-hidden rounded-md border border-border bg-card p-1 shadow-xl">
+          <div className="px-2 pb-1 pt-1 text-[10px] font-medium uppercase tracking-wide text-text-secondary"><span>Servers</span></div>
+          <div className="flex flex-col gap-0.5">
             {servers.map(server => {
           const isActive = server.id === activeServerId;
           const isSwitching = server.id === switchingId;
-          return <button key={server.id} onClick={() => void handleSwitchServer(server)} disabled={isSwitching}>
-                  <div><PiLogo size={10} color={isDark ? '#1a1a1a' : '#fff'} /></div>
-                  <div className="flex flex-col">
-                    <span>{server.name}</span>
-                    <span>{server.address}</span>
-                  </div>
-                  {isActive && <Check size={14} color="#34C759" strokeWidth={2.5} />}
+          return <button className={`flex min-h-9 w-full items-center gap-2 rounded px-2 text-left hover:bg-hover disabled:opacity-50 ${isActive ? 'bg-hover' : ''}`} key={server.id} onClick={() => void handleSwitchServer(server)} disabled={isSwitching} role="menuitem">
+                  <span className="flex size-5 shrink-0 items-center justify-center rounded bg-foreground"><PiLogo size={11} color={isDark ? '#1a1a1a' : '#fff'} /></span>
+                  <span className="min-w-0 flex-1"><span className="block truncate text-xs">{server.name}</span><span className="block truncate text-[10px] text-text-secondary">{server.address}</span></span>
+                  {isSwitching ? <span className="size-3 shrink-0 animate-spin rounded-full border border-primary border-r-transparent" /> : isActive && <Check size={14} className="shrink-0 text-success" strokeWidth={2.5} />}
                 </button>;
         })}
           </div>
-          <div>
-            <button onClick={() => {
+          <div className="mt-1 border-t border-border pt-1">
+            <button className="flex h-7 w-full items-center gap-2 rounded px-2 text-left text-xs text-text-secondary hover:bg-hover" onClick={() => {
           setPopoverVisible(false);
           router.push('/settings/servers');
         }}>

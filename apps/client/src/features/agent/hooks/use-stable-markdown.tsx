@@ -5,7 +5,7 @@ import type { useMarkdownHookOptions } from "@/platform/markdown";
 const STREAMING_THROTTLE_MS = 100;
 
 /** DOM markdown renderer with throttled updates while an assistant response streams. */
-export function useStableMarkdown(text: string, options: useMarkdownHookOptions, isStreaming = false): JSX.Element[] {
+export function useStableMarkdown(text: string, options: useMarkdownHookOptions, isStreaming = false): JSX.Element {
   const textRef = useRef(text);
   textRef.current = text;
   const [throttledText, setThrottledText] = useState(text);
@@ -30,14 +30,10 @@ export function useStableMarkdown(text: string, options: useMarkdownHookOptions,
     if (timerRef.current) clearTimeout(timerRef.current);
   }, []);
   const source = isStreaming ? deferredText : throttledText;
-  return useMemo(() => [{
-    key: "markdown",
-    className: "prose prose-sm max-w-none dark:prose-invert",
-    dangerouslySetInnerHTML: {
+  return useMemo(() => <div className="aijee-markdown" dangerouslySetInnerHTML={{
       __html: marked.parse(source, {
         gfm: true,
         breaks: true
       }) as string
-    }
-  } as JSX.Element], [source, options]);
+    }} />, [source, options]);
 }

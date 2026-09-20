@@ -20,8 +20,8 @@ export function ExtensionUiView({
     canSubmitSelect
   } = controller;
   if (!request) return null;
-  return <div className="flex flex-col">
-      <div className={"  bg-surface border-border"}>
+  return <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4" role="dialog" aria-modal="true">
+      <div className="w-full max-w-md rounded-lg border border-border bg-card p-5 shadow-xl">
         <div>
           <div className="flex flex-col">
             <span className={"  text-foreground"}>
@@ -73,13 +73,11 @@ export function ExtensionUiView({
           </div>}
 
         {request.method === "input" && <div className="flex flex-col">
-            <input value={draft} onChange={event => setDraft(event.target.value)} placeholder={request.placeholder ?? "Type your response"} className={"  text-foreground bg-card border-border"} autoFocus editable={!mutation.isPending} onKeyDown={event => event.key === "Enter" && (() => submit({
-          value: draft
-        }))(event)} />
+            <input value={draft} onChange={event => setDraft(event.target.value)} placeholder={request.placeholder ?? "Type your response"} className="w-full rounded border border-border bg-card px-3 py-2 text-foreground" autoFocus disabled={mutation.isPending} onKeyDown={event => { if (event.key === "Enter") submit({ value: draft }); }} />
           </div>}
 
         {request.method === "editor" && <div className="flex flex-col">
-            <input value={draft} onChange={event => setDraft(event.target.value)} placeholder="Edit the text" className={"  text-foreground bg-card border-border"} autoFocus multiline editable={!mutation.isPending} />
+            <textarea value={draft} onChange={event => setDraft(event.target.value)} placeholder="Edit the text" className="min-h-28 w-full rounded border border-border bg-card px-3 py-2 text-foreground" autoFocus disabled={mutation.isPending} />
           </div>}
 
         {request.method !== "confirm" && <div>

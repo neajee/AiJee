@@ -1,12 +1,11 @@
 import { memo, useCallback, useMemo, useState } from "react";
+import { FileDiff } from "lucide-react";
 import { useWorkspaceStore } from "@/features/workspace/store";
-import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import type { TurnFileStats } from "../../component-types.ts";
-import { basename, relativePath, type TurnFileChange } from "../../utils/message-list";
+import type { TurnFileChange } from "../../utils/message-list";
 import { ToolBody, ToolHeader, ToolSurface } from "./tool-call/tool-disclosure";
 import { FileChangeRow } from "./file-change-row";
 const SUMMARY_BLOCKS = 5;
-const SUMMARY_SCROLL_AFTER = 8;
 export const TurnSummary = memo(function TurnSummary({
   stats,
   changes,
@@ -16,7 +15,6 @@ export const TurnSummary = memo(function TurnSummary({
   changes: TurnFileChange[];
   isDark: boolean;
 }) {
-  const colors = useThemeTokens();
   const [expanded, setExpanded] = useState(false);
   const toggle = useCallback(() => setExpanded(prev => !prev), []);
 
@@ -48,7 +46,7 @@ export const TurnSummary = memo(function TurnSummary({
   return <div className="flex flex-col">
       <ToolSurface isDark={isDark} padded={false}>
         <div className="flex flex-col">
-          <ToolHeader expanded={expanded} expandable={expandable} onToggle={toggle} isDark={isDark} aria-label={`${expanded ? "Collapse" : "Expand"} the list of changed files`}>
+          <ToolHeader expanded={expanded} expandable={expandable} onToggle={toggle} isDark={isDark} icon={FileDiff} aria-label={`${expanded ? "Collapse" : "Expand"} the list of changed files`}>
             <span className={"  text-text-secondary"}>
               {totalFiles} {totalFiles === 1 ? "file" : "files"} changed
             </span>

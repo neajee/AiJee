@@ -1,4 +1,5 @@
 import { AlertCircle, Check, Wifi, X } from 'lucide-react';
+import { AppModal } from '@/components/ui';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { QrScannerScanPanel } from './scan-panel';
 import { useQrScannerController } from '../../hooks/use-qr-scanner-controller';
@@ -30,111 +31,9 @@ export function QrScanner({
     onClose
   });
   const overlayBg = isDark ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.3)';
-  const modalProps = {
-    hidden: !visible
-  };
-  if (step === 'pairing') {
-    return <div {...modalProps}>
-        <div onClick={handleClose} role="dialog">
-          <button onClick={event => event.stopPropagation()}>
-            <div className="flex flex-col">
-              <span className="size-3 animate-spin" />
-              <span>Connecting to AiJee</span>
-              <span>Completing secure pairing…</span>
-            </div>
-            <button onClick={handleClose}>
-              <span>Cancel</span>
-            </button>
-          </button>
-        </div>
-      </div>;
-  }
-  if (step === 'done') {
-    return <div {...modalProps}>
-        <div onClick={handleClose} role="dialog">
-          <button onClick={event => event.stopPropagation()}>
-            <div className="flex flex-col">
-              <div>
-                <Check size={28} color="#fff" strokeWidth={2.5} />
-              </div>
-              <span>Connected</span>
-            </div>
-          </button>
-        </div>
-      </div>;
-  }
-  if (step === 'error') {
-    return <div {...modalProps}>
-        <div onClick={handleClose} role="dialog">
-          <button onClick={event => event.stopPropagation()}>
-            <div className="flex flex-col">
-              <div>
-                <AlertCircle size={28} color="#fff" strokeWidth={2} />
-              </div>
-              <span>Pairing Failed</span>
-              <span>{error}</span>
-            </div>
-            <div className="flex flex-col">
-              <button onClick={reset}>
-                <span>Try Again</span>
-              </button>
-              <button onClick={handleClose}>
-                <span>Cancel</span>
-              </button>
-            </div>
-          </button>
-        </div>
-      </div>;
-  }
-  if (step === 'pick-ip' && connectParams) {
-    return <div {...modalProps}>
-        <div onClick={handleClose} role="dialog">
-          <button onClick={event => event.stopPropagation()}>
-            <div className="flex flex-col">
-              <span>Select Network</span>
-              <button onClick={handleClose} className="inline-flex items-center">
-                <X size={18} color={textMuted} strokeWidth={1.8} />
-              </button>
-            </div>
-            <span>
-              {connectParams.hostname ? `"${connectParams.hostname}" is available on multiple addresses:` : 'Multiple addresses found:'}
-            </span>
-            <div className="flex flex-col">
-              {connectParams.ips.map(ip => <button key={ip} onClick={() => handleSelectIp(ip)}>
-                  <Wifi size={16} color={textMuted} strokeWidth={1.8} />
-                  <div className="flex flex-col">
-                    <span>{ip}</span>
-                    <span>Port {connectParams.port}</span>
-                  </div>
-                </button>)}
-            </div>
-          </button>
-        </div>
-      </div>;
-  }
-  return <div {...modalProps}>
-      <div onClick={handleClose} role="dialog">
-        <button onClick={event => event.stopPropagation()}>
-          <div className="flex flex-col">
-            <span>Scan QR Code</span>
-            <button onClick={handleClose} className="inline-flex items-center">
-              <X size={18} color={textMuted} strokeWidth={1.8} />
-            </button>
-          </div>
-          <QrScannerScanPanel visible={visible} scanned={scanned} isDark={isDark} textMuted={textMuted} onBarcodeData={handleBarCodeScanned} />
-          <div className="flex flex-col">
-            <span>
-              {true ? 'Paste connect URL' : 'Or paste URL manually'}
-            </span>
-            <div className="flex flex-col">
-              <input value={manualUrl} onChange={event => handleManualUrlChange(event.target.value)} placeholder="http://设备地址/?k=授权码" />
-              <button onClick={handleManualSubmit} className={"  opacity-[0.4]"} disabled={!manualUrl.trim()}>
-                <span>Connect</span>
-              </button>
-            </div>
-          </div>
-          {error && <span>{error}</span>}
-        </button>
-      </div>
-    </div>;
+  if (step === 'pairing') return <AppModal visible={visible} onClose={handleClose} title="Connecting to AiJee"><div className="flex flex-col items-center gap-3 py-6 text-center"><span className="size-5 animate-spin rounded-full border-2 border-primary border-r-transparent" /><p className="text-sm">Completing secure pairing…</p><button className="rounded-md px-3 py-2 text-sm hover:bg-hover" onClick={handleClose}>Cancel</button></div></AppModal>;
+  if (step === 'done') return <AppModal visible={visible} onClose={handleClose}><div className="flex flex-col items-center gap-3 py-8 text-center"><Check size={36} className="text-success" strokeWidth={2.5} /><h2 className="text-lg font-semibold">Connected</h2></div></AppModal>;
+  if (step === 'error') return <AppModal visible={visible} onClose={handleClose} title="Pairing Failed"><div className="flex flex-col gap-4"><div className="flex items-center gap-3 text-error"><AlertCircle size={24} /><span className="text-sm">{error}</span></div><div className="flex justify-end gap-2"><button className="rounded-md px-3 py-2 text-sm hover:bg-hover" onClick={reset}>Try Again</button><button className="rounded-md bg-primary px-3 py-2 text-sm text-primary-content" onClick={handleClose}>Cancel</button></div></div></AppModal>;
+  if (step === 'pick-ip' && connectParams) return <AppModal visible={visible} onClose={handleClose} title="Select Network" showClose><div className="flex flex-col gap-3"><p className="text-sm text-muted-foreground">{connectParams.hostname ? `"${connectParams.hostname}" is available on multiple addresses:` : 'Multiple addresses found:'}</p><div className="flex flex-col gap-1">{connectParams.ips.map(ip => <button className="flex items-center gap-3 rounded-md p-3 text-left hover:bg-hover" key={ip} onClick={() => handleSelectIp(ip)}><Wifi size={16} /><span><span className="block text-sm">{ip}</span><span className="block text-xs text-muted-foreground">Port {connectParams.port}</span></span></button>)}</div></div></AppModal>;
+  return <AppModal visible={visible} onClose={handleClose} title="Scan QR Code" showClose><div className="flex flex-col gap-5"><QrScannerScanPanel visible={visible} scanned={scanned} isDark={isDark} textMuted={textMuted} onBarcodeData={handleBarCodeScanned} /><div className="flex flex-col gap-2"><span className="text-sm font-medium">Paste connect URL</span><div className="flex gap-2"><input className="min-w-0 flex-1 rounded-md border border-border bg-muted px-3 py-2 text-sm outline-none focus:border-primary" value={manualUrl} onChange={event => handleManualUrlChange(event.target.value)} placeholder="http://设备地址/?k=授权码" /><button onClick={handleManualSubmit} className="rounded-md bg-primary px-3 py-2 text-sm text-primary-content disabled:opacity-40" disabled={!manualUrl.trim()}>Connect</button></div></div>{error && <p className="text-sm text-error">{error}</p>}</div></AppModal>;
 }

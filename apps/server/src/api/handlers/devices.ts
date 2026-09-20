@@ -21,7 +21,10 @@ import { ModelRuntime } from "@earendil-works/pi-coding-agent";
 
 export async function createDevice(ctx: HandlerContext, request: IncomingMessage, response: ServerResponse): Promise<void> {
     const body = await ctx.body<{ code?: string; name?: string }>(request);
-    const local = ctx.isLocalRequest(request) && ctx.hasSameOrigin(request);
+    // The UI is served by this runtime. A browser request from that same
+    // origin may establish its initial device session on loopback or LAN;
+    // code-less requests from any other origin remain forbidden.
+    const local = ctx.hasSameOrigin(request);
     try {
       const device = body.code ? ctx.authenticated().issueWithCode(body.code, body.name) : local ? ctx.authenticated().issueDevice(body.name) : (() => { throw new HttpError(403, "A device code is required"); })();
       const token = String(device.token);
@@ -88,7 +91,10 @@ export function isLocalRequest(ctx: HandlerContext, request: IncomingMessage): b
 
 export function hasSameOrigin(ctx: HandlerContext, request: IncomingMessage): boolean {
     const origin = request.headers.origin;
-    const host = request.headers.host;
+    const peer = request.socket.remoteAddress ?? "";
+    const trustedProxy = new Set(["127.0.0.1", "::1", "::ffff:127.0.0.1"]).has(peer);
+    const forwardedHost = request.headers["x-forwarded-host"];
+    const host = trustedProxy && typeof forwardedHost === "string" ? forwardedHost : request.headers.host;
     if (typeof origin === "string" && typeof host === "string") {
       try {
         const url = new URL(origin);

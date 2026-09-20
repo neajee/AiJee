@@ -24,11 +24,11 @@ export function CommitBar({
     inputBorder,
     sendColor
   } = useChangesTheme();
-  const commitInputRef = useRef<RNTextInput>(null);
-  return <div>
-      <div>
-        <input ref={commitInputRef} value={commitMsg} onChange={event => onChangeCommitMsg(event.target.value)} placeholder={`Commit message for ${stagedCount} staged file${stagedCount !== 1 ? "s" : ""}...`} multiline editable={!isCommitting} />
-        <div className="flex flex-col">
+  const commitInputRef = useRef<HTMLTextAreaElement>(null);
+  return <div className="border-t border-border p-2">
+      <div className="rounded-md border border-border bg-card">
+        <textarea ref={commitInputRef} value={commitMsg} onChange={event => onChangeCommitMsg(event.target.value)} placeholder={`Commit message for ${stagedCount} staged file${stagedCount !== 1 ? "s" : ""}...`} disabled={isCommitting} className="min-h-16 w-full resize-y bg-transparent p-2 text-sm outline-none" />
+        <div className="flex justify-end p-2">
           {isCommitting ? <span className="size-3 animate-spin" /> : <button onClick={onCommit} disabled={!commitMsg.trim()} aria-label="Commit" {...{
           title: "Commit"
         }}>

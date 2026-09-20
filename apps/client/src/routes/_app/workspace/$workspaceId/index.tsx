@@ -108,19 +108,19 @@ export default function WorkspaceScreen() {
   }, [workspaceId, modesLoaded, sending, ensureSession, client, router]);
   const clearAlert = useCallback(() => setAlertMessage(null), []);
   const editorBg = colors.background;
-  return <div className={"  pb-0"}>
-      <div className="flex flex-col">
-        <div>
+  return <div className="flex min-h-0 flex-1 bg-background">
+      <div className="flex min-w-0 flex-1 flex-col">
+        <div className="flex min-h-0 flex-1 items-center justify-center px-6 py-8">
           {/* Hero and composer are one vertically centred group, so the mark,
               the greeting and the input read as a single focal block. */}
-          <div className="flex flex-col">
-            {sending ? <div className="flex flex-col">
+          <div className="flex w-full max-w-[760px] flex-col items-center gap-5">
+            {sending ? <div className="flex flex-col items-center gap-3 py-6">
                 <span className="size-3 animate-spin" />
                 <span>
                   Starting session…
                 </span>
               </div> : <WorkspaceHero />}
-            <div>
+            <div className="w-full">
               {/* Project / environment / branch are the preconditions of the
                   prompt, so they sit directly above the composer. */}
               {!sending && <ComposerContextBar />}
@@ -128,12 +128,10 @@ export default function WorkspaceScreen() {
             </div>
           </div>
         </div>
-        {isWideScreen && <WorkspaceSidebar storageScope="start" defaultCollapsed locked>
-            <div className={"flex-1"}>
-              <WorkspaceRightPane sessionId={preSessionId} />
-            </div>
-          </WorkspaceSidebar>}
       </div>
+      {isWideScreen && <WorkspaceSidebar storageScope="start" defaultCollapsed locked>
+          <div className="flex-1"><WorkspaceRightPane sessionId={preSessionId} /></div>
+        </WorkspaceSidebar>}
     </div>;
 }
 const styles = {

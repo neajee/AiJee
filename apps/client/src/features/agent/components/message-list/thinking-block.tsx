@@ -1,7 +1,5 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Brain, ChevronRight } from "lucide-react";
-import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from "@/styles/motion";
-import { Colors, Fonts } from "@/constants/theme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { AnimatedCollapse } from "./animated-collapse";
 import { formatDuration } from "../../utils/turns";
@@ -10,9 +8,6 @@ interface ThinkingBlockProps {
   isStreaming?: boolean;
   isDark: boolean;
 }
-const BREATH_DURATION = 900;
-const BREATH_MIN_OPACITY = 0.45;
-
 /** The tail of the thinking stream, used as the collapsed one-line preview. */
 function lastLineOf(text: string): string {
   if (!text) return "";
@@ -25,48 +20,13 @@ function lastLineOf(text: string): string {
 }
 export const ThinkingBlock = memo(function ThinkingBlock({
   text,
-  isStreaming,
-  isDark
+  isStreaming
 }: ThinkingBlockProps) {
   const colors = useThemeTokens();
   const [expanded, setExpanded] = useState(false);
   const toggle = useCallback(() => {
     setExpanded(prev => !prev);
   }, []);
-
-  // Breathing label instead of animated dots: runs on the UI thread, so
-  // streaming never re-renders this block just to move the animation on.
-  const breath = useSharedValue(1);
-  useEffect(() => {
-    if (!isStreaming) {
-      breath.value = withTiming(1, {
-        duration: 200
-      });
-      return;
-    }
-    breath.value = withRepeat(withSequence(withTiming(BREATH_MIN_OPACITY, {
-      duration: BREATH_DURATION,
-      easing: Easing.inOut(Easing.ease)
-    }), withTiming(1, {
-      duration: BREATH_DURATION,
-      easing: Easing.inOut(Easing.ease)
-    })), -1);
-  }, [isStreaming, breath]);
-  const breathStyle = useAnimatedStyle(() => ({
-    opacity: breath.value
-  }));
-  const chevronRotate = useSharedValue(expanded ? 90 : 0);
-  useEffect(() => {
-    chevronRotate.value = withTiming(expanded ? 90 : 0, {
-      duration: 180,
-      easing: Easing.out(Easing.cubic)
-    });
-  }, [expanded, chevronRotate]);
-  const chevronStyle = useAnimatedStyle(() => ({
-    transform: [{
-      rotate: `${chevronRotate.value}deg`
-    }]
-  }));
 
   // Only report a duration we actually observed: history loaded from the
   // server never streams, so guessing there would invent numbers.
@@ -91,51 +51,18 @@ export const ThinkingBlock = memo(function ThinkingBlock({
   // whole line saying "Thinking", which the moving text already says.
   const headline = peek || label;
   return <div>
-      <button onClick={toggle} disabled={!text} role="button" aria-label={expanded ? "Collapse thinking" : "Expand thinking"} className="inline-flex items-center">
-        <div className="flex flex-col">
-          <Brain size={12} color={colors.textTertiary} strokeWidth={1.8} />
-        </div>
-        <span className={"  text-text-tertiary"}>
+      <button onClick={toggle} disabled={!text} role="button" aria-label={expanded ? "Collapse thinking" : "Expand thinking"} className="flex min-h-7 w-full items-center gap-1.5 py-1 text-left text-xs hover:bg-hover disabled:cursor-default">
+        <Brain size={12} color={colors.textTertiary} strokeWidth={1.8} className="shrink-0" />
+        <span className={`text-xs text-text-tertiary ${peek ? "min-w-0 flex-1 truncate font-normal leading-[18px] opacity-[0.85]" : "font-semibold"}`}>
           {headline}
         </span>
-        {!!text && <div className="flex flex-col">
-            <ChevronRight size={11} color={colors.textTertiary} strokeWidth={2} />
-          </div>}
+        {!!text && <ChevronRight className={`shrink-0 transition-transform ${expanded ? "rotate-90" : ""}`} size={11} color={colors.textTertiary} strokeWidth={2} />}
       </button>
 
       <AnimatedCollapse expanded={expanded}>
-        <span className={"  text-text-secondary"}>
+        <span className="block whitespace-pre-wrap pb-1.5 pt-0.5 text-xs leading-[18px] text-text-secondary">
           {text}
         </span>
       </AnimatedCollapse>
     </div>;
 });
-const styles = {
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 5,
-    paddingTop: 4,
-    paddingBottom: 4
-  },
-  label: {
-    fontSize: 12,
-    fontFamily: Fonts.sansSemiBold,
-    fontWeight: "600"
-  },
-  /** The live tail reads as prose, so it drops the label's weight. */
-  peekText: {
-    flex: 1,
-    fontFamily: Fonts.sans,
-    fontWeight: "400",
-    lineHeight: 18,
-    opacity: 0.85
-  },
-  text: {
-    fontSize: 12,
-    lineHeight: 18,
-    fontFamily: Fonts.sans,
-    paddingTop: 2,
-    paddingBottom: 6
-  }
-} as const;

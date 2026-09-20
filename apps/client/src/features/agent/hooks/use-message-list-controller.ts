@@ -1,6 +1,6 @@
 import type React from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { VirtualList } from "@/components/ui/virtual-list";
+import type { VirtualListHandle } from "@/components/ui/virtual-list";
 import { useAgentSession } from "@aijee/client-sdk";
 import type { ChatMessage } from "../component-types";
 import { buildListItems, reconcileItems, type ListItem } from "../utils/turns";
@@ -19,7 +19,7 @@ export function useMessageListController({
   sessionId,
   onForked
 }: MessageListProps) {
-  const listRef = useRef<FlatList<ListItem>>(null);
+  const listRef = useRef<VirtualListHandle>(null);
   const [showScrollButton, setShowScrollButton] = useState(false);
   const [editing, setEditing] = useState<{
     entryId: string;
@@ -226,20 +226,18 @@ export function useMessageListController({
       s.loadOlderMessages();
     }
   }, []);
-  const handleScroll = useCallback((e: React.SyntheticEvent<React.UIEvent>) => {
-    const {
-      contentOffset,
-      contentSize,
-      layoutMeasurement
-    } = e.nativeEvent;
-    const distanceFromBottom = contentSize.height - layoutMeasurement.height - contentOffset.y;
-    const offset = contentOffset.y;
+  const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
+    const element = e.currentTarget;
+    const offset = element.scrollTop;
+    const contentHeight = element.scrollHeight;
+    const viewportHeight = element.clientHeight;
+    const distanceFromBottom = contentHeight - viewportHeight - offset;
     const scrolledUp = offset < lastOffsetRef.current - SCROLL_UP_EPSILON;
     lastOffsetRef.current = offset;
     if (aligningRef.current) {
       // Our own offset. Record the height so the first reader-driven scroll
       // after the align cannot immediately read as "new content at the top".
-      lastPrefetchHeightRef.current = contentSize.height;
+      lastPrefetchHeightRef.current = contentHeight;
       return;
     }
 
@@ -260,8 +258,8 @@ export function useMessageListController({
     // event instead of onEndReached, whose initial fire can happen before the
     // history request reports that another page is available.
     const distanceFromOldest = offset;
-    if (!autoFollowRef.current && distanceFromOldest <= HISTORY_PREFETCH_DISTANCE && contentSize.height !== lastPrefetchHeightRef.current) {
-      lastPrefetchHeightRef.current = contentSize.height;
+    if (!autoFollowRef.current && distanceFromOldest <= HISTORY_PREFETCH_DISTANCE && contentHeight !== lastPrefetchHeightRef.current) {
+      lastPrefetchHeightRef.current = contentHeight;
       handleLoadMore();
     }
   }, [handleLoadMore, cancelPin]);

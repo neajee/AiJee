@@ -1,5 +1,5 @@
 import { memo, useCallback, useMemo, useState } from "react";
-import { Colors, Fonts } from "@/constants/theme";
+import { Bot } from "lucide-react";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { useAppSettingsStore } from "@/features/settings/store";
 import type { ToolCallInfo } from "../../../component-types.ts";
@@ -12,13 +12,10 @@ interface SubagentToolCallProps {
   isDark: boolean;
 }
 
-/** Transcripts are long-form, so they get more room than a plain tool result. */
-const DETAIL_MAX_HEIGHT = 320;
 export const SubagentToolCall = memo(function SubagentToolCall({
   tc,
   isDark
 }: SubagentToolCallProps) {
-  const colors = useThemeTokens();
   const active = isToolActive(tc);
   // Results stay collapsed by default, even while the tool is running.
   const [expanded, setExpanded] = useState(false);
@@ -52,7 +49,7 @@ export const SubagentToolCall = memo(function SubagentToolCall({
     return items;
   }, [active, meta, tc.progress, tc.status]);
   return <div>
-      <ToolHeader expanded={expanded} expandable={hasDetail} onToggle={toggle} isDark={isDark} alignTop aria-label={`${expanded ? "Collapse" : "Expand"} details of ${agentName}`}>
+      <ToolHeader expanded={expanded} expandable={hasDetail} onToggle={toggle} isDark={isDark} icon={Bot} alignTop aria-label={`${expanded ? "Collapse" : "Expand"} details of ${agentName}`}>
         <div className="flex flex-col">
           <div className="flex flex-col">
             <span className={"  text-text-secondary"}>
@@ -94,58 +91,3 @@ export const SubagentToolCall = memo(function SubagentToolCall({
       </ToolBody>
     </div>;
 });
-const styles = {
-  headerText: {
-    flex: 1,
-    minWidth: 0
-  },
-  headerTopRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8
-  },
-  agentName: {
-    fontSize: 12,
-    fontFamily: Fonts.sansSemiBold,
-    fontWeight: "600"
-  },
-  metaInline: {
-    flex: 1,
-    fontSize: 11,
-    fontFamily: Fonts.sans
-  },
-  task: {
-    fontSize: 12,
-    lineHeight: 18,
-    fontFamily: Fonts.sans,
-    marginTop: 1
-  },
-  scroll: {
-    maxHeight: DETAIL_MAX_HEIGHT
-  },
-  scrollContent: {
-    gap: 10
-  },
-  section: {
-    minWidth: 0
-  },
-  sectionLabel: {
-    fontSize: 11,
-    fontFamily: Fonts.sansMedium,
-    fontWeight: "500",
-    marginBottom: 4
-  },
-  stepText: {
-    fontSize: 11,
-    lineHeight: 16,
-    fontFamily: Fonts.mono
-  },
-  outputText: {
-    fontSize: 11,
-    lineHeight: 16,
-    fontFamily: Fonts.mono
-  },
-  markdownWrap: {
-    minWidth: 0
-  }
-} as const;

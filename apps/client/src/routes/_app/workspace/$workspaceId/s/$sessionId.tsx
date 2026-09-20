@@ -1,13 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useLocalSearchParams, useRouter } from "@/hooks/router";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { useSafeAreaInsets } from "@/platform/browser";
+import { useCallback, useEffect, useState } from "react";
 import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
 import { PromptInput } from "@/features/workspace/components/prompt-input";
 import { WorkspaceSidebar } from "@/features/workspace/components/workspace-sidebar";
 import { WorkspaceRightPane } from "@/features/preview/components/workspace-right-pane";
 import { useWorkspaceStore } from "@/features/workspace/store";
-import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { MessageList } from "@/features/agent/components/message-list";
 import { ChatShimmer } from "@/features/agent/components/message-list/chat-shimmer";
 import { ExtensionUiDialog } from "@/features/agent/components/extension-ui-dialog/index";
@@ -30,11 +28,9 @@ export default function SessionScreen() {
     sessionId: string;
   }>();
   const router = useRouter();
-  const colors = useThemeTokens();
   const {
     isWideScreen
   } = useResponsiveLayout();
-  const insets = useSafeAreaInsets();
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const selectWorkspace = useWorkspaceStore(s => s.selectWorkspace);
   const clearWorkspaceNotification = useWorkspaceStore(s => s.clearWorkspaceNotification);
@@ -76,7 +72,7 @@ export default function SessionScreen() {
     if (!sessionId || inputBlockedByConnection) return;
     setAlertMessage(null);
     requestBrowserNotificationPermission();
-    let images: ImageContent[] | undefined = attachmentsToImages(attachments);
+    const images: ImageContent[] | undefined = attachmentsToImages(attachments);
 
     // Always send through `prompt` and let pi decide from its own live state
     // whether to run now or queue. Picking steer/followUp here from a possibly
@@ -103,50 +99,26 @@ export default function SessionScreen() {
     }
   }, [sessionId, agentSession]);
   const clearAlert = useCallback(() => setAlertMessage(null), []);
-  const editorBg = colors.background;
   const hasMessages = messages.length > 0;
   return <DiffPanelProvider messages={messages}>
       <NarrowDiffSheetProvider>
-      <div className={"  pb-0"}>
-        <div className="flex flex-col">
-          <div>
+      <div className="flex min-h-0 flex-1 bg-background">
+        <div className="flex min-w-0 flex-1 flex-col">
+          <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
             {agentSession.isReady && hasMessages && sessionId ? <MessageList key={sessionId} sessionId={sessionId} onForked={nextSessionId => {
               router.replace(`/workspace/${workspaceId}/s/${nextSessionId}`);
             }} /> : agentSession.isLoading || !agentSession.isReady && sessionId ? <ChatShimmer /> : <div className="flex flex-col" />}
-            <ExtensionUiDialog sessionId={sessionId} request={agentSession.pendingExtensionUiRequest as LegacyPendingUiRequest | null} />
-            <PromptInput sessionId={sessionId} onSend={handleSend} isStreaming={agentSession.isStreaming} onAbort={handleAbort} sessionReady={agentSession.isReady} disabled={inputBlockedByConnection || !!agentSession.pendingExtensionUiRequest} allowTypingWhileDisabled={!inputBlockedByConnection} stackedAbove={!!agentSession.pendingExtensionUiRequest} errorMessage={alertMessage} onClearError={clearAlert} />
           </div>
 
-          {isWideScreen && <>
-              <DiffSidebar messages={messages} />
-              <WorkspaceSidebar>
-                <div className={"flex-1"}>
-                  <WorkspaceRightPane sessionId={sessionId ?? null} />
-                </div>
-              </WorkspaceSidebar>
-            </>}
+          <div className="shrink-0 px-3 pb-3"><div className="mx-auto w-full max-w-[880px]"><PromptInput sessionId={sessionId} onSend={handleSend} isStreaming={agentSession.isStreaming} onAbort={handleAbort} sessionReady={agentSession.isReady} disabled={inputBlockedByConnection || !!agentSession.pendingExtensionUiRequest} allowTypingWhileDisabled={!inputBlockedByConnection} stackedAbove={!!agentSession.pendingExtensionUiRequest} errorMessage={alertMessage} onClearError={clearAlert} /></div></div>
+          <ExtensionUiDialog sessionId={sessionId} request={agentSession.pendingExtensionUiRequest as LegacyPendingUiRequest | null} />
         </div>
-</div>
+
+        {isWideScreen && <><DiffSidebar messages={messages} /><WorkspaceSidebar><div className="flex h-full min-h-0 flex-col"><WorkspaceRightPane sessionId={sessionId ?? null} /></div></WorkspaceSidebar></>}
+      </div>
     </NarrowDiffSheetProvider>
     </DiffPanelProvider>;
 }
-const styles = {
-  container: {
-    flex: 1
-  },
-  upperRow: {
-    flex: 1,
-    flexDirection: "row"
-  },
-  editorColumn: {
-    flex: 1
-  },
-  emptyCenter: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center"
-  }
-} as const;
 export const Route = createFileRoute("/_app/workspace/$workspaceId/s/$sessionId")({
   component: SessionScreen
 });

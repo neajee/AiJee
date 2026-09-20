@@ -1,9 +1,9 @@
 import { memo, useCallback, useState } from "react";
-import { Colors, Fonts } from "@/constants/theme";
-import { useThemeTokens } from "@/hooks/use-theme-tokens";
+import { FilePlus } from "lucide-react";
 import type { ToolCallInfo } from "../../../component-types.ts";
 import { basename, isToolActive, parseToolArguments, countLines } from "../../../utils/message-list";
-import { CodePreview } from "../code-preview";
+import { detectLanguage } from "../../../utils/diff";
+import { DiffPreview } from "../code-preview";
 import { ToolBody, ToolHeader, TOOL_BODY_MAX_HEIGHT } from "./tool-disclosure";
 interface WriteToolCallProps {
   tc: ToolCallInfo;
@@ -13,7 +13,6 @@ export const WriteToolCall = memo(function WriteToolCall({
   tc,
   isDark
 }: WriteToolCallProps) {
-  const colors = useThemeTokens();
   const active = isToolActive(tc);
   // Results stay collapsed by default, even while the tool is running.
   const [expanded, setExpanded] = useState(false);
@@ -25,31 +24,17 @@ export const WriteToolCall = memo(function WriteToolCall({
   const addedLines = countLines(content);
   const hasContent = !!content;
   const title = active ? "Writing" : "Wrote";
-  return <div>
-      <ToolHeader expanded={expanded} expandable={hasContent} onToggle={toggle} isDark={isDark} aria-label={`${expanded ? "Collapse" : "Expand"} contents of ${fileName || "file"}`}>
-        <span className={"  text-text-secondary"}>
-          {title} {fileName || filePath || "file"}
-        </span>
-        {addedLines > 0 && <span>
-            +{addedLines}
-          </span>}
+  return <div className="flex flex-col">
+      <ToolHeader expanded={expanded} expandable={hasContent} onToggle={toggle} isDark={isDark} icon={FilePlus} aria-label={`${expanded ? "Collapse" : "Expand"} contents of ${fileName || "file"}`}>
+        <div className="flex min-w-0 items-center gap-1.5">
+          <span className="min-w-0 flex-1 truncate text-text-secondary">{title} <span className="font-mono text-foreground">{fileName || filePath || "file"}</span></span>
+          {addedLines > 0 && <span className="shrink-0 font-mono text-meta text-success">+{addedLines}</span>}
+        </div>
       </ToolHeader>
 
       <ToolBody expanded={expanded && hasContent}>
-        <CodePreview code={content} isDark={isDark} maxHeight={TOOL_BODY_MAX_HEIGHT} />
+        {/* A created file is a diff against nothing: every line is an addition. */}
+        <DiffPreview oldValue="" newValue={content} isDark={isDark} maxHeight={TOOL_BODY_MAX_HEIGHT} language={detectLanguage(fileName, filePath)} />
       </ToolBody>
     </div>;
 });
-const styles = {
-  fileName: {
-    fontSize: 12,
-    fontFamily: Fonts.sansMedium,
-    fontWeight: "500",
-    flexShrink: 1
-  },
-  metaAdd: {
-    fontSize: 10,
-    fontFamily: Fonts.mono,
-    flexShrink: 0
-  }
-} as const;

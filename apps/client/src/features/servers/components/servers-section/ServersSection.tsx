@@ -146,18 +146,16 @@ export function ServersView({
         })()}
         </button>
       </div>
-      <div hidden={!codeDialog}>
-        <button className="inline-flex items-center" onClick={() => setCodeDialog(null)} aria-label="关闭授权对话框">
-          <button onClick={e => e.stopPropagation()}>
+      {codeDialog && <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4" role="dialog" aria-modal="true">
+        <button className="absolute inset-0 size-full cursor-default" onClick={() => setCodeDialog(null)} aria-label="关闭授权对话框" />
+          <section className="relative w-full max-w-sm rounded-lg bg-card p-5 shadow-xl">
             <div className="flex flex-col">
               <span>设备授权二维码</span>
               <button onClick={() => setCodeDialog(null)} aria-label="关闭授权二维码" className="inline-flex items-center">
                 <X size={18} color={p.textTertiary} />
               </button>
             </div>
-            {codeDialog && <img src={{
-            uri: codeDialog.image
-          }} className="flex flex-col" />}
+            <img src={codeDialog.image} alt="设备授权二维码" className="mx-auto max-h-64 max-w-full object-contain" />
             <div className="flex flex-col">
               <span>授权码</span>
               <span>{codeDialog?.code}</span>
@@ -168,8 +166,8 @@ export function ServersView({
                 {refreshingCode ? <span className="size-3 animate-spin" /> : <RefreshCw size={18} color={p.text} />}
               </button>
             </div>
-          </button>
-        </button>
+          </section>
       </div>
+      }
     </div>;
 }

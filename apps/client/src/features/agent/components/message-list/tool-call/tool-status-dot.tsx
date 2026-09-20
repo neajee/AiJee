@@ -1,5 +1,5 @@
 import { memo, useEffect } from "react";
-import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming, Easing } from "@/styles/motion";
+import { useSharedValue, withRepeat, withSequence, withTiming, Easing } from "@/styles/motion";
 import type { ToolCallInfo } from "../../../component-types.ts";
 interface ToolStatusDotProps {
   status: ToolCallInfo["status"];
@@ -33,8 +33,5 @@ function PulseDot({
       easing: Easing.in(Easing.ease)
     })), -1);
   }, [opacity]);
-  const style = useAnimatedStyle(() => ({
-    opacity: opacity.value
-  }));
   return <div className="rounded-full bg-current" style={{ width: size, height: size, opacity: opacity.value }} />;
 }

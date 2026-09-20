@@ -1,27 +1,9 @@
-import { Animated } from "@/styles/motion";
-import { Search } from 'lucide-react';
-import { ABSOLUTE_FILL_STYLE } from '@/constants/layout';
-import { useColorScheme } from '@/hooks/use-color-scheme';
-import { useThemeTokens } from '@/hooks/use-theme-tokens';
-import { useCommandPaletteController } from '../../hooks/use-command-palette-controller';
-import type { CommandPaletteProps } from './component-types';
-export function CommandPalette({
-  visible,
-  onClose
-}: CommandPaletteProps) {
-  const colors = useThemeTokens();
-  const isDark = (useColorScheme() ?? 'light') === 'dark';
-  const textPrimary = isDark ? '#fefdfd' : colors.text;
-  const textMuted = isDark ? '#cdc8c5' : colors.textTertiary;
-  const textDim = isDark ? '#888' : '#999';
-  const bg = isDark ? '#1e1e1e' : '#FFFFFF';
-  const borderColor = isDark ? '#3b3a39' : 'rgba(0,0,0,0.12)';
-  const hoverBg = isDark ? '#2a2a2a' : '#F0F0F0';
-  const selectedBg = isDark ? '#333' : '#E8E8E8';
-  const controller = useCommandPaletteController({
-    visible,
-    onClose
-  });
+import { createPortal } from "react-dom";
+import { Search } from "lucide-react";
+import { useCommandPaletteController } from "../../hooks/use-command-palette-controller";
+import type { CommandPaletteProps } from "./component-types";
+
+export function CommandPalette({ visible, onClose }: CommandPaletteProps) {
   const {
     search,
     setSearch,
@@ -31,69 +13,94 @@ export function CommandPalette({
     inputRef,
     scrollRef,
     itemRefs,
-    scrollContentRef,
-    overlayAnim,
-    scaleAnim,
     handleClose,
     handleKeyPress
-  } = controller;
-  if (!visible) return null;
+  } = useCommandPaletteController({ visible, onClose });
+
+  if (!visible || typeof document === "undefined") return null;
   let flatIndex = 0;
-  return <div>
-      <div className="flex flex-col">
-        <AnimatedOverlay animation={overlayAnim} onClick={handleClose} />
-        <div className={"  opacity-100"}>
-          <div>
-            <Search size={16} color={textMuted} strokeWidth={2} />
-            <input ref={inputRef} value={search} onChange={event => setSearch(event.target.value)} onKeyPress={handleKeyPress} placeholder="搜索对话…" />
-          </div>
-          <div ref={scrollRef} className="flex flex-col">
-            <div ref={scrollContentRef}>
-              {sessionsLoading ? <div className="flex flex-col">
-                  <span className="size-3 animate-spin" />
-                </div> : sections.length === 0 ? <div className="flex flex-col">
-                  <span>
-                    {search.trim() ? '没有匹配的对话' : '暂无最近对话'}
-                  </span>
-                </div> : null}
-              {sections.map(section => <div key={section.title}>
-                  <span>{section.title}</span>
-                  {section.items.map(item => {
+
+  return createPortal(
+    <div
+      className="fixed inset-0 z-[80] flex items-start justify-center bg-black/35 px-4 pt-20 backdrop-blur-[1px]"
+      role="presentation"
+      onMouseDown={event => {
+        if (event.target === event.currentTarget) handleClose();
+      }}
+    >
+      <section
+        role="dialog"
+        aria-modal="true"
+        aria-label="搜索对话"
+        className="flex max-h-[420px] w-full max-w-[560px] flex-col overflow-hidden rounded-xl border border-border bg-card text-foreground shadow-2xl"
+        onMouseDown={event => event.stopPropagation()}
+      >
+        <div className="flex h-11 shrink-0 items-center gap-2.5 border-b border-border px-4">
+          <Search size={14} strokeWidth={2} className="shrink-0 text-text-tertiary" />
+          <input
+            ref={inputRef}
+            value={search}
+            onChange={event => setSearch(event.target.value)}
+            onKeyDown={handleKeyPress}
+            placeholder="搜索对话…"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
+            className="min-w-0 flex-1 bg-transparent text-[14px] text-foreground outline-none placeholder:text-text-tertiary"
+          />
+        </div>
+
+        <div ref={scrollRef} role="listbox" className="min-h-0 flex-1 overflow-y-auto py-1">
+          {sessionsLoading ? (
+            <div className="flex justify-center py-6">
+              <span className="size-3.5 animate-spin rounded-full border-2 border-border border-t-text-tertiary" />
+            </div>
+          ) : sections.length === 0 ? (
+            <div className="py-6 text-center text-[12px] text-text-tertiary">
+              {search.trim() ? "没有匹配的对话" : "暂无最近对话"}
+            </div>
+          ) : null}
+
+          {sections.map(section => (
+            <div key={section.title}>
+              <div className="px-4 pb-1 pt-3 text-[10.5px] font-medium uppercase tracking-wide text-text-tertiary">
+                {section.title}
+              </div>
+              {section.items.map(item => {
                 const index = flatIndex++;
                 const isSelected = index === selectedIndex;
                 const Icon = item.icon;
-                return <button key={item.id} ref={ref => {
-                  itemRefs.current[index] = ref as any;
-                }} onClick={item.onSelect}>
-                        <Icon size={15} color={isSelected ? textPrimary : textMuted} strokeWidth={1.8} />
-                        <div className="flex flex-col">
-                          <span>
-                            {item.label}
-                          </span>
-                          {item.description && <span>
-                              {item.description}
-                            </span>}
-                        </div>
-                        {isSelected && <span>{'\u21B5'}</span>}
-                      </button>;
+                return (
+                  <button
+                    key={item.id}
+                    ref={node => {
+                      itemRefs.current[index] = node;
+                    }}
+                    onClick={item.onSelect}
+                    role="option"
+                    aria-selected={isSelected}
+                    className={`flex w-full items-center gap-2.5 px-4 py-2 text-left transition-colors ${isSelected ? "bg-active" : "hover:bg-hover"}`}
+                  >
+                    <Icon
+                      size={13}
+                      strokeWidth={1.8}
+                      className={`shrink-0 ${isSelected ? "text-foreground" : "text-text-tertiary"}`}
+                    />
+                    <span className="flex min-w-0 flex-1 flex-col">
+                      <span className="truncate text-[12px] text-foreground">{item.label}</span>
+                      {item.description ? (
+                        <span className="truncate text-[10.5px] text-text-secondary">{item.description}</span>
+                      ) : null}
+                    </span>
+                    {isSelected ? <span className="shrink-0 font-mono text-[12px] text-text-tertiary">↵</span> : null}
+                  </button>
+                );
               })}
-                </div>)}
             </div>
-          </div>
+          ))}
         </div>
-      </div>
-    </div>;
-}
-function AnimatedOverlay({
-  animation,
-  onClick
-}: {
-  animation: {
-    value: number;
-  };
-  onClick: () => void;
-}) {
-  return <div className={"  opacity-100"}>
-      <button className="inline-flex items-center" onClick={onClick} />
-    </div>;
+      </section>
+    </div>,
+    document.body
+  );
 }

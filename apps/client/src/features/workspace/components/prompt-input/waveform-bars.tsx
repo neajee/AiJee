@@ -1,5 +1,3 @@
-import { useEffect, useRef } from "react";
-import { Animated } from "@/styles/motion";
 const BAR_COUNT = 5;
 const BAR_SCALES = [0.6, 0.85, 1, 0.85, 0.6];
 export function WaveformBars({
@@ -7,33 +5,7 @@ export function WaveformBars({
 }: {
   audioLevel: number;
 }) {
-  const anims = useRef(Array.from({
-    length: BAR_COUNT
-  }, () => new Animated.Value(0))).current;
-  useEffect(() => {
-    anims.forEach((anim, i) => {
-      const scale = BAR_SCALES[i];
-      const target = Math.max(0.15, audioLevel * scale);
-      Animated.timing(anim, {
-        toValue: target,
-        duration: 80,
-        useNativeDriver: false
-      }).start();
-    });
-  }, [anims, audioLevel]);
-  return <div className="flex flex-col">
-      {anims.map((anim, i) => <div key={i} className={"  bg-[#EF4444] h-0"} />)}
+  return <div className="flex h-[18px] items-center gap-0.5">
+      {BAR_SCALES.map((scale, i) => <div key={i} className="w-[3px] rounded-sm bg-red-500 transition-[height] duration-75" style={{ height: `${Math.max(3, Math.round(18 * Math.max(0.15, audioLevel * scale)))}px` }} />)}
     </div>;
 }
-const styles = {
-  container: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 2,
-    height: 18
-  },
-  bar: {
-    width: 3,
-    borderRadius: 1.5
-  }
-} as const;

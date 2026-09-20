@@ -18,7 +18,7 @@ export const ToolCallGroup = memo(function ToolCallGroup({
 }) {
   const groups = useMemo(() => groupToolCalls(toolCalls), [toolCalls]);
   if (!groups.length) return null;
-  return <div className="flex flex-col">{groups.map(group => group.calls.length === 1 ? <SingleToolCall key={group.key} tc={group.calls[0]} isDark={isDark} /> : <GroupedToolCalls key={group.key} toolName={group.toolName} calls={group.calls} isDark={isDark} />)}</div>;
+  return <div className="flex flex-col gap-1.5">{groups.map(group => group.calls.length === 1 ? <SingleToolCall key={group.key} tc={group.calls[0]} isDark={isDark} /> : <GroupedToolCalls key={group.key} toolName={group.toolName} calls={group.calls} isDark={isDark} />)}</div>;
 });
 function SingleToolCall({
   tc,

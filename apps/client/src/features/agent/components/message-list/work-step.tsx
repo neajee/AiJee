@@ -1,5 +1,4 @@
 import { memo } from "react";
-import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { AssistantMarkdown } from "./assistant-markdown";
 import { ToolCallGroup } from "./tool-call";
 import { ThinkingBlock } from "./thinking-block";
@@ -11,7 +10,6 @@ export const WorkStepView = memo(function WorkStepView({
   step: WorkStep;
   isDark: boolean;
 }) {
-  const colors = useThemeTokens();
   switch (step.kind) {
     case "thinking":
       return <ThinkingBlock text={step.text} isStreaming={step.streaming} isDark={isDark} />;

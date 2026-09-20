@@ -14,5 +14,15 @@ export default defineConfig(({ mode }) => ({
   define: { __DEV__: JSON.stringify(mode !== "production") },
   base: "/",
   build: { outDir: "../../dist", emptyOutDir: true },
-  server: { strictPort: true, port: 8081 },
+  server: {
+    strictPort: true,
+    port: 8081,
+    proxy: {
+      "/api": {
+        target: process.env.AIJEE_API_ORIGIN ?? "http://127.0.0.1:10088",
+        changeOrigin: true,
+        ws: true,
+      },
+    },
+  },
 }));

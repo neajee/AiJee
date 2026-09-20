@@ -1,5 +1,4 @@
-import Animated from "@/styles/motion";
-import { ABSOLUTE_FILL_STYLE } from '@/constants/layout';
+import { AppSheet } from '@/components/ui';
 import type { NarrowHeaderActionsSheetViewProps } from './component-types';
 export function NarrowHeaderActionsSheetView({
   visible,
@@ -16,31 +15,10 @@ export function NarrowHeaderActionsSheetView({
   panGesture,
   onDismiss
 }: NarrowHeaderActionsSheetViewProps) {
-  return <div {...false ? {
-    pointerEvents: visible ? 'auto' : 'none'
-  } : {}}>
-      <div>
-        <button className="inline-flex items-center" onClick={onDismiss} />
-      </div>
-
-      <div className={"  pb-0"}>
-        <div>
-          <div className="flex flex-col">
-            <div />
-          </div>
-        </div>
-
-        <div className="flex flex-col">
-          <span>More</span>
-          <span>Quick actions for this screen</span>
-        </div>
-
-        <div className="flex flex-col">
-          {items.map((item, index) => <button key={item.key} onClick={item.onClick} role="button" aria-label={item.label}>
-              <div className="flex flex-col">{item.icon}</div>
-              <span>{item.label}</span>
-            </button>)}
-        </div>
-      </div>
-    </div>;
+  return <AppSheet visible={visible} onClose={onDismiss} title="More">
+    <p className="mb-3 text-sm text-muted-foreground">Quick actions for this screen</p>
+    <div className="flex flex-col gap-1">{items.map(item => <button key={item.key} className="flex items-center gap-3 rounded-md px-3 py-3 text-left hover:bg-hover" onClick={() => { item.onClick(); onDismiss(); }} aria-label={item.label}>
+      <span className="flex size-5 items-center justify-center">{item.icon}</span><span>{item.label}</span>
+    </button>)}</div>
+  </AppSheet>;
 }

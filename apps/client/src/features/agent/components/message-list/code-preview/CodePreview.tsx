@@ -1,10 +1,8 @@
 import { memo, useMemo } from 'react';
-import { useThemeTokens } from '@/hooks/use-theme-tokens';
 import { tokenizeLine } from '../../../utils/code-preview-tokens';
 import type { CodePreviewProps } from './component-types';
 export const CodePreview = memo(function CodePreview({
   code,
-  isDark,
   maxHeight,
   startLine = 1,
   language,
@@ -13,29 +11,16 @@ export const CodePreview = memo(function CodePreview({
   fill = false,
   bare = false
 }: CodePreviewProps) {
-  const colors = useThemeTokens();
   const lines = useMemo(() => code.split('\n'), [code]);
-  const tokenColors = useMemo(() => ({
-    plain: isDark ? '#D4D4D4' : '#24292E',
-    keyword: isDark ? '#C792EA' : '#6F42C1',
-    string: isDark ? '#C3E88D' : '#0B6E4F',
-    number: isDark ? '#F78C6C' : '#B75501',
-    comment: isDark ? '#6A9955' : '#6A737D',
-    operator: isDark ? '#89DDFF' : '#005CC5',
-    property: isDark ? '#82AAFF' : '#005CC5',
-    punctuation: isDark ? '#89DDFF' : '#586069',
-    diffAdd: colors.diffAdded,
-    diffRemove: colors.diffRemoved,
-    diffMeta: colors.skill
-  }), [colors, isDark]);
-  return <div className={"  bg-surface-raised border-border"}>
-      <div className={"max-h-0"}>
-        <div horizontal>
-          <div>
+  // Borderless so an expanded tool result reads as a continuation of its header;
+  // only the bottom corners round off.
+  return <div className={`overflow-hidden bg-muted ${bare ? '' : 'rounded-b-md'}`}>
+      <div className={fill ? "overflow-auto" : "max-h-80 overflow-auto"} style={maxHeight ? { maxHeight } : undefined}>
+        <div className="min-w-max p-3 font-mono text-xs leading-5">
             {lines.map((line, index) => {
             const segments = tokenizeLine(line, language, diffLanguage);
-            return <div key={index} className="flex flex-col">
-                  {showLineNumbers ? <div>
+            return <div key={index} className="flex">
+                  {showLineNumbers ? <div className="w-10 shrink-0 select-none text-right pr-3">
                       <span className={"  text-text-tertiary"}>{startLine + index}</span>
                     </div> : null}
                   <span className={"  text-foreground"}>
@@ -45,7 +30,6 @@ export const CodePreview = memo(function CodePreview({
                   </span>
                 </div>;
           })}
-          </div>
         </div>
       </div>
     </div>;

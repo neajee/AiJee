@@ -1,6 +1,5 @@
 import { memo, useCallback, useRef, useState } from "react";
-import { Colors, Fonts } from "@/constants/theme";
-import { useThemeTokens } from "@/hooks/use-theme-tokens";
+import { Terminal } from "lucide-react";
 import type { ToolCallInfo } from "../../../component-types.ts";
 import { parseToolArguments, truncateOutput } from "../../../utils/message-list";
 import { ToolBody, ToolHeader, ToolSurface } from "./tool-disclosure";
@@ -16,29 +15,14 @@ interface BashToolCallProps {
  * with a visible indicator. The data layer still truncates at 50 lines so a
  * runaway `cat` cannot render megabytes into the list.
  */
-const BASH_OUTPUT_MAX_HEIGHT = 420;
 export const BashToolCall = memo(function BashToolCall({
   tc,
   isDark
 }: BashToolCallProps) {
-  const colors = useThemeTokens();
   // Results stay collapsed by default, even while the tool is running.
   const [expanded, setExpanded] = useState(false);
   const toggle = useCallback(() => setExpanded(p => !p), []);
-  // While streaming, the panel tracks the tail of the output so the reader
-  // always sees the newest lines; dragging inside the panel stops the chase.
-  const scrollRef = useRef<RNScrollView>(null);
-  const followTailRef = useRef(true);
-  const handleOutputGrowth = useCallback(() => {
-    if (expanded && followTailRef.current) {
-      scrollRef.current?.scrollToEnd({
-        animated: false
-      });
-    }
-  }, [expanded]);
-  const stopFollowing = useCallback(() => {
-    followTailRef.current = false;
-  }, []);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const parsed = parseToolArguments(tc.arguments);
   const rawCommand = parsed.command as string || "";
   const cdMatch = rawCommand.match(/^cd\s+(.+?)\s*&&\s*(.+)/);
@@ -50,55 +34,23 @@ export const BashToolCall = memo(function BashToolCall({
     truncated
   } = truncateOutput(output);
   const hasOutput = !!displayOutput;
-  return <div>
-      <ToolHeader expanded={expanded} expandable={hasOutput} onToggle={toggle} isDark={isDark} aria-label={`${expanded ? "Collapse" : "Expand"} output of ${command || "bash"}`}>
-        <span className={"  text-text-secondary"}>
-          Ran <span className={"  text-foreground"}>{command || "bash"}</span>
+  return <div className="flex flex-col">
+      <ToolHeader expanded={expanded} expandable={hasOutput} onToggle={toggle} isDark={isDark} icon={Terminal} aria-label={`${expanded ? "Collapse" : "Expand"} output of ${command || "bash"}`}>
+        <span className="block truncate text-text-secondary">
+          Ran <span className="font-mono text-foreground">{command || "bash"}</span>
           {cdPath ? <span>
               {" in "}
-              <span className={"  text-foreground"}>{cdPath}</span>
+              <span className="font-mono text-foreground">{cdPath}</span>
             </span> : null}
         </span>
       </ToolHeader>
 
       {hasOutput && <ToolBody expanded={expanded}>
           <ToolSurface isDark={isDark}>
-            <div ref={scrollRef} className="flex flex-col">
-              <span className={"  text-text-secondary"}>
-                {displayOutput}
-              </span>
-              {truncated && <span className={"  text-text-tertiary"}>
-                  … output truncated
-                </span>}
-            </div>
+            <div ref={scrollRef} className="max-h-[420px] overflow-auto"><pre className="whitespace-pre-wrap break-words font-mono text-meta leading-4 text-text-secondary">{displayOutput}</pre>{truncated && <p className="mt-1 font-mono text-[10px] italic text-text-tertiary">… output truncated</p>}</div>
           </ToolSurface>
         </ToolBody>}
 
       {tc.resultImages && tc.resultImages.length > 0 && <ToolResultImages images={tc.resultImages} isDark={isDark} />}
     </div>;
 });
-const styles = {
-  ranLabel: {
-    fontSize: 12,
-    fontFamily: Fonts.sans,
-    flexShrink: 1
-  },
-  command: {
-    fontSize: 12,
-    fontFamily: Fonts.mono
-  },
-  scroll: {
-    maxHeight: BASH_OUTPUT_MAX_HEIGHT
-  },
-  outputText: {
-    fontSize: 11,
-    lineHeight: 16,
-    fontFamily: Fonts.mono
-  },
-  truncatedText: {
-    fontSize: 10,
-    fontFamily: Fonts.mono,
-    fontStyle: "italic",
-    marginTop: 6
-  }
-} as const;

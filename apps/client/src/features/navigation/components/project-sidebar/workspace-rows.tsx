@@ -6,7 +6,6 @@ import type { Workspace } from "@/features/workspace/types";
 import { MENU_WIDTH } from "../workspace-context-menu";
 export function WorkspaceRow({
   workspace,
-  isSelected,
   isOpen,
   isRunning,
   hasUnread,
@@ -17,7 +16,6 @@ export function WorkspaceRow({
   isDark
 }: {
   workspace: Workspace;
-  isSelected: boolean;
   isOpen: boolean;
   /** At least one session in this project is working right now. */
   isRunning: boolean;
@@ -34,19 +32,17 @@ export function WorkspaceRow({
   const colors = useThemeTokens();
   const [hovered, setHovered] = useState(false);
   const hoverBg = isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.035)";
-  const moreRef = useRef<RNView>(null);
+  const moreRef = useRef<HTMLDivElement>(null);
   // Hovering swaps the status dot for the actions; both never fit at once.
   const showActions = hovered;
   const openMenu = useCallback(() => {
-    const node = moreRef.current;
-    if (!node?.measureInWindow) {
+    const rect = moreRef.current?.getBoundingClientRect();
+    if (!rect) {
       onMenu(24, 120);
       return;
     }
-    // Anchor under the button, right edges aligned.
-    node.measureInWindow((x, y, width, height) => {
-      onMenu(x + width - MENU_WIDTH, y + height + 4);
-    });
+    // Anchor under the button, right edges aligned (viewport coordinates).
+    onMenu(rect.right - MENU_WIDTH, rect.bottom + 4);
   }, [onMenu]);
   return (
     /*
@@ -56,17 +52,17 @@ export function WorkspaceRow({
      * exist while hovering would vanish the moment the cursor reached them.
      * `pointerenter`/`pointerleave` don't fire for movement between children.
      */
-    <div onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)}>
-      <button onClick={onClick} onLongPress={onLongPress} delayLongPress={400} aria-label={isOpen ? `收起 ${workspace.title}` : `展开 ${workspace.title}`}>
-        <div className="flex flex-col">
+    <div className="group flex w-full" onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)}>
+      <button className="flex h-[29px] min-w-0 flex-1 items-center gap-[7px] rounded-md px-[7px] text-left hover:bg-hover" onClick={onClick} aria-label={isOpen ? `收起 ${workspace.title}` : `展开 ${workspace.title}`}>
+        <span className="flex size-5 shrink-0 items-center justify-center">
           <Folder size={15} color={colors.text} strokeWidth={1.8} />
-        </div>
-        <span className={"  font-sans"}>
+        </span>
+        <span className="min-w-0 flex-1 truncate font-sans">
           {workspace.title}
         </span>
       </button>
 
-      <div className="flex flex-col">
+      <div className="flex items-center justify-end gap-1">
         {showActions && <RowAction label={`在 ${workspace.title} 中新建对话`} onClick={onNewSession} isDark={isDark}>
             <SquarePen size={13} color={colors.textTertiary} strokeWidth={1.8} />
           </RowAction>}
@@ -96,7 +92,7 @@ export function RowAction({
 }) {
   const [hovered, setHovered] = useState(false);
   const hoverBg = isDark ? "rgba(255,255,255,0.09)" : "rgba(0,0,0,0.07)";
-  return <button onClick={e => {
+  return <button className="flex size-7 items-center justify-center rounded hover:bg-hover" onClick={e => {
     e.stopPropagation();
     onClick();
   }} aria-label={label} onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)}>

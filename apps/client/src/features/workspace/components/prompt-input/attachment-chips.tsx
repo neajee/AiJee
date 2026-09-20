@@ -17,9 +17,7 @@ export function AttachmentChips({
   return <div className="flex flex-col">
       {imageAtts.length > 0 && <div className="flex flex-col">
           {imageAtts.map(att => <div key={att.id} className={"  border-border"}>
-              {att.preview ? <img src={{
-          uri: att.preview
-        }} className="flex flex-col" /> : <div>
+              {att.preview ? <img src={att.preview} alt={att.name} className="size-16 rounded object-cover" /> : <div>
                   <ImageIcon size={18} color={theme.textMuted} strokeWidth={1.8} />
                 </div>}
               <button onClick={() => onRemove(att.id)} role="button" aria-label="Remove image">
@@ -28,7 +26,7 @@ export function AttachmentChips({
             </div>)}
         </div>}
 
-      {fileAtts.length > 0 && <div horizontal className="flex flex-col">
+      {fileAtts.length > 0 && <div className="flex flex-wrap gap-2">
           {fileAtts.map(att => <div key={att.id}>
               <FileText size={14} color={theme.textMuted} strokeWidth={1.8} />
               <span className={"  text-foreground"}>

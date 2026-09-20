@@ -1,10 +1,9 @@
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
-import Animated, { Easing, FadeIn, useAnimatedStyle, useSharedValue, withTiming } from "@/styles/motion";
 import { ChevronRight, GitFork } from "lucide-react";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { AssistantMessage, MessageToolbar } from "./assistant-message";
 import { collectFileChanges } from "../../utils/message-list";
-import { formatDuration, groupWorkSteps, type TurnListItem } from "../../utils/turns";
+import { formatDuration, formatTps, groupWorkSteps, type TurnListItem } from "../../utils/turns";
 import { TurnSummary } from "./turn-summary";
 import { WorkActivityGroup } from "./work-activity-group";
 import { WorkStepView } from "./work-step";
@@ -43,18 +42,6 @@ export const TurnBlock = memo(function TurnBlock({
   }, [active]);
   const expanded = override ?? autoExpanded;
   const hasWork = turn.steps.length > 0;
-  const chevronRotate = useSharedValue(expanded ? 90 : 0);
-  useEffect(() => {
-    chevronRotate.value = withTiming(expanded ? 90 : 0, {
-      duration: 180,
-      easing: Easing.out(Easing.cubic)
-    });
-  }, [expanded, chevronRotate]);
-  const chevronStyle = useAnimatedStyle(() => ({
-    transform: [{
-      rotate: `${chevronRotate.value}deg`
-    }]
-  }));
   const toggle = useCallback(() => setOverride(!expanded), [expanded]);
 
   // The action row belongs to the whole turn, so hover is tracked here rather
@@ -73,22 +60,16 @@ export const TurnBlock = memo(function TurnBlock({
   const timeLabel = active ? formatDuration(Math.max(1000, elapsedMs)) : settledMs ? formatDuration(settledMs) : null;
   const showDivider = hasWork || active || !!settledMs;
   const forkEntryId = turn.final?.entryId ?? turn.sourceEntryId;
-  const divider = <div className="flex flex-col">
-      <div />
-      <div className="flex flex-col">
-        <span>
-          {label}
-        </span>
-        {timeLabel && <span>
-            {timeLabel}
-          </span>}
-        {hasWork && <div>
-            <ChevronRight size={12} color={colors.textTertiary} strokeWidth={2} />
-          </div>}
-      </div>
-      <div />
+  const divider = <div className="flex w-full items-center px-4 py-2.5">
+      <span className="h-px flex-1 bg-border opacity-60" />
+      <span className="flex min-w-0 items-center gap-1 px-2 text-xs text-text-secondary">
+        <span className="truncate">{label}</span>
+        {timeLabel && <span className="font-mono text-meta text-text-tertiary">{timeLabel}</span>}
+        {hasWork && <ChevronRight className={`shrink-0 transition-transform ${expanded ? 'rotate-90' : ''}`} size={12} color={colors.textTertiary} strokeWidth={2} />}
+      </span>
+      <span className="h-px flex-1 bg-border opacity-60" />
     </div>;
-  return <div {...true ? {
+  return <div className="flex flex-col gap-2" {...true ? {
     onPointerEnter: () => setHovered(true),
     onPointerLeave: () => setHovered(false)
   } : {}}>
@@ -96,21 +77,24 @@ export const TurnBlock = memo(function TurnBlock({
             {divider}
           </button> : divider)}
 
-      {hasWork && expanded && <div>
+      {hasWork && expanded && <div className="ml-4 flex flex-col gap-1.5 border-l border-border pb-2.5 pl-3 pr-4 pt-0.5">
           {sections.map(section => section.kind === "activity" ? <WorkActivityGroup key={section.key} steps={section.steps} isDark={isDark} /> : <WorkStepView key={section.key} step={section.step} isDark={isDark} />)}
         </div>}
 
       {turn.final && <AssistantMessage message={turn.final} isDark={isDark} />}
-      {turn.aborted && <span>
+      {turn.aborted && <span className="px-4 py-0.5 text-xs leading-[18px] text-text-tertiary">
           Stopped
         </span>}
       {turn.fileStats && <TurnSummary stats={turn.fileStats} changes={fileChanges} isDark={isDark} />}
       {/* Last in the turn: the answer, then what it changed, then the actions. */}
-      {turn.final && !turn.final.isStreaming && (turn.final.text || turn.final.errorMessage) && <div className="flex flex-col">
-          <MessageToolbar message={turn.final} isDark={isDark} hovered={hovered} />
-          {forkEntryId && onFork && <button onClick={() => onFork(forkEntryId)} disabled={active || !!forkingEntryId} role="button" aria-label="Fork from this reply" className="inline-flex items-center">
-              {forkingEntryId === forkEntryId ? <span className={"w-[12px] h-[12px]" + " size-3 animate-spin"} /> : <GitFork size={14} color={colors.textTertiary} strokeWidth={1.8} />}
-            </button>}
+      {turn.final && !turn.final.isStreaming && (turn.final.text || turn.final.errorMessage) && <div className="flex items-center justify-between gap-1 px-4 pt-1.5">
+          <div className="flex items-center gap-0.5">
+            <MessageToolbar message={turn.final} isDark={isDark} hovered={hovered} />
+            {forkEntryId && onFork && <button onClick={() => onFork(forkEntryId)} disabled={active || !!forkingEntryId} role="button" aria-label="Fork from this reply" className="flex size-[26px] items-center justify-center rounded-md hover:bg-hover disabled:opacity-40">
+                {forkingEntryId === forkEntryId ? <span className="size-3 animate-spin rounded-full border-2 border-border border-t-text-tertiary" /> : <GitFork size={14} color={colors.textTertiary} strokeWidth={1.8} />}
+              </button>}
+          </div>
+          {turn.tps !== undefined && <span className="whitespace-nowrap px-1 font-mono text-meta text-text-tertiary">{formatTps(turn.tps)}</span>}
         </div>}
     </div>;
 });

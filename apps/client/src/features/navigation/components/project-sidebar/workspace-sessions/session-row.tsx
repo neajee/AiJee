@@ -64,11 +64,9 @@ export function SessionRow({
     }
   }, [busy, onArchive]);
   const status = <div className="flex flex-col">{isWorking ? <SessionActivityIndicator sessionId={session.id} color={colors.textSecondary} idlePlaceholder={false} /> : hasUnread ? <div /> : null}</div>;
-  return <div onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)}>
-      {editing ? <div className="flex flex-col">{status}<input autoFocus value={draft} onChange={event => setDraft(event.target.value)} onKeyDown={event => event.key === "Enter" && (() => void commitRename())(event)} onKeyPress={event => {
-        if (event.nativeEvent.key === 'Escape') setEditing(false);
-      }} editable={busy !== 'rename'} maxLength={200} className={"  font-sans"} /></div> : <button onClick={onClick}>{status}<span className={"  font-sans"}>{title}</span></button>}
-      {showActions && !editing && <div className="flex flex-col">
+  return <div className={`group flex h-[26px] w-full min-w-0 items-center gap-1 rounded-md px-2 text-xs ${isSelected ? 'bg-active' : ''}`} onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)}>
+      {editing ? <div className="flex min-w-0 flex-1 items-center gap-1">{status}<input autoFocus value={draft} onChange={event => setDraft(event.target.value)} onKeyDown={event => { if (event.key === "Enter") void commitRename(); if (event.key === "Escape") setEditing(false); }} disabled={busy === 'rename'} maxLength={200} className="h-[22px] min-w-0 flex-1 rounded bg-transparent font-sans outline-none" /></div> : <button className={`flex min-w-0 flex-1 items-center gap-1 text-left ${isSelected ? 'font-medium' : ''}`} onClick={onClick}>{status}<span className="min-w-0 flex-1 truncate font-sans">{title}</span></button>}
+      {showActions && !editing && <div className="flex shrink-0 items-center">
         <RowAction label="重命名对话" onClick={() => setEditing(true)} isDark={isDark}><Pencil size={11} color={colors.textTertiary} strokeWidth={1.8} /></RowAction>
         <RowAction label="归档对话" onClick={() => void handleArchive()} isDark={isDark}>{busy === 'archive' ? <span className={"w-[10px] h-[10px]" + " size-3 animate-spin"} /> : <ArchiveIcon size={11} color={colors.textTertiary} strokeWidth={1.8} />}</RowAction>
       </div>}

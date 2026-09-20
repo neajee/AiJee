@@ -29,9 +29,7 @@ export function TaskOutputPanel() {
   const startHeightRef = useRef(outputPanelHeight);
   useEffect(() => {
     if (selectedTaskId && logScrollRef.current && !minimized) {
-      setTimeout(() => logScrollRef.current?.scrollToEnd({
-        animated: false
-      }), 50);
+      requestAnimationFrame(() => logScrollRef.current?.scrollTo({ top: logScrollRef.current.scrollHeight }));
     }
   }, [selectedTaskId, logsById, minimized]);
   const panResponder = useRef(PanResponder.create({
@@ -95,7 +93,7 @@ export function TaskOutputPanel() {
         </button>
       </div>;
   }
-  return <div className={"  h-0"}>
+  return <div className="flex min-h-40 flex-col overflow-hidden border-t border-border bg-card" style={{ height: outputPanelHeight }}>
       <div {...panResponder.panHandlers} className="flex flex-col">
         <div />
       </div>

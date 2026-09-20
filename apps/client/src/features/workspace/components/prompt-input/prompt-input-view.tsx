@@ -154,7 +154,7 @@ export function PromptInputView({
   closeNarrowSheet
 }: PromptInputViewProps) {
   const formatQueueBehaviorLabel = (behavior: QueueBehavior) => behavior === 'followUp' ? 'Follow up' : 'Steer';
-  return <div className={"  opacity-100 pb-0"}>
+  return <div className="w-full opacity-100">
       {/* Send error */}
       {!!errorMessage && <button onClick={onClearError}>
           <span>

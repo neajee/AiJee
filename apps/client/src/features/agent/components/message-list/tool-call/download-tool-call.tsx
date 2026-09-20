@@ -1,6 +1,5 @@
 import { memo } from "react";
-import { Colors, Fonts } from "@/constants/theme";
-import { useThemeTokens } from "@/hooks/use-theme-tokens";
+import { Download } from "lucide-react";
 import type { ToolCallInfo } from "../../../component-types.ts";
 import { parseToolArguments } from "../../../utils/message-list";
 interface DownloadToolCallProps {
@@ -8,40 +7,19 @@ interface DownloadToolCallProps {
   isDark: boolean;
 }
 export const DownloadToolCall = memo(function DownloadToolCall({
-  tc,
-  isDark
+  tc
 }: DownloadToolCallProps) {
-  const colors = useThemeTokens();
   const parsed = parseToolArguments(tc.arguments);
   const url = parsed.url as string || "";
-  return <div>
-      <div className="flex flex-col">
-        <span className={"  text-text-secondary"}>
+    return <div>
+      <div className="flex min-w-0 items-center gap-1.5 py-1">
+        <Download size={12} strokeWidth={1.8} className="shrink-0 text-text-tertiary" />
+        <span className="shrink-0 text-xs font-medium text-text-secondary">
           Download
         </span>
-        {url ? <span className={"  text-text-tertiary"}>
+        {url ? <span className="min-w-0 flex-1 truncate font-mono text-meta text-text-tertiary">
             {url}
           </span> : null}
       </div>
-
     </div>;
 });
-const styles = {
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 6,
-    paddingTop: 4,
-    paddingBottom: 4
-  },
-  label: {
-    fontSize: 12,
-    fontFamily: Fonts.sansMedium,
-    fontWeight: "500"
-  },
-  url: {
-    fontSize: 11,
-    fontFamily: Fonts.mono,
-    flex: 1
-  }
-} as const;

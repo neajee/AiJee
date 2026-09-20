@@ -21,17 +21,17 @@ export function EffortPicker({
   popoverIndex,
   handleSelectThinking
 }: EffortPickerProps) {
-  return <div className="flex flex-col">
-      <button onClick={() => isWideScreen ? toggleDropdown('effort') : onOpenNarrowSheet('effort')} disabled={toolbarDisabled || thinkingDisabled} role="button" aria-label={thinkingDisabled ? `Thinking not supported by ${currentModel?.name ?? 'this model'}` : `Thinking: ${thinkingLabel}. Press to change.`}>
-        <span className={"  text-text-secondary"}>{thinkingLabel}</span>
-        {!thinkingDisabled && <ChevronDown size={14} color={theme.textMuted} strokeWidth={1.8} />}
+  return <div className="relative min-w-0">
+      <button className="flex h-7 min-w-0 items-center gap-1.5 rounded-md px-2 text-xs text-text-secondary hover:bg-hover disabled:opacity-40" onClick={() => isWideScreen ? toggleDropdown('effort') : onOpenNarrowSheet('effort')} disabled={toolbarDisabled || thinkingDisabled} role="button" aria-label={thinkingDisabled ? `Thinking not supported by ${currentModel?.name ?? 'this model'}` : `Thinking: ${thinkingLabel}. Press to change.`}>
+        <span className="min-w-0 flex-1 truncate">{thinkingLabel}</span>
+        {!thinkingDisabled && <ChevronDown className="shrink-0" size={14} color={theme.textMuted} strokeWidth={1.8} />}
       </button>
-      {isWideScreen && activeDropdown === 'effort' && <div role="menu" aria-label="Thinking level selection" className={"  bg-surface border-border opacity-100"}>
+      {isWideScreen && activeDropdown === 'effort' && <div role="menu" aria-label="Thinking level selection" className="absolute bottom-full right-0 z-50 mb-1 min-w-32 rounded-md border border-border bg-card p-1 shadow-xl">
         {effortOptions.map((item, index) => {
         const highlighted = index === popoverIndex;
         const active = item.level === thinkingPreference;
-        return <button key={item.level} onClick={() => handleSelectThinking(item.level)} role="menuitem" aria-label={item.description ? `${item.label} — ${item.description}` : item.label}>
-            <div className="flex flex-col"><span>{item.label}</span></div>
+        return <button className={`flex h-7 w-full items-center rounded px-1.5 text-left text-xs hover:bg-hover ${active ? 'bg-active' : ''}`} key={item.level} onClick={() => handleSelectThinking(item.level)} role="menuitem" aria-label={item.description ? `${item.label} — ${item.description}` : item.label}>
+            <span>{item.label}</span>
           </button>;
       })}
       </div>}

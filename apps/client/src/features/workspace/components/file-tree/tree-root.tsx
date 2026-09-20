@@ -1,10 +1,8 @@
-import { useFileList, type FsEntry } from '@aijee/client-sdk';
+import { useFileList } from '@aijee/client-sdk';
 import { applyFilter } from '../../utils/file-tree';
-import type { FileTreeNodeProps } from './component-types';
 import { FileTreeNode } from './tree-node';
 export function FileTreeRoot({
   rootPath,
-  textMuted,
   onFilePress,
   expandedDirs,
   onToggleDir,
@@ -12,7 +10,6 @@ export function FileTreeRoot({
   selectedPath
 }: {
   rootPath: string;
-  textMuted: string;
   onFilePress: (path: string) => void;
   expandedDirs: Set<string>;
   onToggleDir: (path: string) => void;
@@ -25,15 +22,17 @@ export function FileTreeRoot({
     error
   } = useFileList(rootPath);
   if (isLoading) {
-    return <span className={"mt-[32px]"} />;
+    return <div className="flex justify-center py-8">
+        <span className="size-4 animate-spin rounded-full border-2 border-border border-t-text-tertiary" />
+      </div>;
   }
   if (error) {
-    return <span>
+    return <span className="mt-8 block px-3 text-center text-[13px] text-text-tertiary">
         Failed to load: {error}
       </span>;
   }
   if (!entries || entries.length === 0) {
-    return <span>
+    return <span className="mt-8 block px-3 text-center text-[13px] text-text-tertiary">
         Empty directory
       </span>;
   }
@@ -42,9 +41,9 @@ export function FileTreeRoot({
     return a.name.localeCompare(b.name);
   });
   if (query && sorted.length === 0) {
-    return <span>No matches</span>;
+    return <span className="mt-8 block px-3 text-center text-[13px] text-text-tertiary">No matches</span>;
   }
-  return <div className={"flex-1"}>
+  return <div className="flex flex-col">
       {sorted.map(entry => <FileTreeNode key={entry.path} entry={entry} depth={0} onFilePress={onFilePress} expandedDirs={expandedDirs} onToggleDir={onToggleDir} query={query} selectedPath={selectedPath} />)}
     </div>;
 }

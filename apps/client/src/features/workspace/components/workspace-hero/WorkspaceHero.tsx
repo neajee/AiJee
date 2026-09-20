@@ -67,13 +67,13 @@ export function WorkspaceHero() {
       useNativeDriver: true
     })]).start();
   }, [fadeAnim, slideAnim, markScale]);
-  return <div className="flex flex-col">
-      <div className={"  opacity-100"}>
-        <div className="flex flex-col">
+  return <div className="flex w-full flex-col items-center">
+      <div className="flex flex-col items-center gap-4 text-center opacity-100">
+        <div className="flex items-center justify-center">
           <AiJeeLogo size={isWideScreen ? 64 : 52} color={textPrimary} opacity={isDark ? 0.92 : 0.88} />
         </div>
 
-        <span className="text-lg leading-6 text-foreground">
+        <span className="text-xl font-medium leading-7 tracking-tight text-foreground">
           {greeting}
         </span>
       </div>

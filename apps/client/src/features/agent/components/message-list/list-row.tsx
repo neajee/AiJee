@@ -1,5 +1,4 @@
 import { memo } from "react";
-import Animated, { FadeIn, FadeOut } from "@/styles/motion";
 import type { ChatMessage } from "../../component-types.ts";
 import { SystemMessage } from "./system-message";
 import { UserMessage } from "./user-message";
@@ -31,7 +30,7 @@ export const ListRow = memo(function ListRow({
   onFork: (entryId: string) => void;
   forkingEntryId: string | null;
 }) {
-  return <div className="flex flex-col">
+  return <div className="mx-auto flex w-full max-w-[880px] flex-col px-5 py-3">
       {item.kind === "turn" ? <TurnBlock turn={item} isDark={isDark} active={active} onFork={onFork} forkingEntryId={forkingEntryId} /> : item.message.role === "user" ? <UserMessage message={item.message} isDark={isDark} editing={editing?.entryId === (item.message.entryId ?? item.message.id)} editText={editing?.entryId === (item.message.entryId ?? item.message.id) ? editing?.text ?? "" : item.message.text} onEdit={item.message.entryId ? () => onEdit(item.message) : undefined} onChangeEdit={onChangeEdit} onCancelEdit={onCancelEdit} onSubmitEdit={onSubmitEdit} /> : <SystemMessage message={item.message} isDark={isDark} />}
     </div>;
 });

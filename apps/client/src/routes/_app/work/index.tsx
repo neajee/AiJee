@@ -58,16 +58,16 @@ export default function WorkIndex() {
     }
   }, [client, router]);
   const editorBg = colors.background;
-  return <div className={"  bg-background pb-0"}>
-      <div>
-        <div className="flex flex-col">
+  return <div className="flex min-h-0 flex-1 flex-col bg-background">
+      <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-5 px-6 py-8">
+        <div className="flex w-full max-w-[680px] flex-col items-center gap-5">
           {sending ? <div className="flex flex-col">
               <span className="size-3 animate-spin" />
               <span className={"  text-text-secondary"}>
                 Starting Work…
               </span>
             </div> : <WorkspaceHero />}
-          <PromptInput onSend={handleSend} disabled={sending} sessionReady={false} errorMessage={errorMessage} onClearError={() => setErrorMessage(null)} />
+          <div className="w-full max-w-[760px]"><PromptInput onSend={handleSend} disabled={sending} sessionReady={false} errorMessage={errorMessage} onClearError={() => setErrorMessage(null)} /></div>
         </div>
       </div>
     </div>;

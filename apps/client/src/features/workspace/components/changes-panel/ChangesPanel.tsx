@@ -12,11 +12,7 @@ export function ChangesPanel({
   ...props
 }: ChangesPanelProps = {}) {
   const {
-    textPrimary,
-    textMuted,
-    surfaceBg,
-    dividerColor,
-    hoverBg
+    textMuted
   } = useChangesTheme();
   const controller = useChangesPanelController(props);
   const {
@@ -52,16 +48,12 @@ export function ChangesPanel({
     unstage,
     discard
   } = controller;
-  return <div>
-      {activeExtraTab ? <div className="flex flex-col">{renderExtraTab?.(activeExtraTab)}</div> : <div className="flex flex-col">
-          <div {...false ? {
-        pointerEvents: currentTab === 'files' ? 'auto' as const : 'none' as const
-      } : {}}>
+  return <div className="flex min-h-0 flex-1 flex-col">
+      {activeExtraTab ? <div className="flex min-h-0 flex-1 flex-col">{renderExtraTab?.(activeExtraTab)}</div> : <div className="flex min-h-0 flex-1 flex-col">
+          <div className="flex min-h-0 flex-1 flex-col">
             {cwd ? <FileTree rootPath={cwd} viewingFile={viewingFile} onViewFile={setViewingFile} expandedDirs={expandedDirs} onToggleDir={handleToggleDir} /> : <span>No workspace selected</span>}
           </div>
-          {isGitRepo && <div {...false ? {
-        pointerEvents: currentTab === 'git' ? 'auto' as const : 'none' as const
-      } : {}}>
+          {isGitRepo && <div className="shrink-0">
               <div>
                 <button onClick={() => setChangesOpen(open => !open)} role="button" aria-label="Toggle changes">
                   <GitCompare size={12} color={textMuted} strokeWidth={2} />

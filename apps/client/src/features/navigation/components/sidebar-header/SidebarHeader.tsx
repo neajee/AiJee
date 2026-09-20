@@ -30,10 +30,10 @@ export function SidebarHeader() {
   }, []);
   const iconColor = isDark ? "#cdc8c5" : colors.textSecondary;
   const hoverBg = isDark ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.05)";
-  return <div className="flex flex-col">
-      <ServerSwitcher />
+  return <div className="flex h-10 items-center gap-1 px-2">
+      <div className="min-w-0 flex-1"><ServerSwitcher /></div>
 
-      <button onClick={() => setPaletteVisible(true)} role="button" aria-label="Search">
+      <button className="flex size-8 shrink-0 items-center justify-center rounded-md hover:bg-hover" onClick={() => setPaletteVisible(true)} role="button" aria-label="Search">
         <Search size={16} color={iconColor} strokeWidth={1.8} />
       </button>
 

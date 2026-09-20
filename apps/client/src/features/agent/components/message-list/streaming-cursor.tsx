@@ -1,5 +1,5 @@
 import { memo, useEffect } from "react";
-import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming, withDelay, Easing } from "@/styles/motion";
+import { useSharedValue, withRepeat, withSequence, withTiming, withDelay, Easing } from "@/styles/motion";
 interface StreamingCursorProps {
   color?: string;
 }
@@ -33,12 +33,6 @@ function Dot({
       easing: Easing.in(Easing.ease)
     })), -1));
   }, [index, opacity, translateY]);
-  const style = useAnimatedStyle(() => ({
-    opacity: opacity.value,
-    transform: [{
-      translateY: translateY.value
-    }]
-  }));
   return <div className="rounded-full bg-current" style={{ width: SIZE, height: SIZE, color, opacity: opacity.value, transform: `translateY(${translateY.value}px)` }} />;
 }
 export const StreamingCursor = memo(function StreamingCursor({
@@ -50,14 +44,3 @@ export const StreamingCursor = memo(function StreamingCursor({
     }, (_, i) => <Dot key={i} index={i} color={color} />)}
     </div>;
 });
-const styles = {
-  container: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 3,
-    paddingTop: 4,
-    paddingBottom: 4,
-    paddingLeft: 2,
-    paddingRight: 2
-  }
-} as const;

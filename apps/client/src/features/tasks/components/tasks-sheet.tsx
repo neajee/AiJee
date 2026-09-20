@@ -1,16 +1,5 @@
-import { useCallback, useEffect } from 'react';
-import { useSafeAreaInsets } from "@/platform/browser";
-import Animated, { Easing, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from "@/styles/motion";
-import { Gesture } from "@/styles/motion";
-import { Colors, Fonts } from '@/constants/theme';
-import { ABSOLUTE_FILL_STYLE } from '@/constants/layout';
-import { useColorScheme } from '@/hooks/use-color-scheme';
+import { AppSheet } from '@/components/ui';
 import { TasksPanelContent } from './tasks-panel/content';
-const SHEET_HEIGHT = 480;
-const TIMING_CONFIG = {
-  duration: 280,
-  easing: Easing.out(Easing.cubic)
-};
 interface TasksSheetProps {
   visible: boolean;
   onClose: () => void;
@@ -19,108 +8,7 @@ export function TasksSheet({
   visible,
   onClose
 }: TasksSheetProps) {
-  const insets = useSafeAreaInsets();
-  const colorScheme = useColorScheme() ?? 'light';
-  const colors = Colors[colorScheme];
-  const isDark = colorScheme === 'dark';
-  const textPrimary = isDark ? '#fefdfd' : '#1a1a1a';
-  const translateY = useSharedValue(SHEET_HEIGHT);
-  const overlayOpacity = useSharedValue(0);
-  useEffect(() => {
-    if (visible) {
-      translateY.value = withTiming(0, TIMING_CONFIG);
-      overlayOpacity.value = withTiming(1, TIMING_CONFIG);
-    } else {
-      translateY.value = withTiming(SHEET_HEIGHT, TIMING_CONFIG);
-      overlayOpacity.value = withTiming(0, TIMING_CONFIG);
-    }
-  }, [visible, translateY, overlayOpacity]);
-  const dismiss = useCallback(() => {
-    translateY.value = withTiming(SHEET_HEIGHT, TIMING_CONFIG);
-    overlayOpacity.value = withTiming(0, TIMING_CONFIG, () => {
-      runOnJS(onClose)();
-    });
-  }, [translateY, overlayOpacity, onClose]);
-  const panGesture = Gesture.Pan().onUpdate(e => {
-    if (e.translationY > 0) {
-      translateY.value = e.translationY;
-    }
-  }).onEnd(e => {
-    if (e.translationY > 100 || e.velocityY > 500) {
-      runOnJS(dismiss)();
-    } else {
-      translateY.value = withTiming(0, TIMING_CONFIG);
-    }
-  });
-  const sheetStyle = useAnimatedStyle(() => ({
-    transform: [{
-      translateY: translateY.value
-    }]
-  }));
-  const overlayStyle = useAnimatedStyle(() => ({
-    opacity: overlayOpacity.value,
-    pointerEvents: overlayOpacity.value > 0 ? 'auto' as const : 'none' as const
-  }));
-  return <div {...false ? {
-    pointerEvents: visible ? 'auto' as const : 'none' as const
-  } : {}}>
-      <div className={"  bg-black/50"}>
-        <button className="inline-flex items-center" onClick={dismiss} />
-      </div>
-
-      <div className={"  pb-[var(--bottom-inset)]"}>
-        <div>
-          <div className="flex flex-col">
-            <div className={"  bg-muted"} />
-          </div>
-        </div>
-
-        <span>Tasks</span>
-
-        <div className="flex flex-col">
-          <TasksPanelContent />
-        </div>
-      </div>
-    </div>;
+  return <AppSheet visible={visible} onClose={onClose} title="Tasks" height={480}>
+    <TasksPanelContent />
+  </AppSheet>;
 }
-const styles = {
-  root: {
-    ...ABSOLUTE_FILL_STYLE,
-    zIndex: 100
-  },
-  overlay: {
-    ...ABSOLUTE_FILL_STYLE
-  },
-  sheet: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    borderTopLeftRadius: 14,
-    borderTopRightRadius: 14,
-    maxHeight: SHEET_HEIGHT,
-    height: SHEET_HEIGHT
-  },
-  handleBar: {
-    alignItems: 'center',
-    paddingTop: 10,
-    paddingBottom: 6
-  },
-  handle: {
-    width: 36,
-    height: 4,
-    borderRadius: 2
-  },
-  title: {
-    fontSize: 15,
-    fontFamily: Fonts.sansSemiBold,
-    fontWeight: '600',
-    paddingLeft: 16,
-    paddingRight: 16,
-    paddingBottom: 8
-  },
-  content: {
-    flex: 1,
-    overflow: 'hidden'
-  }
-} as const;

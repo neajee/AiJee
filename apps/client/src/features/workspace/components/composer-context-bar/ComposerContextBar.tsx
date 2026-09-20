@@ -39,7 +39,7 @@ export function ComposerContextBar() {
   } = controller;
   if (!workspace) return null;
   return <>
-      <div className="flex flex-col" {...{
+      <div className="flex min-w-0 items-center" {...{
       'data-composer-context': true
     } as any}>
         <ContextDropdown theme={theme} open={open} anim={anim} branches={branches} branchesLoading={branchesLoading} busy={busy} workspaces={workspaces} selectedWorkspaceId={selectedWorkspaceId} activeServer={activeServer} servers={servers} activeServerId={activeServerId} currentBranch={currentBranch} isGitRepo={git.isGitRepo} localBranches={localBranches} onToggle={toggle} onSelectProject={handleSelectProject} onSelectServer={handleSelectServer} onSelectBranch={handleSelectBranch} onAddWorkspace={() => {

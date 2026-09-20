@@ -1,17 +1,7 @@
-import { useCallback, useEffect, useRef } from 'react';
-import { useSafeAreaInsets } from "@/platform/browser";
-import Animated, { Easing, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from "@/styles/motion";
-import { Gesture } from "@/styles/motion";
+import { useEffect, useRef } from 'react';
 import { Circle, X } from 'lucide-react';
-import { Colors, Fonts } from '@/constants/theme';
-import { ABSOLUTE_FILL_STYLE } from '@/constants/layout';
-import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useTaskOutputData } from '../../hooks/use-task-output-data';
 import { useSheetHeight } from '@/features/navigation/hooks/use-sheet-height';
-const TIMING_CONFIG = {
-  duration: 280,
-  easing: Easing.out(Easing.cubic)
-};
 interface TaskOutputSheetProps {
   visible: boolean;
   onClose: () => void;
@@ -20,14 +10,6 @@ export function TaskOutputSheet({
   visible,
   onClose
 }: TaskOutputSheetProps) {
-  const insets = useSafeAreaInsets();
-  const colorScheme = useColorScheme() ?? 'light';
-  const colors = Colors[colorScheme];
-  const isDark = colorScheme === 'dark';
-  const textPrimary = isDark ? '#fefdfd' : '#1a1a1a';
-  const textMuted = isDark ? '#cdc8c5' : colors.textTertiary;
-  const borderColor = isDark ? '#3b3a39' : 'rgba(0,0,0,0.12)';
-  const logBg = isDark ? '#1a1a1a' : '#F5F5F5';
   const {
     selectedTaskId,
     selectedInstance,
@@ -43,89 +25,32 @@ export function TaskOutputSheet({
     min: 320,
     max: 440
   });
-  const translateY = useSharedValue(sheetHeight);
-  const overlayOpacity = useSharedValue(0);
-  useEffect(() => {
-    if (visible) {
-      translateY.value = withTiming(0, TIMING_CONFIG);
-      overlayOpacity.value = withTiming(1, TIMING_CONFIG);
-    } else {
-      translateY.value = withTiming(sheetHeight, TIMING_CONFIG);
-      overlayOpacity.value = withTiming(0, TIMING_CONFIG);
-    }
-  }, [visible, translateY, overlayOpacity, sheetHeight]);
   useEffect(() => {
     if (selectedTaskId && logScrollRef.current) {
-      setTimeout(() => logScrollRef.current?.scrollToEnd({
-        animated: false
-      }), 50);
+      requestAnimationFrame(() => logScrollRef.current?.scrollTo({ top: logScrollRef.current.scrollHeight }));
     }
   }, [selectedTaskId, logsById]);
-  const dismiss = useCallback(() => {
-    translateY.value = withTiming(sheetHeight, TIMING_CONFIG);
-    overlayOpacity.value = withTiming(0, TIMING_CONFIG, () => {
-      runOnJS(onClose)();
-    });
-  }, [translateY, overlayOpacity, onClose]);
-  const panGesture = Gesture.Pan().onUpdate(e => {
-    if (e.translationY > 0) {
-      translateY.value = e.translationY;
-    }
-  }).onEnd(e => {
-    if (e.translationY > 100 || e.velocityY > 500) {
-      runOnJS(dismiss)();
-    } else {
-      translateY.value = withTiming(0, TIMING_CONFIG);
-    }
-  });
-  const sheetStyle = useAnimatedStyle(() => ({
-    transform: [{
-      translateY: translateY.value
-    }]
-  }));
-  const overlayStyle = useAnimatedStyle(() => ({
-    opacity: overlayOpacity.value,
-    pointerEvents: overlayOpacity.value > 0 ? 'auto' as const : 'none' as const
-  }));
   const statusColor = selectedInstance?.status === 'running' ? '#34C759' : selectedInstance?.status === 'failed' ? '#FF3B30' : '#8E8E93';
-  return <div {...false ? {
-    pointerEvents: visible ? 'auto' as const : 'none' as const
-  } : {}}>
-      <div className={"  bg-black/50"}>
-        <button className="inline-flex items-center" onClick={dismiss} />
-      </div>
-
-      <div className={"  pb-[var(--bottom-inset)] h-0 max-h-0"}>
-        <div>
-          <div className="flex flex-col">
-            <div className={"  bg-muted"} />
-          </div>
-        </div>
-
-        <div>
-          <div className="flex flex-col">
+  if (!visible) return null;
+  return <div className="fixed inset-0 z-50 bg-black/50" role="dialog" aria-modal="true">
+      <button className="absolute inset-0 size-full cursor-default" aria-label="Close task output" onClick={onClose} />
+      <section className="absolute inset-x-0 bottom-0 flex flex-col overflow-hidden rounded-t-2xl bg-card shadow-2xl" style={{ height: sheetHeight }}>
+        <header className="flex shrink-0 items-center gap-2 border-b border-border px-4 py-3">
+          <div className="min-w-0 flex-1">
             {selectedInstance ? <>
-                <Circle size={8} color={statusColor} fill={statusColor} strokeWidth={0} />
-                <span>
-                  {selectedInstance.label}
-                </span>
-                <span>
-                  {selectedInstance.command}
-                </span>
-              </> : <span>Task Output</span>}
+              <div className="flex items-center gap-2"><Circle size={8} color={statusColor} fill={statusColor} strokeWidth={0} /><span className="font-medium">{selectedInstance.label}</span></div>
+              <p className="truncate text-xs text-muted-foreground">{selectedInstance.command}</p>
+            </> : <span className="font-medium">Task Output</span>}
           </div>
-          <button onClick={dismiss} className="inline-flex items-center">
-            <X size={14} color={textMuted} strokeWidth={2} />
-          </button>
-        </div>
-
-        <div ref={logScrollRef}>
+          <button onClick={onClose} className="rounded p-1 hover:bg-hover" aria-label="Close task output"><X size={18} /></button>
+        </header>
+        <div ref={logScrollRef} className="min-h-0 flex-1 overflow-auto whitespace-pre-wrap bg-muted/40 p-4 font-mono text-xs">
           {selectedLogs.length === 0 ? <span>
               {selectedInstance ? 'No output yet...' : 'Select a running task to view output'}
             </span> : selectedLogs.map((line, i) => <span key={i}>
                 {line}
               </span>)}
         </div>
-      </div>
+      </section>
     </div>;
 }

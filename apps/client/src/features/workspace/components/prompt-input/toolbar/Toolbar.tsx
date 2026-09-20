@@ -31,12 +31,12 @@ export function ToolbarView(controller: ToolbarController) {
       </div>;
   }
   if (!agentState && !currentModel) return <>{skeleton}</>;
-  return <div ref={toolbarRef} className={"  z-[10]"}>
-      <div className={"  bg-surface border-border"}>
+  return <div ref={toolbarRef} className="relative z-10 min-w-0">
+      <div className="flex min-w-0 items-center gap-1">
         <ModelPicker {...controller} />
         <EffortPicker {...controller} />
-        {!inline && <div className="flex flex-col" />}
-        {showTaskSelector && appMode === 'code' && isWideScreen && <div className="flex flex-col"><TaskSelector placement="above" /></div>}
+        {!inline && <div className="h-5 border-l border-border" />}
+        {showTaskSelector && appMode === 'code' && isWideScreen && <div className="min-w-0"><TaskSelector placement="above" /></div>}
         <ModeToggle {...controller} />
       </div>
     </div>;

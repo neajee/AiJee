@@ -16,9 +16,16 @@ function targetFor(pathname) {
 function upstreamHeaders(requestFromClient, targetPort) {
   const headers = {
     ...requestFromClient.headers,
-    host: `127.0.0.1:${targetPort}`,
     "x-forwarded-for": requestFromClient.socket.remoteAddress ?? "",
+    "x-forwarded-host": requestFromClient.headers.host ?? `127.0.0.1:${listenPort}`,
+    "x-forwarded-proto": "http",
   };
+  // The runtime uses Origin + Host to distinguish an owner opening its local
+  // UI from a remote device. Preserve the public host for API requests; Vite
+  // still needs its internal host for HMR and asset delivery.
+  headers.host = targetPort === apiPort
+    ? requestFromClient.headers.host ?? `127.0.0.1:${listenPort}`
+    : `127.0.0.1:${targetPort}`;
   if (targetPort === frontendPort) {
     if (headers.origin) headers.origin = `http://127.0.0.1:${frontendPort}`;
     if (headers.referer) headers.referer = `http://127.0.0.1:${frontendPort}/`;

@@ -20,5 +20,13 @@ export function AiJeeLogo({
   style
 }: AiJeeLogoProps) {
   const box = Math.round(size * CANVAS_TO_MARK);
-  return <img src={MARK} alt="AiJee" className="object-contain" style={{ width: box, height: box, opacity, ...style }} />;
+  return <span role="img" aria-label="AiJee" className="inline-block shrink-0 bg-foreground [mask-position:center] [mask-repeat:no-repeat] [mask-size:contain]" style={{
+    width: box,
+    height: box,
+    opacity,
+    backgroundColor: color ?? 'currentColor',
+    WebkitMaskImage: `url(${MARK})`,
+    maskImage: `url(${MARK})`,
+    ...style
+  }} />;
 }

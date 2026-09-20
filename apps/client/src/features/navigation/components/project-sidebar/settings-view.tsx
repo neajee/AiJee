@@ -15,11 +15,10 @@ export function SettingsSidebar() {
   const selectedWorkspaceId = useWorkspaceStore(s => s.selectedWorkspaceId);
   const activeSlug = pathname.match(/^\/settings\/([^/]+)/)?.[1] ?? SETTINGS_SECTIONS[0]?.slug;
   const handleBack = () => router.replace(selectedWorkspaceId ? `/workspace/${selectedWorkspaceId}` : "/");
-  return <div className={"  bg-background"}>
-      <div><SidebarHeader /></div>
-      <div className="flex flex-col"><SidebarRow icon={<ChevronLeft size={15} color={colors.textSecondary} strokeWidth={1.8} />} label="返回" onClick={handleBack} isDark={isDark} /></div>
-      <div className="flex flex-col"><span className={"  text-foreground"}>设置</span></div>
-      <div className="flex flex-col">
+  return <div className="flex h-full w-full flex-col overflow-y-auto bg-background text-sm">
+      <div className="shrink-0 border-b border-border"><SidebarHeader /></div>
+      <div className="flex shrink-0 flex-col px-2 pt-2"><SidebarRow icon={<ChevronLeft size={15} color={colors.textSecondary} strokeWidth={1.8} />} label="返回" onClick={handleBack} isDark={isDark} /></div>
+      <div className="flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto px-2 pb-3 pt-1">
         {SETTINGS_SECTIONS.map(section => {
         const Icon = section.icon;
         return <SidebarRow key={section.slug} icon={<Icon size={15} color={section.slug === activeSlug ? colors.text : colors.textSecondary} strokeWidth={1.8} />} label={section.title} isActive={section.slug === activeSlug} onClick={() => router.push(`/settings/${section.slug}` as any)} isDark={isDark} />;
