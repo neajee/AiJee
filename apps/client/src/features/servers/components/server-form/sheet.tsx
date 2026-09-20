@@ -87,9 +87,7 @@ export function ServerFormSheet({
     opacity: overlayOpacity.value,
     pointerEvents: overlayOpacity.value > 0 ? 'auto' as const : 'none' as const
   }));
-  return <div visible={visible} transparent animationType="none" onRequestClose={() => {
-    if (!loading) dismiss();
-  }}>
+  return <div hidden={!visible}>
       <div className="flex flex-col">
         <div className={"  bg-black/50"}>
           <button className="inline-flex items-center" onClick={loading ? undefined : dismiss} />

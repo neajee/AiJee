@@ -132,7 +132,7 @@ export function NewWorkspaceDialogView({
 
   // Narrow: bottom sheet
   if (!isWideScreen) {
-    return <div visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+    return <div hidden={!visible}>
         <div className={"flex-1"} behavior={false ? 'padding' : undefined}>
           <button className="inline-flex items-center" onClick={onClose}>
             <button className={"  pb-0"} onClick={e => e.stopPropagation()}>
@@ -150,7 +150,7 @@ export function NewWorkspaceDialogView({
   }
 
   // Desktop: centered dialog
-  return <div visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+  return <div hidden={!visible}>
       <button className="inline-flex items-center" onClick={onClose}>
         <button onClick={e => e.stopPropagation()}>
           {showSuggestions && <button className={"  z-[5]"} onClick={dismissSuggestions} />}

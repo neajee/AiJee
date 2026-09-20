@@ -17,18 +17,14 @@ export const ToolResultImages = memo(function ToolResultImages({
         {images.map((img, i) => {
         const uri = img.data.startsWith("data:") ? img.data : `data:${img.mimeType};base64,${img.data}`;
         return <button key={i} onClick={() => openPreview(uri)}>
-              <img src={{
-            uri
-          }} className="flex flex-col" resizeMode="contain" />
+              <img src={uri} className="max-w-full object-contain" />
             </button>;
       })}
       </div>
-      {previewUri && <div visible transparent animationType="fade" onRequestClose={closePreview}>
+      {previewUri && <div>
           <button className="inline-flex items-center" onClick={closePreview}>
             <div className="flex flex-col">
-              <img src={{
-            uri: previewUri
-          }} className="flex flex-col" resizeMode="contain" />
+              <img src={previewUri} className="max-w-full max-h-[80vh] object-contain" />
             </div>
           </button>
         </div>}

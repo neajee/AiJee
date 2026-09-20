@@ -87,7 +87,7 @@ export function ProjectSidebarView({
       ...prev,
       visible: false
     }))} />
-      <div visible={!!deleteWorkspace} transparent animationType="fade" onRequestClose={() => setDeleteWorkspace(null)}>
+      <div hidden={!deleteWorkspace}>
         <button className="inline-flex items-center" onClick={() => setDeleteWorkspace(null)}>
           <button role="alert" className={"  bg-surface-raised border-border"} onClick={event => event.stopPropagation()}>
             <span className={"  text-foreground"}>删除项目？</span>

@@ -53,7 +53,7 @@ export const EditToolCall = memo(function EditToolCall({
           <CodePreview code={diffText} isDark={isDark} maxHeight={TOOL_BODY_MAX_HEIGHT} language="diff" showLineNumbers={false} />
         </div>
       </ToolBody>
-      <div visible={fullscreenOpen} transparent animationType="none" onRequestClose={closeFullscreen}>
+      <div hidden={!fullscreenOpen}>
         <div className="flex flex-col">
           <div className={"  opacity-100"} />
           <button className="inline-flex items-center" onClick={closeFullscreen} />

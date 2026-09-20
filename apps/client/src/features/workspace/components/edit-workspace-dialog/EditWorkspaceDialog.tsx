@@ -35,7 +35,7 @@ export function EditWorkspaceDialog({
     onClose
   };
   if (!isWideScreen) {
-    return <div visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+    return <div hidden={!visible}>
         <div className={"flex-1"} behavior={false ? 'padding' : undefined}>
           <button className="inline-flex items-center" onClick={onClose}>
             <button className={"  pb-0"} onClick={event => event.stopPropagation()}>
@@ -49,7 +49,7 @@ export function EditWorkspaceDialog({
         </div>
       </div>;
   }
-  return <div visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+  return <div hidden={!visible}>
       <button className="inline-flex items-center" onClick={onClose}>
         <button onClick={event => event.stopPropagation()}>
           <div className="flex flex-col">

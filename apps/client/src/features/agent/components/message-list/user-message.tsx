@@ -60,9 +60,7 @@ export const UserMessage = memo(function UserMessage({
   return <div className="flex flex-col">
       <div className={"  bg-surface-raised"}>
         {images.length > 0 && <div horizontal className="flex flex-col">
-            {images.map(img => <img key={img.id} src={{
-          uri: `data:${img.mimeType || "image/png"};base64,${img.data}`
-        }} className="flex flex-col" resizeMode="cover" />)}
+            {images.map(img => <img key={img.id} src={`data:${img.mimeType || "image/png"};base64,${img.data}`} className="max-w-full object-cover" />)}
           </div>}
         {editing ? <>
             <input autoFocus multiline value={editText} onChange={event => onChangeEdit(event.target.value)} className={"  text-foreground border-border"} />

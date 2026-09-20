@@ -120,7 +120,7 @@ export function ServersView({
       if (!loginLoading) setFormVisible(false);
     }} onSave={handleSave} initial={editingServer} isDark={isDark} loading={loginLoading} error={loginError} />
       <QrScanner visible={qrVisible} onClose={() => setQrVisible(false)} onNeedNewWorkspace={() => router.replace("/")} />
-      <div transparent visible={!!menuServerId} animationType="fade" onRequestClose={() => setMenuServerId(null)}>
+      <div hidden={!menuServerId}>
         <button className="inline-flex items-center" onClick={() => {
         setMenuServerId(null);
         setMenuPosition(null);
@@ -146,7 +146,7 @@ export function ServersView({
         })()}
         </button>
       </div>
-      <div visible={!!codeDialog} transparent animationType="fade" onRequestClose={() => setCodeDialog(null)}>
+      <div hidden={!codeDialog}>
         <button className="inline-flex items-center" onClick={() => setCodeDialog(null)} aria-label="关闭授权对话框">
           <button onClick={e => e.stopPropagation()}>
             <div className="flex flex-col">

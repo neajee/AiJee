@@ -21,7 +21,7 @@ export function WorkspaceContextMenu(props: WorkspaceContextMenuProps) {
   const menuBorder = isDark ? '#3b3a39' : 'rgba(0,0,0,0.12)';
   const hoverBg = isDark ? '#333' : '#F0F0F0';
   const separator = <div />;
-  return <div visible transparent animationType="none" onRequestClose={props.onClose} statusBarTranslucent>
+  return <div>
       <button className="inline-flex items-center" onClick={props.onClose} aria-label="关闭菜单" />
       <div>
         {props.onNewSession && <MenuItem icon={SquarePen} label="新对话" color={textPrimary} hoverBg={hoverBg} onClick={() => {

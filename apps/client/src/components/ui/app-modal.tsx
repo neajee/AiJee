@@ -11,17 +11,15 @@ export function AppModal({
   visible: boolean;
   onClose: () => void;
   children: ReactNode;
-  contentStyle?: React.CSSProperties<React.CSSProperties>;
+  contentStyle?: React.CSSProperties | React.CSSProperties[];
   closeOnBackdrop?: boolean;
 }) {
   const isDark = (useColorScheme() ?? 'light') === 'dark';
   const contentStyles = Array.isArray(contentStyle) ? contentStyle : contentStyle ? [contentStyle] : [];
-  return <div visible={visible} transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent>
-      <div className="flex flex-col">
-        <button onClick={closeOnBackdrop ? onClose : undefined} aria-label="关闭弹窗" />
-        <button onClick={event => event.stopPropagation()}>
-          {children}
-        </button>
+  if (!visible) return null;
+  return <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4" onClick={closeOnBackdrop ? onClose : undefined}>
+      <div className="max-h-[calc(100vh-2rem)] w-full max-w-lg overflow-auto rounded-lg border border-border bg-card p-4 shadow-xl" style={Object.assign({}, ...contentStyles)} onClick={event => event.stopPropagation()}>
+        {children}
       </div>
     </div>;
 }

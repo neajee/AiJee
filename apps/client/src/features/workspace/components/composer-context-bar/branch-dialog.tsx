@@ -21,7 +21,7 @@ export function BranchDialog({
   onCreate
 }: BranchDialogProps) {
   const theme = usePromptTheme();
-  return <div visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+  return <div hidden={!visible}>
       <button className="inline-flex items-center" onClick={onClose}>
         <button className={"  bg-surface border-border"} onClick={event => event.stopPropagation()}>
           <span className={"  text-foreground"}>新建分支</span>

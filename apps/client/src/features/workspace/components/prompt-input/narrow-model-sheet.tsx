@@ -107,7 +107,7 @@ function NarrowModelSheetComponent({
       models: grouped.get(p)!
     }));
   })();
-  return <div visible={visible} transparent animationType="none" onRequestClose={handleClose}>
+  return <div hidden={!visible}>
       <div className="flex flex-col">
         <div className={"  opacity-100"}>
           <button className="inline-flex items-center" onClick={handleClose} />

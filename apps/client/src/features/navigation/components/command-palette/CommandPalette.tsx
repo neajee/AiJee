@@ -39,7 +39,7 @@ export function CommandPalette({
   } = controller;
   if (!visible) return null;
   let flatIndex = 0;
-  return <div visible transparent animationType="none" onRequestClose={handleClose}>
+  return <div>
       <div className="flex flex-col">
         <AnimatedOverlay animation={overlayAnim} onClick={handleClose} />
         <div className={"  opacity-100"}>

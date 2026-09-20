@@ -25,7 +25,7 @@ export function ServerFormDesktopModal({
   const borderColor = isDark ? '#3b3a39' : 'rgba(0,0,0,0.08)';
   const overlayBg = isDark ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.3)';
   const canSave = Boolean(name.trim() && address.trim() && !loading);
-  return <div visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+  return <div hidden={!visible}>
       <button onClick={loading ? undefined : onClose}>
         <button onClick={() => {}}>
           <div className="flex flex-col">

@@ -9,6 +9,7 @@ export function useStableMarkdown(text: string, options: useMarkdownHookOptions,
   const textRef = useRef(text);
   textRef.current = text;
   const [throttledText, setThrottledText] = useState(text);
+  const deferredText = useDeferredValue(throttledText);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const update = useCallback((value: string) => setThrottledText(value), []);
   useEffect(() => {
@@ -28,7 +29,7 @@ export function useStableMarkdown(text: string, options: useMarkdownHookOptions,
   useEffect(() => () => {
     if (timerRef.current) clearTimeout(timerRef.current);
   }, []);
-  const source = isStreaming ? useDeferredValue(throttledText) : throttledText;
+  const source = isStreaming ? deferredText : throttledText;
   return useMemo(() => [{
     key: "markdown",
     className: "prose prose-sm max-w-none dark:prose-invert",

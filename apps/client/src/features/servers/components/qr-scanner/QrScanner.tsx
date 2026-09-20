@@ -31,13 +31,11 @@ export function QrScanner({
   });
   const overlayBg = isDark ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.3)';
   const modalProps = {
-    visible,
-    transparent: true as const,
-    onRequestClose: handleClose
+    hidden: !visible
   };
   if (step === 'pairing') {
-    return <div {...modalProps} animationType="fade">
-        <button onClick={handleClose} aria-label="关闭配对弹窗">
+    return <div {...modalProps}>
+        <div onClick={handleClose} role="dialog">
           <button onClick={event => event.stopPropagation()}>
             <div className="flex flex-col">
               <span className="size-3 animate-spin" />
@@ -48,12 +46,12 @@ export function QrScanner({
               <span>Cancel</span>
             </button>
           </button>
-        </button>
+        </div>
       </div>;
   }
   if (step === 'done') {
-    return <div {...modalProps} animationType="fade">
-        <button onClick={handleClose} aria-label="关闭配对成功弹窗">
+    return <div {...modalProps}>
+        <div onClick={handleClose} role="dialog">
           <button onClick={event => event.stopPropagation()}>
             <div className="flex flex-col">
               <div>
@@ -62,12 +60,12 @@ export function QrScanner({
               <span>Connected</span>
             </div>
           </button>
-        </button>
+        </div>
       </div>;
   }
   if (step === 'error') {
-    return <div {...modalProps} animationType="fade">
-        <button onClick={handleClose} aria-label="关闭配对失败弹窗">
+    return <div {...modalProps}>
+        <div onClick={handleClose} role="dialog">
           <button onClick={event => event.stopPropagation()}>
             <div className="flex flex-col">
               <div>
@@ -85,12 +83,12 @@ export function QrScanner({
               </button>
             </div>
           </button>
-        </button>
+        </div>
       </div>;
   }
   if (step === 'pick-ip' && connectParams) {
-    return <div {...modalProps} animationType="fade">
-        <button onClick={handleClose} aria-label="关闭网络选择弹窗">
+    return <div {...modalProps}>
+        <div onClick={handleClose} role="dialog">
           <button onClick={event => event.stopPropagation()}>
             <div className="flex flex-col">
               <span>Select Network</span>
@@ -111,11 +109,11 @@ export function QrScanner({
                 </button>)}
             </div>
           </button>
-        </button>
+        </div>
       </div>;
   }
-  return <div {...modalProps} animationType="fade">
-      <button onClick={handleClose} aria-label="关闭扫码弹窗">
+  return <div {...modalProps}>
+      <div onClick={handleClose} role="dialog">
         <button onClick={event => event.stopPropagation()}>
           <div className="flex flex-col">
             <span>Scan QR Code</span>
@@ -137,6 +135,6 @@ export function QrScanner({
           </div>
           {error && <span>{error}</span>}
         </button>
-      </button>
+      </div>
     </div>;
 }

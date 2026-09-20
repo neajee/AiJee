@@ -1,12 +1,18 @@
 import { useMemo } from "react";
 
 const operation = (value: any) => ({ value, start: (done?: (result: { finished: boolean }) => void) => done?.({ finished: true }), stop() {}, interpolate: () => value });
-export const Animated: any = { Value: class { value: number; constructor(value: number) { this.value = value; } interpolate = () => this.value; }, timing: operation, spring: operation, sequence: operation, parallel: operation, loop: operation, delay: operation, multiply: (a: any, b: number) => (a?.value ?? a) * b, subtract: (a: any, b: number) => (a?.value ?? a) - b };
+export const Animated: any = { Value: class { value: number; constructor(value: number) { this.value = value; } setValue(value: number) { this.value = value; } interpolate = () => this.value; }, timing: operation, spring: operation, sequence: operation, parallel: operation, loop: operation, delay: operation, multiply: (a: any, b: number) => (a?.value ?? a) * b, subtract: (a: any, b: number) => (a?.value ?? a) - b };
 export default Animated;
 export const Easing: any = { cubic: (value: number) => value, out: (value: any) => value, linear: (value: number) => value };
 export const FadeIn: any = { duration: () => FadeIn };
 export const FadeOut: any = { duration: () => FadeOut };
-export const LinearTransition: any = { duration: () => LinearTransition, springify: () => LinearTransition };
+export const LinearTransition: any = {
+  duration: () => LinearTransition,
+  springify: () => LinearTransition,
+  damping: () => LinearTransition,
+  stiffness: () => LinearTransition,
+  mass: () => LinearTransition,
+};
 export const useAnimatedStyle = (factory: () => any) => useMemo(factory, [factory]);
 export const useSharedValue = <T,>(value: T) => ({ value });
 export const withTiming = <T,>(value: T) => value;
