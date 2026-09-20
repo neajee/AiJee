@@ -54,17 +54,17 @@ export const MarkdownTable = memo(function MarkdownTable({
   };
   const table = <div className={"  border-border bg-background"}>
       {header.length > 0 && <div className={"  bg-surface-raised"}>
-          {header.map((cell, index) => <div key={index} className={" "}>
+          {header.map((cell, index) => <div key={index}>
               {/* Header cells arrive as inline nodes; wrapping in Text keeps the
                   emphasis without a second block-level box. */}
-              <span className={" "}>
+              <span>
                 {normalizeCellTypography(cell)}
               </span>
             </div>)}
         </div>}
 
-      {rows.map((row, rowIndex) => <div key={rowIndex} className={" "}>
-          {row.map((cell, cellIndex) => <div key={cellIndex} className={" "}>
+      {rows.map((row, rowIndex) => <div key={rowIndex}>
+          {row.map((cell, cellIndex) => <div key={cellIndex}>
               {normalizeCellTypography(cell)}
             </div>)}
         </div>)}

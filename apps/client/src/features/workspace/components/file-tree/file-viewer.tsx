@@ -32,7 +32,7 @@ export function FileViewer({
   } = useFileRead(filePath);
   return <div className={"block"}>
       {/* Sticky header */}
-      <div className={" "}>
+      <div>
         <button onClick={onClose} aria-label="Close file" {...{
         title: "Close file"
       }}>
@@ -40,19 +40,19 @@ export function FileViewer({
           <X size={13} color={textMuted} strokeWidth={2} />
         </button>
         {/* The trail may lose its middle; the filename never does. */}
-        <span className={" "}>
+        <span>
           {trail}
         </span>
-        <span className={" "}>›</span>
-        <span className={" "}>
+        <span>›</span>
+        <span>
           {fileName}
         </span>
-        {fileData?.truncated && <span className={" "}>truncated</span>}
+        {fileData?.truncated && <span>truncated</span>}
       </div>
 
       {/* Scrollable content */}
       {isLoading ? <span className={"mt-[32px]"} /> : fileError ? <div className={"block"}>
-          <span className={" "}>
+          <span>
             {fileError.includes("non-UTF8") ? "Binary file preview is not available." : "Cannot read file"}
           </span>
         </div> : fileData ? <CodePreview code={fileData.content} isDark={isDark} language={languageOf(filePath)} bare fill /> : null}

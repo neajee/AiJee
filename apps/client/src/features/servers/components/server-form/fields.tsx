@@ -20,12 +20,12 @@ export function ServerFormFields({
   const borderColor = isDark ? '#3b3a39' : 'rgba(0,0,0,0.08)';
   return <div className={"block"}>
       <div className={"block"}>
-        <span className={" "}>Name</span>
-        <input className={" "} value={name} onChangeText={setName} placeholder="My Server" placeholderTextColor={isDark ? '#666' : '#bbb'} autoFocus={autoFocus} />
+        <span>Name</span>
+        <input value={name} onChange={event => setName(event.target.value)} placeholder="My Server" autoFocus={autoFocus} />
       </div>
       <div className={"block"}>
-        <span className={" "}>Address</span>
-        <input className={" "} value={address} onChangeText={setAddress} placeholder="http://192.168.1.100:10088" placeholderTextColor={isDark ? '#666' : '#bbb'} autoCapitalize="none" autoCorrect={false} keyboardType="url" />
+        <span>Address</span>
+        <input value={address} onChange={event => setAddress(event.target.value)} placeholder="http://192.168.1.100:10088" />
       </div>
     </div>;
 }

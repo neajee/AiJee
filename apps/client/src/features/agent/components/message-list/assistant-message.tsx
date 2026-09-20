@@ -36,7 +36,7 @@ export const AssistantMessage = memo(function AssistantMessage({
           <AssistantMarkdown text={message.text} isStreaming={isStreaming} />
         </div>}
 
-      {hasError && <div className={" "}>
+      {hasError && <div>
           <span className={"  text-destructive"}>
             {message.errorMessage}
           </span>
@@ -75,9 +75,9 @@ export const MessageToolbar = memo(function MessageToolbar({
   }, [message.text]);
   return <>
       <div className={"block"}>
-        <div className={" "}>
+        <div>
           <div className={"block"}>
-            <button onClick={handleCopy} className={"  bg-surface-raised"} hitSlop={4}>
+            <button onClick={handleCopy} className={"  bg-surface-raised"}>
               {copied ? <span className={"  text-text-tertiary"}>✓</span> : <Copy size={13} color={colors.textTertiary} strokeWidth={1.8} />}
             </button>
           </div>

@@ -62,7 +62,7 @@ export function ProjectSidebarView({
       </div>;
   }, [activityByWorkspace, handleArchivedSession, handleContextMenu, handleLongPress, handleMenuAt, handleNewSessionIn, handleSelectSession, handleToggleWorkspace, isDark, overrides, selectedSessionId, selectedWorkspaceId]);
   return <div className={"  bg-background"}>
-      <div className={" "}><SidebarHeader /></div>
+      <div><SidebarHeader /></div>
       <div className={"block"}>
         <SidebarRow icon={<SquarePen size={15} color={colors.text} strokeWidth={1.8} />} label="新对话" onClick={handleNewSession} isDark={isDark} />
         <SidebarRow icon={<PackageOpen size={15} color={colors.textSecondary} strokeWidth={1.8} />} label="插件" isActive={pathname.startsWith("/packages")} onClick={() => router.push("/packages" as any)} isDark={isDark} />
@@ -72,7 +72,7 @@ export function ProjectSidebarView({
         <SectionHeader title="项目" isDark={isDark} actions={<HeaderAction onClick={() => setShowNewDialog(true)} label="添加项目" isDark={isDark}><Plus size={13} color={colors.textTertiary} strokeWidth={2} /></HeaderAction>} />
         {rest.length === 0 && pinned.length === 0 ? <span className={"  text-text-tertiary"}>暂无项目</span> : rest.map(renderWorkspace)}
       </div>
-      <div className={" "}>
+      <div>
         <SidebarRow icon={<Settings size={15} color={colors.textSecondary} strokeWidth={1.8} />} label="设置" isActive={pathname.startsWith("/settings")} onClick={() => router.push("/settings")} isDark={isDark} />
       </div>
       <NewWorkspaceDialog visible={showNewDialog} onClose={() => setShowNewDialog(false)} />

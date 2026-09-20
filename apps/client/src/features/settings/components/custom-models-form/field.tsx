@@ -24,6 +24,6 @@ export function Field({
       <span className={"  text-text-secondary"}>
         {label}
       </span>
-      <input className={"  text-foreground bg-background border-border font-mono"} value={value} onChangeText={onChangeText} placeholder={placeholder} placeholderTextColor={colors.placeholder} autoCapitalize="none" autoCorrect={false} autoFocus={autoFocus} />
+      <input className={"  text-foreground bg-background border-border font-mono"} value={value} onChange={event => onChangeText(event.target.value)} placeholder={placeholder} autoFocus={autoFocus} />
     </div>;
 }

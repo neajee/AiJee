@@ -16,7 +16,7 @@ export const ToolResultImages = memo(function ToolResultImages({
       <div className={"block"}>
         {images.map((img, i) => {
         const uri = img.data.startsWith("data:") ? img.data : `data:${img.mimeType};base64,${img.data}`;
-        return <button key={i} onClick={() => openPreview(uri)} className={" "}>
+        return <button key={i} onClick={() => openPreview(uri)}>
               <img src={{
             uri
           }} className={"block"} resizeMode="contain" />

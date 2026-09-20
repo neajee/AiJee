@@ -52,16 +52,9 @@ export const ToolHeader = memo(function ToolHeader({
   if (!expandable) {
     return <div className={"block"}>{children}</div>;
   }
-  return <button onClick={onToggle} role="button" aria-label={accessibilityLabel} accessibilityState={{
-    expanded
-  }} hitSlop={{
-    top: 6,
-    bottom: 6,
-    left: 4,
-    right: 8
-  }}>
+  return <button onClick={onToggle} role="button" aria-label={accessibilityLabel}>
       {children}
-      <div className={" "}>
+      <div>
         <ChevronRight size={CHEVRON_SIZE} color={colors.textTertiary} strokeWidth={2} />
       </div>
     </button>;

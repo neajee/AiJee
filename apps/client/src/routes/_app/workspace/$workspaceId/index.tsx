@@ -110,13 +110,13 @@ export default function WorkspaceScreen() {
   const editorBg = colors.background;
   return <div className={"  pb-0"}>
       <div className={"block"}>
-        <div className={" "}>
+        <div>
           {/* Hero and composer are one vertically centred group, so the mark,
               the greeting and the input read as a single focal block. */}
           <div className={"block"}>
             {sending ? <div className={"block"}>
-                <span size="small" color={colors.textSecondary} />
-                <span className={" "}>
+                <span className="size-3 animate-spin" />
+                <span>
                   Starting session…
                 </span>
               </div> : <WorkspaceHero />}

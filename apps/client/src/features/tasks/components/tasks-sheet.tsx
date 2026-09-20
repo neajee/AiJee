@@ -63,7 +63,7 @@ export function TasksSheet({
   }));
   return <div {...false ? {
     pointerEvents: visible ? 'auto' as const : 'none' as const
-  } : {}} className={" "}>
+  } : {}}>
       <div className={"  bg-black/50"}>
         <button className={"block"} onClick={dismiss} />
       </div>
@@ -75,7 +75,7 @@ export function TasksSheet({
           </div>
         </div>
 
-        <span className={" "}>Tasks</span>
+        <span>Tasks</span>
 
         <div className={"block"}>
           <TasksPanelContent />

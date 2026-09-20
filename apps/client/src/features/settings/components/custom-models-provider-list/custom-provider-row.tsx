@@ -35,19 +35,19 @@ export function CustomProviderRow({
                 <span className={"  text-destructive"}>删除服务</span>
               </button> : null}
           </div> : null} />
-      {expanded ? <div className={" "}>
-          <Field label="Base URL" value={provider.baseUrl ?? ''} onChangeText={value => onUpdate({
+      {expanded ? <div>
+          <Field label="Base URL" value={provider.baseUrl ?? ''} onChange={event => (value => onUpdate({
         ...provider,
         baseUrl: value || undefined
-      })} placeholder="http://localhost:11434/v1" colors={colors} mono />
+      }))(event.target.value)} placeholder="http://localhost:11434/v1" colors={colors} mono />
           <ApiTypeSelector value={provider.api ?? 'openai-completions'} onChange={value => onUpdate({
         ...provider,
         api: value
       })} colors={colors} />
-          <Field label="API 密钥" value={provider.apiKey ?? ''} onChangeText={value => onUpdate({
+          <Field label="API 密钥" value={provider.apiKey ?? ''} onChange={event => (value => onUpdate({
         ...provider,
         apiKey: value || undefined
-      })} placeholder="可选" colors={colors} />
+      }))(event.target.value)} placeholder="可选" colors={colors} />
           <div className={"block"}>
             <span className={"  text-text-secondary"}>模型</span>
             <button onClick={() => onUpdate({

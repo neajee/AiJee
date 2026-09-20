@@ -43,21 +43,21 @@ export function CommandPalette({
       <div className={"block"}>
         <AnimatedOverlay animation={overlayAnim} onClick={handleClose} />
         <div className={"  opacity-100"}>
-          <div className={" "}>
+          <div>
             <Search size={16} color={textMuted} strokeWidth={2} />
-            <input ref={inputRef} className={" "} value={search} onChangeText={setSearch} onKeyPress={handleKeyPress} placeholder="搜索对话…" placeholderTextColor={textDim} autoCapitalize="none" autoCorrect={false} returnKeyType="go" />
+            <input ref={inputRef} value={search} onChange={event => setSearch(event.target.value)} onKeyPress={handleKeyPress} placeholder="搜索对话…" />
           </div>
           <div ref={scrollRef} className={"block"} keyboardShouldPersistTaps="handled">
             <div ref={scrollContentRef}>
               {sessionsLoading ? <div className={"block"}>
-                  <span size="small" color={textMuted} />
+                  <span className="size-3 animate-spin" />
                 </div> : sections.length === 0 ? <div className={"block"}>
-                  <span className={" "}>
+                  <span>
                     {search.trim() ? '没有匹配的对话' : '暂无最近对话'}
                   </span>
                 </div> : null}
               {sections.map(section => <div key={section.title}>
-                  <span className={" "}>{section.title}</span>
+                  <span>{section.title}</span>
                   {section.items.map(item => {
                 const index = flatIndex++;
                 const isSelected = index === selectedIndex;
@@ -67,14 +67,14 @@ export function CommandPalette({
                 }} onClick={item.onSelect}>
                         <Icon size={15} color={isSelected ? textPrimary : textMuted} strokeWidth={1.8} />
                         <div className={"block"}>
-                          <span className={" "}>
+                          <span>
                             {item.label}
                           </span>
-                          {item.description && <span className={" "}>
+                          {item.description && <span>
                               {item.description}
                             </span>}
                         </div>
-                        {isSelected && <span className={" "}>{'\u21B5'}</span>}
+                        {isSelected && <span>{'\u21B5'}</span>}
                       </button>;
               })}
                 </div>)}

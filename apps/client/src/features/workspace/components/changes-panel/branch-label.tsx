@@ -23,18 +23,18 @@ export function BranchLabel({
   } = useChangesTheme();
   return <div className={"block"}>
       <GitBranch size={12} color={textMuted} strokeWidth={2} />
-      <span className={" "} {...{
+      <span {...{
       title: branch
     }}>
         {branch}
       </span>
       {ahead > 0 && <div className={"block"}>
           <ArrowUp size={9} color={textMuted} strokeWidth={2.5} />
-          <span className={" "}>{ahead}</span>
+          <span>{ahead}</span>
         </div>}
       {behind > 0 && <div className={"block"}>
           <ArrowDown size={9} color={textMuted} strokeWidth={2.5} />
-          <span className={" "}>{behind}</span>
+          <span>{behind}</span>
         </div>}
     </div>;
 }

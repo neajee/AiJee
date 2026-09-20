@@ -156,15 +156,15 @@ export function PromptInputView({
   const formatQueueBehaviorLabel = (behavior: QueueBehavior) => behavior === 'followUp' ? 'Follow up' : 'Steer';
   return <div className={"  opacity-100 pb-0"}>
       {/* Send error */}
-      {!!errorMessage && <button onClick={onClearError} className={" "}>
-          <span className={" "}>
+      {!!errorMessage && <button onClick={onClearError}>
+          <span>
             {errorMessage}
           </span>
         </button>}
 
       {/* Speech error */}
-      {speechError && <button onClick={clearSpeechError} className={" "}>
-          <span className={" "}>
+      {speechError && <button onClick={clearSpeechError}>
+          <span>
             {speechError}
           </span>
         </button>}
@@ -178,7 +178,7 @@ export function PromptInputView({
               <div className={"block"}>
                 {isStreaming && <button onClick={() => {
               void requestAbort();
-            }} role="button" aria-label="Stop generation" hitSlop={8}>
+            }} role="button" aria-label="Stop generation">
                     <div className={"block"}>
                       <Square size={10} color={theme.textMuted} strokeWidth={2} fill={theme.textMuted} />
                       <span className={"  text-text-secondary"}>Stop</span>
@@ -207,7 +207,7 @@ export function PromptInputView({
         <InputCard theme={theme} isWideScreen={isWideScreen} inputRef={inputRef} fileInputRef={fileInputRef} showCommands={showCommands} shouldOverlaySlashCommands={shouldOverlaySlashCommands} stackedAbove={stackedAbove} toolbarOverlap={toolbarOverlap} entryDone={entryDone} isFocused={isFocused} lineCount={lineCount} text={text} handleTextChange={handleTextChange} handleKeyPress={handleKeyPress} inputDisabled={inputDisabled} sendDisabled={sendDisabled} canComposeWhileDisabled={canComposeWhileDisabled} setIsFocused={setIsFocused} handleWebFileChange={handleWebFileChange} handleFilePick={handleFilePick} isListening={isListening} handleMicPress={handleMicPress} audioLevel={audioLevel} inlineToolbar={inlineToolbar} sessionId={sessionId} setNarrowSheet={setNarrowSheet} setToolbarPopoverOpen={setToolbarPopoverOpen} streamedMode={streamedMode} sessionReady={sessionReady} agentConfig={agentConfig} thinkingPreference={thinkingPreference} setThinkingPreference={setThinkingPreference} contextUsage={contextUsage} showQueueActions={showQueueActions} sendDraft={sendDraft} showAbortButton={showAbortButton} handleSubmit={handleSubmit} hasDraft={hasDraft} />
       </div>
 
-      {!inlineToolbar && <div className={" "}>
+      {!inlineToolbar && <div>
           <Toolbar sessionId={sessionId} isWideScreen={isWideScreen} onOpenNarrowSheet={type => setNarrowSheet(type)} onDropdownOpenChange={setToolbarPopoverOpen} inputRef={inputRef} skeleton={<ToolbarSkeleton isDark={theme.isDark} />} modeLabel={sessionId && sessionReady && streamedMode ? formatAgentModeLabel(streamedMode) : null} ready={!!sessionReady && !!sessionId} config={agentConfig} thinkingPreference={thinkingPreference} onThinkingPreferenceChange={setThinkingPreference} />
         </div>}
 

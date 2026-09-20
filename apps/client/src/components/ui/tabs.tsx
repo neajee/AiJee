@@ -1,6 +1,50 @@
 import { createContext, useContext, type ReactNode } from "react";
-const TabsContext = createContext<{ value: string; onValueChange?: (value: string) => void }>({ value: "" });
-export function Tabs({ value, defaultValue, onValueChange, children }: { value?: string; defaultValue?: string; onValueChange?: (value: string) => void; children: ReactNode }) { return <TabsContext.Provider value={{ value: value ?? defaultValue ?? "", onValueChange }}>{children}</TabsContext.Provider>; }
-export function TabsList({ children }: { children: ReactNode }) { return <div className="inline-flex items-center gap-1 rounded-md bg-black/5 p-1">{children}</div>; }
-export function TabsTrigger({ value, children }: { value: string; children: ReactNode }) { const ctx = useContext(TabsContext); return <button className={ctx.value === value ? "rounded bg-background px-3 py-1.5 text-sm shadow-sm" : "rounded px-3 py-1.5 text-sm text-muted-foreground"} onClick={() => ctx.onValueChange?.(value)}>{children}</button>; }
-export function TabsContent({ value, children }: { value: string; children: ReactNode }) { const ctx = useContext(TabsContext); return ctx.value === value ? <div className="mt-4">{children}</div> : null; }
+const TabsContext = createContext<{
+  value: string;
+  onValueChange?: (value: string) => void;
+}>({
+  value: ""
+});
+export function Tabs({
+  value,
+  defaultValue,
+  onValueChange,
+  children
+}: {
+  value?: string;
+  defaultValue?: string;
+  onValueChange?: (value: string) => void;
+  children: ReactNode;
+}) {
+  return <TabsContext.Provider value={{
+    value: value ?? defaultValue ?? "",
+    onValueChange
+  }}>{children}</TabsContext.Provider>;
+}
+export function TabsList({
+  children
+}: {
+  children: ReactNode;
+}) {
+  return <div className="inline-flex items-center gap-1 rounded-md bg-black/5 p-1">{children}</div>;
+}
+export function TabsTrigger({
+  value,
+  children
+}: {
+  value: string;
+  children: ReactNode;
+}) {
+  const ctx = useContext(TabsContext);
+  return <button className={ctx.value === value ? "rounded bg-background px-3 py-1.5 text-sm shadow-sm" : "rounded px-3 py-1.5 text-sm text-muted-foreground"} onClick={() => ctx.onValueChange?.(value)}>{children}</button>;
+}
+export function TabsContent({
+  value,
+  children
+}: {
+  value: string;
+  children: ReactNode;
+}) {
+  const ctx = useContext(TabsContext);
+  return ctx.value === value ? <div className="mt-4">{children}</div> : null;
+}

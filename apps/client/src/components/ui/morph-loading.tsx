@@ -44,7 +44,7 @@ function MorphBlock({
       }]
     };
   });
-  return <div className={" "} />;
+  return <div />;
 }
 export default function MorphLoading({
   size = 'md',

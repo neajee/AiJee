@@ -22,8 +22,8 @@ export function AddProviderForm({
         <span className={"  text-foreground"}>
           新建提供商
         </span>
-        <Field label="提供商名称" value={name} onChangeText={setName} placeholder="例如 ollama、lm-studio、my-vllm" colors={colors} autoFocus />
-        <Field label="Base URL" value={baseUrl} onChangeText={setBaseUrl} placeholder="http://localhost:11434/v1" colors={colors} mono />
+        <Field label="提供商名称" value={name} onChange={event => setName(event.target.value)} placeholder="例如 ollama、lm-studio、my-vllm" colors={colors} autoFocus />
+        <Field label="Base URL" value={baseUrl} onChange={event => setBaseUrl(event.target.value)} placeholder="http://localhost:11434/v1" colors={colors} mono />
         <ApiTypeSelector value={api} onChange={setApi} colors={colors} />
         <div className={"block"}>
           <button onClick={onCancel}>
@@ -36,7 +36,7 @@ export function AddProviderForm({
             onAdd(name.trim(), baseUrl.trim(), api);
           }
         }}>
-            <span className={" "}>
+            <span>
               添加提供商
             </span>
           </button>

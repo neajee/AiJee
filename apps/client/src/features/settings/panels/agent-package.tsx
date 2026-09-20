@@ -82,7 +82,7 @@ export function AgentActionButton({
   const m = useSettingsMetrics();
   const p = useSettingsPalette();
   return <button onClick={onPress} disabled={updating} role="button" aria-label={`${label} Pi agent`}>
-      {updating ? <span size="small" color={p.onAccent} /> : <>
+      {updating ? <span className="size-3 animate-spin" /> : <>
           <Icon size={13} color={p.onAccent} strokeWidth={2.2} />
           <span className={"  text-accent-content"}>{label}</span>
         </>}

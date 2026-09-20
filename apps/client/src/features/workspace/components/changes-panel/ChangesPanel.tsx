@@ -52,23 +52,21 @@ export function ChangesPanel({
     unstage,
     discard
   } = controller;
-  return <div className={" "}>
+  return <div>
       {activeExtraTab ? <div className={"block"}>{renderExtraTab?.(activeExtraTab)}</div> : <div className={"block"}>
           <div {...false ? {
         pointerEvents: currentTab === 'files' ? 'auto' as const : 'none' as const
-      } : {}} className={" "}>
-            {cwd ? <FileTree rootPath={cwd} viewingFile={viewingFile} onViewFile={setViewingFile} expandedDirs={expandedDirs} onToggleDir={handleToggleDir} /> : <span className={" "}>No workspace selected</span>}
+      } : {}}>
+            {cwd ? <FileTree rootPath={cwd} viewingFile={viewingFile} onViewFile={setViewingFile} expandedDirs={expandedDirs} onToggleDir={handleToggleDir} /> : <span>No workspace selected</span>}
           </div>
           {isGitRepo && <div {...false ? {
         pointerEvents: currentTab === 'git' ? 'auto' as const : 'none' as const
-      } : {}} className={" "}>
-              <div className={" "}>
-                <button onClick={() => setChangesOpen(open => !open)} role="button" accessibilityState={{
-            expanded: changesOpen
-          }} aria-label="Toggle changes">
+      } : {}}>
+              <div>
+                <button onClick={() => setChangesOpen(open => !open)} role="button" aria-label="Toggle changes">
                   <GitCompare size={12} color={textMuted} strokeWidth={2} />
-                  <span className={" "}>Changes</span>
-                  {totalChanges > 0 && <span className={" "}>{totalChanges}</span>}
+                  <span>Changes</span>
+                  {totalChanges > 0 && <span>{totalChanges}</span>}
                   <div className={"flex-1"} />
                   {gitData && <BranchLabel branch={gitData.branch} ahead={gitData.ahead} behind={gitData.behind} />}
                   {changesOpen ? <ChevronUp size={13} color={textMuted} strokeWidth={2} /> : <ChevronDown size={13} color={textMuted} strokeWidth={2} />}

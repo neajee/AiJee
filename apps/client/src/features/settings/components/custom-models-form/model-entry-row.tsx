@@ -44,33 +44,33 @@ export function ModelEntryRow({
     return parts.join(' · ');
   }, [model.name, model.contextWindow, model.input, model.reasoning]);
   if (editing) {
-    return <div className={" "}>
+    return <div>
         <div className={"block"}>
           <div className={"flex-1"}>
-            <Field label="模型 ID" value={draft.id} onChangeText={v => setDraft({
+            <Field label="模型 ID" value={draft.id} onChange={event => (v => setDraft({
             ...draft,
             id: v
-          })} placeholder="llama3.1:8b" colors={colors} mono />
+          }))(event.target.value)} placeholder="llama3.1:8b" colors={colors} mono />
           </div>
           <div className={"flex-1"}>
-            <Field label="显示名称" value={draft.name ?? ''} onChangeText={v => setDraft({
+            <Field label="显示名称" value={draft.name ?? ''} onChange={event => (v => setDraft({
             ...draft,
             name: v || undefined
-          })} placeholder="可选" colors={colors} />
+          }))(event.target.value)} placeholder="可选" colors={colors} />
           </div>
         </div>
         <div className={"block"}>
           <div className={"flex-1"}>
-            <Field label="上下文窗口" value={draft.contextWindow?.toString() ?? ''} onChangeText={v => setDraft({
+            <Field label="上下文窗口" value={draft.contextWindow?.toString() ?? ''} onChange={event => (v => setDraft({
             ...draft,
             contextWindow: v ? parseInt(v, 10) || undefined : undefined
-          })} placeholder={`${PI_DEFAULTS.contextWindow}（缺省）`} colors={colors} />
+          }))(event.target.value)} placeholder={`${PI_DEFAULTS.contextWindow}（缺省）`} colors={colors} />
           </div>
           <div className={"flex-1"}>
-            <Field label="最大 Token" value={draft.maxTokens?.toString() ?? ''} onChangeText={v => setDraft({
+            <Field label="最大 Token" value={draft.maxTokens?.toString() ?? ''} onChange={event => (v => setDraft({
             ...draft,
             maxTokens: v ? parseInt(v, 10) || undefined : undefined
-          })} placeholder={`${PI_DEFAULTS.maxTokens}（缺省）`} colors={colors} />
+          }))(event.target.value)} placeholder={`${PI_DEFAULTS.maxTokens}（缺省）`} colors={colors} />
           </div>
         </div>
         <ChipToggleRow label="输入模态" hint="决定能否向该模型发送图片附件；留空等同仅文本。" colors={colors} options={[{
@@ -100,7 +100,7 @@ export function ModelEntryRow({
       }]} />
         <div className={"block"}>
           <button onClick={() => setEditing(false)}>
-            <span className={" "}>
+            <span>
               取消
             </span>
           </button>
@@ -113,20 +113,20 @@ export function ModelEntryRow({
             setEditing(false);
           }
         }}>
-            <span className={" "}>
+            <span>
               保存
             </span>
           </button>
         </div>
       </div>;
   }
-  return <div className={" "}>
+  return <div>
       <Cpu size={colors.roomy ? 14 : 9} color={colors.textMuted} strokeWidth={1.8} />
       <div className={"block"}>
-        <span className={" "}>
+        <span>
           {model.id}
         </span>
-        {summary ? <span className={" "}>
+        {summary ? <span>
             {summary}
           </span> : null}
       </div>

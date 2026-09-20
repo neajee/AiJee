@@ -18,8 +18,8 @@ export function AppModal({
   const contentStyles = Array.isArray(contentStyle) ? contentStyle : contentStyle ? [contentStyle] : [];
   return <div visible={visible} transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent>
       <div className={"block"}>
-        <button className={" "} onClick={closeOnBackdrop ? onClose : undefined} aria-label="关闭弹窗" />
-        <button className={" "} onClick={event => event.stopPropagation()}>
+        <button onClick={closeOnBackdrop ? onClose : undefined} aria-label="关闭弹窗" />
+        <button onClick={event => event.stopPropagation()}>
           {children}
         </button>
       </div>

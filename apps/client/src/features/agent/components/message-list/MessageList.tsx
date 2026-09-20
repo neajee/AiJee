@@ -48,7 +48,7 @@ export function MessageListView({
   const keyExtractor = useCallback((item: ListItem) => item.key, []);
   const listHeader = <div className={"block"}>
       {session.isLoadingOlderMessages ? <div entering={FadeIn.duration(180)} exiting={FadeOut.duration(180)} className={"block"}>
-          <span size="small" color={colors.textTertiary} />
+          <span className="size-3 animate-spin" />
         </div> : session.hasMoreMessages ? <button onClick={handleLoadMore} role="button" aria-label="Load earlier messages" className={"block"}>
           <span className={"  text-text-tertiary"}>Load earlier messages</span>
         </button> : null}

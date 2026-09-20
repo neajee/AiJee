@@ -59,7 +59,7 @@ export function SidebarRow({
   const activeBg = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)";
   return <button onClick={onPress} disabled={disabled} onHoverIn={() => setHovered(true)} onHoverOut={() => setHovered(false)}>
       <div className={"block"}>{icon}</div>
-      <span className={" "}>
+      <span>
         {label}
       </span>
     </button>;

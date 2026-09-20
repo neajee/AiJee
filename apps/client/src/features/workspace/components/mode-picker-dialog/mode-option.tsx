@@ -25,15 +25,15 @@ export function ModeOption({
   if (mode?.thinking_level) parts.push(`thinking: ${mode.thinking_level}`);
   const extensionCount = Array.isArray(mode?.extensions) ? mode.extensions.length : 0;
   if (extensionCount) parts.push(`${extensionCount} ext`);
-  return <button onClick={onPress} className={" "}>
+  return <button onClick={onPress}>
       <div className={"block"}>
         <div className={"block"}>
-          {mode ? <span className={" "}>{mode.name}</span> : <><CircleOff size={14} color={textMuted} strokeWidth={1.8} /><span className={" "}>Default</span></>}
+          {mode ? <span>{mode.name}</span> : <><CircleOff size={14} color={textMuted} strokeWidth={1.8} /><span>Default</span></>}
           {mode?.is_default && <Star size={12} color="#E8A300" fill="#E8A300" strokeWidth={1.8} />}
         </div>
         {selected && <Check size={16} color={textPrimary} strokeWidth={2} />}
       </div>
-      {mode ? mode.description ? <span className={" "}>{mode.description}</span> : null : <span className={" "}>No extra configuration — standard pi session</span>}
-      {parts.length > 0 && <span className={" "}>{parts.join(' · ')}</span>}
+      {mode ? mode.description ? <span>{mode.description}</span> : null : <span>No extra configuration — standard pi session</span>}
+      {parts.length > 0 && <span>{parts.join(' · ')}</span>}
     </button>;
 }

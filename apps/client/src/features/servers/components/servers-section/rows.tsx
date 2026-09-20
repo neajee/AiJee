@@ -75,11 +75,11 @@ export function ServerRow({
     color: p.textTertiary
   };
   return <div className={"block"}>
-      {isActive ? <div className={" "} /> : null}
+      {isActive ? <div /> : null}
       <button onClick={onPress} onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)} role="button" aria-label={`连接到 ${server.name}，${status.label}`}>
       <ConnectionStatusDot label={status.label} color={status.color} connecting={isConnecting} />
       <div className={"w-[30px] h-[30px] rounded-[8px] items-center justify-center"}>
-        {isConnecting ? <span size="small" color={p.text} /> : <PiLogo size={16} color={p.textSecondary} />}
+        {isConnecting ? <span className="size-3 animate-spin" /> : <PiLogo size={16} color={p.textSecondary} />}
       </div>
 
       <div className={"flex-1 self-stretch justify-center gap-[2px]"}>
@@ -90,13 +90,13 @@ export function ServerRow({
       </div>
       </button>
 
-      <button onClick={onShowCode} role="button" aria-label={`显示 ${server.name} 授权二维码`} hitSlop={8}>
+      <button onClick={onShowCode} role="button" aria-label={`显示 ${server.name} 授权二维码`}>
         <QrCode size={20} color={p.textSecondary} strokeWidth={1.5} />
       </button>
-      <button ref={moreRef} onClick={() => onToggleMenu(callback => moreRef.current?.measureInWindow((x: number, y: number, width: number, height: number) => callback(x, y, width, height)))} role="button" aria-label={`管理 ${server.name}`} hitSlop={8}>
+      <button ref={moreRef} onClick={() => onToggleMenu(callback => moreRef.current?.measureInWindow((x: number, y: number, width: number, height: number) => callback(x, y, width, height)))} role="button" aria-label={`管理 ${server.name}`}>
         <MoreHorizontal size={20} color={p.textSecondary} strokeWidth={1.8} />
       </button>
-      {!isLast ? <div className={" "} /> : null}
+      {!isLast ? <div /> : null}
     </div>;
 }
 export function FooterAction({
@@ -114,9 +114,9 @@ export function FooterAction({
 }) {
   const p = useSettingsPalette();
   return <button onClick={onPress} role="button" aria-label={label}>
-      {isFirst ? <div className={" "} /> : null}
+      {isFirst ? <div /> : null}
       <Icon size={16} color={p.textSecondary} strokeWidth={1.8} />
-      <span className={" "}>{label}</span>
+      <span>{label}</span>
     </button>;
 }
 export function MenuAction({
@@ -130,5 +130,5 @@ export function MenuAction({
   onPress: () => void;
   color: string;
 }) {
-  return <button onClick={onPress} role="button" aria-label={label}><Icon size={16} color={color} strokeWidth={1.8} /><span className={" "}>{label}</span></button>;
+  return <button onClick={onPress} role="button" aria-label={label}><Icon size={16} color={color} strokeWidth={1.8} /><span>{label}</span></button>;
 }

@@ -12,7 +12,7 @@ export function AddWorkspaceButton({
 }: AddWorkspaceButtonProps) {
   const colorScheme = useColorScheme() ?? 'light';
   const colors = useThemeTokens();
-  return <div className={" "}>
+  return <div>
       <button onClick={onPress} role="button" aria-label="Add workspace">
         <Plus size={20} color={colors.iconMuted} strokeWidth={1.8} />
       </button>

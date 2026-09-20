@@ -73,7 +73,7 @@ export function ChangesTab({
   if (totalChanges === 0) {
     return <div className={"block"}>
         <Check size={20} color={textMuted} strokeWidth={2} />
-        <span className={" "}>
+        <span>
           Working tree clean
         </span>
       </div>;

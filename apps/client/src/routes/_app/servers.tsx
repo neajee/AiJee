@@ -20,7 +20,7 @@ export default function ServersScreen() {
   const isDark = colorScheme === "dark";
   const p = useSettingsPalette();
   const empty = useServersStore(s => s.servers.length === 0);
-  return <div className={"  bg-background"} edges={["top", "left", "right"]}>
+  return <div className={"  bg-background"}>
       {empty ? <ServersSection isDark={isDark} variant="onboarding" /> : <div className={"block"}>
           <div className={"block"}>
             {/* This route can render outside the app shell, so it carries its

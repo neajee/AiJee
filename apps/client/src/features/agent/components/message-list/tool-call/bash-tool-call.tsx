@@ -52,7 +52,7 @@ export const BashToolCall = memo(function BashToolCall({
   const hasOutput = !!displayOutput;
   return <div>
       <ToolHeader expanded={expanded} expandable={hasOutput} onToggle={toggle} isDark={isDark} aria-label={`${expanded ? "Collapse" : "Expand"} output of ${command || "bash"}`}>
-        <span className={"  text-text-secondary"} ellipsizeMode="tail">
+        <span className={"  text-text-secondary"}>
           Ran <span className={"  text-foreground"}>{command || "bash"}</span>
           {cdPath ? <span>
               {" in "}
@@ -64,7 +64,7 @@ export const BashToolCall = memo(function BashToolCall({
       {hasOutput && <ToolBody expanded={expanded}>
           <ToolSurface isDark={isDark}>
             <div ref={scrollRef} className={"block"} nestedScrollEnabled onContentSizeChange={handleOutputGrowth} onScrollBeginDrag={stopFollowing}>
-              <span className={"  text-text-secondary"} selectable>
+              <span className={"  text-text-secondary"}>
                 {displayOutput}
               </span>
               {truncated && <span className={"  text-text-tertiary"}>

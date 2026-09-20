@@ -73,7 +73,7 @@ export function WorkspaceHero() {
           <AiJeeLogo size={isWideScreen ? 64 : 52} color={textPrimary} opacity={isDark ? 0.92 : 0.88} />
         </div>
 
-        <span className={"  text-[0px] leading-[0]"}>
+        <span className="text-lg leading-6 text-foreground">
           {greeting}
         </span>
       </div>

@@ -61,12 +61,12 @@ export function WorkspaceSidebar({
               </RailButton>}
           </div>}
 
-        {!locked && !collapsed && <div className={"  mt-[0]"} pointerEvents="box-none">
+        {!locked && !collapsed && <div className={"  mt-[0]"}>
             <SeamToggle chevron="right" onClick={toggleCollapsed} label="Close side panel" />
           </div>}
 
         {!collapsed && <div {...panelResizer.panHandlers} {...webSeamHoverProps} className={"block"}>
-            <div className={" "} />
+            <div />
           </div>}
       </div>
     </WorkspacePaneContext.Provider>;

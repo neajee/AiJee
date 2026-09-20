@@ -38,7 +38,7 @@ export function InstalledView({
       {message ? <span className={"  rounded-[var(--tile-radius)]"}>{message}</span> : null}
       {error ? <Notice text={error} tone="error" /> : null}
 
-      {loading ? <div className={"block"}><span size="small" color={p.textTertiary} /></div> : output === '暂无已安装插件' ? <span className={"  text-[var(--desc-size)]"}>暂无已安装插件。</span> : <div className={"block"}>
+      {loading ? <div className={"block"}><span className="size-3 animate-spin" /></div> : output === '暂无已安装插件' ? <span className={"  text-[var(--desc-size)]"}>暂无已安装插件。</span> : <div className={"block"}>
           {parseInstalledPackages(output).map((pkg, index) => <InstalledPackageCard key={`${pkg.name}-${index}`} pkg={pkg} single={single} onUpdate={() => void client.api.marketplaceOperation({
         operation: 'update',
         name: pkg.name,
@@ -81,10 +81,10 @@ function InstalledPackageCard({
       <div className={"block"}>
         <div className={"block"}>
           <span className={"  text-[var(--label-size)]"}>{pkg.name}</span>
-          {pkg.detail ? <span className={" "}>{pkg.detail}</span> : null}
+          {pkg.detail ? <span>{pkg.detail}</span> : null}
         </div>
       </div>
-      <div className={" "}>
+      <div>
         <InstalledAction label="更新" onClick={onUpdate} />
         <InstalledAction label="卸载" destructive onClick={onRemove} />
       </div>

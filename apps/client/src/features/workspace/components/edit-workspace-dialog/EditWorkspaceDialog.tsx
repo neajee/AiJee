@@ -39,8 +39,8 @@ export function EditWorkspaceDialog({
         <div className={"flex-1"} behavior={false ? 'padding' : undefined}>
           <button className={"block"} onClick={onClose}>
             <button className={"  pb-0"} onClick={event => event.stopPropagation()}>
-              <div className={"block"}><div className={" "} /></div>
-              <span className={" "}>Edit Workspace</span>
+              <div className={"block"}><div /></div>
+              <span>Edit Workspace</span>
               <div className={"block"} keyboardShouldPersistTaps="handled">
                 <EditWorkspaceForm {...formProps} />
               </div>
@@ -51,9 +51,9 @@ export function EditWorkspaceDialog({
   }
   return <div visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <button className={"block"} onClick={onClose}>
-        <button className={" "} onClick={event => event.stopPropagation()}>
+        <button onClick={event => event.stopPropagation()}>
           <div className={"block"}>
-            <span className={" "}>Edit Workspace</span>
+            <span>Edit Workspace</span>
             <button onClick={onClose}>
               <X size={18} color={textMuted} strokeWidth={2} />
             </button>

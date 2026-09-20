@@ -16,7 +16,7 @@ export function SettingsSidebar() {
   const activeSlug = pathname.match(/^\/settings\/([^/]+)/)?.[1] ?? SETTINGS_SECTIONS[0]?.slug;
   const handleBack = () => router.replace(selectedWorkspaceId ? `/workspace/${selectedWorkspaceId}` : "/");
   return <div className={"  bg-background"}>
-      <div className={" "}><SidebarHeader /></div>
+      <div><SidebarHeader /></div>
       <div className={"block"}><SidebarRow icon={<ChevronLeft size={15} color={colors.textSecondary} strokeWidth={1.8} />} label="返回" onClick={handleBack} isDark={isDark} /></div>
       <div className={"block"}><span className={"  text-foreground"}>设置</span></div>
       <div className={"block"}>

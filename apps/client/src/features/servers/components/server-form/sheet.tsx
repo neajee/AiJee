@@ -101,13 +101,13 @@ export function ServerFormSheet({
                 <div className={"  bg-muted"} />
               </div>
               <div className={"block"}>
-                <span className={" "}>
+                <span>
                   {initial ? 'Edit Server' : 'Add Server'}
                 </span>
               </div>
               <div keyboardShouldPersistTaps="handled">
                 <ServerFormFields name={name} setName={setName} address={address} setAddress={setAddress} isDark={isDark} />
-                {error && <span className={" "}>
+                {error && <span>
                     {error}
                   </span>}
                 <button onClick={() => {
@@ -116,7 +116,7 @@ export function ServerFormSheet({
                   address: address.trim()
                 });
               }} className={"  opacity-[0.4]"} disabled={!canSave}>
-                  {loading ? <span size="small" color={isDark ? '#1a1a1a' : '#fff'} /> : <span className={" "}>
+                  {loading ? <span className="size-3 animate-spin" /> : <span>
                       {initial ? 'Save & Connect' : 'Add & Connect'}
                     </span>}
                 </button>

@@ -12,16 +12,13 @@ export function ConnectionStatusBannerView({
   onRetry
 }: ConnectionStatusBannerViewProps) {
   return <div className={"  h-0 pb-0"}>
-      <div className={" "}>
+      <div>
         <span className={"block"}>
           {message}
         </span>
-        <button role="button" accessibilityState={{
-        busy: isAttemptInFlight,
-        disabled: isAttemptInFlight
-      }} disabled={isAttemptInFlight} onClick={onRetry}>
+        <button role="button" disabled={isAttemptInFlight} onClick={onRetry}>
           <div className={"block"}>
-            {isAttemptInFlight ? <span size="small" color="#A22E26" className={"block"} /> : null}
+            {isAttemptInFlight ? <span className={"block" + " size-3 animate-spin"} /> : null}
             <span className={"block"}>
               {hasConnectionIssue ? isWaitingToRetry ? 'Retry now' : isAttemptInFlight ? 'Retrying…' : 'Retry' : 'Dismiss'}
             </span>

@@ -37,11 +37,11 @@ export const MarkdownCodeBlock = memo(function MarkdownCodeBlock({
   }, [code]);
   const label = (language || "").trim().toLowerCase();
   return <div className={"  bg-surface-raised border-border"}>
-      <div className={" "}>
+      <div>
         <span className={"  text-text-tertiary"}>
           {label}
         </span>
-        <button onClick={handleCopy} hitSlop={6} role="button" aria-label={copied ? "Code copied" : "Copy code"}>
+        <button onClick={handleCopy} role="button" aria-label={copied ? "Code copied" : "Copy code"}>
           {copied ? <Check size={13} color={colors.textSecondary} strokeWidth={1.8} /> : <Copy size={13} color={colors.textTertiary} strokeWidth={1.8} />}
         </button>
       </div>

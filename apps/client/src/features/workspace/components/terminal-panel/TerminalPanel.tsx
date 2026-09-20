@@ -9,12 +9,12 @@ export function TerminalPanel() {
   const activeTabBorder = colors.accent;
   const textPrimary = colors.text;
   const textMuted = colors.textTertiary;
-  return <div className={" "}>
+  return <div>
       {/* Tab bar */}
-      <div className={" "}>
+      <div>
         <div className={"block"}>
-          <div className={" "}>
-            <span className={" "}>
+          <div>
+            <span>
               Terminal 1
             </span>
             <button className={"block"}>

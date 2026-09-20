@@ -36,14 +36,14 @@ export function ContextUsageRing({
           {ratio > 0 && <SvgCircle cx={size / 2} cy={size / 2} r={radius} stroke={fillColor} strokeWidth={stroke} fill="none" strokeDasharray={`${filled} ${circumference - filled}`} strokeDashoffset={circumference * 0.25} strokeLinecap="round" />}
         </Svg>
       </button>
-      {showTooltip && <button className={" "} onClick={() => setShowTooltip(false)}>
-          <span className={" "}>
+      {showTooltip && <button onClick={() => setShowTooltip(false)}>
+          <span>
             Context · {pct}%
           </span>
-          <span className={" "}>
+          <span>
             Used {formatTokens(used)} of {formatTokens(total)}
           </span>
-          <span className={" "}>
+          <span>
             Free {formatTokens(free)}
           </span>
         </button>}

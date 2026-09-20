@@ -56,7 +56,7 @@ export function WorkspaceRow({
      * exist while hovering would vanish the moment the cursor reached them.
      * `pointerenter`/`pointerleave` don't fire for movement between children.
      */
-    <div className={" "} onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)}>
+    <div onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)}>
       <button onClick={onPress} onLongPress={onLongPress} delayLongPress={400} aria-label={isOpen ? `收起 ${workspace.title}` : `展开 ${workspace.title}`}>
         <div className={"block"}>
           <Folder size={15} color={colors.text} strokeWidth={1.8} />
@@ -76,7 +76,7 @@ export function WorkspaceRow({
             </RowAction>
           </div>}
 
-        {!showActions && !isRunning && hasUnread && <div className={" "} />}
+        {!showActions && !isRunning && hasUnread && <div />}
       </div>
     </div>
   );

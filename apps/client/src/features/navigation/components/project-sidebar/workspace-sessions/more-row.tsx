@@ -12,6 +12,6 @@ export function MoreRow({
   const colors = useThemeTokens();
   const [hovered, setHovered] = useState(false);
   return <button onClick={onPress} disabled={disabled} onHoverIn={() => setHovered(true)} onHoverOut={() => setHovered(false)}>
-      <span className={" "}>{label}</span>
+      <span>{label}</span>
     </button>;
 }

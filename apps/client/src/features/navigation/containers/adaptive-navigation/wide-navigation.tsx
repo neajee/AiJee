@@ -38,23 +38,23 @@ export function WideNavigation({
     onMouseEnter: handleHoverZoneIn,
     onMouseLeave: handleHoverZoneOut
   } : {};
-  return <div className={" "} edges={['top']}>
+  return <div>
       <div className={"block"}>
         {hasServer && showPersistentSidebar && <div className={"w-0 overflow-hidden h-full"}>
             <div className={"w-[280px] flex-1"}>{settingsMode ? <SettingsSidebar /> : <ProjectSidebar />}</div>
           </div>}
-        <div className={" "}>
+        <div>
           <div className={"block"}>{children}</div>
           {isCodeMode && <TaskOutputPanel />}
           {hasServer && !isPersistent && <>
               <div {...webHoverProps} className={"block"} />
               <div className={"  opacity-100"} />
-              <div {...webSidebarHoverProps} className={" "}>
+              <div {...webSidebarHoverProps}>
                 {settingsMode ? <SettingsSidebar /> : <ProjectSidebar />}
               </div>
             </>}
         </div>
-        {hasServer && <div pointerEvents="box-none" className={" "}>
+        {hasServer && <div>
             <SeamToggle chevron={isPersistent ? 'left' : 'right'} onClick={handleToggleSidebar} label={isPersistent ? 'Collapse sidebar' : 'Expand sidebar'} onHoverIn={handleHoverZoneIn} onHoverOut={handleHoverZoneOut} />
           </div>}
       </div>

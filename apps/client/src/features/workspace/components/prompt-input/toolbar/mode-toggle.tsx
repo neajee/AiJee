@@ -15,12 +15,9 @@ export function ModeToggle({
     {(['work', 'plan'] as AgentMode[]).map(mode => {
       const active = displayedMode === mode;
       const pending = pendingMode === mode;
-      return <button key={mode} role="button" aria-label={pending ? `Switching to ${formatAgentModeLabel(mode)} mode` : `Switch to ${formatAgentModeLabel(mode)} mode`} accessibilityState={{
-        selected: active,
-        disabled: toolbarDisabled || false
-      }} disabled={toolbarDisabled || false} onClick={() => handleSelectMode(mode)}>
+      return <button key={mode} role="button" aria-label={pending ? `Switching to ${formatAgentModeLabel(mode)} mode` : `Switch to ${formatAgentModeLabel(mode)} mode`} disabled={toolbarDisabled || false} onClick={() => handleSelectMode(mode)}>
         <span className={"  opacity-100"}>{formatAgentModeLabel(mode)}</span>
-        {pending && <span size="small" color={active ? theme.textPrimary : theme.textMuted} className={"block"} />}
+        {pending && <span className={"block" + " size-3 animate-spin"} />}
       </button>;
     })}
   </div>;

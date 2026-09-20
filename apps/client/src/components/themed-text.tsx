@@ -17,7 +17,7 @@ export function ThemedText({
     light: lightColor,
     dark: darkColor
   }, 'text');
-  return <span className={" "} {...rest} />;
+  return <span {...rest} />;
 }
 const typeStyles = {
   default: {

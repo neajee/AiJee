@@ -50,15 +50,15 @@ export function NewWorkspaceDialogView({
   const formContent = <>
       {/* Path input */}
       <div className={"  z-[10]"}>
-        <span className={" "}>项目路径</span>
-        <div className={" "}>
+        <span>项目路径</span>
+        <div>
           <Folder size={16} color={textMuted} strokeWidth={1.8} />
-          <input ref={pathRef} className={" "} focusStyle={{
+          <input ref={pathRef} focusStyle={{
           outlineWidth: 0,
           borderWidth: 0,
           borderColor: 'transparent',
           boxShadow: 'none'
-        } as any} value={path} onChangeText={handlePathChange} onKeyPress={handlePathKeyPress} placeholder="例如：~/work/my-project" placeholderTextColor={textMuted} autoCapitalize="none" autoCorrect={false} onFocus={() => {
+        } as any} value={path} onChange={event => handlePathChange(event.target.value)} onKeyPress={handlePathKeyPress} placeholder="例如：~/work/my-project" onFocus={() => {
           if (path.length > 0) {
             setShowSuggestions(true);
             fetchCompletions(path);
@@ -66,22 +66,22 @@ export function NewWorkspaceDialogView({
         }} onBlur={useInlineSuggestions ? () => {
           setTimeout(dismissSuggestions, 200);
         } : undefined} />
-          {loadingSuggestions && <span size="small" color={textMuted} />}
+          {loadingSuggestions && <span className="size-3 animate-spin" />}
         </div>
 
         {pathPreview && !showSuggestions ? <div className={"block"}>
-            <span className={" "}>位置</span>
-            <span className={" "}>
+            <span>位置</span>
+            <span>
               {pathPreview}
             </span>
           </div> : null}
 
         {/* Path suggestions popover */}
-        {showSuggestions && suggestions.length > 0 && <div className={" "}>
+        {showSuggestions && suggestions.length > 0 && <div>
             {useInlineSuggestions ? <div>
                 {suggestions.map((item, index) => <button key={item.path} onClick={() => handleSelectSuggestion(item)}>
                     {item.is_dir ? <Folder size={14} color={textMuted} strokeWidth={1.8} /> : <File size={14} color={textMuted} strokeWidth={1.8} />}
-                    <span className={" "}>
+                    <span>
                       {item.path}
                     </span>
                   </button>)}
@@ -94,7 +94,7 @@ export function NewWorkspaceDialogView({
           index
         }) => <button onClick={() => handleSelectSuggestion(item)}>
                     {item.is_dir ? <Folder size={14} color={textMuted} strokeWidth={1.8} /> : <File size={14} color={textMuted} strokeWidth={1.8} />}
-                    <span className={" "}>
+                    <span>
                       {item.path}
                     </span>
                   </button>} />}
@@ -103,16 +103,16 @@ export function NewWorkspaceDialogView({
 
       {/* Name input */}
       <div className={"block"}>
-        <span className={" "}>项目名称</span>
-        <div className={" "}>
-          <input ref={nameRef} className={" "} focusStyle={{
+        <span>项目名称</span>
+        <div>
+          <input ref={nameRef} focusStyle={{
           outlineWidth: 0,
           borderWidth: 0,
           borderColor: 'transparent',
           boxShadow: 'none'
-        } as any} value={name} onChangeText={handleNameChange} onKeyPress={handleNameKeyPress} placeholder="例如：My Project" placeholderTextColor={textMuted} />
+        } as any} value={name} onChange={event => handleNameChange(event.target.value)} onKeyPress={handleNameKeyPress} placeholder="例如：My Project" />
         </div>
-        {!nameEdited && name.length > 0 && <span className={" "}>
+        {!nameEdited && name.length > 0 && <span>
             已根据路径自动生成
           </span>}
       </div>
@@ -120,10 +120,10 @@ export function NewWorkspaceDialogView({
       {/* Actions */}
       <div className={"block"}>
         <button onClick={onClose}>
-          <span className={" "}>取消</span>
+          <span>取消</span>
         </button>
         <button onClick={handleCreate} disabled={!canCreate}>
-          <span className={" "}>
+          <span>
             添加项目
           </span>
         </button>
@@ -137,9 +137,9 @@ export function NewWorkspaceDialogView({
           <button className={"block"} onClick={onClose}>
             <button className={"  pb-0"} onClick={e => e.stopPropagation()}>
               <div className={"block"}>
-                <div className={" "} />
+                <div />
               </div>
-              <span className={" "}>新建项目</span>
+              <span>新建项目</span>
               <div className={"block"} keyboardShouldPersistTaps="handled">
                 {formContent}
               </div>
@@ -152,12 +152,12 @@ export function NewWorkspaceDialogView({
   // Desktop: centered dialog
   return <div visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <button className={"block"} onClick={onClose}>
-        <button className={" "} onClick={e => e.stopPropagation()}>
+        <button onClick={e => e.stopPropagation()}>
           {showSuggestions && <button className={"  z-[5]"} onClick={dismissSuggestions} />}
           <div className={"block"}>
             <div className={"block"}>
-              <span className={" "}>新建项目</span>
-              <span className={" "}>添加本地目录，随时切换</span>
+              <span>新建项目</span>
+              <span>添加本地目录，随时切换</span>
             </div>
           </div>
           {formContent}

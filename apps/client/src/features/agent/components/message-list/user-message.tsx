@@ -65,7 +65,7 @@ export const UserMessage = memo(function UserMessage({
         }} className={"block"} resizeMode="cover" />)}
           </div>}
         {editing ? <>
-            <input autoFocus multiline value={editText} onChangeText={onChangeEdit} className={"  text-foreground border-border"} selectionColor={colors.tint} />
+            <input autoFocus multiline value={editText} onChange={event => onChangeEdit(event.target.value)} className={"  text-foreground border-border"} />
             <div className={"block"}>
               <button onClick={onCancelEdit} aria-label="Cancel edit" className={"block"}>
                 <X size={14} color={colors.textTertiary} />
@@ -75,7 +75,7 @@ export const UserMessage = memo(function UserMessage({
               </button>
             </div>
           </> : !!message.text && <>
-            <span className={"  text-foreground"} selectable>
+            <span className={"  text-foreground"}>
               {expanded || !collapsible ? message.text : preview}
             </span>
             {collapsible && <div className={"block"}>

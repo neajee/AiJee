@@ -19,8 +19,8 @@ export function ApiTypeSelector({
       <div className={"block"}>
         {API_TYPES.map(item => {
         const isActive = value === item.value;
-        return <button key={item.value} onClick={() => onChange(item.value)} className={" "}>
-              <span className={" "}>
+        return <button key={item.value} onClick={() => onChange(item.value)}>
+              <span>
                 {item.label}
               </span>
             </button>;

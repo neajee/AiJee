@@ -23,9 +23,7 @@ export function Segmented({
   return <div className={"  rounded-none"}>
       {options.map(option => {
       const active = option.value === value;
-      return <button key={option.value} onClick={() => onChange(option.value)} role="button" accessibilityState={{
-        selected: active
-      }} aria-label={option.label} className={"block"}>
+      return <button key={option.value} onClick={() => onChange(option.value)} role="button" aria-label={option.label} className={"block"}>
             <span className={"text-[var(--desc-size)] font-sans"}>
               {option.label}
             </span>
@@ -46,8 +44,8 @@ export function SearchField({
   const p = useSettingsPalette();
   return <div className={"  rounded-[var(--tile-radius)]"}>
       <Search size={14} color={p.textTertiary} strokeWidth={1.8} />
-      <input value={value} onChangeText={onChangeText} onSubmitEditing={onSubmit} placeholder="搜索插件名称或关键词" placeholderTextColor={p.textTertiary} returnKeyType="search" autoCapitalize="none" autoCorrect={false} aria-label="搜索插件" className={"  text-[var(--value-size)]"} />
-      {value ? <button onClick={() => onChangeText('')} role="button" aria-label="清空搜索" hitSlop={6} className={"block"}>
+      <input value={value} onChange={event => onChangeText(event.target.value)} onKeyDown={event => event.key === "Enter" && onSubmit(event)} placeholder="搜索插件名称或关键词" aria-label="搜索插件" className={"  text-[var(--value-size)]"} />
+      {value ? <button onClick={() => onChangeText('')} role="button" aria-label="清空搜索" className={"block"}>
           <X size={13} color={p.textTertiary} strokeWidth={2} />
         </button> : null}
     </div>;
@@ -63,9 +61,7 @@ export function Chip({
 }) {
   const m = useSettingsMetrics();
   const p = useSettingsPalette();
-  return <button onClick={onPress} role="button" accessibilityState={{
-    selected: active
-  }} aria-label={label} className={"block"}>
+  return <button onClick={onPress} role="button" aria-label={label} className={"block"}>
       <span className={"text-[var(--desc-size)] font-sans"}>
         {label}
       </span>
@@ -91,16 +87,16 @@ export function PackageCard({
         <span className={"  text-[var(--label-size)]"}>
           {pkg.name}
         </span>
-        <span className={" "}>v{pkg.version}</span>
+        <span>v{pkg.version}</span>
       </div>
       <span className={"  text-[var(--desc-size)]"}>
         {pkg.description || '作者未提供介绍'}
       </span>
       <div className={"block"}>
-        <span className={" "}>
+        <span>
           {pkg.package_types.join(' · ') || 'npm'}
         </span>
-        {pkg.downloads ? <span className={" "}>
+        {pkg.downloads ? <span>
             {pkg.downloads.toLocaleString()} 次/周
           </span> : null}
       </div>

@@ -26,35 +26,35 @@ export function ServerSwitcher() {
     'data-server-popover': true
   } as any}>
       <button onClick={() => setPopoverVisible(value => !value)} role="button" aria-label="Switch server">
-        <div className={" "}>
+        <div>
           <PiLogo size={14} color={isDark ? '#1a1a1a' : '#fff'} />
         </div>
-        <span className={" "}>{activeServer?.name ?? 'No Server'}</span>
+        <span>{activeServer?.name ?? 'No Server'}</span>
         <ChevronDown size={12} color={textMuted} strokeWidth={2} />
       </button>
-      {popoverVisible && <div className={" "}>
-          <div className={"block"}><span className={" "}>Servers</span></div>
+      {popoverVisible && <div>
+          <div className={"block"}><span>Servers</span></div>
           <div className={"block"}>
             {servers.map(server => {
           const isActive = server.id === activeServerId;
           const isSwitching = server.id === switchingId;
           return <button key={server.id} onClick={() => void handleSwitchServer(server)} disabled={isSwitching}>
-                  <div className={" "}><PiLogo size={10} color={isDark ? '#1a1a1a' : '#fff'} /></div>
+                  <div><PiLogo size={10} color={isDark ? '#1a1a1a' : '#fff'} /></div>
                   <div className={"block"}>
-                    <span className={" "}>{server.name}</span>
-                    <span className={" "}>{server.address}</span>
+                    <span>{server.name}</span>
+                    <span>{server.address}</span>
                   </div>
                   {isActive && <Check size={14} color="#34C759" strokeWidth={2.5} />}
                 </button>;
         })}
           </div>
-          <div className={" "}>
+          <div>
             <button onClick={() => {
           setPopoverVisible(false);
           router.push('/settings/servers');
         }}>
               <Settings size={13} color={textMuted} strokeWidth={1.8} />
-              <span className={" "}>管理服务器</span>
+              <span>管理服务器</span>
             </button>
           </div>
         </div>}

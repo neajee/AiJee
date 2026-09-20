@@ -22,7 +22,7 @@ export function NarrowHeaderBar(props: NarrowHeaderBarProps) {
             {workspace && <div className={"  bg-background"}>
                 <span className={"block"}>{workspace.title.charAt(0).toUpperCase()}</span>
               </div>}
-            <span className={" "}>
+            <span>
               {workspace?.title ?? 'Workspace'}
             </span>
           </button>

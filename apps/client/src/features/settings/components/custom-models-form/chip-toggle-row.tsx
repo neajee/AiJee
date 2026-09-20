@@ -29,11 +29,8 @@ export function ChipToggleRow({
         {label}
       </span>
       <div className={"block"}>
-        {options.map(item => <button key={item.key} onClick={item.locked ? undefined : item.onToggle} disabled={item.locked} role="checkbox" accessibilityState={{
-        checked: item.active,
-        disabled: item.locked
-      }} className={"  opacity-[0.6]"}>
-            <span className={" "}>
+        {options.map(item => <button key={item.key} onClick={item.locked ? undefined : item.onToggle} disabled={item.locked} role="checkbox" className={"  opacity-[0.6]"}>
+            <span>
               {item.label}
             </span>
           </button>)}

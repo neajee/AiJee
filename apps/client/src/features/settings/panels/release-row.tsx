@@ -22,11 +22,9 @@ export function ReleaseRow({
   const otherTotal = notes.filter(note => note.type === 'other').length;
   const countText = [featureTotal && `${featureTotal} 新功能`, fixTotal && `${fixTotal} 修复`, otherTotal && `${otherTotal} 其他`].filter(Boolean).join(' · ') || '无变更记录';
   return <div>
-      <button onClick={() => setOpen(value => !value)} role="button" aria-label={`${release.tag}，发布于 ${formatReleaseTime(release.published_at)}，${countText}`} accessibilityState={{
-      expanded: open
-    }}>
-        <div className={" "} />
-        <span className={" "}>
+      <button onClick={() => setOpen(value => !value)} role="button" aria-label={`${release.tag}，发布于 ${formatReleaseTime(release.published_at)}，${countText}`}>
+        <div />
+        <span>
           {release.tag}
         </span>
         <span className={"  text-text-tertiary"}>
@@ -40,7 +38,7 @@ export function ReleaseRow({
           </div> : null}
         {open ? <ChevronUp size={14} color={p.textTertiary} strokeWidth={2} /> : <ChevronDown size={14} color={p.textTertiary} strokeWidth={2} />}
       </button>
-      {open ? <div className={" "}>
+      {open ? <div>
           {(['feature', 'fix', 'other'] as const).map(type => {
         const items = notes.filter(note => note.type === type);
         if (!items.length) return null;

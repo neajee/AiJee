@@ -22,10 +22,7 @@ export function EffortPicker({
   handleSelectThinking
 }: EffortPickerProps) {
   return <div className={"block"}>
-      <button onClick={() => isWideScreen ? toggleDropdown('effort') : onOpenNarrowSheet('effort')} disabled={toolbarDisabled || thinkingDisabled} role="button" aria-label={thinkingDisabled ? `Thinking not supported by ${currentModel?.name ?? 'this model'}` : `Thinking: ${thinkingLabel}. Press to change.`} accessibilityState={{
-      expanded: activeDropdown === 'effort',
-      disabled: toolbarDisabled || thinkingDisabled
-    }}>
+      <button onClick={() => isWideScreen ? toggleDropdown('effort') : onOpenNarrowSheet('effort')} disabled={toolbarDisabled || thinkingDisabled} role="button" aria-label={thinkingDisabled ? `Thinking not supported by ${currentModel?.name ?? 'this model'}` : `Thinking: ${thinkingLabel}. Press to change.`}>
         <span className={"  text-text-secondary"}>{thinkingLabel}</span>
         {!thinkingDisabled && <ChevronDown size={14} color={theme.textMuted} strokeWidth={1.8} />}
       </button>
@@ -33,10 +30,8 @@ export function EffortPicker({
         {effortOptions.map((item, index) => {
         const highlighted = index === popoverIndex;
         const active = item.level === thinkingPreference;
-        return <button key={item.level} onClick={() => handleSelectThinking(item.level)} role="menuitem" aria-label={item.description ? `${item.label} — ${item.description}` : item.label} accessibilityState={{
-          selected: active
-        }}>
-            <div className={"block"}><span className={" "}>{item.label}</span></div>
+        return <button key={item.level} onClick={() => handleSelectThinking(item.level)} role="menuitem" aria-label={item.description ? `${item.label} — ${item.description}` : item.label}>
+            <div className={"block"}><span>{item.label}</span></div>
           </button>;
       })}
       </div>}

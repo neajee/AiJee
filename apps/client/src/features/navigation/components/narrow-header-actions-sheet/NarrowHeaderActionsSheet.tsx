@@ -18,27 +18,27 @@ export function NarrowHeaderActionsSheetView({
 }: NarrowHeaderActionsSheetViewProps) {
   return <div {...false ? {
     pointerEvents: visible ? 'auto' : 'none'
-  } : {}} className={" "}>
-      <div className={" "}>
+  } : {}}>
+      <div>
         <button className={"block"} onClick={onDismiss} />
       </div>
 
       <div className={"  pb-0"}>
         <div>
           <div className={"block"}>
-            <div className={" "} />
+            <div />
           </div>
         </div>
 
         <div className={"block"}>
-          <span className={" "}>More</span>
-          <span className={" "}>Quick actions for this screen</span>
+          <span>More</span>
+          <span>Quick actions for this screen</span>
         </div>
 
         <div className={"block"}>
           {items.map((item, index) => <button key={item.key} onClick={item.onPress} role="button" aria-label={item.label}>
               <div className={"block"}>{item.icon}</div>
-              <span className={" "}>{item.label}</span>
+              <span>{item.label}</span>
             </button>)}
         </div>
       </div>

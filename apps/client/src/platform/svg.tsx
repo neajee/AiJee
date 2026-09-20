@@ -1,6 +1,11 @@
 import React from "react";
-
-export default function Svg({ children, width = 24, height = 24, viewBox = "0 0 24 24", ...props }: any) {
+export default function Svg({
+  children,
+  width = 24,
+  height = 24,
+  viewBox = "0 0 24 24",
+  ...props
+}: any) {
   return <svg width={width} height={height} viewBox={viewBox} fill="none" xmlns="http://www.w3.org/2000/svg" {...props}>{children}</svg>;
 }
 export const Path = (props: any) => <path {...props} />;

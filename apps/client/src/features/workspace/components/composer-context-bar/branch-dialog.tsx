@@ -26,7 +26,7 @@ export function BranchDialog({
         <button className={"  bg-surface border-border"} onClick={event => event.stopPropagation()}>
           <span className={"  text-foreground"}>新建分支</span>
           <span className={"  text-text-secondary"}>将从当前分支 {currentBranch ?? 'HEAD'} 创建并立即切换。</span>
-          <input value={branchName} onChangeText={setBranchName} onSubmitEditing={onCreate} autoFocus autoCapitalize="none" autoCorrect={false} placeholder="例如：feat/new-flow" placeholderTextColor={theme.textMuted} className={"  text-foreground border-border bg-muted"} />
+          <input value={branchName} onChange={event => setBranchName(event.target.value)} onKeyDown={event => event.key === "Enter" && onCreate(event)} autoFocus placeholder="例如：feat/new-flow" className={"  text-foreground border-border bg-muted"} />
           {error ? <span className={"  text-destructive"}>{error}</span> : null}
           <div className={"block"}>
             <button onClick={onClose}><span className={"text-foreground"}>取消</span></button>

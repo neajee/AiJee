@@ -69,7 +69,7 @@ export function TasksPanelContent() {
       {instances.length > 0 && <>
           <button onClick={() => setExpandedSection(expandedSection === 'running' ? null : 'running')} className={"block"}>
             {expandedSection === 'running' ? <ChevronDown size={12} color={textMuted} strokeWidth={2} /> : <ChevronRight size={12} color={textMuted} strokeWidth={2} />}
-            <span className={" "}>
+            <span>
               ACTIVE ({instances.length})
             </span>
           </button>
@@ -79,7 +79,7 @@ export function TasksPanelContent() {
       {availableTasks.length > 0 && <>
           <button onClick={() => setExpandedSection(expandedSection === 'available' ? null : 'available')} className={"block"}>
             {expandedSection === 'available' ? <ChevronDown size={12} color={textMuted} strokeWidth={2} /> : <ChevronRight size={12} color={textMuted} strokeWidth={2} />}
-            <span className={" "}>
+            <span>
               AVAILABLE ({availableTasks.length})
             </span>
           </button>
@@ -87,7 +87,7 @@ export function TasksPanelContent() {
         </>}
 
       {instances.length === 0 && availableTasks.length === 0 && <div className={"block"}>
-          <span className={" "}>
+          <span>
             No tasks configured.{'\n'}Add .pi/tasks.json to your workspace.
           </span>
         </div>}

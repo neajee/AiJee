@@ -49,7 +49,7 @@ export function WorkspaceSheet({
   const avatarScrollBg = isDark ? '#191919' : '#F8F8F8';
   return <div {...!isWeb ? {
     pointerEvents: visible ? 'auto' as const : 'none' as const
-  } : {}} className={" "}>
+  } : {}}>
       <div className={"  bg-black/50"}>
         <button className={"block"} onClick={dismiss} />
       </div>
@@ -61,7 +61,7 @@ export function WorkspaceSheet({
           </div>
         </div>
 
-        <div className={" "}>
+        <div>
           <div ref={stripScrollRef} horizontal>
             {workspaces.map((workspace, index) => {
             const isActive = workspace.id === selectedWorkspaceId;
@@ -83,7 +83,7 @@ export function WorkspaceSheet({
               <div className={"  border-[1.5px] border-dashed"}>
                 <Plus size={18} color={textMuted} strokeWidth={1.8} />
               </div>
-              <span className={" "}>Add</span>
+              <span>Add</span>
             </button>
           </div>
         </div>
@@ -97,14 +97,14 @@ export function WorkspaceSheet({
             </div>)}
         </Pager>
 
-        <div className={" "}>
+        <div>
           <button onClick={handleServersPress}>
             <MaterialIcons name="dns" size={18} color={colors.icon} />
-            <span className={" "}>连接</span>
+            <span>连接</span>
           </button>
           <button onClick={handleSettingsPress}>
             <MaterialIcons name="settings" size={18} color={colors.icon} />
-            <span className={" "}>Settings</span>
+            <span>Settings</span>
           </button>
         </div>
       </div>

@@ -59,10 +59,10 @@ export default function WorkIndex() {
   }, [client, router]);
   const editorBg = colors.background;
   return <div className={"  bg-background pb-0"}>
-      <div className={" "}>
+      <div>
         <div className={"block"}>
           {sending ? <div className={"block"}>
-              <span size="small" color={colors.textSecondary} />
+              <span className="size-3 animate-spin" />
               <span className={"  text-text-secondary"}>
                 Starting Work…
               </span>

@@ -75,7 +75,7 @@ export function AnimatedCollapse({
         </div>
       </div>;
   }
-  return <div className={" "}>
+  return <div>
       <div onLayout={handleLayout} className={"block"}>
         {children}
       </div>

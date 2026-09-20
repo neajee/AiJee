@@ -80,13 +80,8 @@ export function SeamToggle({
     title: label
   }} {...webHoverProps}
   // The mark is small; the hit area is the whole seam segment plus slop.
-  hitSlop={{
-    top: 10,
-    bottom: 10,
-    left: 10,
-    right: 10
-  }} className={"block"}>
-      <div pointerEvents="none" className={"  w-0 h-0 rounded-none"}>
+  className={"block"}>
+      <div className={"  w-0 h-0 rounded-none"}>
         {/* Held back until the bar has some width to hold it. */}
         <div className={"opacity-100"}>
           <Chevron size={13} color={colors.text} strokeWidth={2} />

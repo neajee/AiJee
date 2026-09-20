@@ -91,13 +91,11 @@ export const ThinkingBlock = memo(function ThinkingBlock({
   // whole line saying "Thinking", which the moving text already says.
   const headline = peek || label;
   return <div>
-      <button onClick={toggle} disabled={!text} role="button" aria-label={expanded ? "Collapse thinking" : "Expand thinking"} accessibilityState={{
-      expanded
-    }} className={"block"}>
+      <button onClick={toggle} disabled={!text} role="button" aria-label={expanded ? "Collapse thinking" : "Expand thinking"} className={"block"}>
         <div className={"block"}>
           <Brain size={12} color={colors.textTertiary} strokeWidth={1.8} />
         </div>
-        <span className={"  text-text-tertiary"} ellipsizeMode="tail">
+        <span className={"  text-text-tertiary"}>
           {headline}
         </span>
         {!!text && <div className={"block"}>
@@ -106,7 +104,7 @@ export const ThinkingBlock = memo(function ThinkingBlock({
       </button>
 
       <AnimatedCollapse expanded={expanded}>
-        <span className={"  text-text-secondary"} selectable>
+        <span className={"  text-text-secondary"}>
           {text}
         </span>
       </AnimatedCollapse>

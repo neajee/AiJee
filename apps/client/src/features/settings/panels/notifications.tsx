@@ -14,11 +14,7 @@ export function NotificationsPanel() {
     if (!loaded) load();
   }, [loaded, load]);
   return <SettingsGroup header="通知">
-      <SettingsRow icon={Bell} label="推送通知" description="接收会话更新提醒" right={<SettingsSwitch value={pushNotifications} onValueChange={v => update({
-      pushNotifications: v
-    })} aria-label="推送通知" />} />
-      <SettingsRow icon={Volume2} label="音效" description="为操作与提醒播放声音" isLast right={<SettingsSwitch value={soundEffects} onValueChange={v => update({
-      soundEffects: v
-    })} aria-label="音效" />} />
+      <SettingsRow icon={Bell} label="推送通知" description="接收会话更新提醒" right={<SettingsSwitch value={pushNotifications} aria-label="推送通知" />} />
+      <SettingsRow icon={Volume2} label="音效" description="为操作与提醒播放声音" isLast right={<SettingsSwitch value={soundEffects} aria-label="音效" />} />
     </SettingsGroup>;
 }

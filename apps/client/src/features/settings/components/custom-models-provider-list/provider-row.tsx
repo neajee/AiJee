@@ -21,17 +21,13 @@ export function ProviderRow({
     </>;
   if (trailing) {
     return <div className={"  opacity-[0.5]"}>
-        <button onClick={onPress} disabled={disabled} role="button" aria-label={name} accessibilityState={{
-        disabled
-      }}>
+        <button onClick={onPress} disabled={disabled} role="button" aria-label={name}>
           {content}
         </button>
         {trailing}
       </div>;
   }
-  return <button onClick={onPress} disabled={disabled} role="button" aria-label={name} accessibilityState={{
-    disabled
-  }}>
+  return <button onClick={onPress} disabled={disabled} role="button" aria-label={name}>
       {content}
     </button>;
 }

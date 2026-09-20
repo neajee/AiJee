@@ -60,26 +60,26 @@ export function ServersView({
   if (variant === "onboarding" && servers.length === 0) {
     return <div className={"block"}>
         <div className={"block"}>
-          <div className={" "}>
+          <div>
             <PiLogo size={36} color={isDark ? "#1a1a1a" : "#fff"} />
           </div>
-          <span className={" "}>
+          <span>
             欢迎使用 AiJee
           </span>
-          <span className={" "}>
+          <span>
             连接到运行 AiJee 的设备，{"\n"}
             使用设备授权后即可打开工作区。
           </span>
           <div className={"block"}>
             <button onClick={() => setQrVisible(true)}>
               <QrCode size={16} color={p.text} strokeWidth={2} />
-              <span className={" "}>
+              <span>
                 扫描授权码
               </span>
             </button>
             <button onClick={handleAdd}>
               <Plus size={16} color={isDark ? "#1a1a1a" : "#fff"} strokeWidth={2} />
-              <span className={" "}>
+              <span>
                 添加服务器
               </span>
             </button>
@@ -90,10 +90,10 @@ export function ServersView({
   }
   return <div className={"  gap-[var(--group-gap)]"}>
       <div className={"block"}>
-        <span className={" "}>我的设备 ({servers.length})</span>
-        <span className={" "}>设备令牌仅保存在本机，不会同步</span>
+        <span>我的设备 ({servers.length})</span>
+        <span>设备令牌仅保存在本机，不会同步</span>
       </div>
-      <div className={" "}>
+      <div>
         {servers.length === 0 ? <div className={"pl-[var(--gutter)] pr-[var(--gutter)] pt-0 pb-0"}>
             <span className={"text-[var(--desc-size)] font-sans"}>
               尚未添加服务器。
@@ -128,7 +128,7 @@ export function ServersView({
           {(() => {
           const server = servers.find(entry => entry.id === menuServerId);
           if (!server) return null;
-          return <button className={" "} onClick={event => event.stopPropagation()}>
+          return <button onClick={event => event.stopPropagation()}>
                 <MenuAction icon={Pencil} label="编辑" onClick={() => {
               setMenuServerId(null);
               handleEdit(server);
@@ -137,7 +137,7 @@ export function ServersView({
               setMenuServerId(null);
               logoutFromServer(server.id);
             }} color={p.text} />
-                <div className={" "} />
+                <div />
                 <MenuAction icon={Trash2} label="删除" onClick={() => {
               setMenuServerId(null);
               handleDelete(server);
@@ -148,10 +148,10 @@ export function ServersView({
       </div>
       <div visible={!!codeDialog} transparent animationType="fade" onRequestClose={() => setCodeDialog(null)}>
         <button className={"block"} onClick={() => setCodeDialog(null)} aria-label="关闭授权对话框">
-          <button className={" "} onClick={e => e.stopPropagation()}>
+          <button onClick={e => e.stopPropagation()}>
             <div className={"block"}>
-              <span className={" "}>设备授权二维码</span>
-              <button onClick={() => setCodeDialog(null)} aria-label="关闭授权二维码" hitSlop={8} className={"block"}>
+              <span>设备授权二维码</span>
+              <button onClick={() => setCodeDialog(null)} aria-label="关闭授权二维码" className={"block"}>
                 <X size={18} color={p.textTertiary} />
               </button>
             </div>
@@ -159,13 +159,13 @@ export function ServersView({
             uri: codeDialog.image
           }} className={"block"} />}
             <div className={"block"}>
-              <span className={" "}>授权码</span>
-              <span selectable className={" "}>{codeDialog?.code}</span>
+              <span>授权码</span>
+              <span>{codeDialog?.code}</span>
               <button onClick={() => codeDialog && Clipboard.setStringAsync(codeDialog.url)} aria-label="复制完整地址" accessibilityHint="复制设备连接地址" className={"block"}>
                 <Copy size={18} color={p.text} />
               </button>
               <button onClick={handleRefreshCode} disabled={refreshingCode} aria-label="刷新授权码" accessibilityHint="生成新授权码并更新当前设备令牌" className={"block"}>
-                {refreshingCode ? <span size="small" color={p.text} /> : <RefreshCw size={18} color={p.text} />}
+                {refreshingCode ? <span className="size-3 animate-spin" /> : <RefreshCw size={18} color={p.text} />}
               </button>
             </div>
           </button>

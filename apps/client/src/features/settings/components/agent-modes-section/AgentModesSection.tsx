@@ -22,17 +22,17 @@ export function AgentModesSection({
     save
   } = useAgentModesController();
   if (!loaded) return null;
-  return <div className={" "}>
-      <div className={" "}>
+  return <div>
+      <div>
         <div className={"block"}>
           <span className={"  text-foreground"}>自定义指令</span>
           <span className={"  text-text-tertiary"}>向智能体提供适用于此主机上所有聊天的额外说明和上下文。</span>
         </div>
         <button onClick={save} disabled={!changed || saving} role="button" aria-label="保存自定义指令">
-          <span className={" "}>{saving ? '保存中' : '保存'}</span>
+          <span>{saving ? '保存中' : '保存'}</span>
         </button>
       </div>
-      <textarea value={value} onChangeText={setValue} multiline textAlignVertical="top" placeholder="例如：回答时保持简洁；先说明结论，再给出关键步骤。" placeholderTextColor={palette.textTertiary} aria-label="自定义指令" className={"  text-foreground bg-muted border-border"} />
+      <textarea value={value} onChange={event => setValue(event.target.value)} multiline placeholder="例如：回答时保持简洁；先说明结论，再给出关键步骤。" aria-label="自定义指令" className={"  text-foreground bg-muted border-border"} />
       <span className={"  text-text-tertiary"}>保存后，新建或重新载入的智能体会应用这些指令。</span>
     </div>;
 }

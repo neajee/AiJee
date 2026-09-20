@@ -71,16 +71,16 @@ export function PackageDetail({
         <div className={"block"}>
           <div className={"  p-[var(--gutter)]"}>
             <div className={"block"}>
-              <span className={"  text-[0px]"}>
+              <span className="text-lg font-semibold text-foreground">
                 {pkg.name}
               </span>
-              <span className={" "}>
+              <span>
                 v{pkg.version}
                 {pkg.author ? ` · ${pkg.author}` : ''}
                 {pkg.package_types.length ? ` · ${pkg.package_types.join('、')}` : ''}
               </span>
             </div>
-            <button onClick={onClose} role="button" aria-label="关闭" hitSlop={8} className={"block"}>
+            <button onClick={onClose} role="button" aria-label="关闭" className={"block"}>
               <X size={16} color={p.textSecondary} strokeWidth={2} />
             </button>
           </div>

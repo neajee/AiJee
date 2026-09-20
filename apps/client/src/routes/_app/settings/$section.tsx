@@ -1,19 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback } from 'react';
 import { Redirect, useLocalSearchParams, useRouter } from '@/hooks/router';
-
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { SettingsDetailScreen } from '@/features/settings/components/settings-screens';
 import { findSettingsSection } from '@/features/settings/sections';
 import { useWorkspaceStore } from '@/features/workspace/store';
-
 export default function SettingsSectionScreen() {
   const router = useRouter();
   const isDark = (useColorScheme() ?? 'light') === 'dark';
-  const { section: slug } = useLocalSearchParams<{ section: string }>();
+  const {
+    section: slug
+  } = useLocalSearchParams<{
+    section: string;
+  }>();
   const section = findSettingsSection(slug);
-  const selectedWorkspaceId = useWorkspaceStore((s) => s.selectedWorkspaceId);
-
+  const selectedWorkspaceId = useWorkspaceStore(s => s.selectedWorkspaceId);
   const handleBack = useCallback(() => {
     if (selectedWorkspaceId) {
       router.replace(`/workspace/${selectedWorkspaceId}`);
@@ -21,10 +22,9 @@ export default function SettingsSectionScreen() {
     }
     router.replace('/');
   }, [router, selectedWorkspaceId]);
-
   if (!section) return <Redirect href="/settings" />;
-
   return <SettingsDetailScreen section={section} isDark={isDark} onBack={handleBack} />;
 }
-
-export const Route = createFileRoute("/_app/settings/$section")({ component: SettingsSectionScreen });
+export const Route = createFileRoute("/_app/settings/$section")({
+  component: SettingsSectionScreen
+});

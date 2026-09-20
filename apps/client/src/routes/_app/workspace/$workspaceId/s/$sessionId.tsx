@@ -109,7 +109,7 @@ export default function SessionScreen() {
       <NarrowDiffSheetProvider>
       <div className={"  pb-0"}>
         <div className={"block"}>
-          <div className={" "}>
+          <div>
             {agentSession.isReady && hasMessages && sessionId ? <MessageList key={sessionId} sessionId={sessionId} onForked={nextSessionId => {
               router.replace(`/workspace/${workspaceId}/s/${nextSessionId}`);
             }} /> : agentSession.isLoading || !agentSession.isReady && sessionId ? <ChatShimmer /> : <div className={"block"} />}

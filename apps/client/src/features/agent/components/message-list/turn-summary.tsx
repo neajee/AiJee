@@ -62,16 +62,16 @@ export const TurnSummary = memo(function TurnSummary({
             <div className={"block"}>
               {Array.from({
               length: addBlocks
-            }).map((_, i) => <div key={`a-${i}`} className={" "} />)}
+            }).map((_, i) => <div key={`a-${i}`} />)}
               {Array.from({
               length: removeBlocks
-            }).map((_, i) => <div key={`r-${i}`} className={" "} />)}
+            }).map((_, i) => <div key={`r-${i}`} />)}
             </div>
           </ToolHeader>
         </div>
 
         {expandable && <ToolBody expanded={expanded}>
-            <div className={" "}
+            <div
         // A turn can touch dozens of files; cap it like any tool body.
         nestedScrollEnabled scrollEnabled={ordered.length > SUMMARY_SCROLL_AFTER}>
               {ordered.map(change => <FileChangeRow key={change.path} change={change} root={root} addColor={addColor} removeColor={removeColor} isDark={isDark} />)}

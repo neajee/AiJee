@@ -31,7 +31,7 @@ function UserShimmer() {
   const colorScheme = useColorScheme() ?? "light";
   const isDark = colorScheme === "dark";
   return <div className={"block"}>
-      <div className={" "}>
+      <div>
         <ShimmerBar width="100%" delay={0} />
       </div>
     </div>;

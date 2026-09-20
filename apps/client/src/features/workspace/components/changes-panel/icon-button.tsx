@@ -14,7 +14,7 @@ export function IconButton({
   return <button onClick={e => {
     e.stopPropagation?.();
     if (!disabled) onPress();
-  }} hitSlop={6} disabled={disabled} aria-label={title} role="button" {...{
+  }} disabled={disabled} aria-label={title} role="button" {...{
     title
   }}>
       {icon}

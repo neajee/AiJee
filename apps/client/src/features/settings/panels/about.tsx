@@ -78,24 +78,24 @@ export function AboutPanel() {
       <AboutGroup title="当前版本">
         <div className={"block"}>
           <div className={"block"}>
-            <span className={" "}>{versionLabel}</span>
-            <span className={" "}>
+            <span>{versionLabel}</span>
+            <span>
               {heroBuildMeta}
             </span>
           </div>
           <div className={"block"}>
-            {checkState === 'checking' ? <div className={" "}>
-                <span size="small" color={p.textTertiary} />
-                <span className={" "}>检查中…</span>
+            {checkState === 'checking' ? <div>
+                <span className="size-3 animate-spin" />
+                <span>检查中…</span>
               </div> : checkState === 'error' ? <button onClick={() => void checkLatest()} role="button" aria-label="重新检查更新">
                 <RefreshCw size={14} color={p.textSecondary} strokeWidth={1.8} />
-                <span className={" "}>检查失败</span>
+                <span>检查失败</span>
               </button> : release?.update_available && latestLabel ? <button onClick={openRelease} role="button" aria-label={`v${latestLabel} 可用，查看发布页`}>
                 <ArrowUpCircle size={16} color={p.onAccent} strokeWidth={1.8} />
-                <span className={" "}>v{latestLabel} 可用</span>
+                <span>v{latestLabel} 可用</span>
               </button> : <button onClick={() => void checkLatest()} role="button" aria-label="检查更新">
                 {checkState === 'checked' ? <CheckCircle2 size={14} color={p.success} strokeWidth={1.8} /> : <RefreshCw size={14} color={p.textSecondary} strokeWidth={1.8} />}
-                <span className={" "}>
+                <span>
                   {checkState === 'checked' ? '已是最新' : '检查更新'}
                 </span>
               </button>}
@@ -106,10 +106,10 @@ export function AboutPanel() {
       {/* 2 · Changelog timeline */}
       <AboutGroup title={`更新日志 (${timeline.length})`}>
         {timeline.length ? <div className={"block"}>
-            <div className={" "} />
+            <div />
             {timeline.map((releaseEntry, index) => <ReleaseRow key={releaseEntry.tag} release={releaseEntry} current={releaseEntry.tag === currentReleaseTag} defaultOpen={index === 0} />)}
           </div> : <div className={"block"}>
-            <span className={" "}>当前构建未附带发布记录。</span>
+            <span>当前构建未附带发布记录。</span>
           </div>}
       </AboutGroup>
 

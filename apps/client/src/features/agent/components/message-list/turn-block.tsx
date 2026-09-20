@@ -74,19 +74,19 @@ export const TurnBlock = memo(function TurnBlock({
   const showDivider = hasWork || active || !!settledMs;
   const forkEntryId = turn.final?.entryId ?? turn.sourceEntryId;
   const divider = <div className={"block"}>
-      <div className={" "} />
+      <div />
       <div className={"block"}>
-        <span className={" "}>
+        <span>
           {label}
         </span>
-        {timeLabel && <span className={" "}>
+        {timeLabel && <span>
             {timeLabel}
           </span>}
-        {hasWork && <div className={" "}>
+        {hasWork && <div>
             <ChevronRight size={12} color={colors.textTertiary} strokeWidth={2} />
           </div>}
       </div>
-      <div className={" "} />
+      <div />
     </div>;
   return <div {...true ? {
     onPointerEnter: () => setHovered(true),
@@ -96,12 +96,12 @@ export const TurnBlock = memo(function TurnBlock({
             {divider}
           </button> : divider)}
 
-      {hasWork && expanded && <div entering={FadeIn.duration(140)} className={" "}>
+      {hasWork && expanded && <div entering={FadeIn.duration(140)}>
           {sections.map(section => section.kind === "activity" ? <WorkActivityGroup key={section.key} steps={section.steps} isDark={isDark} /> : <WorkStepView key={section.key} step={section.step} isDark={isDark} />)}
         </div>}
 
       {turn.final && <AssistantMessage message={turn.final} isDark={isDark} />}
-      {turn.aborted && <span className={" "}>
+      {turn.aborted && <span>
           Stopped
         </span>}
       {turn.fileStats && <TurnSummary stats={turn.fileStats} changes={fileChanges} isDark={isDark} />}
@@ -109,7 +109,7 @@ export const TurnBlock = memo(function TurnBlock({
       {turn.final && !turn.final.isStreaming && (turn.final.text || turn.final.errorMessage) && <div className={"block"}>
           <MessageToolbar message={turn.final} isDark={isDark} hovered={hovered} />
           {forkEntryId && onFork && <button onClick={() => onFork(forkEntryId)} disabled={active || !!forkingEntryId} role="button" aria-label="Fork from this reply" className={"block"}>
-              {forkingEntryId === forkEntryId ? <span size="small" color={colors.textTertiary} className={"w-[12px] h-[12px]"} /> : <GitFork size={14} color={colors.textTertiary} strokeWidth={1.8} />}
+              {forkingEntryId === forkEntryId ? <span className={"w-[12px] h-[12px]" + " size-3 animate-spin"} /> : <GitFork size={14} color={colors.textTertiary} strokeWidth={1.8} />}
             </button>}
         </div>}
     </div>;

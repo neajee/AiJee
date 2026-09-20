@@ -100,9 +100,7 @@ function ThemePicker({
       label
     }) => {
       const active = value === key;
-      return <button key={key} onClick={() => onChange(key)} role="button" accessibilityState={{
-        selected: active
-      }} aria-label={`主题：${label}`} hitSlop={4}>
+      return <button key={key} onClick={() => onChange(key)} role="button" aria-label={`主题：${label}`}>
             <Icon size={m.tileIcon + 2} color={active ? compact ? p.text : p.onAccent : p.textTertiary} strokeWidth={active ? 2.2 : 1.8} />
             {!compact ? <span className={"text-[var(--desc-size)] font-sans"}>{label}</span> : null}
           </button>;
@@ -190,9 +188,9 @@ function SizeStepper({
   max: number;
   palette: ReturnType<typeof useSettingsPalette>;
 }) {
-  return <div className={" "}>
+  return <div>
       <button onClick={() => onChange(Math.max(min, value - 1))} aria-label="减小字号"><span className={"block"}>−</span></button>
-      <span className={" "}>{value}px</span>
+      <span>{value}px</span>
       <button onClick={() => onChange(Math.min(max, value + 1))} aria-label="增大字号"><span className={"block"}>+</span></button>
     </div>;
 }

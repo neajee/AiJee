@@ -37,15 +37,15 @@ export function QrScanner({
   };
   if (step === 'pairing') {
     return <div {...modalProps} animationType="fade">
-        <button className={" "} onClick={handleClose} aria-label="关闭配对弹窗">
-          <button className={" "} onClick={event => event.stopPropagation()}>
+        <button onClick={handleClose} aria-label="关闭配对弹窗">
+          <button onClick={event => event.stopPropagation()}>
             <div className={"block"}>
-              <span size="large" color={textPrimary} />
-              <span className={" "}>Connecting to AiJee</span>
-              <span className={" "}>Completing secure pairing…</span>
+              <span className="size-3 animate-spin" />
+              <span>Connecting to AiJee</span>
+              <span>Completing secure pairing…</span>
             </div>
-            <button onClick={handleClose} className={" "}>
-              <span className={" "}>Cancel</span>
+            <button onClick={handleClose}>
+              <span>Cancel</span>
             </button>
           </button>
         </button>
@@ -53,13 +53,13 @@ export function QrScanner({
   }
   if (step === 'done') {
     return <div {...modalProps} animationType="fade">
-        <button className={" "} onClick={handleClose} aria-label="关闭配对成功弹窗">
-          <button className={" "} onClick={event => event.stopPropagation()}>
+        <button onClick={handleClose} aria-label="关闭配对成功弹窗">
+          <button onClick={event => event.stopPropagation()}>
             <div className={"block"}>
-              <div className={" "}>
+              <div>
                 <Check size={28} color="#fff" strokeWidth={2.5} />
               </div>
-              <span className={" "}>Connected</span>
+              <span>Connected</span>
             </div>
           </button>
         </button>
@@ -67,21 +67,21 @@ export function QrScanner({
   }
   if (step === 'error') {
     return <div {...modalProps} animationType="fade">
-        <button className={" "} onClick={handleClose} aria-label="关闭配对失败弹窗">
-          <button className={" "} onClick={event => event.stopPropagation()}>
+        <button onClick={handleClose} aria-label="关闭配对失败弹窗">
+          <button onClick={event => event.stopPropagation()}>
             <div className={"block"}>
-              <div className={" "}>
+              <div>
                 <AlertCircle size={28} color="#fff" strokeWidth={2} />
               </div>
-              <span className={" "}>Pairing Failed</span>
-              <span className={" "}>{error}</span>
+              <span>Pairing Failed</span>
+              <span>{error}</span>
             </div>
             <div className={"block"}>
-              <button onClick={reset} className={" "}>
-                <span className={" "}>Try Again</span>
+              <button onClick={reset}>
+                <span>Try Again</span>
               </button>
-              <button onClick={handleClose} className={" "}>
-                <span className={" "}>Cancel</span>
+              <button onClick={handleClose}>
+                <span>Cancel</span>
               </button>
             </div>
           </button>
@@ -90,23 +90,23 @@ export function QrScanner({
   }
   if (step === 'pick-ip' && connectParams) {
     return <div {...modalProps} animationType="fade">
-        <button className={" "} onClick={handleClose} aria-label="关闭网络选择弹窗">
-          <button className={" "} onClick={event => event.stopPropagation()}>
+        <button onClick={handleClose} aria-label="关闭网络选择弹窗">
+          <button onClick={event => event.stopPropagation()}>
             <div className={"block"}>
-              <span className={" "}>Select Network</span>
+              <span>Select Network</span>
               <button onClick={handleClose} className={"block"}>
                 <X size={18} color={textMuted} strokeWidth={1.8} />
               </button>
             </div>
-            <span className={" "}>
+            <span>
               {connectParams.hostname ? `"${connectParams.hostname}" is available on multiple addresses:` : 'Multiple addresses found:'}
             </span>
             <div className={"block"}>
               {connectParams.ips.map(ip => <button key={ip} onClick={() => handleSelectIp(ip)}>
                   <Wifi size={16} color={textMuted} strokeWidth={1.8} />
                   <div className={"block"}>
-                    <span className={" "}>{ip}</span>
-                    <span className={" "}>Port {connectParams.port}</span>
+                    <span>{ip}</span>
+                    <span>Port {connectParams.port}</span>
                   </div>
                 </button>)}
             </div>
@@ -115,27 +115,27 @@ export function QrScanner({
       </div>;
   }
   return <div {...modalProps} animationType="fade">
-      <button className={" "} onClick={handleClose} aria-label="关闭扫码弹窗">
-        <button className={" "} onClick={event => event.stopPropagation()}>
+      <button onClick={handleClose} aria-label="关闭扫码弹窗">
+        <button onClick={event => event.stopPropagation()}>
           <div className={"block"}>
-            <span className={" "}>Scan QR Code</span>
+            <span>Scan QR Code</span>
             <button onClick={handleClose} className={"block"}>
               <X size={18} color={textMuted} strokeWidth={1.8} />
             </button>
           </div>
           <QrScannerScanPanel visible={visible} scanned={scanned} isDark={isDark} textMuted={textMuted} onBarcodeData={handleBarCodeScanned} />
           <div className={"block"}>
-            <span className={" "}>
+            <span>
               {true ? 'Paste connect URL' : 'Or paste URL manually'}
             </span>
             <div className={"block"}>
-              <input className={" "} value={manualUrl} onChangeText={handleManualUrlChange} placeholder="http://设备地址/?k=授权码" placeholderTextColor={isDark ? '#666' : '#bbb'} autoCapitalize="none" autoCorrect={false} />
+              <input value={manualUrl} onChange={event => handleManualUrlChange(event.target.value)} placeholder="http://设备地址/?k=授权码" />
               <button onClick={handleManualSubmit} className={"  opacity-[0.4]"} disabled={!manualUrl.trim()}>
-                <span className={" "}>Connect</span>
+                <span>Connect</span>
               </button>
             </div>
           </div>
-          {error && <span className={" "}>{error}</span>}
+          {error && <span>{error}</span>}
         </button>
       </button>
     </div>;

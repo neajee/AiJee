@@ -30,10 +30,10 @@ export function FileTree({
   const treeWidth = isNarrow ? TREE_COLUMN_NARROW : TREE_COLUMN_WIDTH;
   const tree = <>
       <div className={"block"}>
-        <div className={" "}>
+        <div>
           <Search size={13} color={textMuted} strokeWidth={2} />
-          <input value={query} onChangeText={setQuery} placeholder="Filter files…" placeholderTextColor={textMuted} className={" "} autoCapitalize="none" autoCorrect={false} aria-label="Filter files" />
-          {query.length > 0 && <button onClick={() => setQuery("")} hitSlop={6} aria-label="Clear filter" {...{
+          <input value={query} onChange={event => setQuery(event.target.value)} placeholder="Filter files…" aria-label="Filter files" />
+          {query.length > 0 && <button onClick={() => setQuery("")} aria-label="Clear filter" {...{
           title: "Clear filter"
         }}>
               <X size={12} color={textMuted} strokeWidth={2} />
@@ -50,10 +50,10 @@ export function FileTree({
           <div className={"block"}>
             {viewingFile ? <FileViewer filePath={viewingFile} rootPath={rootPath} onClose={() => onViewFile(null)} /> : <div className={"block"}>
                 <FolderOpen size={26} color={textMuted} strokeWidth={1.5} />
-                <span className={" "}>
+                <span>
                   Open a file
                 </span>
-                <span className={" "}>
+                <span>
                   Pick one from the workspace tree
                 </span>
               </div>}

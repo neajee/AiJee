@@ -29,18 +29,18 @@ export function FilesPanel() {
     });
   }, []);
   if (!cwd) {
-    return <div className={" "}>
-        <span className={" "}>
+    return <div>
+        <span>
           No workspace selected
         </span>
       </div>;
   }
-  return <div className={" "}>
-      <div className={" "}>
-        <span className={" "}>
+  return <div>
+      <div>
+        <span>
           Files
         </span>
-        <span className={" "}>
+        <span>
           {workspace?.title ?? cwd}
         </span>
       </div>

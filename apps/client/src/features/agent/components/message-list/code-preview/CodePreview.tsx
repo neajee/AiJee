@@ -35,7 +35,7 @@ export const CodePreview = memo(function CodePreview({
             {lines.map((line, index) => {
             const segments = tokenizeLine(line, language, diffLanguage);
             return <div key={index} className={"block"}>
-                  {showLineNumbers ? <div className={" "}>
+                  {showLineNumbers ? <div>
                       <span className={"  text-text-tertiary"}>{startLine + index}</span>
                     </div> : null}
                   <span className={"  text-foreground"}>

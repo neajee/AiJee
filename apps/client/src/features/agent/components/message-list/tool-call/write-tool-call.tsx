@@ -30,7 +30,7 @@ export const WriteToolCall = memo(function WriteToolCall({
         <span className={"  text-text-secondary"}>
           {title} {fileName || filePath || "file"}
         </span>
-        {addedLines > 0 && <span className={" "}>
+        {addedLines > 0 && <span>
             +{addedLines}
           </span>}
       </ToolHeader>

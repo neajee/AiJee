@@ -22,7 +22,7 @@ export function ExtensionUiView({
   if (!request) return null;
   return <div className={"block"}>
       <div className={"  bg-surface border-border"}>
-        <div className={" "}>
+        <div>
           <div className={"block"}>
             <span className={"  text-foreground"}>
               {title}
@@ -73,16 +73,16 @@ export function ExtensionUiView({
           </div>}
 
         {request.method === "input" && <div className={"block"}>
-            <input value={draft} onChangeText={setDraft} placeholder={request.placeholder ?? "Type your response"} placeholderTextColor={theme.textMuted} className={"  text-foreground bg-card border-border"} autoFocus autoCorrect={false} editable={!mutation.isPending} returnKeyType="done" onSubmitEditing={() => submit({
+            <input value={draft} onChange={event => setDraft(event.target.value)} placeholder={request.placeholder ?? "Type your response"} className={"  text-foreground bg-card border-border"} autoFocus editable={!mutation.isPending} onKeyDown={event => event.key === "Enter" && (() => submit({
           value: draft
-        })} />
+        }))(event)} />
           </div>}
 
         {request.method === "editor" && <div className={"block"}>
-            <input value={draft} onChangeText={setDraft} placeholder="Edit the text" placeholderTextColor={theme.textMuted} className={"  text-foreground bg-card border-border"} autoFocus multiline textAlignVertical="top" editable={!mutation.isPending} />
+            <input value={draft} onChange={event => setDraft(event.target.value)} placeholder="Edit the text" className={"  text-foreground bg-card border-border"} autoFocus multiline editable={!mutation.isPending} />
           </div>}
 
-        {request.method !== "confirm" && <div className={" "}>
+        {request.method !== "confirm" && <div>
             <button onClick={handleCancel} disabled={mutation.isPending} className={"  border-border"}>
               <span className={"  text-foreground"}>
                 Cancel
@@ -91,7 +91,7 @@ export function ExtensionUiView({
             <button onClick={() => submit({
           value: request.method === "select" ? selectedOption : draft
         })} disabled={mutation.isPending || !canSubmitSelect} className={"  bg-foreground opacity-100"}>
-              {mutation.isPending ? <span size="small" color={theme.colors.background} /> : <span className={"  text-surface"}>
+              {mutation.isPending ? <span className="size-3 animate-spin" /> : <span className={"  text-surface"}>
                   Submit
                 </span>}
             </button>

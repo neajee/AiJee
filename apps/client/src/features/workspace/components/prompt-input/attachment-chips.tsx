@@ -19,17 +19,17 @@ export function AttachmentChips({
           {imageAtts.map(att => <div key={att.id} className={"  border-border"}>
               {att.preview ? <img src={{
           uri: att.preview
-        }} className={"block"} /> : <div className={" "}>
+        }} className={"block"} /> : <div>
                   <ImageIcon size={18} color={theme.textMuted} strokeWidth={1.8} />
                 </div>}
-              <button onClick={() => onRemove(att.id)} className={" "} role="button" aria-label="Remove image" hitSlop={6}>
+              <button onClick={() => onRemove(att.id)} role="button" aria-label="Remove image">
                 <X size={11} color={theme.isDark ? '#fff' : '#333'} strokeWidth={2.5} />
               </button>
             </div>)}
         </div>}
 
       {fileAtts.length > 0 && <div horizontal className={"block"}>
-          {fileAtts.map(att => <div key={att.id} className={" "}>
+          {fileAtts.map(att => <div key={att.id}>
               <FileText size={14} color={theme.textMuted} strokeWidth={1.8} />
               <span className={"  text-foreground"}>
                 {att.name}

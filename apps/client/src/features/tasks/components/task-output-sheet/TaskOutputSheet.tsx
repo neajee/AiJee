@@ -90,7 +90,7 @@ export function TaskOutputSheet({
   const statusColor = selectedInstance?.status === 'running' ? '#34C759' : selectedInstance?.status === 'failed' ? '#FF3B30' : '#8E8E93';
   return <div {...false ? {
     pointerEvents: visible ? 'auto' as const : 'none' as const
-  } : {}} className={" "}>
+  } : {}}>
       <div className={"  bg-black/50"}>
         <button className={"block"} onClick={dismiss} />
       </div>
@@ -102,27 +102,27 @@ export function TaskOutputSheet({
           </div>
         </div>
 
-        <div className={" "}>
+        <div>
           <div className={"block"}>
             {selectedInstance ? <>
                 <Circle size={8} color={statusColor} fill={statusColor} strokeWidth={0} />
-                <span className={" "}>
+                <span>
                   {selectedInstance.label}
                 </span>
-                <span className={" "}>
+                <span>
                   {selectedInstance.command}
                 </span>
-              </> : <span className={" "}>Task Output</span>}
+              </> : <span>Task Output</span>}
           </div>
           <button onClick={dismiss} className={"block"}>
             <X size={14} color={textMuted} strokeWidth={2} />
           </button>
         </div>
 
-        <div ref={logScrollRef} className={" "}>
-          {selectedLogs.length === 0 ? <span className={" "}>
+        <div ref={logScrollRef}>
+          {selectedLogs.length === 0 ? <span>
               {selectedInstance ? 'No output yet...' : 'Select a running task to view output'}
-            </span> : selectedLogs.map((line, i) => <span key={i} className={" "} selectable>
+            </span> : selectedLogs.map((line, i) => <span key={i}>
                 {line}
               </span>)}
         </div>

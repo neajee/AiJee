@@ -98,7 +98,7 @@ export default function DirectConnectScreen() {
   };
   return <div className={"  bg-background"}>
       <div className={"  bg-surface border-border"}>
-        {status === "error" ? <div className={" "} /> : <span size="large" color={status === "done" ? colors.success : colors.text} />}
+        {status === "error" ? <div /> : <span className="size-3 animate-spin" />}
         <span className={"  text-foreground"}>
           {titleByStatus[status]}
         </span>

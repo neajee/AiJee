@@ -40,7 +40,7 @@ export function WorkspaceSessions({
   useEffect(() => {
     if (forcedOpen) setShowAll(true);
   }, [forcedOpen]);
-  if (isLoading) return <span size="small" className={"block"} />;
+  if (isLoading) return <span className={"block" + " size-3 animate-spin"} />;
   if (sessions.length === 0) return <span className={"  text-text-tertiary"}>暂无对话</span>;
   const expanded = showAll || forcedOpen;
   const visible = expanded ? sessions : sessions.slice(0, SESSION_PREVIEW_COUNT);

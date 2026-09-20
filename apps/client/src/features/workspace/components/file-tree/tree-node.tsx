@@ -52,7 +52,7 @@ export function FileTreeNode({
         {entry.is_dir ? <div className={"block"}>
             {expanded ? <ChevronDown size={13} color={textMuted} strokeWidth={2} /> : <ChevronRight size={13} color={textMuted} strokeWidth={2} />}
           </div> : <FileTypeBadge path={entry.path} fallbackColor={iconColor} />}
-        <span className={" "}>
+        <span>
           {entry.name}
         </span>
       </button>
@@ -85,7 +85,7 @@ function ExpandedDir({
   } = useFileList(dirPath);
   if (isLoading) {
     return <div className={"pl-0 pt-[4px] pb-[4px]"}>
-        <span size="small" />
+        <span className="size-3 animate-spin" />
       </div>;
   }
   if (!entries || entries.length === 0) {

@@ -55,10 +55,7 @@ export function ContextDropdown({
   onAddBranch
 }: ContextDropdownProps) {
   if (!isGitRepo && open === 'branch') return null;
-  const renderControl = (kind: Exclude<DropdownKind, null>, icon: ReactNode, label: string, labelText: string, disabled = false) => <button onClick={() => onToggle(kind)} disabled={disabled} role="button" aria-label={labelText} accessibilityState={{
-    expanded: open === kind,
-    disabled
-  }}>
+  const renderControl = (kind: Exclude<DropdownKind, null>, icon: ReactNode, label: string, labelText: string, disabled = false) => <button onClick={() => onToggle(kind)} disabled={disabled} role="button" aria-label={labelText}>
       {icon}<span className={"  text-text-secondary"}>{label}</span>
       {!disabled && <ChevronDown size={12} color={theme.textMuted} strokeWidth={1.8} />}
     </button>;
@@ -69,10 +66,8 @@ export function ContextDropdown({
           <div className={"block"}>
             {workspaces.map(workspace => {
             const active = workspace.id === selectedWorkspaceId;
-            return <button key={workspace.id} onClick={() => onSelectProject(workspace.id)} role="menuitem" accessibilityState={{
-              selected: active
-            }}>
-                <div className={"block"}><div className={"  bg-background"} /><span className={" "}>{workspace.title}</span></div>
+            return <button key={workspace.id} onClick={() => onSelectProject(workspace.id)} role="menuitem">
+                <div className={"block"}><div className={"  bg-background"} /><span>{workspace.title}</span></div>
                 {active && <Check size={13} color={theme.accentColor} strokeWidth={2} />}
               </button>;
           })}
@@ -88,11 +83,9 @@ export function ContextDropdown({
           <div className={"block"}>
             {servers.map(server => {
             const active = server.id === activeServerId;
-            return <button key={server.id} onClick={() => void onSelectServer(server)} role="menuitem" accessibilityState={{
-              selected: active
-            }}>
-                <div className={"block"}><Globe size={13} color={active ? theme.accentColor : theme.textMuted} strokeWidth={1.8} /><div className={"block"}><span className={" "}>{server.name}</span><span className={"  text-text-secondary"}>{server.address}</span></div></div>
-                {busy === server.id ? <span size="small" color={theme.textMuted} /> : active && <Check size={13} color={theme.accentColor} strokeWidth={2} />}
+            return <button key={server.id} onClick={() => void onSelectServer(server)} role="menuitem">
+                <div className={"block"}><Globe size={13} color={active ? theme.accentColor : theme.textMuted} strokeWidth={1.8} /><div className={"block"}><span>{server.name}</span><span className={"  text-text-secondary"}>{server.address}</span></div></div>
+                {busy === server.id ? <span className="size-3 animate-spin" /> : active && <Check size={13} color={theme.accentColor} strokeWidth={2} />}
               </button>;
           })}
           </div>
@@ -101,9 +94,7 @@ export function ContextDropdown({
       {isGitRepo && <div className={"block"}>
         {renderControl('branch', <GitBranch size={13} color={theme.textMuted} strokeWidth={1.8} />, currentBranch ?? '—', `Branch: ${currentBranch ?? 'unknown'}. Press to change.`)}
         {open === 'branch' && <div role="menu" aria-label="Branch selection" className={"block"}>
-          {branchesLoading && !branches ? <div className={"block"}><span size="small" color={theme.textMuted} /></div> : localBranches.length === 0 ? <span className={"  text-text-secondary"}>No branches found</span> : <><div className={"block"}>{localBranches.map(branch => <button key={branch.name} onClick={() => void onSelectBranch(branch)} role="menuitem" accessibilityState={{
-              selected: branch.is_current
-            }}><div className={"block"}><GitBranch size={13} color={branch.is_current ? theme.accentColor : theme.textMuted} strokeWidth={1.8} /><span className={" "}>{branch.name}</span></div>{busy === branch.name ? <span size="small" color={theme.textMuted} /> : branch.is_current && <Check size={13} color={theme.accentColor} strokeWidth={2} />}</button>)}</div><button onClick={onAddBranch}><Plus size={13} color={theme.textMuted} strokeWidth={1.8} /><span className={"  text-text-secondary"}>新建分支</span></button></>}</div>}
+          {branchesLoading && !branches ? <div className={"block"}><span className="size-3 animate-spin" /></div> : localBranches.length === 0 ? <span className={"  text-text-secondary"}>No branches found</span> : <><div className={"block"}>{localBranches.map(branch => <button key={branch.name} onClick={() => void onSelectBranch(branch)} role="menuitem"><div className={"block"}><GitBranch size={13} color={branch.is_current ? theme.accentColor : theme.textMuted} strokeWidth={1.8} /><span>{branch.name}</span></div>{busy === branch.name ? <span className="size-3 animate-spin" /> : branch.is_current && <Check size={13} color={theme.accentColor} strokeWidth={2} />}</button>)}</div><button onClick={onAddBranch}><Plus size={13} color={theme.textMuted} strokeWidth={1.8} /><span className={"  text-text-secondary"}>新建分支</span></button></>}</div>}
       </div>}
     </div>;
 }

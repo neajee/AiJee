@@ -26,10 +26,10 @@ export function ServerFormDesktopModal({
   const overlayBg = isDark ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.3)';
   const canSave = Boolean(name.trim() && address.trim() && !loading);
   return <div visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <button className={" "} onClick={loading ? undefined : onClose}>
-        <button className={" "} onClick={() => {}}>
+      <button onClick={loading ? undefined : onClose}>
+        <button onClick={() => {}}>
           <div className={"block"}>
-            <span className={" "}>
+            <span>
               {initial ? 'Edit Server' : 'Add Server'}
             </span>
             <button onClick={onClose} className={"block"} disabled={loading}>
@@ -37,12 +37,12 @@ export function ServerFormDesktopModal({
             </button>
           </div>
           <ServerFormFields name={name} setName={setName} address={address} setAddress={setAddress} isDark={isDark} autoFocus />
-          {error && <span className={" "}>
+          {error && <span>
               {error}
             </span>}
           <div className={"block"}>
-            <button onClick={onClose} className={" "} disabled={loading}>
-              <span className={" "}>Cancel</span>
+            <button onClick={onClose} disabled={loading}>
+              <span>Cancel</span>
             </button>
             <button onClick={() => {
             if (canSave) onSave({
@@ -50,7 +50,7 @@ export function ServerFormDesktopModal({
               address: address.trim()
             });
           }} className={"  opacity-[0.4]"} disabled={!canSave}>
-              {loading ? <span size="small" color="#fff" /> : <span className={"  text-[#fff]"}>
+              {loading ? <span className="size-3 animate-spin" /> : <span className={"  text-[#fff]"}>
                   {initial ? 'Save' : 'Add & Connect'}
                 </span>}
             </button>

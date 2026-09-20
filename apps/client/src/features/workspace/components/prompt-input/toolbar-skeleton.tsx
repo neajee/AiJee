@@ -31,15 +31,15 @@ export function ToolbarSkeleton({
   const border = isDark ? "#3b3a39" : "rgba(0,0,0,0.12)";
   if (inline) {
     return <div className={"  opacity-100"}>
-        <div className={" "} />
-        <div className={" "} />
+        <div />
+        <div />
       </div>;
   }
   return <div className={"block"}>
-      <div className={" "}>
+      <div>
         <div className={"  opacity-100"}>
-          <div className={" "} />
-          <div className={" "} />
+          <div />
+          <div />
         </div>
       </div>
     </div>;

@@ -66,9 +66,9 @@ function NarrowEffortSheetComponent({
         <div className={"  opacity-100"}>
           <button className={"block"} onClick={handleClose} />
         </div>
-        <div className={" "}>
+        <div>
           <div className={"block"}>
-            <div className={" "} />
+            <div />
           </div>
           <span className={"  text-foreground"}>思考深度</span>
           {[{
@@ -78,7 +78,7 @@ function NarrowEffortSheetComponent({
           const isActive = item.level === thinkingPreference;
           return <button key={item.level} onClick={() => handleSelect(item.level)}>
                 <div>
-                  <span className={" "}>
+                  <span>
                     {item.label}
                   </span>
                 </div>

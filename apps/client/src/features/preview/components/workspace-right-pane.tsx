@@ -29,7 +29,7 @@ function WorkspaceRightPaneComponent({
   useEffect(() => {
     setPreviewActive(previewPaneOpen);
   }, [previewPaneOpen]);
-  return <div className={" "}>
+  return <div>
       <ChangesPanel extraTabs={isDesktopShell ? PREVIEW_TAB : undefined} activeExtraTab={isDesktopShell && previewActive ? "preview" : null} onExtraTabChange={isDesktopShell ? key => {
       const open = key === "preview";
       setPreviewActive(open);

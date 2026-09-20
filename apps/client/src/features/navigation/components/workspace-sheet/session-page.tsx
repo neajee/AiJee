@@ -40,30 +40,30 @@ export function SessionPage({
   }, [createPending, onDismiss, router, workspaceId]);
   return <div className={"block"}>
       <div className={"block"}>
-        <span className={" "}>Sessions</span>
+        <span>Sessions</span>
         <button onClick={() => refetch()} disabled={isRefetching}>
-          {isRefetching ? <span size="small" color={textMuted} className={"w-[13px] h-[13px]"} /> : <RefreshCw size={13} color={textMuted} strokeWidth={1.8} />}
+          {isRefetching ? <span className={"w-[13px] h-[13px]" + " size-3 animate-spin"} /> : <RefreshCw size={13} color={textMuted} strokeWidth={1.8} />}
         </button>
       </div>
 
       <div className={"block"}>
         <button onClick={handleNewSession} disabled={createPending}>
-          {createPending ? <span size="small" color={textPrimary} className={"w-[14px] h-[14px]"} /> : <SquarePen size={14} color={textPrimary} strokeWidth={1.8} />}
-          <span className={" "}>New session</span>
+          {createPending ? <span className={"w-[14px] h-[14px]" + " size-3 animate-spin"} /> : <SquarePen size={14} color={textPrimary} strokeWidth={1.8} />}
+          <span>New session</span>
         </button>
       </div>
 
       <div className={"block"} nestedScrollEnabled>
-        {isLoading ? <span className={"mt-[24px]"} /> : sessions.length === 0 ? <span className={" "}>No sessions yet</span> : sessions.map(session => <AnimatedListItem key={session.id}>
+        {isLoading ? <span className={"mt-[24px]"} /> : sessions.length === 0 ? <span>No sessions yet</span> : sessions.map(session => <AnimatedListItem key={session.id}>
               <button onClick={() => onSessionPress(session.id)}>
                 <SessionActivityIndicator sessionId={session.id} color={textMuted} />
-                <span className={" "}>
+                <span>
                   {session.display_name ?? session.id}
                 </span>
               </button>
             </AnimatedListItem>)}
         {hasNextPage && <button onClick={() => fetchNextPage()} disabled={isFetchingNextPage}>
-            {isFetchingNextPage ? <span size="small" /> : <span className={" "}>Load more</span>}
+            {isFetchingNextPage ? <span className="size-3 animate-spin" /> : <span>Load more</span>}
           </button>}
       </div>
     </div>;

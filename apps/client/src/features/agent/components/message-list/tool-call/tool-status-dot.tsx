@@ -12,7 +12,7 @@ export const ToolStatusDot = memo(function ToolStatusDot({
   const isActive = status === "streaming" || status === "pending" || status === "running";
   if (status === "running") {
     return <div className={"w-0 h-0 items-center justify-center"}>
-        <span size="small" color="#999" className={"w-0 h-0"} />
+        <span className={"w-0 h-0" + " size-3 animate-spin"} />
       </div>;
   }
   if (!isActive) return null;

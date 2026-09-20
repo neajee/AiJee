@@ -53,35 +53,35 @@ export function SessionSheetContent({
       <div className={"block"}>
         <div className={"block"}>
           <div className={"block"}>
-            <span className={" "}>{title}</span>
-            {subtitle ? <span className={" "}>
+            <span>{title}</span>
+            {subtitle ? <span>
                 {subtitle}
               </span> : null}
           </div>
           <button onClick={onRefresh} disabled={isRefetching}>
-            {isRefetching ? <span size={13 as any} color={textMuted} /> : <RefreshCw size={13} color={textMuted} strokeWidth={1.8} />}
+            {isRefetching ? <span className="size-3 animate-spin" /> : <RefreshCw size={13} color={textMuted} strokeWidth={1.8} />}
           </button>
         </div>
       </div>
 
       <div className={"block"}>
         <button onClick={onNew} disabled={createPending}>
-          {createPending ? <span size={14 as any} color={textPrimary} /> : <SquarePen size={14 as any} color={textPrimary} strokeWidth={1.8} />}
-          <span className={" "}>{newButtonLabel}</span>
+          {createPending ? <span className="size-3 animate-spin" /> : <SquarePen size={14 as any} color={textPrimary} strokeWidth={1.8} />}
+          <span>{newButtonLabel}</span>
         </button>
       </div>
 
       <div className={"block"}>
-        {isLoading ? <span className={"mt-[24px]"} /> : sessions.length === 0 ? <span className={" "}>{emptyLabel}</span> : sessions.map(session => <AnimatedListItem key={session.id}>
+        {isLoading ? <span className={"mt-[24px]"} /> : sessions.length === 0 ? <span>{emptyLabel}</span> : sessions.map(session => <AnimatedListItem key={session.id}>
               <button onClick={() => onSelect(session.id)}>
                 <SessionActivityIndicator sessionId={session.id} color={textMuted} />
-                <span className={" "}>
+                <span>
                   {session.display_name ?? session.id}
                 </span>
               </button>
             </AnimatedListItem>)}
         {hasNextPage && <button onClick={onLoadMore} disabled={isFetchingNextPage}>
-            {isFetchingNextPage ? <span size="small" /> : <span className={" "}>Load more</span>}
+            {isFetchingNextPage ? <span className="size-3 animate-spin" /> : <span>Load more</span>}
           </button>}
       </div>
 

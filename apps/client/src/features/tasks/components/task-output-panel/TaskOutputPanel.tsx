@@ -71,16 +71,16 @@ export function TaskOutputPanel() {
   if (!outputPanelVisible) return null;
   const statusColor = selectedInstance?.status === 'running' ? '#34C759' : selectedInstance?.status === 'failed' ? '#FF3B30' : '#8E8E93';
   if (minimized) {
-    return <div className={" "}>
+    return <div>
         <button onClick={handleToggleMinimize} className={"block"}>
           <div className={"block"}>
             {selectedInstance && <>
                 <Circle size={8} color={statusColor} fill={statusColor} strokeWidth={0} />
-                <span className={" "}>
+                <span>
                   {selectedInstance.label}
                 </span>
               </>}
-            {!selectedInstance && <span className={" "}>
+            {!selectedInstance && <span>
                 No task selected
               </span>}
           </div>
@@ -97,21 +97,21 @@ export function TaskOutputPanel() {
   }
   return <div className={"  h-0"}>
       <div {...panResponder.panHandlers} className={"block"}>
-        <div className={" "} />
+        <div />
       </div>
 
-      <div className={" "}>
+      <div>
         <div className={"block"}>
           {selectedInstance && <>
               <Circle size={8} color={statusColor} fill={statusColor} strokeWidth={0} />
-              <span className={" "}>
+              <span>
                 {selectedInstance.label}
               </span>
-              <span className={" "}>
+              <span>
                 {selectedInstance.command}
               </span>
             </>}
-          {!selectedInstance && <span className={" "}>
+          {!selectedInstance && <span>
               No task selected
             </span>}
         </div>
@@ -125,10 +125,10 @@ export function TaskOutputPanel() {
         </div>
       </div>
 
-      <div ref={logScrollRef} className={" "}>
-        {selectedLogs.length === 0 ? <span className={" "}>
+      <div ref={logScrollRef}>
+        {selectedLogs.length === 0 ? <span>
             {selectedInstance ? 'No output yet...' : 'Select a running task to view output'}
-          </span> : selectedLogs.map((line, i) => <span key={i} className={" "} selectable>
+          </span> : selectedLogs.map((line, i) => <span key={i}>
               {line}
             </span>)}
       </div>

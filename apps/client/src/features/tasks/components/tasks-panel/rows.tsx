@@ -38,8 +38,8 @@ function SourceBadge({
   const bg = SOURCE_COLORS[source] ?? (isDark ? '#555' : '#999');
   const label = SOURCE_LABELS[source] ?? source;
   const textColor = source === 'bun' ? '#000' : '#fff';
-  return <div className={" "}>
-      <span className={" "}>
+  return <div>
+      <span>
         {label}
       </span>
     </div>;
@@ -79,10 +79,10 @@ export function TaskInstanceRow({
       <StatusDot status={instance.status} />
       <SourceBadge source={instance.source ?? 'pi'} isDark={isDark} />
       <div className={"block"}>
-        <span className={" "}>
+        <span>
           {instance.label}
         </span>
-        <span className={" "}>
+        <span>
           {instance.command}
         </span>
       </div>
@@ -129,15 +129,15 @@ export function AvailableTaskRow({
   return <button onClick={onSelect} disabled={loading} className={"block"}>
       <SourceBadge source={definition.source ?? 'pi'} isDark={isDark} />
       <div className={"block"}>
-        <span className={" "}>
+        <span>
           {definition.label}
         </span>
-        <span className={" "}>
+        <span>
           {definition.command}
         </span>
       </div>
-      {definition.group && <div className={" "}>
-          <span className={" "}>
+      {definition.group && <div>
+          <span>
             {definition.group}
           </span>
         </div>}
