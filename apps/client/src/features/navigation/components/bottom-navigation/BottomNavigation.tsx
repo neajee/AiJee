@@ -1,5 +1,5 @@
 import MaterialIcons from '@/platform/icons';
-import { useRouter, usePathname } from '@/platform/router-adapter';
+import { useRouter, usePathname } from '@/hooks/router';
 import { useSafeAreaInsets } from "@/platform/browser";
 import { Colors, WorkspaceColors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -29,15 +29,15 @@ export function BottomNavigation() {
       color: WorkspaceColors[workspaces.length % WorkspaceColors.length]
     });
   };
-  return <div className={"" + " " + "pb-[bottom]"}>
-      <div horizontal className={""}>
+  return <div className={"  bg-background pb-[var(--bottom-inset)]"}>
+      <div horizontal className={"block"}>
         {workspaces.map(ws => <WorkspaceAvatar key={ws.id} title={ws.title} color={ws.color} isActive={ws.id === selectedWorkspaceId} hasNotification={ws.hasNotifications} onClick={() => handleWorkspacePress(ws.id)} layout="horizontal" />)}
         <AddWorkspaceButton onClick={handleAddWorkspace} layout="horizontal" />
       </div>
 
-      <div className={"" + " " + ""} />
+      <div className={"  bg-muted"} />
 
-      <div className={""}>
+      <div className={"block"}>
         <BottomBarIcon icon="settings" isActive={isSettingsActive} onClick={() => router.push('/settings')} />
       </div>
     </div>;

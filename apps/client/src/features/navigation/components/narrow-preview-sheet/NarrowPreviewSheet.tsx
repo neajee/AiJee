@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from "react";
 import { useSafeAreaInsets } from "@/platform/browser";
-import Animated, { Easing, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from "@/platform/animation";
-import { Gesture } from "@/platform/animation";
+import Animated, { Easing, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from "@/styles/motion";
+import { Gesture } from "@/styles/motion";
 import { Colors } from "@/constants/theme";
 import { ABSOLUTE_FILL_STYLE } from "@/constants/layout";
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -73,19 +73,19 @@ export function NarrowPreviewSheet({
   }));
   return <div {...false ? {
     pointerEvents: visible ? "auto" as const : "none" as const
-  } : {}} className={"" + " " + (true ? "" : "")}>
-      <div className={"" + " " + "" + " " + ""}>
-        <button className={""} onClick={dismiss} />
+  } : {}} className={" "}>
+      <div className={"  bg-black/50"}>
+        <button className={"block"} onClick={dismiss} />
       </div>
 
-      <div className={"" + " " + "pb-[bottom] h-[0] max-h-[0]" + " " + ""}>
+      <div className={"  pb-[var(--bottom-inset)] h-0 max-h-0"}>
         <div>
-          <div className={""}>
-            <div className={"" + " " + ""} />
+          <div className={"block"}>
+            <div className={"  bg-muted"} />
           </div>
         </div>
 
-        <div className={""}>
+        <div className={"block"}>
           <PreviewPanel sessionId={sessionId} />
         </div>
       </div>

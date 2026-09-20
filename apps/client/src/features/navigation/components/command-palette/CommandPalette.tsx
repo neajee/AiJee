@@ -1,4 +1,4 @@
-import { Animated } from "@/platform/animation";
+import { Animated } from "@/styles/motion";
 import { Search } from 'lucide-react';
 import { ABSOLUTE_FILL_STYLE } from '@/constants/layout';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -40,24 +40,24 @@ export function CommandPalette({
   if (!visible) return null;
   let flatIndex = 0;
   return <div visible transparent animationType="none" onRequestClose={handleClose}>
-      <div className={""}>
+      <div className={"block"}>
         <AnimatedOverlay animation={overlayAnim} onClick={handleClose} />
-        <div className={"" + " " + "opacity-[null]"}>
-          <div className={"" + " " + ""}>
+        <div className={"  opacity-100"}>
+          <div className={" "}>
             <Search size={16} color={textMuted} strokeWidth={2} />
-            <input ref={inputRef} className={"" + " " + ""} value={search} onChangeText={setSearch} onKeyPress={handleKeyPress} placeholder="搜索对话…" placeholderTextColor={textDim} autoCapitalize="none" autoCorrect={false} returnKeyType="go" />
+            <input ref={inputRef} className={" "} value={search} onChangeText={setSearch} onKeyPress={handleKeyPress} placeholder="搜索对话…" placeholderTextColor={textDim} autoCapitalize="none" autoCorrect={false} returnKeyType="go" />
           </div>
-          <div ref={scrollRef} className={""} keyboardShouldPersistTaps="handled">
+          <div ref={scrollRef} className={"block"} keyboardShouldPersistTaps="handled">
             <div ref={scrollContentRef}>
-              {sessionsLoading ? <div className={""}>
+              {sessionsLoading ? <div className={"block"}>
                   <span size="small" color={textMuted} />
-                </div> : sections.length === 0 ? <div className={""}>
-                  <span className={"" + " " + ""}>
+                </div> : sections.length === 0 ? <div className={"block"}>
+                  <span className={" "}>
                     {search.trim() ? '没有匹配的对话' : '暂无最近对话'}
                   </span>
                 </div> : null}
               {sections.map(section => <div key={section.title}>
-                  <span className={"" + " " + ""}>{section.title}</span>
+                  <span className={" "}>{section.title}</span>
                   {section.items.map(item => {
                 const index = flatIndex++;
                 const isSelected = index === selectedIndex;
@@ -66,15 +66,15 @@ export function CommandPalette({
                   itemRefs.current[index] = ref as any;
                 }} onClick={item.onSelect}>
                         <Icon size={15} color={isSelected ? textPrimary : textMuted} strokeWidth={1.8} />
-                        <div className={""}>
-                          <span className={"" + " " + ""}>
+                        <div className={"block"}>
+                          <span className={" "}>
                             {item.label}
                           </span>
-                          {item.description && <span className={"" + " " + ""}>
+                          {item.description && <span className={" "}>
                               {item.description}
                             </span>}
                         </div>
-                        {isSelected && <span className={"" + " " + ""}>{'\u21B5'}</span>}
+                        {isSelected && <span className={" "}>{'\u21B5'}</span>}
                       </button>;
               })}
                 </div>)}
@@ -93,7 +93,7 @@ function AnimatedOverlay({
   };
   onPress: () => void;
 }) {
-  return <div className={"" + " " + "opacity-[null]"}>
-      <button className={""} onClick={onPress} />
+  return <div className={"  opacity-100"}>
+      <button className={"block"} onClick={onPress} />
     </div>;
 }

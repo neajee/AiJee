@@ -61,18 +61,18 @@ export function ProjectSidebarView({
         {isOpen && <WorkspaceSessions workspaceId={workspace.id} selectedSessionId={isSelected ? selectedSessionId : null} onSelect={handleSelectSession} onArchived={handleArchivedSession} isDark={isDark} />}
       </div>;
   }, [activityByWorkspace, handleArchivedSession, handleContextMenu, handleLongPress, handleMenuAt, handleNewSessionIn, handleSelectSession, handleToggleWorkspace, isDark, overrides, selectedSessionId, selectedWorkspaceId]);
-  return <div className={"" + " " + ""}>
-      <div className={"" + " " + ""}><SidebarHeader /></div>
-      <div className={""}>
+  return <div className={"  bg-background"}>
+      <div className={" "}><SidebarHeader /></div>
+      <div className={"block"}>
         <SidebarRow icon={<SquarePen size={15} color={colors.text} strokeWidth={1.8} />} label="新对话" onClick={handleNewSession} isDark={isDark} />
         <SidebarRow icon={<PackageOpen size={15} color={colors.textSecondary} strokeWidth={1.8} />} label="插件" isActive={pathname.startsWith("/packages")} onClick={() => router.push("/packages" as any)} isDark={isDark} />
       </div>
-      <div className={""}>
+      <div className={"block"}>
         {pinned.length > 0 && <><SectionHeader title="置顶" isDark={isDark} />{pinned.map(renderWorkspace)}</>}
         <SectionHeader title="项目" isDark={isDark} actions={<HeaderAction onClick={() => setShowNewDialog(true)} label="添加项目" isDark={isDark}><Plus size={13} color={colors.textTertiary} strokeWidth={2} /></HeaderAction>} />
-        {rest.length === 0 && pinned.length === 0 ? <span className={"" + " " + ""}>暂无项目</span> : rest.map(renderWorkspace)}
+        {rest.length === 0 && pinned.length === 0 ? <span className={"  text-text-tertiary"}>暂无项目</span> : rest.map(renderWorkspace)}
       </div>
-      <div className={"" + " " + ""}>
+      <div className={" "}>
         <SidebarRow icon={<Settings size={15} color={colors.textSecondary} strokeWidth={1.8} />} label="设置" isActive={pathname.startsWith("/settings")} onClick={() => router.push("/settings")} isDark={isDark} />
       </div>
       <NewWorkspaceDialog visible={showNewDialog} onClose={() => setShowNewDialog(false)} />
@@ -88,14 +88,14 @@ export function ProjectSidebarView({
       visible: false
     }))} />
       <div visible={!!deleteWorkspace} transparent animationType="fade" onRequestClose={() => setDeleteWorkspace(null)}>
-        <button className={""} onClick={() => setDeleteWorkspace(null)}>
-          <button role="alert" className={"" + " " + ""} onClick={event => event.stopPropagation()}>
-            <span className={"" + " " + ""}>删除项目？</span>
-            <span className={"" + " " + ""}>“{deleteWorkspace?.title}” 将从 AiJee 移除。</span>
-            <span className={"" + " " + ""}>本地目录和其中的对话文件不会被删除。</span>
-            <div className={""}>
-              <button onClick={() => setDeleteWorkspace(null)}><span className={"" + " " + ""}>取消</span></button>
-              <button onClick={confirmDelete}><span className={""}>删除项目</span></button>
+        <button className={"block"} onClick={() => setDeleteWorkspace(null)}>
+          <button role="alert" className={"  bg-surface-raised border-border"} onClick={event => event.stopPropagation()}>
+            <span className={"  text-foreground"}>删除项目？</span>
+            <span className={"  text-text-secondary"}>“{deleteWorkspace?.title}” 将从 AiJee 移除。</span>
+            <span className={"  text-text-tertiary"}>本地目录和其中的对话文件不会被删除。</span>
+            <div className={"block"}>
+              <button onClick={() => setDeleteWorkspace(null)}><span className={"  text-foreground"}>取消</span></button>
+              <button onClick={confirmDelete}><span className={"block"}>删除项目</span></button>
             </div>
           </button>
         </button>

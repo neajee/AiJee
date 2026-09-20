@@ -56,17 +56,17 @@ export function WorkspaceRow({
      * exist while hovering would vanish the moment the cursor reached them.
      * `pointerenter`/`pointerleave` don't fire for movement between children.
      */
-    <div className={"" + " " + (hovered ? "" : "")} onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)}>
+    <div className={" "} onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)}>
       <button onClick={onPress} onLongPress={onLongPress} delayLongPress={400} aria-label={isOpen ? `收起 ${workspace.title}` : `展开 ${workspace.title}`}>
-        <div className={""}>
+        <div className={"block"}>
           <Folder size={15} color={colors.text} strokeWidth={1.8} />
         </div>
-        <span className={"" + " " + "font-sans"}>
+        <span className={"  font-sans"}>
           {workspace.title}
         </span>
       </button>
 
-      <div className={""}>
+      <div className={"block"}>
         {showActions && <RowAction label={`在 ${workspace.title} 中新建对话`} onClick={onNewSession} isDark={isDark}>
             <SquarePen size={13} color={colors.textTertiary} strokeWidth={1.8} />
           </RowAction>}
@@ -76,7 +76,7 @@ export function WorkspaceRow({
             </RowAction>
           </div>}
 
-        {!showActions && !isRunning && hasUnread && <div className={"" + " " + ""} />}
+        {!showActions && !isRunning && hasUnread && <div className={" "} />}
       </div>
     </div>
   );

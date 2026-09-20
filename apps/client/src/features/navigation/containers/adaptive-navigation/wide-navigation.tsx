@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Animated } from "@/platform/animation";
+import { Animated } from "@/styles/motion";
 import { ConnectionStatusBanner } from '@/features/agent/components/connection-status-banner';
 import { ProjectSidebar, SettingsSidebar } from '../../components/project-sidebar';
 import { TaskOutputPanel } from '@/features/tasks/components/task-output-panel';
@@ -38,23 +38,23 @@ export function WideNavigation({
     onMouseEnter: handleHoverZoneIn,
     onMouseLeave: handleHoverZoneOut
   } : {};
-  return <div className={"" + " " + ""} edges={['top']}>
-      <div className={""}>
-        {hasServer && showPersistentSidebar && <div className={"w-[0] overflow-hidden h-full"}>
+  return <div className={" "} edges={['top']}>
+      <div className={"block"}>
+        {hasServer && showPersistentSidebar && <div className={"w-0 overflow-hidden h-full"}>
             <div className={"w-[280px] flex-1"}>{settingsMode ? <SettingsSidebar /> : <ProjectSidebar />}</div>
           </div>}
-        <div className={"" + " " + (hasServer ? "" : "")}>
-          <div className={""}>{children}</div>
+        <div className={" "}>
+          <div className={"block"}>{children}</div>
           {isCodeMode && <TaskOutputPanel />}
           {hasServer && !isPersistent && <>
-              <div {...webHoverProps} className={""} />
-              <div className={"" + " " + "opacity-[null]"} />
-              <div {...webSidebarHoverProps} className={"" + " " + ""}>
+              <div {...webHoverProps} className={"block"} />
+              <div className={"  opacity-100"} />
+              <div {...webSidebarHoverProps} className={" "}>
                 {settingsMode ? <SettingsSidebar /> : <ProjectSidebar />}
               </div>
             </>}
         </div>
-        {hasServer && <div pointerEvents="box-none" className={"" + " " + ""}>
+        {hasServer && <div pointerEvents="box-none" className={" "}>
             <SeamToggle chevron={isPersistent ? 'left' : 'right'} onClick={handleToggleSidebar} label={isPersistent ? 'Collapse sidebar' : 'Expand sidebar'} onHoverIn={handleHoverZoneIn} onHoverOut={handleHoverZoneOut} />
           </div>}
       </div>

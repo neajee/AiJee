@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { Linking } from "@/platform/browser";
-import { usePathname } from '@/platform/router-adapter';
+import { usePathname } from '@/hooks/router';
 import { ExternalLink, GitBranch, Globe, Play } from 'lucide-react';
 import { useThemeTokens } from '@/hooks/use-theme-tokens';
 import { useColorScheme } from '@/hooks/use-color-scheme';

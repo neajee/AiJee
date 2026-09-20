@@ -39,10 +39,10 @@ export function NarrowNavigation({
     openGit,
     openPreview
   } = controller;
-  return <div className={"" + " " + ""}>
-      <div className={"" + " " + ""} edges={['top']}>
+  return <div className={"  bg-background"}>
+      <div className={"  bg-background"} edges={['top']}>
         {hasServer && <NarrowHeaderBar onWorkspacePress={() => setSheetVisible(true)} onFilesPress={openFiles} onGitPress={openGit} onPreviewPress={openPreview} onTasksPress={() => setTasksSheetVisible(true)} onTaskOutputPress={() => setTaskOutputSheetVisible(true)} />}
-        <div className={""}>{children}</div>
+        <div className={"block"}>{children}</div>
         {hasServer && <ConnectionStatusBanner />}
       </div>
       {hasServer && isCodeMode && <>

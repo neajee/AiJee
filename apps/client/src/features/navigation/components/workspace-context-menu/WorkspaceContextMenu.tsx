@@ -20,10 +20,10 @@ export function WorkspaceContextMenu(props: WorkspaceContextMenuProps) {
   const menuBg = isDark ? '#252525' : '#FFFFFF';
   const menuBorder = isDark ? '#3b3a39' : 'rgba(0,0,0,0.12)';
   const hoverBg = isDark ? '#333' : '#F0F0F0';
-  const separator = <div className={"" + " " + ""} />;
+  const separator = <div className={" "} />;
   return <div visible transparent animationType="none" onRequestClose={props.onClose} statusBarTranslucent>
-      <button className={""} onClick={props.onClose} aria-label="关闭菜单" />
-      <div className={"" + " " + ""}>
+      <button className={"block"} onClick={props.onClose} aria-label="关闭菜单" />
+      <div className={" "}>
         {props.onNewSession && <MenuItem icon={SquarePen} label="新对话" color={textPrimary} hoverBg={hoverBg} onClick={() => {
         props.onClose();
         props.onNewSession?.();
@@ -67,6 +67,6 @@ function MenuItem({
 }) {
   return <button onClick={onPress} aria-label={label}>
       <Icon size={14} color={color} strokeWidth={1.8} />
-      <span className={"" + " " + ""}>{label}</span>
+      <span className={" "}>{label}</span>
     </button>;
 }

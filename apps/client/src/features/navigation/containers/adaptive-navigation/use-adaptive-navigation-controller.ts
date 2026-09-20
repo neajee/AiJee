@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Animated } from "@/platform/animation";
-import { usePathname } from '@/platform/router-adapter';
+import { Animated } from "@/styles/motion";
+import { usePathname } from '@/hooks/router';
 import { useResponsiveLayout } from '../../hooks/use-responsive-layout';
 import { useAuthStore } from '@/features/auth/store';
 import { useWorkspaceStore } from '@/features/workspace/store';

@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from "react";
-import { usePathname, useRouter } from "@/platform/router-adapter";
+import { usePathname, useRouter } from "@/hooks/router";
 import { useStreamingSessions } from "@aijee/client-sdk";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useWorkspaceStore } from "@/features/workspace/store";

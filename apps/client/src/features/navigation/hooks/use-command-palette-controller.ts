@@ -1,8 +1,8 @@
 import { ScrollView, View } from "@/types/dom";
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Animated } from "@/platform/animation";
+import { Animated } from "@/styles/motion";
 import { TextInput, type ScrollView as RNScrollView, type View as RNView } from "@/types/dom";
-import { useRouter } from '@/platform/router-adapter';
+import { useRouter } from '@/hooks/router';
 import { MessageSquare } from 'lucide-react';
 import { useWorkspaceStore } from '@/features/workspace/store';
 import { usePiClient, type SessionListItem } from '@aijee/client-sdk';

@@ -63,12 +63,12 @@ export function SessionRow({
       Alert.alert('归档失败', '无法归档该对话，请重试。');
     }
   }, [busy, onArchive]);
-  const status = <div className={""}>{isWorking ? <SessionActivityIndicator sessionId={session.id} color={colors.textSecondary} idlePlaceholder={false} /> : hasUnread ? <div className={"" + " " + ""} /> : null}</div>;
-  return <div className={"" + " " + (isSelected ? "" : hovered ? "" : "")} onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)}>
-      {editing ? <div className={""}>{status}<input autoFocus selectTextOnFocus underlineColorAndroid="transparent" value={draft} onChangeText={setDraft} onSubmitEditing={() => void commitRename()} onKeyPress={event => {
+  const status = <div className={"block"}>{isWorking ? <SessionActivityIndicator sessionId={session.id} color={colors.textSecondary} idlePlaceholder={false} /> : hasUnread ? <div className={" "} /> : null}</div>;
+  return <div className={" "} onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)}>
+      {editing ? <div className={"block"}>{status}<input autoFocus selectTextOnFocus underlineColorAndroid="transparent" value={draft} onChangeText={setDraft} onSubmitEditing={() => void commitRename()} onKeyPress={event => {
         if (event.nativeEvent.key === 'Escape') setEditing(false);
-      }} editable={busy !== 'rename'} maxLength={200} selectionColor={colors.tint} className={"" + " " + "font-sans"} /></div> : <button onClick={onPress}>{status}<span className={"" + " " + "font-sans"}>{title}</span></button>}
-      {showActions && !editing && <div className={""}>
+      }} editable={busy !== 'rename'} maxLength={200} selectionColor={colors.tint} className={"  font-sans"} /></div> : <button onClick={onPress}>{status}<span className={"  font-sans"}>{title}</span></button>}
+      {showActions && !editing && <div className={"block"}>
         <RowAction label="重命名对话" onClick={() => setEditing(true)} isDark={isDark}><Pencil size={11} color={colors.textTertiary} strokeWidth={1.8} /></RowAction>
         <RowAction label="归档对话" onClick={() => void handleArchive()} isDark={isDark}>{busy === 'archive' ? <span size="small" color={colors.textTertiary} className={"w-[10px] h-[10px]"} /> : <ArchiveIcon size={11} color={colors.textTertiary} strokeWidth={1.8} />}</RowAction>
       </div>}

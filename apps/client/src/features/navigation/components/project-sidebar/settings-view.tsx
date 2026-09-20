@@ -1,4 +1,4 @@
-import { usePathname, useRouter } from "@/platform/router-adapter";
+import { usePathname, useRouter } from "@/hooks/router";
 import { ChevronLeft } from "lucide-react";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
@@ -15,11 +15,11 @@ export function SettingsSidebar() {
   const selectedWorkspaceId = useWorkspaceStore(s => s.selectedWorkspaceId);
   const activeSlug = pathname.match(/^\/settings\/([^/]+)/)?.[1] ?? SETTINGS_SECTIONS[0]?.slug;
   const handleBack = () => router.replace(selectedWorkspaceId ? `/workspace/${selectedWorkspaceId}` : "/");
-  return <div className={"" + " " + ""}>
-      <div className={"" + " " + ""}><SidebarHeader /></div>
-      <div className={""}><SidebarRow icon={<ChevronLeft size={15} color={colors.textSecondary} strokeWidth={1.8} />} label="返回" onClick={handleBack} isDark={isDark} /></div>
-      <div className={""}><span className={"" + " " + ""}>设置</span></div>
-      <div className={""}>
+  return <div className={"  bg-background"}>
+      <div className={" "}><SidebarHeader /></div>
+      <div className={"block"}><SidebarRow icon={<ChevronLeft size={15} color={colors.textSecondary} strokeWidth={1.8} />} label="返回" onClick={handleBack} isDark={isDark} /></div>
+      <div className={"block"}><span className={"  text-foreground"}>设置</span></div>
+      <div className={"block"}>
         {SETTINGS_SECTIONS.map(section => {
         const Icon = section.icon;
         return <SidebarRow key={section.slug} icon={<Icon size={15} color={section.slug === activeSlug ? colors.text : colors.textSecondary} strokeWidth={1.8} />} label={section.title} isActive={section.slug === activeSlug} onClick={() => router.push(`/settings/${section.slug}` as any)} isDark={isDark} />;

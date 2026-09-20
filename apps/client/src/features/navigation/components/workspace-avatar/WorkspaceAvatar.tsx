@@ -40,22 +40,22 @@ export function WorkspaceAvatar({
   const activeBorderColor = isDark ? '#ede8e4' : '#1A1A1A';
   const innerBorderColor = isDark ? '#3b3a39' : 'rgba(0,0,0,0.1)';
   const letterColor = getLighterColor(color);
-  return <div className={"" + " " + (isVertical ? "" : "")}>
-      <div className={""}>
+  return <div className={" "}>
+      <div className={"block"}>
         <button onClick={onPress} role="button" aria-label={title} accessibilityState={{
         selected: isActive
       }}>
-          <div className={"" + " " + ""}>
-            <span className={"" + " " + ""}>{initial}</span>
+          <div className={" "}>
+            <span className={" "}>{initial}</span>
           </div>
         </button>
 
-        {hasNotification && <div className={"" + " " + ""}>
-            <div className={"" + " " + ""} />
+        {hasNotification && <div className={"  bg-background"}>
+            <div className={"  bg-primary"} />
           </div>}
       </div>
 
-      {!isVertical && isActive && <div className={"" + " " + ""} />}
+      {!isVertical && isActive && <div className={"  bg-accent"} />}
     </div>;
 }
 const styles = {

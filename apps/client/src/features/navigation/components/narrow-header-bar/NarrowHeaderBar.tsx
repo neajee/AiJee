@@ -16,18 +16,18 @@ export function NarrowHeaderBar(props: NarrowHeaderBarProps) {
     closeMore
   } = useNarrowHeaderController(props);
   return <>
-      <div className={"" + " " + ""}>
-        <div className={""}>
+      <div className={"  bg-background"}>
+        <div className={"block"}>
           <button onClick={props.onWorkspacePress} role="button" aria-label="Open workspace switcher">
-            {workspace && <div className={"" + " " + ""}>
-                <span className={""}>{workspace.title.charAt(0).toUpperCase()}</span>
+            {workspace && <div className={"  bg-background"}>
+                <span className={"block"}>{workspace.title.charAt(0).toUpperCase()}</span>
               </div>}
-            <span className={"" + " " + ""}>
+            <span className={" "}>
               {workspace?.title ?? 'Workspace'}
             </span>
           </button>
         </div>
-        <div className={""}>
+        <div className={"block"}>
           <button onClick={props.onFilesPress} role="button" aria-label="Files">
             <FolderOpen size={16} color={textPrimary} strokeWidth={1.8} />
           </button>

@@ -1,8 +1,8 @@
 import { ScrollView } from "@/types/dom";
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { useRouter } from '@/platform/router-adapter';
-import Animated, { Easing, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from "@/platform/animation";
-import { Gesture } from "@/platform/animation";
+import { useRouter } from '@/hooks/router';
+import Animated, { Easing, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from "@/styles/motion";
+import { Gesture } from "@/styles/motion";
 import type { PagerHandle } from '@/platform/pager';
 import { useWorkspaceStore } from '@/features/workspace/store';
 import { useSheetHeight } from './use-sheet-height';

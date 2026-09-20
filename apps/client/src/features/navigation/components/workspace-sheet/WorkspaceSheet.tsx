@@ -1,7 +1,7 @@
 import MaterialIcons from '@/platform/icons';
 import { useSafeAreaInsets } from "@/platform/browser";
 import { Plus } from 'lucide-react';
-import Animated from "@/platform/animation";
+import Animated from "@/styles/motion";
 import { Pager } from '@/platform/pager';
 import { Fonts } from '@/constants/theme';
 import { ABSOLUTE_FILL_STYLE } from '@/constants/layout';
@@ -49,47 +49,47 @@ export function WorkspaceSheet({
   const avatarScrollBg = isDark ? '#191919' : '#F8F8F8';
   return <div {...!isWeb ? {
     pointerEvents: visible ? 'auto' as const : 'none' as const
-  } : {}} className={"" + " " + (isWeb ? "" : "")}>
-      <div className={"" + " " + "" + " " + ""}>
-        <button className={""} onClick={dismiss} />
+  } : {}} className={" "}>
+      <div className={"  bg-black/50"}>
+        <button className={"block"} onClick={dismiss} />
       </div>
 
-      <div className={"" + " " + "pb-[0] h-[0] max-h-[0]" + " " + ""}>
+      <div className={"  bg-surface pb-0 h-0 max-h-0"}>
         <div>
-          <div className={""}>
-            <div className={"" + " " + ""} />
+          <div className={"block"}>
+            <div className={"  bg-muted"} />
           </div>
         </div>
 
-        <div className={"" + " " + ""}>
+        <div className={" "}>
           <div ref={stripScrollRef} horizontal>
             {workspaces.map((workspace, index) => {
             const isActive = workspace.id === selectedWorkspaceId;
             return <button key={workspace.id} onClick={() => handleWorkspacePress(workspace.id, index)}>
-                  <div className={"" + " " + (isActive ? "border-[2px]" : "")}>
-                    <div className={"" + " " + ""}>
-                      <span className={""}>
+                  <div className={"  border-[2px]"}>
+                    <div className={"  bg-background"}>
+                      <span className={"block"}>
                         {workspace.title.charAt(0).toUpperCase()}
                       </span>
                     </div>
-                    {workspace.hasNotifications && <div className={"" + " " + ""} />}
+                    {workspace.hasNotifications && <div className={"  bg-primary"} />}
                   </div>
-                  <span className={"" + " " + "" + " " + (isActive ? "font-sans" : "")}>
+                  <span className={"  font-medium"}>
                     {workspace.title}
                   </span>
                 </button>;
           })}
             <button onClick={handleAddWorkspace}>
-              <div className={"" + " " + "border-[1.5px] border-dashed"}>
+              <div className={"  border-[1.5px] border-dashed"}>
                 <Plus size={18} color={textMuted} strokeWidth={1.8} />
               </div>
-              <span className={"" + " " + ""}>Add</span>
+              <span className={" "}>Add</span>
             </button>
           </div>
         </div>
 
-        <Pager ref={pagerRef} className={""} initialPage={Math.max(0, selectedIndex)} onPageSelected={event => handlePageSelected(event.nativeEvent.position)} overdrag>
-          {workspaces.map(workspace => <div key={workspace.id} className={""}>
+        <Pager ref={pagerRef} className={"block"} initialPage={Math.max(0, selectedIndex)} onPageSelected={event => handlePageSelected(event.nativeEvent.position)} overdrag>
+          {workspaces.map(workspace => <div key={workspace.id} className={"block"}>
               <SessionPage workspaceId={workspace.id} onSessionPress={sessionId => {
             router.navigate(`/workspace/${workspace.id}/s/${sessionId}`);
             dismiss();
@@ -97,14 +97,14 @@ export function WorkspaceSheet({
             </div>)}
         </Pager>
 
-        <div className={"" + " " + ""}>
+        <div className={" "}>
           <button onClick={handleServersPress}>
             <MaterialIcons name="dns" size={18} color={colors.icon} />
-            <span className={"" + " " + ""}>连接</span>
+            <span className={" "}>连接</span>
           </button>
           <button onClick={handleSettingsPress}>
             <MaterialIcons name="settings" size={18} color={colors.icon} />
-            <span className={"" + " " + ""}>Settings</span>
+            <span className={" "}>Settings</span>
           </button>
         </div>
       </div>

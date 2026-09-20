@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from 'react';
-import { Easing, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from "@/platform/animation";
-import { Gesture } from "@/platform/animation";
+import { Easing, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from "@/styles/motion";
+import { Gesture } from "@/styles/motion";
 import { useSafeAreaInsets } from "@/platform/browser";
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useThemeTokens } from '@/hooks/use-theme-tokens';
