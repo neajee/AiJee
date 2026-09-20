@@ -1,4 +1,4 @@
-import { Animated } from "@/platform/animation";
+import { Animated } from "@/styles/motion";
 export interface ConnectionStatusBannerViewProps {
   bottomPad: number;
   heightAnim: Animated.Value;

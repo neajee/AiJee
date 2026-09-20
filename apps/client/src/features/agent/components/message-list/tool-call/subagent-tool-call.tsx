@@ -53,16 +53,16 @@ export const SubagentToolCall = memo(function SubagentToolCall({
   }, [active, meta, tc.progress, tc.status]);
   return <div>
       <ToolHeader expanded={expanded} expandable={hasDetail} onToggle={toggle} isDark={isDark} alignTop aria-label={`${expanded ? "Collapse" : "Expand"} details of ${agentName}`}>
-        <div className={""}>
-          <div className={""}>
-            <span className={"" + " " + ""}>
+        <div className={"block"}>
+          <div className={"block"}>
+            <span className={"  text-text-secondary"}>
               {agentName}
             </span>
-            {!!metaItems.length && <span className={"" + " " + ""}>
+            {!!metaItems.length && <span className={"  text-text-tertiary"}>
                 {metaItems.join(" • ")}
               </span>}
           </div>
-          {task ? <span className={"" + " " + ""}>
+          {task ? <span className={"  text-text-tertiary"}>
               {task}
             </span> : null}
         </div>
@@ -70,24 +70,24 @@ export const SubagentToolCall = memo(function SubagentToolCall({
 
       <ToolBody expanded={expanded && hasDetail}>
         <ToolSurface isDark={isDark}>
-          <div className={""} nestedScrollEnabled>
-            {recentTools.length > 0 && <div className={""}>
-                <span className={"" + " " + ""}>Steps</span>
-                {recentTools.map((step, i) => <span key={i} className={"" + " " + ""}>
+          <div className={"block"} nestedScrollEnabled>
+            {recentTools.length > 0 && <div className={"block"}>
+                <span className={"  text-text-tertiary"}>Steps</span>
+                {recentTools.map((step, i) => <span key={i} className={"  text-text-secondary"}>
                     {step.tool}({step.args})
                   </span>)}
               </div>}
 
-            {recentOutput.length > 0 && !transcript && <div className={""}>
-                <span className={"" + " " + ""}>Output</span>
-                {recentOutput.map((line, i) => <span key={`o-${i}`} className={"" + " " + ""}>
+            {recentOutput.length > 0 && !transcript && <div className={"block"}>
+                <span className={"  text-text-tertiary"}>Output</span>
+                {recentOutput.map((line, i) => <span key={`o-${i}`} className={"  text-text-secondary"}>
                     {line}
                   </span>)}
               </div>}
 
-            {!!transcript && <div className={""}>
-                {(recentTools.length > 0 || recentOutput.length > 0 || hasProgressMeta) && <span className={"" + " " + ""}>Transcript</span>}
-                <div className={""}>{markdownElements}</div>
+            {!!transcript && <div className={"block"}>
+                {(recentTools.length > 0 || recentOutput.length > 0 || hasProgressMeta) && <span className={"  text-text-tertiary"}>Transcript</span>}
+                <div className={"block"}>{markdownElements}</div>
               </div>}
           </div>
         </ToolSurface>

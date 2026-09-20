@@ -57,38 +57,38 @@ export const UserMessage = memo(function UserMessage({
     window.addEventListener("blur", collapse);
     return () => window.removeEventListener("blur", collapse);
   }, []);
-  return <div className={""}>
-      <div className={"" + " " + ""}>
-        {images.length > 0 && <div horizontal className={""}>
+  return <div className={"block"}>
+      <div className={"  bg-surface-raised"}>
+        {images.length > 0 && <div horizontal className={"block"}>
             {images.map(img => <img key={img.id} src={{
           uri: `data:${img.mimeType || "image/png"};base64,${img.data}`
-        }} className={""} resizeMode="cover" />)}
+        }} className={"block"} resizeMode="cover" />)}
           </div>}
         {editing ? <>
-            <input autoFocus multiline value={editText} onChangeText={onChangeEdit} className={"" + " " + ""} selectionColor={colors.tint} />
-            <div className={""}>
-              <button onClick={onCancelEdit} aria-label="Cancel edit" className={""}>
+            <input autoFocus multiline value={editText} onChangeText={onChangeEdit} className={"  text-foreground border-border"} selectionColor={colors.tint} />
+            <div className={"block"}>
+              <button onClick={onCancelEdit} aria-label="Cancel edit" className={"block"}>
                 <X size={14} color={colors.textTertiary} />
               </button>
-              <button onClick={onSubmitEdit} disabled={!editText.trim()} aria-label="Send edited message" className={"" + " " + ""}>
+              <button onClick={onSubmitEdit} disabled={!editText.trim()} aria-label="Send edited message" className={"  bg-accent"}>
                 <Check size={14} color={colors.background} />
               </button>
             </div>
           </> : !!message.text && <>
-            <span className={"" + " " + ""} selectable>
+            <span className={"  text-foreground"} selectable>
               {expanded || !collapsible ? message.text : preview}
             </span>
-            {collapsible && <div className={""}>
-                <div className={"" + " " + ""} />
+            {collapsible && <div className={"block"}>
+                <div className={"  bg-muted"} />
                 <button onClick={() => setExpanded(value => !value)} role="button" aria-label={expanded ? "收起长消息" : "展开长消息"}>
-                  <span className={"" + " " + ""}>{expanded ? "收起" : "展开全文"}</span>
-                  <ChevronDown size={12} color={colors.textTertiary} className={expanded ? "" : ""} />
+                  <span className={"  text-text-tertiary"}>{expanded ? "收起" : "展开全文"}</span>
+                  <ChevronDown size={12} color={colors.textTertiary} className={"block"} />
                 </button>
-                <div className={"" + " " + ""} />
+                <div className={"  bg-muted"} />
               </div>}
           </>}
       </div>
-      {!editing && onEdit && <button onClick={onEdit} role="button" aria-label="Edit message" className={""}>
+      {!editing && onEdit && <button onClick={onEdit} role="button" aria-label="Edit message" className={"block"}>
           <Pencil size={13} color={colors.textTertiary} strokeWidth={1.8} />
         </button>}
     </div>;

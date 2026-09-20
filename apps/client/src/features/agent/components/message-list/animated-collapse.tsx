@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import { LayoutChangeEvent } from "@/types/dom";
-import Animated, { Easing, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from "@/platform/animation";
+import Animated, { Easing, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from "@/styles/motion";
 interface AnimatedCollapseProps {
   expanded: boolean;
   maxHeight?: number;
@@ -69,14 +69,14 @@ export function AnimatedCollapse({
   // opening motion has finished, hand the subtree back to a normal View so
   // nested disclosures grow the parent layout instead of being clipped.
   if (expanded && settled) {
-    return <div className={""}>
-        <div onLayout={handleLayout} className={""}>
+    return <div className={"block"}>
+        <div onLayout={handleLayout} className={"block"}>
           {children}
         </div>
       </div>;
   }
-  return <div className={"" + " " + ""}>
-      <div onLayout={handleLayout} className={""}>
+  return <div className={" "}>
+      <div onLayout={handleLayout} className={"block"}>
         {children}
       </div>
     </div>;

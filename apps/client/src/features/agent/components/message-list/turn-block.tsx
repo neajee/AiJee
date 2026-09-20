@@ -1,5 +1,5 @@
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
-import Animated, { Easing, FadeIn, useAnimatedStyle, useSharedValue, withTiming } from "@/platform/animation";
+import Animated, { Easing, FadeIn, useAnimatedStyle, useSharedValue, withTiming } from "@/styles/motion";
 import { ChevronRight, GitFork } from "lucide-react";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { AssistantMessage, MessageToolbar } from "./assistant-message";
@@ -73,20 +73,20 @@ export const TurnBlock = memo(function TurnBlock({
   const timeLabel = active ? formatDuration(Math.max(1000, elapsedMs)) : settledMs ? formatDuration(settledMs) : null;
   const showDivider = hasWork || active || !!settledMs;
   const forkEntryId = turn.final?.entryId ?? turn.sourceEntryId;
-  const divider = <div className={""}>
-      <div className={"" + " " + ""} />
-      <div className={""}>
-        <span className={"" + " " + ""}>
+  const divider = <div className={"block"}>
+      <div className={" "} />
+      <div className={"block"}>
+        <span className={" "}>
           {label}
         </span>
-        {timeLabel && <span className={"" + " " + ""}>
+        {timeLabel && <span className={" "}>
             {timeLabel}
           </span>}
-        {hasWork && <div className={"" + " " + ""}>
+        {hasWork && <div className={" "}>
             <ChevronRight size={12} color={colors.textTertiary} strokeWidth={2} />
           </div>}
       </div>
-      <div className={"" + " " + ""} />
+      <div className={" "} />
     </div>;
   return <div {...true ? {
     onPointerEnter: () => setHovered(true),
@@ -96,19 +96,19 @@ export const TurnBlock = memo(function TurnBlock({
             {divider}
           </button> : divider)}
 
-      {hasWork && expanded && <div entering={FadeIn.duration(140)} className={"" + " " + ""}>
+      {hasWork && expanded && <div entering={FadeIn.duration(140)} className={" "}>
           {sections.map(section => section.kind === "activity" ? <WorkActivityGroup key={section.key} steps={section.steps} isDark={isDark} /> : <WorkStepView key={section.key} step={section.step} isDark={isDark} />)}
         </div>}
 
       {turn.final && <AssistantMessage message={turn.final} isDark={isDark} />}
-      {turn.aborted && <span className={"" + " " + ""}>
+      {turn.aborted && <span className={" "}>
           Stopped
         </span>}
       {turn.fileStats && <TurnSummary stats={turn.fileStats} changes={fileChanges} isDark={isDark} />}
       {/* Last in the turn: the answer, then what it changed, then the actions. */}
-      {turn.final && !turn.final.isStreaming && (turn.final.text || turn.final.errorMessage) && <div className={""}>
+      {turn.final && !turn.final.isStreaming && (turn.final.text || turn.final.errorMessage) && <div className={"block"}>
           <MessageToolbar message={turn.final} isDark={isDark} hovered={hovered} />
-          {forkEntryId && onFork && <button onClick={() => onFork(forkEntryId)} disabled={active || !!forkingEntryId} role="button" aria-label="Fork from this reply" className={""}>
+          {forkEntryId && onFork && <button onClick={() => onFork(forkEntryId)} disabled={active || !!forkingEntryId} role="button" aria-label="Fork from this reply" className={"block"}>
               {forkingEntryId === forkEntryId ? <span size="small" color={colors.textTertiary} className={"w-[12px] h-[12px]"} /> : <GitFork size={14} color={colors.textTertiary} strokeWidth={1.8} />}
             </button>}
         </div>}

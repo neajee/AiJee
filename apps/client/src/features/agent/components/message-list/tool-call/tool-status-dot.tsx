@@ -1,5 +1,5 @@
 import { memo, useEffect } from "react";
-import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming, Easing } from "@/platform/animation";
+import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming, Easing } from "@/styles/motion";
 import type { ToolCallInfo } from "../agent-types";
 interface ToolStatusDotProps {
   status: ToolCallInfo["status"];
@@ -11,8 +11,8 @@ export const ToolStatusDot = memo(function ToolStatusDot({
 }: ToolStatusDotProps) {
   const isActive = status === "streaming" || status === "pending" || status === "running";
   if (status === "running") {
-    return <div className={"w-[0] h-[0] items-center justify-center"}>
-        <span size="small" color="#999" className={"w-[0] h-[0]"} />
+    return <div className={"w-0 h-0 items-center justify-center"}>
+        <span size="small" color="#999" className={"w-0 h-0"} />
       </div>;
   }
   if (!isActive) return null;
@@ -36,5 +36,5 @@ function PulseDot({
   const style = useAnimatedStyle(() => ({
     opacity: opacity.value
   }));
-  return <div className={"w-[0] h-[0] rounded-[0]" + " " + ""} />;
+  return <div className={"w-0 h-0 rounded-none  "} />;
 }

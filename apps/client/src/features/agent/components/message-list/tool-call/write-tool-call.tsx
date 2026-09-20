@@ -27,10 +27,10 @@ export const WriteToolCall = memo(function WriteToolCall({
   const title = active ? "Writing" : "Wrote";
   return <div>
       <ToolHeader expanded={expanded} expandable={hasContent} onToggle={toggle} isDark={isDark} aria-label={`${expanded ? "Collapse" : "Expand"} contents of ${fileName || "file"}`}>
-        <span className={"" + " " + ""}>
+        <span className={"  text-text-secondary"}>
           {title} {fileName || filePath || "file"}
         </span>
-        {addedLines > 0 && <span className={"" + " " + ""}>
+        {addedLines > 0 && <span className={" "}>
             +{addedLines}
           </span>}
       </ToolHeader>

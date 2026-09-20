@@ -52,25 +52,25 @@ export const MarkdownTable = memo(function MarkdownTable({
     flex: 1,
     minWidth: 0
   };
-  const table = <div className={"" + " " + ""}>
-      {header.length > 0 && <div className={"" + " " + ""}>
-          {header.map((cell, index) => <div key={index} className={"" + " " + "" + " " + (index > 0 ? "" : "")}>
+  const table = <div className={"  border-border bg-background"}>
+      {header.length > 0 && <div className={"  bg-surface-raised"}>
+          {header.map((cell, index) => <div key={index} className={" "}>
               {/* Header cells arrive as inline nodes; wrapping in Text keeps the
                   emphasis without a second block-level box. */}
-              <span className={"" + " " + ""}>
+              <span className={" "}>
                 {normalizeCellTypography(cell)}
               </span>
             </div>)}
         </div>}
 
-      {rows.map((row, rowIndex) => <div key={rowIndex} className={"" + " " + ""}>
-          {row.map((cell, cellIndex) => <div key={cellIndex} className={"" + " " + "" + " " + (cellIndex > 0 ? "" : "")}>
+      {rows.map((row, rowIndex) => <div key={rowIndex} className={" "}>
+          {row.map((cell, cellIndex) => <div key={cellIndex} className={" "}>
               {normalizeCellTypography(cell)}
             </div>)}
         </div>)}
     </div>;
-  if (!scrolls) return <div className={""}>{table}</div>;
-  return <div horizontal className={""}>
+  if (!scrolls) return <div className={"block"}>{table}</div>;
+  return <div horizontal className={"block"}>
       {table}
     </div>;
 });

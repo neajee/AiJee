@@ -52,22 +52,22 @@ export const BashToolCall = memo(function BashToolCall({
   const hasOutput = !!displayOutput;
   return <div>
       <ToolHeader expanded={expanded} expandable={hasOutput} onToggle={toggle} isDark={isDark} aria-label={`${expanded ? "Collapse" : "Expand"} output of ${command || "bash"}`}>
-        <span className={"" + " " + ""} ellipsizeMode="tail">
-          Ran <span className={"" + " " + ""}>{command || "bash"}</span>
+        <span className={"  text-text-secondary"} ellipsizeMode="tail">
+          Ran <span className={"  text-foreground"}>{command || "bash"}</span>
           {cdPath ? <span>
               {" in "}
-              <span className={"" + " " + ""}>{cdPath}</span>
+              <span className={"  text-foreground"}>{cdPath}</span>
             </span> : null}
         </span>
       </ToolHeader>
 
       {hasOutput && <ToolBody expanded={expanded}>
           <ToolSurface isDark={isDark}>
-            <div ref={scrollRef} className={""} nestedScrollEnabled onContentSizeChange={handleOutputGrowth} onScrollBeginDrag={stopFollowing}>
-              <span className={"" + " " + ""} selectable>
+            <div ref={scrollRef} className={"block"} nestedScrollEnabled onContentSizeChange={handleOutputGrowth} onScrollBeginDrag={stopFollowing}>
+              <span className={"  text-text-secondary"} selectable>
                 {displayOutput}
               </span>
-              {truncated && <span className={"" + " " + ""}>
+              {truncated && <span className={"  text-text-tertiary"}>
                   … output truncated
                 </span>}
             </div>

@@ -28,18 +28,18 @@ export const CodePreview = memo(function CodePreview({
     diffRemove: colors.diffRemoved,
     diffMeta: colors.skill
   }), [colors, isDark]);
-  return <div className={(bare ? "" : "" + " " + "") + " " + (fill ? "" : "")}>
-      <div className={maxHeight ? "max-h-[0]" : ""} nestedScrollEnabled>
+  return <div className={"  bg-surface-raised border-border"}>
+      <div className={"max-h-0"} nestedScrollEnabled>
         <div horizontal>
           <div>
             {lines.map((line, index) => {
             const segments = tokenizeLine(line, language, diffLanguage);
-            return <div key={index} className={""}>
-                  {showLineNumbers ? <div className={"" + " " + ""}>
-                      <span className={"" + " " + ""}>{startLine + index}</span>
+            return <div key={index} className={"block"}>
+                  {showLineNumbers ? <div className={" "}>
+                      <span className={"  text-text-tertiary"}>{startLine + index}</span>
                     </div> : null}
-                  <span className={"" + " " + (!showLineNumbers ? "" : "") + " " + (bare ? "" : "") + " " + ""}>
-                    {segments.length ? segments.map((segment, segmentIndex) => <span key={`${index}-${segmentIndex}`} className={""}>
+                  <span className={"  text-foreground"}>
+                    {segments.length ? segments.map((segment, segmentIndex) => <span key={`${index}-${segmentIndex}`} className={"block"}>
                             {segment.text || (segmentIndex === 0 ? ' ' : '')}
                           </span>) : ' '}
                   </span>

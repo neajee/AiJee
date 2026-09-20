@@ -45,33 +45,33 @@ export const TurnSummary = memo(function TurnSummary({
   }
   if (totalFiles === 0) return null;
   const expandable = ordered.length > 0;
-  return <div className={""}>
+  return <div className={"block"}>
       <ToolSurface isDark={isDark} padded={false}>
-        <div className={""}>
+        <div className={"block"}>
           <ToolHeader expanded={expanded} expandable={expandable} onToggle={toggle} isDark={isDark} aria-label={`${expanded ? "Collapse" : "Expand"} the list of changed files`}>
-            <span className={"" + " " + ""}>
+            <span className={"  text-text-secondary"}>
               {totalFiles} {totalFiles === 1 ? "file" : "files"} changed
             </span>
             {/* Keeps the counts on the trailing edge, next to the chevron. */}
-            <div className={""} />
-            <span className={""}>
-              {stats.linesAdded > 0 && <span className={""}>+{stats.linesAdded}</span>}
+            <div className={"block"} />
+            <span className={"block"}>
+              {stats.linesAdded > 0 && <span className={"block"}>+{stats.linesAdded}</span>}
               {stats.linesAdded > 0 && stats.linesRemoved > 0 && " "}
-              {stats.linesRemoved > 0 && <span className={""}>{"−"}{stats.linesRemoved}</span>}
+              {stats.linesRemoved > 0 && <span className={"block"}>{"−"}{stats.linesRemoved}</span>}
             </span>
-            <div className={""}>
+            <div className={"block"}>
               {Array.from({
               length: addBlocks
-            }).map((_, i) => <div key={`a-${i}`} className={"" + " " + ""} />)}
+            }).map((_, i) => <div key={`a-${i}`} className={" "} />)}
               {Array.from({
               length: removeBlocks
-            }).map((_, i) => <div key={`r-${i}`} className={"" + " " + ""} />)}
+            }).map((_, i) => <div key={`r-${i}`} className={" "} />)}
             </div>
           </ToolHeader>
         </div>
 
         {expandable && <ToolBody expanded={expanded}>
-            <div className={"" + " " + ""}
+            <div className={" "}
         // A turn can touch dozens of files; cap it like any tool body.
         nestedScrollEnabled scrollEnabled={ordered.length > SUMMARY_SCROLL_AFTER}>
               {ordered.map(change => <FileChangeRow key={change.path} change={change} root={root} addColor={addColor} removeColor={removeColor} isDark={isDark} />)}

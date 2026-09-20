@@ -15,23 +15,23 @@ export const SystemMessage = memo(function SystemMessage({
   const colors = useThemeTokens();
   const [expanded, setExpanded] = useState(false);
   if (message.systemKind === "compaction") {
-    return <div className={""}>
-        <div className={"" + " " + ""} />
-        <button role="button" aria-label="Toggle compaction summary" onClick={() => setExpanded(value => !value)} className={""}>
-          <span className={"" + " " + ""}>
+    return <div className={"block"}>
+        <div className={"  bg-muted"} />
+        <button role="button" aria-label="Toggle compaction summary" onClick={() => setExpanded(value => !value)} className={"block"}>
+          <span className={"  text-text-tertiary"}>
             上下文已压缩{message.compactionTokensBefore !== undefined ? ` · ${message.compactionTokensBefore.toLocaleString()} tokens` : ""}
           </span>
         </button>
-        <div className={"" + " " + ""} />
-        {expanded && message.text ? <div className={""}>
+        <div className={"  bg-muted"} />
+        {expanded && message.text ? <div className={"block"}>
             <AssistantMarkdown text={message.text} />
           </div> : null}
       </div>;
   }
   const label = message.systemKind === "bashExecution" ? `$ ${message.command || "command"}` : message.text || "System event";
-  return <div className={""}>
-      <div className={"" + " " + ""}>
-        <span className={"" + " " + ""}>
+  return <div className={"block"}>
+      <div className={"  bg-surface-raised"}>
+        <span className={"  text-text-tertiary"}>
           {label}
         </span>
       </div>

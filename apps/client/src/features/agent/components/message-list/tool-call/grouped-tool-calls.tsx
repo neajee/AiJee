@@ -1,5 +1,5 @@
 import { memo, useEffect, useRef, useState } from 'react';
-import { Animated } from "@/platform/animation";
+import { Animated } from "@/styles/motion";
 import { useThemeTokens } from '@/hooks/use-theme-tokens';
 import type { ToolCallInfo } from '../agent-types';
 import { isToolActive } from '../../../utils/message-list';
@@ -64,16 +64,16 @@ export const GroupedToolCalls = memo(function GroupedToolCalls({
   const visible = expanded ? showAll ? calls : calls.slice(0, MAX_VISIBLE) : [];
   return <div>
       <ToolHeader expanded={expanded} expandable onToggle={() => setExpanded(value => !value)} isDark={isDark} aria-label={`${expanded ? 'Collapse' : 'Expand'} ${calls.length} ${toolName} calls`}>
-        <div className={""}>
-          <span className={"" + " " + ""}>{activeCall ? base.activeBefore ?? base.before : base.before}</span>
-          <AnimatedNumber value={calls.length} className={"" + " " + ""} />
-          <span className={"" + " " + ""}>{toolName === 'read' ? ' files' : base.after}</span>
+        <div className={"block"}>
+          <span className={"  text-foreground"}>{activeCall ? base.activeBefore ?? base.before : base.before}</span>
+          <AnimatedNumber value={calls.length} className={"  text-foreground"} />
+          <span className={"  text-foreground"}>{toolName === 'read' ? ' files' : base.after}</span>
         </div>
       </ToolHeader>
       <ToolBody expanded={expanded}>
-        <div className={""}>
-          {visible.map(call => <div key={call.id} className={""}><span className={"" + " " + ""}>{formatSingleLine(call)}</span></div>)}
-          {calls.length > MAX_VISIBLE && !showAll && <button role="button" onClick={() => setShowAll(true)}><span className={"" + " " + ""}>Show {calls.length - MAX_VISIBLE} more…</span></button>}
+        <div className={"block"}>
+          {visible.map(call => <div key={call.id} className={"block"}><span className={"  text-text-secondary"}>{formatSingleLine(call)}</span></div>)}
+          {calls.length > MAX_VISIBLE && !showAll && <button role="button" onClick={() => setShowAll(true)}><span className={"  text-text-tertiary"}>Show {calls.length - MAX_VISIBLE} more…</span></button>}
         </div>
       </ToolBody>
     </div>;
@@ -104,5 +104,5 @@ function AnimatedNumber({
       }).start();
     });
   }, [opacity, value]);
-  return <span className={"" + " " + "opacity-[null]"}>{display}</span>;
+  return <span className={"  opacity-100"}>{display}</span>;
 }

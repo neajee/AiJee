@@ -20,17 +20,17 @@ export function ExtensionUiView({
     canSubmitSelect
   } = controller;
   if (!request) return null;
-  return <div className={""}>
-      <div className={"" + " " + ""}>
-        <div className={"" + " " + ""}>
-          <div className={""}>
-            <span className={"" + " " + ""}>
+  return <div className={"block"}>
+      <div className={"  bg-surface border-border"}>
+        <div className={" "}>
+          <div className={"block"}>
+            <span className={"  text-foreground"}>
               {title}
             </span>
-            {request.message ? <span className={"" + " " + ""}>
+            {request.message ? <span className={"  text-text-secondary"}>
                 {request.message}
               </span> : null}
-            {timeoutText ? <span className={"" + " " + ""}>
+            {timeoutText ? <span className={"  text-foreground"}>
                 {timeoutText}
               </span> : null}
           </div>
@@ -40,65 +40,65 @@ export function ExtensionUiView({
           </button>
         </div>
 
-        {request.method === "select" && <div className={""} keyboardShouldPersistTaps="handled">
+        {request.method === "select" && <div className={"block"} keyboardShouldPersistTaps="handled">
             {request.options.map(option => {
           const isSelected = selectedOption === option;
           return <button key={`${request.id}-${option}`} onClick={() => setSelectedOption(option)}>
                   {isSelected ? <CircleDot size={16} color={theme.accentColor} strokeWidth={1.8} /> : <Circle size={16} color={theme.textMuted} strokeWidth={1.8} />}
-                  <span className={"" + " " + ""}>
+                  <span className={"  text-foreground"}>
                     {option}
                   </span>
                 </button>;
         })}
           </div>}
 
-        {request.method === "confirm" && <div className={""}>
-            <div className={""}>
+        {request.method === "confirm" && <div className={"block"}>
+            <div className={"block"}>
               <button onClick={() => submit({
             confirmed: false
-          })} disabled={mutation.isPending} className={"" + " " + ""}>
-                <span className={"" + " " + ""}>
+          })} disabled={mutation.isPending} className={"  border-border"}>
+                <span className={"  text-foreground"}>
                   No
                 </span>
               </button>
               <button onClick={() => submit({
             confirmed: true
-          })} disabled={mutation.isPending} className={"" + " " + ""}>
+          })} disabled={mutation.isPending} className={"  bg-foreground"}>
                 <Check size={14} color={theme.colors.background} strokeWidth={2} />
-                <span className={"" + " " + ""}>
+                <span className={"  text-surface"}>
                   Yes
                 </span>
               </button>
             </div>
           </div>}
 
-        {request.method === "input" && <div className={""}>
-            <input value={draft} onChangeText={setDraft} placeholder={request.placeholder ?? "Type your response"} placeholderTextColor={theme.textMuted} className={"" + " " + ""} autoFocus autoCorrect={false} editable={!mutation.isPending} returnKeyType="done" onSubmitEditing={() => submit({
+        {request.method === "input" && <div className={"block"}>
+            <input value={draft} onChangeText={setDraft} placeholder={request.placeholder ?? "Type your response"} placeholderTextColor={theme.textMuted} className={"  text-foreground bg-card border-border"} autoFocus autoCorrect={false} editable={!mutation.isPending} returnKeyType="done" onSubmitEditing={() => submit({
           value: draft
         })} />
           </div>}
 
-        {request.method === "editor" && <div className={""}>
-            <input value={draft} onChangeText={setDraft} placeholder="Edit the text" placeholderTextColor={theme.textMuted} className={"" + " " + ""} autoFocus multiline textAlignVertical="top" editable={!mutation.isPending} />
+        {request.method === "editor" && <div className={"block"}>
+            <input value={draft} onChangeText={setDraft} placeholder="Edit the text" placeholderTextColor={theme.textMuted} className={"  text-foreground bg-card border-border"} autoFocus multiline textAlignVertical="top" editable={!mutation.isPending} />
           </div>}
 
-        {request.method !== "confirm" && <div className={"" + " " + ""}>
-            <button onClick={handleCancel} disabled={mutation.isPending} className={"" + " " + ""}>
-              <span className={"" + " " + ""}>
+        {request.method !== "confirm" && <div className={" "}>
+            <button onClick={handleCancel} disabled={mutation.isPending} className={"  border-border"}>
+              <span className={"  text-foreground"}>
                 Cancel
               </span>
             </button>
             <button onClick={() => submit({
           value: request.method === "select" ? selectedOption : draft
-        })} disabled={mutation.isPending || !canSubmitSelect} className={"" + " " + "opacity-[null]"}>
-              {mutation.isPending ? <span size="small" color={theme.colors.background} /> : <span className={"" + " " + ""}>
+        })} disabled={mutation.isPending || !canSubmitSelect} className={"  bg-foreground opacity-100"}>
+              {mutation.isPending ? <span size="small" color={theme.colors.background} /> : <span className={"  text-surface"}>
                   Submit
                 </span>}
             </button>
           </div>}
 
-        {mutation.isError && <div className={""}>
-            <span className={"" + " " + ""}>
+        {mutation.isError && <div className={"block"}>
+            <span className={"  text-destructive"}>
               {mutation.error instanceof Error ? mutation.error.message : "Failed to send the response"}
             </span>
           </div>}

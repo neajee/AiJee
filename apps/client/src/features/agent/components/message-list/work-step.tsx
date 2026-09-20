@@ -16,11 +16,11 @@ export const WorkStepView = memo(function WorkStepView({
     case "thinking":
       return <ThinkingBlock text={step.text} isStreaming={step.streaming} isDark={isDark} />;
     case "text":
-      return <div className={""}>
+      return <div className={"block"}>
           <AssistantMarkdown text={step.text} />
         </div>;
     case "error":
-      return <span className={"" + " " + ""}>
+      return <span className={"  text-destructive"}>
           {step.text}
         </span>;
     case "tools":

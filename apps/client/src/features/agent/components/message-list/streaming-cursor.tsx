@@ -1,5 +1,5 @@
 import { memo, useEffect } from "react";
-import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming, withDelay, Easing } from "@/platform/animation";
+import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming, withDelay, Easing } from "@/styles/motion";
 interface StreamingCursorProps {
   color?: string;
 }
@@ -39,12 +39,12 @@ function Dot({
       translateY: translateY.value
     }]
   }));
-  return <div className={"w-[0] h-[0] rounded-[0]" + " " + ""} />;
+  return <div className={"w-0 h-0 rounded-none  "} />;
 }
 export const StreamingCursor = memo(function StreamingCursor({
   color = "#888"
 }: StreamingCursorProps) {
-  return <div className={""}>
+  return <div className={"block"}>
       {Array.from({
       length: DOT_COUNT
     }, (_, i) => <Dot key={i} index={i} color={color} />)}

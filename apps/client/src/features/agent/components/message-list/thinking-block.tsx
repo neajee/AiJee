@@ -1,6 +1,6 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Brain, ChevronRight } from "lucide-react";
-import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from "@/platform/animation";
+import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from "@/styles/motion";
 import { Colors, Fonts } from "@/constants/theme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { AnimatedCollapse } from "./animated-collapse";
@@ -93,20 +93,20 @@ export const ThinkingBlock = memo(function ThinkingBlock({
   return <div>
       <button onClick={toggle} disabled={!text} role="button" aria-label={expanded ? "Collapse thinking" : "Expand thinking"} accessibilityState={{
       expanded
-    }} className={""}>
-        <div className={""}>
+    }} className={"block"}>
+        <div className={"block"}>
           <Brain size={12} color={colors.textTertiary} strokeWidth={1.8} />
         </div>
-        <span className={"" + " " + (peek ? "" : "") + " " + "" + " " + (peek ? "" : "")} ellipsizeMode="tail">
+        <span className={"  text-text-tertiary"} ellipsizeMode="tail">
           {headline}
         </span>
-        {!!text && <div className={""}>
+        {!!text && <div className={"block"}>
             <ChevronRight size={11} color={colors.textTertiary} strokeWidth={2} />
           </div>}
       </button>
 
       <AnimatedCollapse expanded={expanded}>
-        <span className={"" + " " + ""} selectable>
+        <span className={"  text-text-secondary"} selectable>
           {text}
         </span>
       </AnimatedCollapse>

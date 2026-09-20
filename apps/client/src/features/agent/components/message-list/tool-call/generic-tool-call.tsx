@@ -23,7 +23,7 @@ export const GenericToolCall = memo(function GenericToolCall({
   const name = toolDisplayName(tc.name);
   return <div>
       <ToolHeader expanded={expanded} expandable={hasResult || hasImages} onToggle={toggle} isDark={isDark} aria-label={`${expanded ? "Collapse" : "Expand"} result of ${name}`}>
-        <span className={"" + " " + ""}>
+        <span className={"  text-text-secondary"}>
           {name}
         </span>
       </ToolHeader>
@@ -32,8 +32,8 @@ export const GenericToolCall = memo(function GenericToolCall({
 
       <ToolBody expanded={expanded && hasResult}>
         <ToolSurface isDark={isDark}>
-          <div className={""} nestedScrollEnabled>
-            <span className={"" + " " + ""} selectable>
+          <div className={"block"} nestedScrollEnabled>
+            <span className={"  text-text-secondary"} selectable>
               {resultText}
             </span>
           </div>

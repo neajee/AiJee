@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Animated } from "@/platform/animation";
+import { Animated } from "@/styles/motion";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 function ShimmerBar({
   width,
@@ -25,13 +25,13 @@ function ShimmerBar({
     animation.start();
     return () => animation.stop();
   }, [delay, opacity]);
-  return <div className={"" + " " + "w-[0] opacity-[null]"} />;
+  return <div className={"  w-0 opacity-100"} />;
 }
 function UserShimmer() {
   const colorScheme = useColorScheme() ?? "light";
   const isDark = colorScheme === "dark";
-  return <div className={""}>
-      <div className={"" + " " + ""}>
+  return <div className={"block"}>
+      <div className={" "}>
         <ShimmerBar width="100%" delay={0} />
       </div>
     </div>;
@@ -41,14 +41,14 @@ function AssistantShimmer({
 }: {
   lines: `${number}%`[];
 }) {
-  return <div className={""}>
-      <div className={""}>
+  return <div className={"block"}>
+      <div className={"block"}>
         {lines.map((w, i) => <ShimmerBar key={i} width={w} delay={i * 80} />)}
       </div>
     </div>;
 }
 export function ChatShimmer() {
-  return <div className={""}>
+  return <div className={"block"}>
       <UserShimmer />
       <AssistantShimmer lines={["92%", "100%", "78%", "55%"]} />
       <UserShimmer />

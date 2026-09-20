@@ -26,7 +26,7 @@ export const ReadToolCall = memo(function ReadToolCall({
   const hasImages = !!(tc.resultImages && tc.resultImages.length > 0);
   return <div>
       <ToolHeader expanded={expanded} expandable={!!content} onToggle={toggle} isDark={isDark} aria-label={`${expanded ? "Collapse" : "Expand"} contents of ${fileName || "file"}`}>
-        <span className={"" + " " + ""}>
+        <span className={"  text-text-secondary"}>
           Read {fileName || filePath || "file"}
         </span>
       </ToolHeader>

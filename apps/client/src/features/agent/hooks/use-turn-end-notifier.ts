@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
-import { usePathname } from "@/platform/router-adapter";
+import { usePathname } from "@/hooks/router";
 import { usePiClient, useTurnEnd, type TurnEndEvent } from "@aijee/client-sdk";
 
 import { useWorkspaceStore } from "@/features/workspace/store";

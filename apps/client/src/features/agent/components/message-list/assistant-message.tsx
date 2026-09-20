@@ -1,7 +1,7 @@
 import { memo, useCallback, useEffect, useState } from "react";
 import * as Clipboard from "@/platform/clipboard";
 import { Copy } from "lucide-react";
-import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing } from "@/platform/animation";
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, Easing } from "@/styles/motion";
 import { Colors, Fonts } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
@@ -31,13 +31,13 @@ export const AssistantMessage = memo(function AssistantMessage({
   const hasText = !!message.text;
   const hasError = !!message.errorMessage;
   const isStreaming = !!message.isStreaming;
-  return <div className={""}>
-      {hasText && <div className={""}>
+  return <div className={"block"}>
+      {hasText && <div className={"block"}>
           <AssistantMarkdown text={message.text} isStreaming={isStreaming} />
         </div>}
 
-      {hasError && <div className={"" + " " + ""}>
-          <span className={"" + " " + ""}>
+      {hasError && <div className={" "}>
+          <span className={"  text-destructive"}>
             {message.errorMessage}
           </span>
         </div>}
@@ -74,11 +74,11 @@ export const MessageToolbar = memo(function MessageToolbar({
     setTimeout(() => setCopied(false), 1500);
   }, [message.text]);
   return <>
-      <div className={""}>
-        <div className={"" + " " + ""}>
-          <div className={""}>
-            <button onClick={handleCopy} className={"" + " " + (copied ? "" : "")} hitSlop={4}>
-              {copied ? <span className={"" + " " + ""}>✓</span> : <Copy size={13} color={colors.textTertiary} strokeWidth={1.8} />}
+      <div className={"block"}>
+        <div className={" "}>
+          <div className={"block"}>
+            <button onClick={handleCopy} className={"  bg-surface-raised"} hitSlop={4}>
+              {copied ? <span className={"  text-text-tertiary"}>✓</span> : <Copy size={13} color={colors.textTertiary} strokeWidth={1.8} />}
             </button>
           </div>
         </div>

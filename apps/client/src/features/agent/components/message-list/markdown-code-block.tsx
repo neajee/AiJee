@@ -36,9 +36,9 @@ export const MarkdownCodeBlock = memo(function MarkdownCodeBlock({
     timerRef.current = setTimeout(() => setCopied(false), 1500);
   }, [code]);
   const label = (language || "").trim().toLowerCase();
-  return <div className={"" + " " + ""}>
-      <div className={"" + " " + ""}>
-        <span className={"" + " " + ""}>
+  return <div className={"  bg-surface-raised border-border"}>
+      <div className={" "}>
+        <span className={"  text-text-tertiary"}>
           {label}
         </span>
         <button onClick={handleCopy} hitSlop={6} role="button" aria-label={copied ? "Code copied" : "Copy code"}>
@@ -46,7 +46,7 @@ export const MarkdownCodeBlock = memo(function MarkdownCodeBlock({
         </button>
       </div>
 
-      <div className={""}>
+      <div className={"block"}>
         <CodePreview code={code} language={language} isDark={isDark} showLineNumbers={false} bare />
       </div>
     </div>;

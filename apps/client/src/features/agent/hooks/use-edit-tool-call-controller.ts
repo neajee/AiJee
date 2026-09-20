@@ -1,7 +1,7 @@
 import { View } from "@/types/dom";
 import { useCallback, useRef, useState } from 'react';
 import { useWindowDimensions } from "@/platform/browser";
-import { Animated, Easing } from "@/platform/animation";
+import { Animated, Easing } from "@/styles/motion";
 import { type View as RNView } from "@/types/dom";
 import type { ToolCallInfo } from '../agent-types';
 import { basename, isToolActive, parseToolArguments } from '../utils/message-list';

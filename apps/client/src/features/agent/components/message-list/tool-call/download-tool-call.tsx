@@ -15,11 +15,11 @@ export const DownloadToolCall = memo(function DownloadToolCall({
   const parsed = parseToolArguments(tc.arguments);
   const url = parsed.url as string || "";
   return <div>
-      <div className={""}>
-        <span className={"" + " " + ""}>
+      <div className={"block"}>
+        <span className={"  text-text-secondary"}>
           Download
         </span>
-        {url ? <span className={"" + " " + ""}>
+        {url ? <span className={"  text-text-tertiary"}>
             {url}
           </span> : null}
       </div>

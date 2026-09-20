@@ -1,6 +1,6 @@
 import { memo, type ReactNode } from "react";
 import { ChevronRight } from "lucide-react";
-import Animated, { Easing, useAnimatedStyle, useDerivedValue, withTiming } from "@/platform/animation";
+import Animated, { Easing, useAnimatedStyle, useDerivedValue, withTiming } from "@/styles/motion";
 import { Colors } from "@/constants/theme";
 import { HAIRLINE_WIDTH } from "@/constants/layout";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
@@ -50,7 +50,7 @@ export const ToolHeader = memo(function ToolHeader({
   }));
   const row = [styles.header, alignTop && styles.headerTop];
   if (!expandable) {
-    return <div className={""}>{children}</div>;
+    return <div className={"block"}>{children}</div>;
   }
   return <button onClick={onToggle} role="button" aria-label={accessibilityLabel} accessibilityState={{
     expanded
@@ -61,7 +61,7 @@ export const ToolHeader = memo(function ToolHeader({
     right: 8
   }}>
       {children}
-      <div className={"" + " " + (alignTop ? "" : "") + " " + ""}>
+      <div className={" "}>
         <ChevronRight size={CHEVRON_SIZE} color={colors.textTertiary} strokeWidth={2} />
       </div>
     </button>;
@@ -80,7 +80,7 @@ export function ToolBody({
   children: ReactNode;
 }) {
   return <AnimatedCollapse expanded={expanded}>
-      <div className={""}>{children}</div>
+      <div className={"block"}>{children}</div>
     </AnimatedCollapse>;
 }
 
@@ -98,7 +98,7 @@ export function ToolSurface({
   children: ReactNode;
 }) {
   const colors = useThemeTokens();
-  return <div className={"" + " " + (padded ? "" : "") + " " + ""}>
+  return <div className={"  bg-surface-raised border-border"}>
       {children}
     </div>;
 }
