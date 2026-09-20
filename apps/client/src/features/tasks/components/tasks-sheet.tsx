@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { useCallback, useEffect } from 'react';
 import { useSafeAreaInsets } from "@/platform/browser";
 import Animated, { Easing, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from "@/platform/animation";
@@ -64,32 +63,21 @@ export function TasksSheet({
   }));
   return <div {...false ? {
     pointerEvents: visible ? 'auto' as const : 'none' as const
-  } : {}} className={toTailwind([styles.root, true && {
-    pointerEvents: visible ? 'auto' : 'none'
-  } as any])}>
-      <div className={toTailwind([styles.overlay, {
-      backgroundColor: colors.overlay
-    }, overlayStyle])}>
-        <button className={toTailwind(ABSOLUTE_FILL_STYLE)} onClick={dismiss} />
+  } : {}} className={"" + " " + (true ? "" : "")}>
+      <div className={"" + " " + "" + " " + ""}>
+        <button className={""} onClick={dismiss} />
       </div>
 
-      <div className={toTailwind([styles.sheet, {
-      backgroundColor: isDark ? '#1e1e1e' : '#FFFFFF',
-      paddingBottom: insets.bottom
-    }, sheetStyle])}>
+      <div className={"" + " " + "pb-[bottom]" + " " + ""}>
         <div>
-          <div className={toTailwind(styles.handleBar)}>
-            <div className={toTailwind([styles.handle, {
-            backgroundColor: colors.sheetHandle
-          }])} />
+          <div className={""}>
+            <div className={"" + " " + ""} />
           </div>
         </div>
 
-        <span className={toTailwind([styles.title, {
-        color: textPrimary
-      }])}>Tasks</span>
+        <span className={"" + " " + ""}>Tasks</span>
 
-        <div className={toTailwind(styles.content)}>
+        <div className={""}>
           <TasksPanelContent />
         </div>
       </div>

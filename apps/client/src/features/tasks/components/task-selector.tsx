@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { useEffect } from 'react';
 import { Play, Square, ChevronDown } from 'lucide-react';
 import { Fonts } from '@/constants/theme';
@@ -43,22 +42,14 @@ export function TaskSelector({
       startTask(selectedTaskLabel, workspace.id);
     }
   };
-  return <div className={toTailwind(styles.container)}>
-      <div className={toTailwind(styles.selector)}>
-        <button onClick={handleToggle} disabled={!selectedTaskLabel} className={toTailwind(({
-        pressed
-      }) => [styles.toggleBtn, pressed && {
-        opacity: 0.7
-      }])} aria-label={isRunning ? 'Stop task' : 'Start task'}>
+  return <div className={""}>
+      <div className={""}>
+        <button onClick={handleToggle} disabled={!selectedTaskLabel} className={""} aria-label={isRunning ? 'Stop task' : 'Start task'}>
           {isRunning ? <Square size={10} color="#FF3B30" fill="#FF3B30" strokeWidth={0} /> : <Play size={10} color="#34C759" fill="#34C759" strokeWidth={0} />}
         </button>
 
-        <button onClick={togglePanel} className={toTailwind(({
-        pressed
-      }) => [styles.labelBtn, pressed && {
-        opacity: 0.7
-      }])} aria-label="Select task">
-          <span className={toTailwind(styles.label)}>
+        <button onClick={togglePanel} className={""} aria-label="Select task">
+          <span className={""}>
             {displayLabel}
           </span>
           <ChevronDown size={10} color="#888" strokeWidth={2} />

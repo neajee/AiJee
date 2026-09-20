@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { useEffect, useRef, useCallback, useState } from 'react';
 import { PanResponder } from "@/platform/animation";
 import { X, Circle, Minus, Maximize2 } from 'lucide-react';
@@ -6,7 +5,6 @@ import { Colors, Fonts } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useTasksStore } from '../../store';
 import { useTaskOutputData } from '../../hooks/use-task-output-data';
-import { styles } from './style-tokens';
 export function TaskOutputPanel() {
   const colorScheme = useColorScheme() ?? 'light';
   const colors = Colors[colorScheme];
@@ -73,89 +71,64 @@ export function TaskOutputPanel() {
   if (!outputPanelVisible) return null;
   const statusColor = selectedInstance?.status === 'running' ? '#34C759' : selectedInstance?.status === 'failed' ? '#FF3B30' : '#8E8E93';
   if (minimized) {
-    return <div className={toTailwind([styles.minimizedContainer, {
-      borderTopColor: borderColor
-    }])}>
-        <button onClick={handleToggleMinimize} className={toTailwind(styles.minimizedHeader)}>
-          <div className={toTailwind(styles.headerLeft)}>
+    return <div className={"" + " " + ""}>
+        <button onClick={handleToggleMinimize} className={""}>
+          <div className={""}>
             {selectedInstance && <>
                 <Circle size={8} color={statusColor} fill={statusColor} strokeWidth={0} />
-                <span className={toTailwind([styles.headerLabel, {
-              color: textPrimary
-            }])}>
+                <span className={"" + " " + ""}>
                   {selectedInstance.label}
                 </span>
               </>}
-            {!selectedInstance && <span className={toTailwind([styles.headerLabel, {
-            color: textMuted
-          }])}>
+            {!selectedInstance && <span className={"" + " " + ""}>
                 No task selected
               </span>}
           </div>
-          <div className={toTailwind(styles.headerActions)}>
-            <button onClick={handleToggleMinimize} className={toTailwind(styles.actionBtn)} aria-label="Maximize panel">
+          <div className={""}>
+            <button onClick={handleToggleMinimize} className={""} aria-label="Maximize panel">
               <Maximize2 size={12} color={textMuted} strokeWidth={2} />
             </button>
-            <button onClick={handleClose} className={toTailwind(styles.actionBtn)} aria-label="Close panel">
+            <button onClick={handleClose} className={""} aria-label="Close panel">
               <X size={12} color={textMuted} strokeWidth={2} />
             </button>
           </div>
         </button>
       </div>;
   }
-  return <div className={toTailwind([styles.container, {
-    height: outputPanelHeight,
-    borderTopColor: borderColor
-  }])}>
-      <div {...panResponder.panHandlers} className={toTailwind(styles.dragHandle)}>
-        <div className={toTailwind([styles.dragBar, {
-        backgroundColor: handleBg
-      }])} />
+  return <div className={"" + " " + "h-[0]"}>
+      <div {...panResponder.panHandlers} className={""}>
+        <div className={"" + " " + ""} />
       </div>
 
-      <div className={toTailwind([styles.header, {
-      borderBottomColor: borderColor
-    }])}>
-        <div className={toTailwind(styles.headerLeft)}>
+      <div className={"" + " " + ""}>
+        <div className={""}>
           {selectedInstance && <>
               <Circle size={8} color={statusColor} fill={statusColor} strokeWidth={0} />
-              <span className={toTailwind([styles.headerLabel, {
-            color: textPrimary
-          }])}>
+              <span className={"" + " " + ""}>
                 {selectedInstance.label}
               </span>
-              <span className={toTailwind([styles.headerCmd, {
-            color: textMuted
-          }])}>
+              <span className={"" + " " + ""}>
                 {selectedInstance.command}
               </span>
             </>}
-          {!selectedInstance && <span className={toTailwind([styles.headerLabel, {
-          color: textMuted
-        }])}>
+          {!selectedInstance && <span className={"" + " " + ""}>
               No task selected
             </span>}
         </div>
-        <div className={toTailwind(styles.headerActions)}>
-          <button onClick={handleToggleMinimize} className={toTailwind(styles.actionBtn)} aria-label="Minimize panel">
+        <div className={""}>
+          <button onClick={handleToggleMinimize} className={""} aria-label="Minimize panel">
             <Minus size={12} color={textMuted} strokeWidth={2} />
           </button>
-          <button onClick={handleClose} className={toTailwind(styles.actionBtn)} aria-label="Close panel">
+          <button onClick={handleClose} className={""} aria-label="Close panel">
             <X size={12} color={textMuted} strokeWidth={2} />
           </button>
         </div>
       </div>
 
-      <div ref={logScrollRef} className={toTailwind([styles.logContent, {
-      backgroundColor: logBg
-    }])}>
-        {selectedLogs.length === 0 ? <span className={toTailwind([styles.logLine, {
-        color: textMuted
-      }])}>
+      <div ref={logScrollRef} className={"" + " " + ""}>
+        {selectedLogs.length === 0 ? <span className={"" + " " + ""}>
             {selectedInstance ? 'No output yet...' : 'Select a running task to view output'}
-          </span> : selectedLogs.map((line, i) => <span key={i} className={toTailwind([styles.logLine, {
-        color: textPrimary
-      }])} selectable>
+          </span> : selectedLogs.map((line, i) => <span key={i} className={"" + " " + ""} selectable>
               {line}
             </span>)}
       </div>

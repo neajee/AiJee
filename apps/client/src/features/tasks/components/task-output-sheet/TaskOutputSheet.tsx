@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { useCallback, useEffect, useRef } from 'react';
 import { useSafeAreaInsets } from "@/platform/browser";
 import Animated, { Easing, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from "@/platform/animation";
@@ -8,7 +7,6 @@ import { Colors, Fonts } from '@/constants/theme';
 import { ABSOLUTE_FILL_STYLE } from '@/constants/layout';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useTaskOutputData } from '../../hooks/use-task-output-data';
-import { styles } from './style-tokens';
 import { useSheetHeight } from '@/features/navigation/hooks/use-sheet-height';
 const TIMING_CONFIG = {
   duration: 280,
@@ -92,64 +90,39 @@ export function TaskOutputSheet({
   const statusColor = selectedInstance?.status === 'running' ? '#34C759' : selectedInstance?.status === 'failed' ? '#FF3B30' : '#8E8E93';
   return <div {...false ? {
     pointerEvents: visible ? 'auto' as const : 'none' as const
-  } : {}} className={toTailwind([styles.root, true && {
-    pointerEvents: visible ? 'auto' : 'none'
-  } as any])}>
-      <div className={toTailwind([styles.overlay, {
-      backgroundColor: colors.overlay
-    }, overlayStyle])}>
-        <button className={toTailwind(ABSOLUTE_FILL_STYLE)} onClick={dismiss} />
+  } : {}} className={"" + " " + (true ? "" : "")}>
+      <div className={"" + " " + "" + " " + ""}>
+        <button className={""} onClick={dismiss} />
       </div>
 
-      <div className={toTailwind([styles.sheet, {
-      backgroundColor: isDark ? '#1e1e1e' : '#FFFFFF',
-      paddingBottom: insets.bottom,
-      height: sheetHeight,
-      maxHeight: sheetHeight
-    }, sheetStyle])}>
+      <div className={"" + " " + "pb-[bottom] h-[0] max-h-[0]" + " " + ""}>
         <div>
-          <div className={toTailwind(styles.handleBar)}>
-            <div className={toTailwind([styles.handle, {
-            backgroundColor: colors.sheetHandle
-          }])} />
+          <div className={""}>
+            <div className={"" + " " + ""} />
           </div>
         </div>
 
-        <div className={toTailwind([styles.header, {
-        borderBottomColor: borderColor
-      }])}>
-          <div className={toTailwind(styles.headerLeft)}>
+        <div className={"" + " " + ""}>
+          <div className={""}>
             {selectedInstance ? <>
                 <Circle size={8} color={statusColor} fill={statusColor} strokeWidth={0} />
-                <span className={toTailwind([styles.headerLabel, {
-              color: textPrimary
-            }])}>
+                <span className={"" + " " + ""}>
                   {selectedInstance.label}
                 </span>
-                <span className={toTailwind([styles.headerCmd, {
-              color: textMuted
-            }])}>
+                <span className={"" + " " + ""}>
                   {selectedInstance.command}
                 </span>
-              </> : <span className={toTailwind([styles.headerLabel, {
-            color: textMuted
-          }])}>Task Output</span>}
+              </> : <span className={"" + " " + ""}>Task Output</span>}
           </div>
-          <button onClick={dismiss} className={toTailwind(styles.closeBtn)}>
+          <button onClick={dismiss} className={""}>
             <X size={14} color={textMuted} strokeWidth={2} />
           </button>
         </div>
 
-        <div ref={logScrollRef} className={toTailwind([styles.logContent, {
-        backgroundColor: logBg
-      }])}>
-          {selectedLogs.length === 0 ? <span className={toTailwind([styles.logLine, {
-          color: textMuted
-        }])}>
+        <div ref={logScrollRef} className={"" + " " + ""}>
+          {selectedLogs.length === 0 ? <span className={"" + " " + ""}>
               {selectedInstance ? 'No output yet...' : 'Select a running task to view output'}
-            </span> : selectedLogs.map((line, i) => <span key={i} className={toTailwind([styles.logLine, {
-          color: textPrimary
-        }])} selectable>
+            </span> : selectedLogs.map((line, i) => <span key={i} className={"" + " " + ""} selectable>
                 {line}
               </span>)}
         </div>

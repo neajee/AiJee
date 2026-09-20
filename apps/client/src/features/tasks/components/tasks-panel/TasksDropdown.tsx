@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { useEffect } from 'react';
 import { X } from 'lucide-react';
 import { Colors, Fonts } from '@/constants/theme';
@@ -36,22 +35,15 @@ export function TasksDropdown({
   }, [setPanelOpen]);
   return <div {...{
     'data-tasks-panel': true
-  } as any} className={toTailwind([styles.panel, placement === "above" ? styles.panelAbove : styles.panelBelow, {
-    backgroundColor: popoverBg,
-    borderColor
-  }])}>
-      <div className={toTailwind([styles.panelHeader, {
-      borderBottomColor: borderColor
-    }])}>
-        <span className={toTailwind([styles.panelTitle, {
-        color: textPrimary
-      }])}>Tasks</span>
-        <button onClick={() => setPanelOpen(false)} className={toTailwind(styles.closeBtn)}>
+  } as any} className={"" + " " + (placement === "above" ? "" : "") + " " + ""}>
+      <div className={"" + " " + ""}>
+        <span className={"" + " " + ""}>Tasks</span>
+        <button onClick={() => setPanelOpen(false)} className={""}>
           <X size={14} color={textMuted} strokeWidth={2} />
         </button>
       </div>
 
-      <div className={toTailwind(styles.panelBody)}>
+      <div className={""}>
         <TasksPanelContent />
       </div>
     </div>;
