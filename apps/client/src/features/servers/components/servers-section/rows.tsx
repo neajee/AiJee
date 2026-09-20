@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { useEffect, useRef, useState } from "react";
 import { Animated } from "@/platform/animation";
 import { MoreHorizontal, Pencil, QrCode, X, Trash2 } from "lucide-react";
@@ -7,7 +6,6 @@ import { PiLogo } from "@/components/pi-logo";
 import { useSettingsPalette } from "@/components/settings-surface";
 import { useIsSessionStreaming } from "@aijee/client-sdk";
 import type { Server } from "@/features/servers/store";
-import { styles } from "./style-tokens";
 function ConnectionStatusDot({
   label,
   color,
@@ -35,10 +33,7 @@ function ConnectionStatusDot({
     animation.start();
     return () => animation.stop();
   }, [connecting, opacity]);
-  return <div aria-label={label} className={toTailwind([styles.statusDot, {
-    backgroundColor: color,
-    opacity
-  }])} />;
+  return <div aria-label={label} className={"" + " " + "opacity-[null]"} />;
 }
 export function ServerRow({
   server,
@@ -79,43 +74,18 @@ export function ServerRow({
     label: minutes ? `上次连接 ${minutes} 分钟前` : '离线 · 尚无连接记录',
     color: p.textTertiary
   };
-  return <div className={toTailwind(styles.serverRowWrap)}>
-      {isActive ? <div className={toTailwind([styles.activeRail, {
-      backgroundColor: p.success
-    }])} /> : null}
+  return <div className={""}>
+      {isActive ? <div className={"" + " " + ""} /> : null}
       <button onClick={onPress} onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)} role="button" aria-label={`连接到 ${server.name}，${status.label}`}>
       <ConnectionStatusDot label={status.label} color={status.color} connecting={isConnecting} />
-      <div className={toTailwind({
-        width: 30,
-        height: 30,
-        borderRadius: 8,
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: p.tile
-      })}>
+      <div className={"w-[30px] h-[30px] rounded-[8px] items-center justify-center"}>
         {isConnecting ? <span size="small" color={p.text} /> : <PiLogo size={16} color={p.textSecondary} />}
       </div>
 
-      <div className={toTailwind({
-        flex: 1,
-        alignSelf: "stretch",
-        justifyContent: "center",
-        gap: 2
-      })}>
-        <span className={toTailwind({
-          fontSize: 13,
-          fontFamily: Fonts.sansMedium,
-          color: p.text,
-          textAlign: "left"
-        })}>{server.name}</span>
-        <div className={toTailwind(styles.statusLine)}>
-          <span className={toTailwind({
-            fontSize: 12,
-            fontFamily: Fonts.mono,
-            color: p.textTertiary,
-            opacity: 0.55,
-            textAlign: "left"
-          })}>{status.label}</span>
+      <div className={"flex-1 self-stretch justify-center gap-[2px]"}>
+        <span className={"text-[13px] font-sans text-left"}>{server.name}</span>
+        <div className={""}>
+          <span className={"text-[12px] font-mono opacity-[0.55] text-left"}>{status.label}</span>
         </div>
       </div>
       </button>
@@ -126,9 +96,7 @@ export function ServerRow({
       <button ref={moreRef} onClick={() => onToggleMenu(callback => moreRef.current?.measureInWindow((x: number, y: number, width: number, height: number) => callback(x, y, width, height)))} role="button" aria-label={`管理 ${server.name}`} hitSlop={8}>
         <MoreHorizontal size={20} color={p.textSecondary} strokeWidth={1.8} />
       </button>
-      {!isLast ? <div className={toTailwind([styles.rowDivider, {
-      backgroundColor: p.separator
-    }])} /> : null}
+      {!isLast ? <div className={"" + " " + ""} /> : null}
     </div>;
 }
 export function FooterAction({
@@ -146,13 +114,9 @@ export function FooterAction({
 }) {
   const p = useSettingsPalette();
   return <button onClick={onPress} role="button" aria-label={label}>
-      {isFirst ? <div className={toTailwind([styles.footerDivider, {
-      backgroundColor: p.separator
-    }])} /> : null}
+      {isFirst ? <div className={"" + " " + ""} /> : null}
       <Icon size={16} color={p.textSecondary} strokeWidth={1.8} />
-      <span className={toTailwind([styles.footerActionText, {
-      color: p.textSecondary
-    }])}>{label}</span>
+      <span className={"" + " " + ""}>{label}</span>
     </button>;
 }
 export function MenuAction({
@@ -166,7 +130,5 @@ export function MenuAction({
   onPress: () => void;
   color: string;
 }) {
-  return <button onClick={onPress} role="button" aria-label={label}><Icon size={16} color={color} strokeWidth={1.8} /><span className={toTailwind([styles.menuActionText, {
-      color
-    }])}>{label}</span></button>;
+  return <button onClick={onPress} role="button" aria-label={label}><Icon size={16} color={color} strokeWidth={1.8} /><span className={"" + " " + ""}>{label}</span></button>;
 }

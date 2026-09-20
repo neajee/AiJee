@@ -1,10 +1,8 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { Check, ChevronDown, Settings } from 'lucide-react';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useThemeTokens } from '@/hooks/use-theme-tokens';
 import { PiLogo } from '@/components/pi-logo';
 import { useServerSwitcherController } from '../../hooks/use-server-switcher-controller';
-import { styles } from './style-tokens';
 export function ServerSwitcher() {
   const colors = useThemeTokens();
   const isDark = (useColorScheme() ?? 'light') === 'dark';
@@ -24,58 +22,39 @@ export function ServerSwitcher() {
   const borderColor = isDark ? '#3b3a39' : 'rgba(0,0,0,0.12)';
   const hoverBg = isDark ? '#333' : '#F5F5F5';
   const iconBg = isDark ? '#fefdfd' : '#1a1a1a';
-  return <div className={toTailwind(styles.root)} {...{
+  return <div className={""} {...{
     'data-server-popover': true
   } as any}>
       <button onClick={() => setPopoverVisible(value => !value)} role="button" aria-label="Switch server">
-        <div className={toTailwind([styles.serverIcon, {
-        backgroundColor: iconBg
-      }])}>
+        <div className={"" + " " + ""}>
           <PiLogo size={14} color={isDark ? '#1a1a1a' : '#fff'} />
         </div>
-        <span className={toTailwind([styles.serverName, {
-        color: textPrimary
-      }])}>{activeServer?.name ?? 'No Server'}</span>
+        <span className={"" + " " + ""}>{activeServer?.name ?? 'No Server'}</span>
         <ChevronDown size={12} color={textMuted} strokeWidth={2} />
       </button>
-      {popoverVisible && <div className={toTailwind([styles.popover, {
-      backgroundColor: popoverBg,
-      borderColor
-    }])}>
-          <div className={toTailwind(styles.popoverHeader)}><span className={toTailwind([styles.popoverTitle, {
-          color: textMuted
-        }])}>Servers</span></div>
-          <div className={toTailwind(styles.popoverList)}>
+      {popoverVisible && <div className={"" + " " + ""}>
+          <div className={""}><span className={"" + " " + ""}>Servers</span></div>
+          <div className={""}>
             {servers.map(server => {
           const isActive = server.id === activeServerId;
           const isSwitching = server.id === switchingId;
           return <button key={server.id} onClick={() => void handleSwitchServer(server)} disabled={isSwitching}>
-                  <div className={toTailwind([styles.popoverItemIcon, {
-              backgroundColor: iconBg
-            }])}><PiLogo size={10} color={isDark ? '#1a1a1a' : '#fff'} /></div>
-                  <div className={toTailwind(styles.popoverItemInfo)}>
-                    <span className={toTailwind([styles.popoverItemName, {
-                color: textPrimary
-              }])}>{server.name}</span>
-                    <span className={toTailwind([styles.popoverItemAddress, {
-                color: textMuted
-              }])}>{server.address}</span>
+                  <div className={"" + " " + ""}><PiLogo size={10} color={isDark ? '#1a1a1a' : '#fff'} /></div>
+                  <div className={""}>
+                    <span className={"" + " " + ""}>{server.name}</span>
+                    <span className={"" + " " + ""}>{server.address}</span>
                   </div>
                   {isActive && <Check size={14} color="#34C759" strokeWidth={2.5} />}
                 </button>;
         })}
           </div>
-          <div className={toTailwind([styles.popoverFooter, {
-        borderTopColor: borderColor
-      }])}>
+          <div className={"" + " " + ""}>
             <button onClick={() => {
           setPopoverVisible(false);
           router.push('/settings/servers');
         }}>
               <Settings size={13} color={textMuted} strokeWidth={1.8} />
-              <span className={toTailwind([styles.popoverFooterText, {
-            color: textMuted
-          }])}>管理服务器</span>
+              <span className={"" + " " + ""}>管理服务器</span>
             </button>
           </div>
         </div>}

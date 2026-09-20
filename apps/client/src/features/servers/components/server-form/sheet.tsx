@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { useCallback, useEffect, useState } from 'react';
 import { Keyboard, useWindowDimensions } from "@/platform/browser";
 import { useSafeAreaInsets } from "@/platform/browser";
@@ -8,7 +7,7 @@ import { Colors } from '@/constants/theme';
 import { ABSOLUTE_FILL_STYLE } from '@/constants/layout';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { ServerFormFields } from './fields';
-import { formStyles, SHEET_HEIGHT, sheetStyles } from './style-tokens';
+const SHEET_HEIGHT = 520;
 import type { ServerFormProps } from './component-types';
 const TIMING_CONFIG = {
   duration: 280,
@@ -91,38 +90,24 @@ export function ServerFormSheet({
   return <div visible={visible} transparent animationType="none" onRequestClose={() => {
     if (!loading) dismiss();
   }}>
-      <div className={toTailwind(sheetStyles.root)}>
-        <div className={toTailwind([sheetStyles.overlay, {
-        backgroundColor: colors.overlay
-      }, overlayStyle])}>
-          <button className={toTailwind(ABSOLUTE_FILL_STYLE)} onClick={loading ? undefined : dismiss} />
+      <div className={""}>
+        <div className={"" + " " + "" + " " + ""}>
+          <button className={""} onClick={loading ? undefined : dismiss} />
         </div>
-        <div className={toTailwind([sheetStyles.keyboardAvoider, {
-        paddingBottom: keyboardInset
-      }])}>
+        <div className={"" + " " + "pb-[0]"}>
           <div>
-            <div className={toTailwind([sheetStyles.sheet, {
-            backgroundColor: sheetBg,
-            paddingBottom: keyboardHeight > 0 ? 12 : sheetBottomPadding,
-            maxHeight: Math.min(SHEET_HEIGHT, maxVisibleSheetHeight)
-          }, sheetStyle])}>
-              <div className={toTailwind(sheetStyles.handleBar)}>
-                <div className={toTailwind([sheetStyles.handle, {
-                backgroundColor: colors.sheetHandle
-              }])} />
+            <div className={"" + " " + "pb-[0] max-h-[0]" + " " + ""}>
+              <div className={""}>
+                <div className={"" + " " + ""} />
               </div>
-              <div className={toTailwind(sheetStyles.sheetHeader)}>
-                <span className={toTailwind([sheetStyles.sheetTitle, {
-                color: textPrimary
-              }])}>
+              <div className={""}>
+                <span className={"" + " " + ""}>
                   {initial ? 'Edit Server' : 'Add Server'}
                 </span>
               </div>
               <div keyboardShouldPersistTaps="handled">
                 <ServerFormFields name={name} setName={setName} address={address} setAddress={setAddress} isDark={isDark} />
-                {error && <span className={toTailwind([formStyles.errorText, {
-                color: isDark ? '#FF453A' : '#FF3B30'
-              }])}>
+                {error && <span className={"" + " " + ""}>
                     {error}
                   </span>}
                 <button onClick={() => {
@@ -130,14 +115,8 @@ export function ServerFormSheet({
                   name: name.trim(),
                   address: address.trim()
                 });
-              }} className={toTailwind([sheetStyles.sheetSaveBtn, {
-                backgroundColor: isDark ? '#fefdfd' : '#1a1a1a'
-              }, !canSave && {
-                opacity: 0.4
-              }])} disabled={!canSave}>
-                  {loading ? <span size="small" color={isDark ? '#1a1a1a' : '#fff'} /> : <span className={toTailwind([sheetStyles.sheetSaveBtnText, {
-                  color: isDark ? '#1a1a1a' : '#fff'
-                }])}>
+              }} className={"" + " " + "" + " " + (!canSave ? "opacity-[0.4]" : "")} disabled={!canSave}>
+                  {loading ? <span size="small" color={isDark ? '#1a1a1a' : '#fff'} /> : <span className={"" + " " + ""}>
                       {initial ? 'Save & Connect' : 'Add & Connect'}
                     </span>}
                 </button>

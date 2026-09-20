@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { QrCode } from "lucide-react";
 import { Fonts } from "@/constants/theme";
 interface QrScannerScanPanelProps {
@@ -11,11 +10,9 @@ interface QrScannerScanPanelProps {
 export function QrScannerScanPanel({
   textMuted
 }: QrScannerScanPanelProps) {
-  return <div className={toTailwind(styles.permissionWrap)}>
+  return <div className={""}>
       <QrCode size={36} color={textMuted} strokeWidth={1.2} />
-      <span className={toTailwind([styles.permissionText, {
-      color: textMuted
-    }])}>
+      <span className={"" + " " + ""}>
         Camera scanning is not available on the web client. Paste the connect
         URL manually.
       </span>
