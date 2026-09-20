@@ -29,10 +29,10 @@ export function FileTree({
   const isNarrow = width > 0 && width < NARROW_PANEL_WIDTH;
   const treeWidth = isNarrow ? TREE_COLUMN_NARROW : TREE_COLUMN_WIDTH;
   const tree = <>
-      <div className={""}>
-        <div className={"" + " " + ""}>
+      <div className={"block"}>
+        <div className={" "}>
           <Search size={13} color={textMuted} strokeWidth={2} />
-          <input value={query} onChangeText={setQuery} placeholder="Filter files…" placeholderTextColor={textMuted} className={"" + " " + ""} autoCapitalize="none" autoCorrect={false} aria-label="Filter files" />
+          <input value={query} onChangeText={setQuery} placeholder="Filter files…" placeholderTextColor={textMuted} className={" "} autoCapitalize="none" autoCorrect={false} aria-label="Filter files" />
           {query.length > 0 && <button onClick={() => setQuery("")} hitSlop={6} aria-label="Clear filter" {...{
           title: "Clear filter"
         }}>
@@ -42,23 +42,23 @@ export function FileTree({
       </div>
       <FileTreeRoot rootPath={rootPath} textMuted={textMuted} onFilePress={p => onViewFile(p)} expandedDirs={expandedDirs} onToggleDir={onToggleDir} query={query.trim()} selectedPath={viewingFile} />
     </>;
-  return <div className={""} onLayout={e => setWidth(e.nativeEvent.layout.width)}>
+  return <div className={"block"} onLayout={e => setWidth(e.nativeEvent.layout.width)}>
       {isNarrow ?
     // One column: the file takes the panel while it is open, the tree
     // returns when it is closed.
-    viewingFile ? <FileViewer filePath={viewingFile} rootPath={rootPath} onClose={() => onViewFile(null)} /> : tree : <div className={""}>
-          <div className={""}>
-            {viewingFile ? <FileViewer filePath={viewingFile} rootPath={rootPath} onClose={() => onViewFile(null)} /> : <div className={""}>
+    viewingFile ? <FileViewer filePath={viewingFile} rootPath={rootPath} onClose={() => onViewFile(null)} /> : tree : <div className={"block"}>
+          <div className={"block"}>
+            {viewingFile ? <FileViewer filePath={viewingFile} rootPath={rootPath} onClose={() => onViewFile(null)} /> : <div className={"block"}>
                 <FolderOpen size={26} color={textMuted} strokeWidth={1.5} />
-                <span className={"" + " " + ""}>
+                <span className={" "}>
                   Open a file
                 </span>
-                <span className={"" + " " + ""}>
+                <span className={" "}>
                   Pick one from the workspace tree
                 </span>
               </div>}
           </div>
-          <div className={"" + " " + "w-[0]"}>
+          <div className={"  w-0"}>
             {tree}
           </div>
         </div>}

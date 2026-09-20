@@ -1,5 +1,5 @@
 import type { ChangeEvent, RefObject } from 'react';
-import { Animated } from "@/platform/animation";
+import { Animated } from "@/styles/motion";
 import { NativeSyntheticEvent, TextInputKeyPressEventData } from "@/types/dom";
 import { formatAgentModeLabel, type AgentMode } from '@/features/agent/mode';
 import { useCachedAgentConfig } from '@/features/agent/hooks/use-cached-agent-config';
@@ -154,34 +154,34 @@ export function PromptInputView({
   closeNarrowSheet
 }: PromptInputViewProps) {
   const formatQueueBehaviorLabel = (behavior: QueueBehavior) => behavior === 'followUp' ? 'Follow up' : 'Steer';
-  return <div className={"" + " " + "opacity-[null] pb-[0]"}>
+  return <div className={"  opacity-100 pb-0"}>
       {/* Send error */}
-      {!!errorMessage && <button onClick={onClearError} className={"" + " " + ""}>
-          <span className={"" + " " + ""}>
+      {!!errorMessage && <button onClick={onClearError} className={" "}>
+          <span className={" "}>
             {errorMessage}
           </span>
         </button>}
 
       {/* Speech error */}
-      {speechError && <button onClick={clearSpeechError} className={"" + " " + ""}>
-          <span className={"" + " " + ""}>
+      {speechError && <button onClick={clearSpeechError} className={" "}>
+          <span className={" "}>
             {speechError}
           </span>
         </button>}
 
-      <div className={""}>
-        {queuedCount > 0 && <div className={"" + " " + ""}>
-            <div className={""}>
-              <span className={"" + " " + ""}>
+      <div className={"block"}>
+        {queuedCount > 0 && <div className={"  border-border"}>
+            <div className={"block"}>
+              <span className={"  text-text-secondary"}>
                 {queuedCount} queued message{queuedCount === 1 ? "" : "s"}
               </span>
-              <div className={""}>
+              <div className={"block"}>
                 {isStreaming && <button onClick={() => {
               void requestAbort();
             }} role="button" aria-label="Stop generation" hitSlop={8}>
-                    <div className={""}>
+                    <div className={"block"}>
                       <Square size={10} color={theme.textMuted} strokeWidth={2} fill={theme.textMuted} />
-                      <span className={"" + " " + ""}>Stop</span>
+                      <span className={"  text-text-secondary"}>Stop</span>
                     </div>
                   </button>}
               </div>
@@ -189,9 +189,9 @@ export function PromptInputView({
             {queuedMessages.map(({
           message,
           kind
-        }, index) => <div key={`${kind}-${index}`} className={""}>
-                <span className={"" + " " + ""}>{kind}</span>
-                <span className={"" + " " + ""}>
+        }, index) => <div key={`${kind}-${index}`} className={"block"}>
+                <span className={"  text-text-secondary"}>{kind}</span>
+                <span className={"  text-text-secondary"}>
                   {message}
                 </span>
               </div>)}
@@ -200,14 +200,14 @@ export function PromptInputView({
 
         {/* Attachments shown above the input card */}
         <AttachmentChips attachments={attachments} onRemove={removeAttachment} />
-        {attachmentNotice && <span role="alert" className={"" + " " + ""}>
+        {attachmentNotice && <span role="alert" className={"  text-text-secondary"}>
             {attachmentNotice}
           </span>}
 
         <InputCard theme={theme} isWideScreen={isWideScreen} inputRef={inputRef} fileInputRef={fileInputRef} showCommands={showCommands} shouldOverlaySlashCommands={shouldOverlaySlashCommands} stackedAbove={stackedAbove} toolbarOverlap={toolbarOverlap} entryDone={entryDone} isFocused={isFocused} lineCount={lineCount} text={text} handleTextChange={handleTextChange} handleKeyPress={handleKeyPress} inputDisabled={inputDisabled} sendDisabled={sendDisabled} canComposeWhileDisabled={canComposeWhileDisabled} setIsFocused={setIsFocused} handleWebFileChange={handleWebFileChange} handleFilePick={handleFilePick} isListening={isListening} handleMicPress={handleMicPress} audioLevel={audioLevel} inlineToolbar={inlineToolbar} sessionId={sessionId} setNarrowSheet={setNarrowSheet} setToolbarPopoverOpen={setToolbarPopoverOpen} streamedMode={streamedMode} sessionReady={sessionReady} agentConfig={agentConfig} thinkingPreference={thinkingPreference} setThinkingPreference={setThinkingPreference} contextUsage={contextUsage} showQueueActions={showQueueActions} sendDraft={sendDraft} showAbortButton={showAbortButton} handleSubmit={handleSubmit} hasDraft={hasDraft} />
       </div>
 
-      {!inlineToolbar && <div className={"" + " " + (toolbarPopoverOpen ? "" : "") + " " + (toolbarHiddenKeepLayout ? "" : "") + " " + (toolbarCollapsed ? "" : "")}>
+      {!inlineToolbar && <div className={" "}>
           <Toolbar sessionId={sessionId} isWideScreen={isWideScreen} onOpenNarrowSheet={type => setNarrowSheet(type)} onDropdownOpenChange={setToolbarPopoverOpen} inputRef={inputRef} skeleton={<ToolbarSkeleton isDark={theme.isDark} />} modeLabel={sessionId && sessionReady && streamedMode ? formatAgentModeLabel(streamedMode) : null} ready={!!sessionReady && !!sessionId} config={agentConfig} thinkingPreference={thinkingPreference} onThinkingPreferenceChange={setThinkingPreference} />
         </div>}
 

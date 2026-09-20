@@ -49,10 +49,10 @@ export function FileTreeNode({
     }}>
         {/* One glyph slot per row, bolt's: a caret for directories, the file's
             kind for files, so names line up at the same x within a level. */}
-        {entry.is_dir ? <div className={""}>
+        {entry.is_dir ? <div className={"block"}>
             {expanded ? <ChevronDown size={13} color={textMuted} strokeWidth={2} /> : <ChevronRight size={13} color={textMuted} strokeWidth={2} />}
           </div> : <FileTypeBadge path={entry.path} fallbackColor={iconColor} />}
-        <span className={"" + " " + "" + " " + (entry.is_dir ? "" : "")}>
+        <span className={" "}>
           {entry.name}
         </span>
       </button>
@@ -84,12 +84,12 @@ function ExpandedDir({
     isLoading
   } = useFileList(dirPath);
   if (isLoading) {
-    return <div className={"pl-[0] pt-[4px] pb-[4px]"}>
+    return <div className={"pl-0 pt-[4px] pb-[4px]"}>
         <span size="small" />
       </div>;
   }
   if (!entries || entries.length === 0) {
-    return <span className={"" + " " + "pl-[0]"}>
+    return <span className={"  pl-0"}>
         Empty
       </span>;
   }

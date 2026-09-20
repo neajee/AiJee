@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Animated } from "@/platform/animation";
+import { Animated } from "@/styles/motion";
 import { Minus } from "lucide-react";
 import { useAgentSession } from "@aijee/client-sdk";
 const DOT_COUNT = 3;
@@ -54,8 +54,8 @@ export function SessionActivityIndicator({
   if (!isWorking) {
     return idlePlaceholder ? <Minus size={14} color={color} strokeWidth={2} /> : null;
   }
-  return <div className={""}>
-      {dotAnims.map((anim, index) => <div key={index} className={"" + " " + "opacity-[null]"} />)}
+  return <div className={"block"}>
+      {dotAnims.map((anim, index) => <div key={index} className={"  opacity-100"} />)}
     </div>;
 }
 const styles = {

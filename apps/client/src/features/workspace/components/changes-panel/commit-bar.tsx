@@ -25,10 +25,10 @@ export function CommitBar({
     sendColor
   } = useChangesTheme();
   const commitInputRef = useRef<RNTextInput>(null);
-  return <div className={"" + " " + ""}>
-      <div className={"" + " " + ""}>
-        <input ref={commitInputRef} className={"" + " " + ""} value={commitMsg} onChangeText={onChangeCommitMsg} placeholder={`Commit message for ${stagedCount} staged file${stagedCount !== 1 ? "s" : ""}...`} placeholderTextColor={textMuted} multiline textAlignVertical="top" editable={!isCommitting} />
-        <div className={""}>
+  return <div className={" "}>
+      <div className={" "}>
+        <input ref={commitInputRef} className={" "} value={commitMsg} onChangeText={onChangeCommitMsg} placeholder={`Commit message for ${stagedCount} staged file${stagedCount !== 1 ? "s" : ""}...`} placeholderTextColor={textMuted} multiline textAlignVertical="top" editable={!isCommitting} />
+        <div className={"block"}>
           {isCommitting ? <span size="small" /> : <button onClick={onCommit} disabled={!commitMsg.trim()} aria-label="Commit" {...{
           title: "Commit"
         }}>

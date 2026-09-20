@@ -1,5 +1,5 @@
 import { useRef, useEffect, useMemo } from "react";
-import { Animated } from "@/platform/animation";
+import { Animated } from "@/styles/motion";
 import { Fonts } from "@/constants/theme";
 import { AiJeeLogo } from "@/components/aijee-logo";
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -67,13 +67,13 @@ export function WorkspaceHero() {
       useNativeDriver: true
     })]).start();
   }, [fadeAnim, slideAnim, markScale]);
-  return <div className={""}>
-      <div className={"" + " " + "opacity-[null]"}>
-        <div className={""}>
+  return <div className={"block"}>
+      <div className={"  opacity-100"}>
+        <div className={"block"}>
           <AiJeeLogo size={isWideScreen ? 64 : 52} color={textPrimary} opacity={isDark ? 0.92 : 0.88} />
         </div>
 
-        <span className={"" + " " + "text-[0] leading-[0]"}>
+        <span className={"  text-[0px] leading-[0]"}>
           {greeting}
         </span>
       </div>

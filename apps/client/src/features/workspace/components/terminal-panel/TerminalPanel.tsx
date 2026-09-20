@@ -9,30 +9,30 @@ export function TerminalPanel() {
   const activeTabBorder = colors.accent;
   const textPrimary = colors.text;
   const textMuted = colors.textTertiary;
-  return <div className={"" + " " + ""}>
+  return <div className={" "}>
       {/* Tab bar */}
-      <div className={"" + " " + ""}>
-        <div className={""}>
-          <div className={"" + " " + ""}>
-            <span className={"" + " " + ""}>
+      <div className={" "}>
+        <div className={"block"}>
+          <div className={" "}>
+            <span className={" "}>
               Terminal 1
             </span>
-            <button className={""}>
+            <button className={"block"}>
               <X size={12} color={textMuted} strokeWidth={2} />
             </button>
           </div>
 
-          <button className={""}>
+          <button className={"block"}>
             <Plus size={18} color={textMuted} strokeWidth={1.8} />
           </button>
         </div>
       </div>
 
       {/* Terminal content */}
-      <div className={""}>
-        <span className={"" + " " + "font-mono"}>
-          <span className={""}>~</span>{' '}
-          <span className={""}>$</span> _
+      <div className={"block"}>
+        <span className={"  font-mono"}>
+          <span className={"text-success"}>~</span>{' '}
+          <span className={"block"}>$</span> _
         </span>
       </div>
     </div>;

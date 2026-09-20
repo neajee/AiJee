@@ -1,5 +1,5 @@
 import { memo, useRef, useState, useEffect } from 'react';
-import { Animated } from "@/platform/animation";
+import { Animated } from "@/styles/motion";
 import { Check, X } from 'lucide-react';
 import { Fonts } from '@/constants/theme';
 import { ABSOLUTE_FILL_STYLE } from '@/constants/layout';
@@ -108,34 +108,34 @@ function NarrowModelSheetComponent({
     }));
   })();
   return <div visible={visible} transparent animationType="none" onRequestClose={handleClose}>
-      <div className={""}>
-        <div className={"" + " " + "opacity-[null]"}>
-          <button className={""} onClick={handleClose} />
+      <div className={"block"}>
+        <div className={"  opacity-100"}>
+          <button className={"block"} onClick={handleClose} />
         </div>
-        <div className={"" + " " + ""}>
-          <div className={""}>
-            <div className={"" + " " + ""} />
+        <div className={" "}>
+          <div className={"block"}>
+            <div className={" "} />
           </div>
-          <span className={"" + " " + ""}>
+          <span className={"  text-foreground"}>
             Select Model
           </span>
-          <div className={"" + " " + ""}>
-            <input ref={searchRef} className={"" + " " + ""} value={search} onChangeText={setSearch} placeholder="Search models..." placeholderTextColor={theme.textMuted} autoCapitalize="none" autoCorrect={false} />
+          <div className={"  bg-card border-border"}>
+            <input ref={searchRef} className={"  text-foreground"} value={search} onChangeText={setSearch} placeholder="Search models..." placeholderTextColor={theme.textMuted} autoCapitalize="none" autoCorrect={false} />
             {search.length > 0 && <button onClick={() => setSearch('')}>
                 <X size={16} color={theme.textMuted} strokeWidth={2} />
               </button>}
           </div>
-          <div className={""} keyboardShouldPersistTaps="handled">
+          <div className={"block"} keyboardShouldPersistTaps="handled">
             {providers.map(provider => <div key={provider.name}>
-                <span className={"" + " " + ""}>
+                <span className={"  text-foreground"}>
                   {provider.name}
                 </span>
                 {provider.models.map(model => {
               const isActive = model.id === currentModel?.id;
               return <button key={model.id} onClick={() => handleSelect(model.provider, model.id)}>
-                      <div className={""}>
+                      <div className={"block"}>
                         <ProviderIcon provider={model.provider} size={14} color={isActive ? theme.accentColor : theme.textMuted} />
-                        <span className={"" + " " + ""}>
+                        <span className={" "}>
                           {model.name}
                         </span>
                       </div>

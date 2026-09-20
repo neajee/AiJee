@@ -1,5 +1,5 @@
 import { useRef, useEffect } from 'react';
-import { Animated } from "@/platform/animation";
+import { Animated } from "@/styles/motion";
 import { Fonts } from '@/constants/theme';
 import { SlashCommand } from '../../utils/prompt-input';
 import { usePromptTheme } from '@/components/surface-theme/use-prompt-theme';
@@ -25,15 +25,15 @@ export function SlashCommandDropdown({
       animated: true
     });
   }, [selectedIndex]);
-  return <div className={"" + " " + (overlay ? "" : "") + " " + "opacity-[null]"}>
-      <div ref={scrollRef} className={""} keyboardShouldPersistTaps="handled">
+  return <div className={"  bg-surface border-border opacity-100"}>
+      <div ref={scrollRef} className={"block"} keyboardShouldPersistTaps="handled">
         {commands.map((cmd, index) => <button key={cmd.name} onClick={() => onSelect(cmd)} role="menuitem" aria-label={`/${cmd.name} — ${cmd.description}`} accessibilityState={{
         selected: index === selectedIndex
       }}>
-            <span className={"" + " " + ""}>
+            <span className={"  text-foreground"}>
               /{cmd.name}
             </span>
-            <span className={"" + " " + ""}>
+            <span className={"  text-text-secondary"}>
               {cmd.description}
             </span>
           </button>)}

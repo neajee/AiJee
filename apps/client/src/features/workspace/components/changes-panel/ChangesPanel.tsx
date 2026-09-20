@@ -52,28 +52,28 @@ export function ChangesPanel({
     unstage,
     discard
   } = controller;
-  return <div className={"" + " " + ""}>
-      {activeExtraTab ? <div className={""}>{renderExtraTab?.(activeExtraTab)}</div> : <div className={""}>
+  return <div className={" "}>
+      {activeExtraTab ? <div className={"block"}>{renderExtraTab?.(activeExtraTab)}</div> : <div className={"block"}>
           <div {...false ? {
         pointerEvents: currentTab === 'files' ? 'auto' as const : 'none' as const
-      } : {}} className={"" + " " + (currentTab !== 'files' ? "" : "") + " " + (true ? "" : "")}>
-            {cwd ? <FileTree rootPath={cwd} viewingFile={viewingFile} onViewFile={setViewingFile} expandedDirs={expandedDirs} onToggleDir={handleToggleDir} /> : <span className={"" + " " + ""}>No workspace selected</span>}
+      } : {}} className={" "}>
+            {cwd ? <FileTree rootPath={cwd} viewingFile={viewingFile} onViewFile={setViewingFile} expandedDirs={expandedDirs} onToggleDir={handleToggleDir} /> : <span className={" "}>No workspace selected</span>}
           </div>
           {isGitRepo && <div {...false ? {
         pointerEvents: currentTab === 'git' ? 'auto' as const : 'none' as const
-      } : {}} className={"" + " " + (currentTab !== 'git' ? "" : "") + " " + (true ? "" : "")}>
-              <div className={"" + " " + ""}>
+      } : {}} className={" "}>
+              <div className={" "}>
                 <button onClick={() => setChangesOpen(open => !open)} role="button" accessibilityState={{
             expanded: changesOpen
           }} aria-label="Toggle changes">
                   <GitCompare size={12} color={textMuted} strokeWidth={2} />
-                  <span className={"" + " " + ""}>Changes</span>
-                  {totalChanges > 0 && <span className={"" + " " + ""}>{totalChanges}</span>}
+                  <span className={" "}>Changes</span>
+                  {totalChanges > 0 && <span className={" "}>{totalChanges}</span>}
                   <div className={"flex-1"} />
                   {gitData && <BranchLabel branch={gitData.branch} ahead={gitData.ahead} behind={gitData.behind} />}
                   {changesOpen ? <ChevronUp size={13} color={textMuted} strokeWidth={2} /> : <ChevronDown size={13} color={textMuted} strokeWidth={2} />}
                 </button>
-                {changesOpen && <div className={""}>
+                {changesOpen && <div className={"block"}>
                     {isLoading ? <span className={"mt-[32px]"} /> : <ChangesTab staged={staged} unstaged={unstaged} untracked={untracked} selectedFile={selectedFile} diffContent={fileDiff} diffLoading={diffLoading} onFilePress={handleFilePress} onStage={stage} onUnstage={unstage} onDiscard={discard} />}
                   </div>}
               </div>

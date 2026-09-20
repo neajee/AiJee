@@ -71,31 +71,31 @@ export function FileRow({
 
         {/* Only the directory may be cut, and it is cut from its own end so the
             filename beside it always shows whole. */}
-        {dir.length > 0 && <span className={"" + " " + ""}>
+        {dir.length > 0 && <span className={" "}>
             {dir}
           </span>}
-        <span className={"" + " " + ""}>
+        <span className={" "}>
           {name}
         </span>
 
-        {(additions ?? 0) > 0 && <span className={"" + " " + ""}>+{additions}</span>}
-        {(deletions ?? 0) > 0 && <span className={"" + " " + ""}>−{deletions}</span>}
-        {showBadge && <span className={"" + " " + ""}>
+        {(additions ?? 0) > 0 && <span className={" "}>+{additions}</span>}
+        {(deletions ?? 0) > 0 && <span className={" "}>−{deletions}</span>}
+        {showBadge && <span className={" "}>
             {badge}
           </span>}
 
-        <div className={""} />
+        <div className={"block"} />
 
         {actions && (isWeb ?
       // Hovering means a pointer, and a pointer means the metadata can be
       // covered for a moment instead of surrendering 50px on every row.
-      <div className={"" + " " + "" + " " + (!hovered ? "" : "")}>
+      <div className={" "}>
               {actions}
-            </div> : <div className={""}>{actions}</div>)}
+            </div> : <div className={"block"}>{actions}</div>)}
       </button>
 
-      {isSelected && <div className={"" + " " + ""}>
-          {diffLoading ? <span className={"pt-[12px] pb-[12px]"} size="small" /> : diffContent ? <DiffView diff={diffContent} /> : <span className={"" + " " + ""}>
+      {isSelected && <div className={" "}>
+          {diffLoading ? <span className={"pt-[12px] pb-[12px]"} size="small" /> : diffContent ? <DiffView diff={diffContent} /> : <span className={" "}>
               No diff available
             </span>}
         </div>}

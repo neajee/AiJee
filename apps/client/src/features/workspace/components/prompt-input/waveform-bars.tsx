@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Animated } from "@/platform/animation";
+import { Animated } from "@/styles/motion";
 const BAR_COUNT = 5;
 const BAR_SCALES = [0.6, 0.85, 1, 0.85, 0.6];
 export function WaveformBars({
@@ -21,8 +21,8 @@ export function WaveformBars({
       }).start();
     });
   }, [anims, audioLevel]);
-  return <div className={""}>
-      {anims.map((anim, i) => <div key={i} className={"" + " " + "h-[0]"} />)}
+  return <div className={"block"}>
+      {anims.map((anim, i) => <div key={i} className={"  bg-[#EF4444] h-0"} />)}
     </div>;
 }
 const styles = {

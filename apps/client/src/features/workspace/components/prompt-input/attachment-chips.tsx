@@ -14,30 +14,30 @@ export function AttachmentChips({
   if (attachments.length === 0) return null;
   const imageAtts = attachments.filter(a => a.type === 'image');
   const fileAtts = attachments.filter(a => a.type !== 'image');
-  return <div className={""}>
-      {imageAtts.length > 0 && <div className={""}>
-          {imageAtts.map(att => <div key={att.id} className={"" + " " + ""}>
+  return <div className={"block"}>
+      {imageAtts.length > 0 && <div className={"block"}>
+          {imageAtts.map(att => <div key={att.id} className={"  border-border"}>
               {att.preview ? <img src={{
           uri: att.preview
-        }} className={""} /> : <div className={"" + " " + ""}>
+        }} className={"block"} /> : <div className={" "}>
                   <ImageIcon size={18} color={theme.textMuted} strokeWidth={1.8} />
                 </div>}
-              <button onClick={() => onRemove(att.id)} className={"" + " " + ""} role="button" aria-label="Remove image" hitSlop={6}>
+              <button onClick={() => onRemove(att.id)} className={" "} role="button" aria-label="Remove image" hitSlop={6}>
                 <X size={11} color={theme.isDark ? '#fff' : '#333'} strokeWidth={2.5} />
               </button>
             </div>)}
         </div>}
 
-      {fileAtts.length > 0 && <div horizontal className={""}>
-          {fileAtts.map(att => <div key={att.id} className={"" + " " + ""}>
+      {fileAtts.length > 0 && <div horizontal className={"block"}>
+          {fileAtts.map(att => <div key={att.id} className={" "}>
               <FileText size={14} color={theme.textMuted} strokeWidth={1.8} />
-              <span className={"" + " " + ""}>
+              <span className={"  text-foreground"}>
                 {att.name}
               </span>
-              {att.size != null && <span className={"" + " " + ""}>
+              {att.size != null && <span className={"  text-text-secondary"}>
                   {att.size > 1024 * 1024 ? `${(att.size / (1024 * 1024)).toFixed(1)}MB` : att.size > 1024 ? `${(att.size / 1024).toFixed(0)}KB` : `${att.size}B`}
                 </span>}
-              <button onClick={() => onRemove(att.id)} className={""} role="button" aria-label={`Remove ${att.name}`}>
+              <button onClick={() => onRemove(att.id)} className={"block"} role="button" aria-label={`Remove ${att.name}`}>
                 <X size={12} color={theme.textMuted} strokeWidth={2} />
               </button>
             </div>)}

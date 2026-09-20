@@ -29,21 +29,21 @@ export function ContextUsageRing({
   const fillColor = isDark ? "#555" : "#AAA";
   const free = Math.max(total - used, 0);
   const pct = Math.round(ratio * 100);
-  return <div className={""}>
+  return <div className={"block"}>
       <button onClick={() => setShowTooltip(v => !v)}>
         <Svg width={size} height={size}>
           <SvgCircle cx={size / 2} cy={size / 2} r={radius} stroke={trackColor} strokeWidth={stroke} fill="none" />
           {ratio > 0 && <SvgCircle cx={size / 2} cy={size / 2} r={radius} stroke={fillColor} strokeWidth={stroke} fill="none" strokeDasharray={`${filled} ${circumference - filled}`} strokeDashoffset={circumference * 0.25} strokeLinecap="round" />}
         </Svg>
       </button>
-      {showTooltip && <button className={"" + " " + ""} onClick={() => setShowTooltip(false)}>
-          <span className={"" + " " + ""}>
+      {showTooltip && <button className={" "} onClick={() => setShowTooltip(false)}>
+          <span className={" "}>
             Context · {pct}%
           </span>
-          <span className={"" + " " + ""}>
+          <span className={" "}>
             Used {formatTokens(used)} of {formatTokens(total)}
           </span>
-          <span className={"" + " " + ""}>
+          <span className={" "}>
             Free {formatTokens(free)}
           </span>
         </button>}

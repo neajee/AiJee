@@ -21,22 +21,22 @@ export function ToolbarView(controller: ToolbarController) {
     showTaskSelector
   } = controller;
   if (configError && !agentState) {
-    return <div className={inline ? "" : ""}>
-        <div className={(inline ? "" : "") + " " + "" + " " + (!inline ? "" : "")}>
-          <span className={"" + " " + ""}>Failed to load</span>
+    return <div className={"block"}>
+        <div className={"  bg-surface border-border"}>
+          <span className={"  text-text-secondary"}>Failed to load</span>
           <button onClick={configRetry} role="button" aria-label="Retry loading toolbar">
-            <RotateCw size={12} color={theme.accentColor} strokeWidth={2} /><span className={"" + " " + ""}>Retry</span>
+            <RotateCw size={12} color={theme.accentColor} strokeWidth={2} /><span className={"  text-accent"}>Retry</span>
           </button>
         </div>
       </div>;
   }
   if (!agentState && !currentModel) return <>{skeleton}</>;
-  return <div ref={toolbarRef} className={(inline ? "" : "") + " " + (activeDropdown ? "z-[10]" : "")}>
-      <div className={(inline ? "" : "") + " " + (!inline ? "" : "")}>
+  return <div ref={toolbarRef} className={"  z-[10]"}>
+      <div className={"  bg-surface border-border"}>
         <ModelPicker {...controller} />
         <EffortPicker {...controller} />
-        {!inline && <div className={""} />}
-        {showTaskSelector && appMode === 'code' && isWideScreen && <div className={""}><TaskSelector placement="above" /></div>}
+        {!inline && <div className={"block"} />}
+        {showTaskSelector && appMode === 'code' && isWideScreen && <div className={"block"}><TaskSelector placement="above" /></div>}
         <ModeToggle {...controller} />
       </div>
     </div>;

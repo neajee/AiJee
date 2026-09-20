@@ -33,23 +33,23 @@ export function TabBar({
     dividerColor,
     hoverBg
   } = useChangesTheme();
-  return <div className={"" + " " + ""}>
+  return <div className={" "}>
       {items.map(item => {
       const isActive = activeKey === item.key;
       return <button key={item.key} onClick={() => onSelect(item.key)} role="tab" accessibilityState={{
         selected: isActive
       }}>
-            <span className={"" + " " + ""}>
+            <span className={" "}>
               {item.label}
             </span>
-            {!!item.count && item.count > 0 && <span className={"" + " " + ""}>
+            {!!item.count && item.count > 0 && <span className={" "}>
                 {item.count}
               </span>}
-            {isActive && <div className={"" + " " + ""} />}
+            {isActive && <div className={"  bg-foreground"} />}
           </button>;
     })}
       {!!right && <>
-          <div className={""} />
+          <div className={"block"} />
           {right}
         </>}
     </div>;

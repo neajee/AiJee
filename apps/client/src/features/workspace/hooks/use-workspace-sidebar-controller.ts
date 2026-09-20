@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useWindowDimensions } from "@/platform/browser";
-import { Animated, Easing, PanResponder } from "@/platform/animation";
+import { Animated, Easing, PanResponder } from "@/styles/motion";
 import * as SecureStore from '@/platform/storage';
 import { usePanelCoordination } from '@/features/navigation/store/panel-coordination';
 import { useWorkspaceStore } from '@/features/workspace/store';

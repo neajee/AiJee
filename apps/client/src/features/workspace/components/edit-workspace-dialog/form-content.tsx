@@ -17,22 +17,22 @@ export function EditWorkspaceForm({
   onClose
 }: EditWorkspaceFormProps) {
   return <>
-      <div className={""}>
-        <span className={"" + " " + ""}>Workspace Name</span>
-        <div className={"" + " " + ""}>
-          <input ref={nameRef} className={"" + " " + ""} value={name} onChangeText={setName} onKeyPress={handleKeyPress} placeholder="My Project" placeholderTextColor={textMuted} />
+      <div className={"block"}>
+        <span className={" "}>Workspace Name</span>
+        <div className={" "}>
+          <input ref={nameRef} className={" "} value={name} onChangeText={setName} onKeyPress={handleKeyPress} placeholder="My Project" placeholderTextColor={textMuted} />
         </div>
       </div>
-      <div className={""}>
-        <span className={"" + " " + ""}>Path</span>
-        <span className={"" + " " + ""}>{workspace?.path}</span>
+      <div className={"block"}>
+        <span className={" "}>Path</span>
+        <span className={" "}>{workspace?.path}</span>
       </div>
-      <div className={""}>
+      <div className={"block"}>
         <button onClick={onClose}>
-          <span className={"" + " " + ""}>Cancel</span>
+          <span className={" "}>Cancel</span>
         </button>
         <button onClick={handleSave} disabled={!canSave || saving}>
-          <span className={"" + " " + ""}>
+          <span className={" "}>
             {saving ? 'Saving...' : 'Save'}
           </span>
         </button>

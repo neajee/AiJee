@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Animated } from "@/platform/animation";
+import { Animated } from "@/styles/motion";
 import { NativeSyntheticEvent, TextInput, TextInputKeyPressEventData, type ScrollView as RNScrollView, type View as RNView } from "@/types/dom";
 import { buildThinkingLevelOptions, thinkingLevelLabel, type FlatModel, type ThinkingPreference } from '../utils/prompt-input';
 import { matchesModelSearch } from '../utils/prompt-input-search';

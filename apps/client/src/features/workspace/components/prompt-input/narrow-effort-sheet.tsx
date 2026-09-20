@@ -1,5 +1,5 @@
 import { memo, useRef, useEffect, useMemo } from 'react';
-import { Animated } from "@/platform/animation";
+import { Animated } from "@/styles/motion";
 import { Check } from 'lucide-react';
 import { Fonts } from '@/constants/theme';
 import { ABSOLUTE_FILL_STYLE } from '@/constants/layout';
@@ -62,15 +62,15 @@ function NarrowEffortSheetComponent({
     animateClose(() => onClose());
   };
   return <div visible={visible} transparent animationType="none" onRequestClose={handleClose}>
-      <div className={""}>
-        <div className={"" + " " + "opacity-[null]"}>
-          <button className={""} onClick={handleClose} />
+      <div className={"block"}>
+        <div className={"  opacity-100"}>
+          <button className={"block"} onClick={handleClose} />
         </div>
-        <div className={"" + " " + ""}>
-          <div className={""}>
-            <div className={"" + " " + ""} />
+        <div className={" "}>
+          <div className={"block"}>
+            <div className={" "} />
           </div>
-          <span className={"" + " " + ""}>思考深度</span>
+          <span className={"  text-foreground"}>思考深度</span>
           {[{
           level: 'auto' as const,
           label: 'Auto'
@@ -78,7 +78,7 @@ function NarrowEffortSheetComponent({
           const isActive = item.level === thinkingPreference;
           return <button key={item.level} onClick={() => handleSelect(item.level)}>
                 <div>
-                  <span className={"" + " " + ""}>
+                  <span className={" "}>
                     {item.label}
                   </span>
                 </div>

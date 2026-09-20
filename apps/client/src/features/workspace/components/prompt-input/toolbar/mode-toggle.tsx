@@ -11,7 +11,7 @@ export function ModeToggle({
   handleSelectMode
 }: ModeToggleProps) {
   if (appMode !== 'code') return null;
-  return <div className={"" + " " + ""}>
+  return <div className={"  border-border"}>
     {(['work', 'plan'] as AgentMode[]).map(mode => {
       const active = displayedMode === mode;
       const pending = pendingMode === mode;
@@ -19,8 +19,8 @@ export function ModeToggle({
         selected: active,
         disabled: toolbarDisabled || false
       }} disabled={toolbarDisabled || false} onClick={() => handleSelectMode(mode)}>
-        <span className={"" + " " + "opacity-[null]"}>{formatAgentModeLabel(mode)}</span>
-        {pending && <span size="small" color={active ? theme.textPrimary : theme.textMuted} className={""} />}
+        <span className={"  opacity-100"}>{formatAgentModeLabel(mode)}</span>
+        {pending && <span size="small" color={active ? theme.textPrimary : theme.textMuted} className={"block"} />}
       </button>;
     })}
   </div>;

@@ -129,8 +129,8 @@ export function FileTypeBadge({
   const known = TYPES[ext];
   // An unknown extension still identifies itself; a dot stands in for none.
   const label = known?.label ?? (ext ? ext.slice(0, 3).toUpperCase() : "·");
-  return <div className={""}>
-      <span className={"" + " " + ""}>
+  return <div className={"block"}>
+      <span className={" "}>
         {label}
       </span>
     </div>;

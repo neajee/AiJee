@@ -1,5 +1,5 @@
 import { Files, GitBranch, Globe2 } from 'lucide-react';
-import { Animated } from "@/platform/animation";
+import { Animated } from "@/styles/motion";
 import { SeamToggle, SEAM_TOGGLE_HEIGHT, SEAM_TOGGLE_WIDTH } from '@/components/ui/seam-toggle';
 import { useThemeTokens } from '@/hooks/use-theme-tokens';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -44,12 +44,12 @@ export function WorkspaceSidebar({
     activeTab: activePaneTab,
     setActiveTab: setActivePaneTab
   }}>
-      <div className={"" + " " + "w-[0]"}>
-        {!collapsed && <div className={""}>
-            {contentMounted && <div className={"w-[0] flex-1"}>{children}</div>}
+      <div className={"  w-0"}>
+        {!collapsed && <div className={"block"}>
+            {contentMounted && <div className={"w-0 flex-1"}>{children}</div>}
           </div>}
 
-        {!locked && <div className={""}>
+        {!locked && <div className={"block"}>
             <RailButton label="Open files" active={activePaneTab === 'files'} onClick={() => openPane('files')}>
               <Files size={17} color={colors.textSecondary} strokeWidth={1.8} />
             </RailButton>
@@ -61,12 +61,12 @@ export function WorkspaceSidebar({
               </RailButton>}
           </div>}
 
-        {!locked && !collapsed && <div className={"" + " " + "mt-[0]"} pointerEvents="box-none">
+        {!locked && !collapsed && <div className={"  mt-[0]"} pointerEvents="box-none">
             <SeamToggle chevron="right" onClick={toggleCollapsed} label="Close side panel" />
           </div>}
 
-        {!collapsed && <div {...panelResizer.panHandlers} {...webSeamHoverProps} className={""}>
-            <div className={"" + " " + ""} />
+        {!collapsed && <div {...panelResizer.panHandlers} {...webSeamHoverProps} className={"block"}>
+            <div className={" "} />
           </div>}
       </div>
     </WorkspacePaneContext.Provider>;

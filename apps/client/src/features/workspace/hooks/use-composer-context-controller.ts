@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Animated } from "@/platform/animation";
-import { useRouter } from '@/platform/router-adapter';
+import { Animated } from "@/styles/motion";
+import { useRouter } from '@/hooks/router';
 import { useWorkspaceStore } from '@/features/workspace/store';
 import { useServersStore, type Server } from '@/features/servers/store';
 import { useAuthStore } from '@/features/auth/store';

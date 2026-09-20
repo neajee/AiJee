@@ -27,15 +27,15 @@ export function ModePickerDialog({
     backgroundColor: bg,
     borderColor
   }]}>
-      <div className={""}><Layers size={18} color={textPrimary} strokeWidth={1.8} /><span className={"" + " " + ""}>Select Mode</span></div>
-      <span className={"" + " " + ""}>Choose how the agent should be configured for this session.</span>
-      <div className={""}>
+      <div className={"block"}><Layers size={18} color={textPrimary} strokeWidth={1.8} /><span className={" "}>Select Mode</span></div>
+      <span className={" "}>Choose how the agent should be configured for this session.</span>
+      <div className={"block"}>
         <ModeOption selected={selectedId === noModeId} borderColor={borderColor} selectedBg={selectedBg} selectedBorder={selectedBorder} textPrimary={textPrimary} textMuted={textMuted} onClick={() => setSelectedId(noModeId)} />
         {modes.map(mode => <ModeOption key={mode.id} mode={mode} selected={selectedId === mode.id} borderColor={borderColor} selectedBg={selectedBg} selectedBorder={selectedBorder} textPrimary={textPrimary} textMuted={textMuted} onClick={() => setSelectedId(mode.id)} />)}
       </div>
-      <div className={""}>
+      <div className={"block"}>
         <button onClick={handleConfirm}>
-          <span className={"" + " " + ""}>Start Session</span>
+          <span className={" "}>Start Session</span>
         </button>
       </div>
     </AppModal>;

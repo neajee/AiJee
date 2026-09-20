@@ -1,6 +1,6 @@
 import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { Keyboard, LayoutAnimation } from "@/platform/browser";
-import { Animated } from "@/platform/animation";
+import { Animated } from "@/styles/motion";
 import { NativeSyntheticEvent, TextInput, TextInputKeyPressEventData } from "@/types/dom";
 import * as DocumentPicker from '@/platform/files';
 import { File as ExpoFile } from '@/platform/files';
