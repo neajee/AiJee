@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { X, Plus } from 'lucide-react';
 import { Fonts } from '@/constants/theme';
 import { useThemeTokens } from '@/hooks/use-theme-tokens';
@@ -10,46 +9,30 @@ export function TerminalPanel() {
   const activeTabBorder = colors.accent;
   const textPrimary = colors.text;
   const textMuted = colors.textTertiary;
-  return <div className={toTailwind([styles.container, {
-    backgroundColor: surfaceBg,
-    borderTopColor: topBorder
-  }])}>
+  return <div className={"" + " " + ""}>
       {/* Tab bar */}
-      <div className={toTailwind([styles.tabBar, {
-      borderBottomColor: tabDivider
-    }])}>
-        <div className={toTailwind(styles.tabBarLeft)}>
-          <div className={toTailwind([styles.tab, {
-          borderBottomColor: activeTabBorder
-        }])}>
-            <span className={toTailwind([styles.tabText, {
-            color: textPrimary
-          }])}>
+      <div className={"" + " " + ""}>
+        <div className={""}>
+          <div className={"" + " " + ""}>
+            <span className={"" + " " + ""}>
               Terminal 1
             </span>
-            <button className={toTailwind(styles.tabClose)}>
+            <button className={""}>
               <X size={12} color={textMuted} strokeWidth={2} />
             </button>
           </div>
 
-          <button className={toTailwind(styles.addTabButton)}>
+          <button className={""}>
             <Plus size={18} color={textMuted} strokeWidth={1.8} />
           </button>
         </div>
       </div>
 
       {/* Terminal content */}
-      <div className={toTailwind(styles.terminalContent)}>
-        <span className={toTailwind([styles.terminalLine, {
-        color: textMuted,
-        fontFamily: Fonts.mono
-      }])}>
-          <span className={toTailwind({
-          color: colors.success
-        })}>~</span>{' '}
-          <span className={toTailwind({
-          color: textPrimary
-        })}>$</span> _
+      <div className={""}>
+        <span className={"" + " " + "font-mono"}>
+          <span className={""}>~</span>{' '}
+          <span className={""}>$</span> _
         </span>
       </div>
     </div>;

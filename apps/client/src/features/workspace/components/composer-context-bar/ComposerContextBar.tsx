@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { usePromptTheme } from '@/components/surface-theme/use-prompt-theme';
 import { NewWorkspaceDialog } from '@/features/workspace/components/new-workspace-dialog';
 import { useComposerContextController } from '../../hooks/use-composer-context-controller';
@@ -40,7 +39,7 @@ export function ComposerContextBar() {
   } = controller;
   if (!workspace) return null;
   return <>
-      <div className={toTailwind(styles.wrapper)} {...{
+      <div className={""} {...{
       'data-composer-context': true
     } as any}>
         <ContextDropdown theme={theme} open={open} anim={anim} branches={branches} branchesLoading={branchesLoading} busy={busy} workspaces={workspaces} selectedWorkspaceId={selectedWorkspaceId} activeServer={activeServer} servers={servers} activeServerId={activeServerId} currentBranch={currentBranch} isGitRepo={git.isGitRepo} localBranches={localBranches} onToggle={toggle} onSelectProject={handleSelectProject} onSelectServer={handleSelectServer} onSelectBranch={handleSelectBranch} onAddWorkspace={() => {

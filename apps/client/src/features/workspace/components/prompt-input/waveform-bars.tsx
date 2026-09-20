@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { useEffect, useRef } from "react";
 import { Animated } from "@/platform/animation";
 const BAR_COUNT = 5;
@@ -22,14 +21,8 @@ export function WaveformBars({
       }).start();
     });
   }, [anims, audioLevel]);
-  return <div className={toTailwind(styles.container)}>
-      {anims.map((anim, i) => <div key={i} className={toTailwind([styles.bar, {
-      backgroundColor: "#EF4444",
-      height: anim.interpolate({
-        inputRange: [0, 1],
-        outputRange: [3, 18]
-      })
-    }])} />)}
+  return <div className={""}>
+      {anims.map((anim, i) => <div key={i} className={"" + " " + "h-[0]"} />)}
     </div>;
 }
 const styles = {

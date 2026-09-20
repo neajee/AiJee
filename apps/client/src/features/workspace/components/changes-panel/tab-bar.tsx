@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import type { ReactNode } from "react";
 import { Fonts } from "@/constants/theme";
 import { useChangesTheme } from "../../hooks/use-changes-theme";
@@ -34,32 +33,23 @@ export function TabBar({
     dividerColor,
     hoverBg
   } = useChangesTheme();
-  return <div className={toTailwind([styles.tabBar, {
-    backgroundColor: surfaceBg,
-    borderBottomColor: dividerColor
-  }])}>
+  return <div className={"" + " " + ""}>
       {items.map(item => {
       const isActive = activeKey === item.key;
       return <button key={item.key} onClick={() => onSelect(item.key)} role="tab" accessibilityState={{
         selected: isActive
       }}>
-            <span className={toTailwind([styles.tabText, {
-          color: isActive ? colors.text : colors.textTertiary
-        }])}>
+            <span className={"" + " " + ""}>
               {item.label}
             </span>
-            {!!item.count && item.count > 0 && <span className={toTailwind([styles.tabCount, {
-          color: isActive ? colors.textSecondary : colors.textTertiary
-        }])}>
+            {!!item.count && item.count > 0 && <span className={"" + " " + ""}>
                 {item.count}
               </span>}
-            {isActive && <div className={toTailwind([styles.underline, {
-          backgroundColor: colors.text
-        }])} />}
+            {isActive && <div className={"" + " " + ""} />}
           </button>;
     })}
       {!!right && <>
-          <div className={toTailwind(styles.filler)} />
+          <div className={""} />
           {right}
         </>}
     </div>;

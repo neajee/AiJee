@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { useRef, useEffect, useMemo } from "react";
 import { Animated } from "@/platform/animation";
 import { Fonts } from "@/constants/theme";
@@ -68,26 +67,13 @@ export function WorkspaceHero() {
       useNativeDriver: true
     })]).start();
   }, [fadeAnim, slideAnim, markScale]);
-  return <div className={toTailwind(styles.container)}>
-      <div className={toTailwind([styles.content, {
-      opacity: fadeAnim,
-      transform: [{
-        translateY: slideAnim
-      }]
-    }])}>
-        <div className={toTailwind({
-        transform: [{
-          scale: markScale
-        }]
-      })}>
+  return <div className={""}>
+      <div className={"" + " " + "opacity-[null]"}>
+        <div className={""}>
           <AiJeeLogo size={isWideScreen ? 64 : 52} color={textPrimary} opacity={isDark ? 0.92 : 0.88} />
         </div>
 
-        <span className={toTailwind([styles.title, {
-        color: textPrimary,
-        fontSize: isWideScreen ? 26 : 21,
-        lineHeight: isWideScreen ? 34 : 29
-      }])}>
+        <span className={"" + " " + "text-[0] leading-[0]"}>
           {greeting}
         </span>
       </div>

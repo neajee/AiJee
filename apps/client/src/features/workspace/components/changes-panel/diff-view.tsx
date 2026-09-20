@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { Fonts } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
 export function DiffView({
@@ -9,7 +8,7 @@ export function DiffView({
   const colorScheme = useColorScheme() ?? "light";
   const isDark = colorScheme === "dark";
   const lines = diff.split("\n");
-  return <div className={toTailwind(styles.diffScroll)} nestedScrollEnabled>
+  return <div className={""} nestedScrollEnabled>
       {lines.map((line, i) => {
       let bg = "transparent";
       let color = isDark ? "#CCC" : "#333";
@@ -24,17 +23,11 @@ export function DiffView({
       } else if (line.startsWith("diff ") || line.startsWith("index ") || line.startsWith("---") || line.startsWith("+++")) {
         color = isDark ? "#8B8685" : "#888";
       }
-      return <div key={i} className={toTailwind([styles.diffLine, {
-        backgroundColor: bg
-      }])}>
-            <span className={toTailwind([styles.diffLineNum, {
-          color: isDark ? "#555" : "#AAA"
-        }])}>
+      return <div key={i} className={"" + " " + ""}>
+            <span className={"" + " " + ""}>
               {i + 1}
             </span>
-            <span className={toTailwind([styles.diffLineText, {
-          color
-        }])}>
+            <span className={"" + " " + ""}>
               {line || " "}
             </span>
           </div>;

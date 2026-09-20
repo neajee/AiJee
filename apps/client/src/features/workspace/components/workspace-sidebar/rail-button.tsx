@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react';
-import { styles } from './style-tokens';
 interface RailButtonProps {
   label: string;
   active: boolean;

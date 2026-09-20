@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { GitBranch, ArrowUp, ArrowDown } from "lucide-react";
 import { Fonts } from "@/constants/theme";
 import { useChangesTheme } from "../../hooks/use-changes-theme";
@@ -22,26 +21,20 @@ export function BranchLabel({
     textSecondary,
     textMuted
   } = useChangesTheme();
-  return <div className={toTailwind(styles.wrap)}>
+  return <div className={""}>
       <GitBranch size={12} color={textMuted} strokeWidth={2} />
-      <span className={toTailwind([styles.branch, {
-      color: textSecondary
-    }])} {...{
+      <span className={"" + " " + ""} {...{
       title: branch
     }}>
         {branch}
       </span>
-      {ahead > 0 && <div className={toTailwind(styles.badge)}>
+      {ahead > 0 && <div className={""}>
           <ArrowUp size={9} color={textMuted} strokeWidth={2.5} />
-          <span className={toTailwind([styles.badgeText, {
-        color: textMuted
-      }])}>{ahead}</span>
+          <span className={"" + " " + ""}>{ahead}</span>
         </div>}
-      {behind > 0 && <div className={toTailwind(styles.badge)}>
+      {behind > 0 && <div className={""}>
           <ArrowDown size={9} color={textMuted} strokeWidth={2.5} />
-          <span className={toTailwind([styles.badgeText, {
-        color: textMuted
-      }])}>{behind}</span>
+          <span className={"" + " " + ""}>{behind}</span>
         </div>}
     </div>;
 }

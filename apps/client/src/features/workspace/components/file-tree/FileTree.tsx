@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { useState } from 'react';
 import { FolderOpen, Search, X } from 'lucide-react';
 import { Colors } from '@/constants/theme';
@@ -7,7 +6,6 @@ import type { FileTreeProps } from './component-types';
 import { FileTreeRoot } from './tree-root';
 import { FileViewer } from './file-viewer';
 import { NARROW_PANEL_WIDTH, TREE_COLUMN_NARROW, TREE_COLUMN_WIDTH } from '../../utils/file-tree-constants';
-import { styles } from './style-tokens';
 export function FileTree({
   rootPath,
   viewingFile,
@@ -31,15 +29,10 @@ export function FileTree({
   const isNarrow = width > 0 && width < NARROW_PANEL_WIDTH;
   const treeWidth = isNarrow ? TREE_COLUMN_NARROW : TREE_COLUMN_WIDTH;
   const tree = <>
-      <div className={toTailwind(styles.filterRow)}>
-        <div className={toTailwind([styles.filterField, {
-        backgroundColor: fieldBg,
-        borderColor
-      }])}>
+      <div className={""}>
+        <div className={"" + " " + ""}>
           <Search size={13} color={textMuted} strokeWidth={2} />
-          <input value={query} onChangeText={setQuery} placeholder="Filter files…" placeholderTextColor={textMuted} className={toTailwind([styles.filterInput, {
-          color: textPrimary
-        }])} autoCapitalize="none" autoCorrect={false} aria-label="Filter files" />
+          <input value={query} onChangeText={setQuery} placeholder="Filter files…" placeholderTextColor={textMuted} className={"" + " " + ""} autoCapitalize="none" autoCorrect={false} aria-label="Filter files" />
           {query.length > 0 && <button onClick={() => setQuery("")} hitSlop={6} aria-label="Clear filter" {...{
           title: "Clear filter"
         }}>
@@ -49,30 +42,23 @@ export function FileTree({
       </div>
       <FileTreeRoot rootPath={rootPath} textMuted={textMuted} onFilePress={p => onViewFile(p)} expandedDirs={expandedDirs} onToggleDir={onToggleDir} query={query.trim()} selectedPath={viewingFile} />
     </>;
-  return <div className={toTailwind(styles.treeContainer)} onLayout={e => setWidth(e.nativeEvent.layout.width)}>
+  return <div className={""} onLayout={e => setWidth(e.nativeEvent.layout.width)}>
       {isNarrow ?
     // One column: the file takes the panel while it is open, the tree
     // returns when it is closed.
-    viewingFile ? <FileViewer filePath={viewingFile} rootPath={rootPath} onClose={() => onViewFile(null)} /> : tree : <div className={toTailwind(styles.splitRow)}>
-          <div className={toTailwind(styles.splitContent)}>
-            {viewingFile ? <FileViewer filePath={viewingFile} rootPath={rootPath} onClose={() => onViewFile(null)} /> : <div className={toTailwind(styles.readerEmpty)}>
+    viewingFile ? <FileViewer filePath={viewingFile} rootPath={rootPath} onClose={() => onViewFile(null)} /> : tree : <div className={""}>
+          <div className={""}>
+            {viewingFile ? <FileViewer filePath={viewingFile} rootPath={rootPath} onClose={() => onViewFile(null)} /> : <div className={""}>
                 <FolderOpen size={26} color={textMuted} strokeWidth={1.5} />
-                <span className={toTailwind([styles.readerEmptyTitle, {
-            color: textPrimary
-          }])}>
+                <span className={"" + " " + ""}>
                   Open a file
                 </span>
-                <span className={toTailwind([styles.readerEmptyHint, {
-            color: textMuted
-          }])}>
+                <span className={"" + " " + ""}>
                   Pick one from the workspace tree
                 </span>
               </div>}
           </div>
-          <div className={toTailwind([styles.splitTree, {
-        width: treeWidth,
-        borderLeftColor: borderColor
-      }])}>
+          <div className={"" + " " + "w-[0]"}>
             {tree}
           </div>
         </div>}

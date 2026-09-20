@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { memo, useRef, useEffect, useMemo } from 'react';
 import { Animated } from "@/platform/animation";
 import { Check } from 'lucide-react';
@@ -63,26 +62,15 @@ function NarrowEffortSheetComponent({
     animateClose(() => onClose());
   };
   return <div visible={visible} transparent animationType="none" onRequestClose={handleClose}>
-      <div className={toTailwind(styles.modalRoot)}>
-        <div className={toTailwind([styles.overlay, {
-        opacity: overlayAnim
-      }])}>
-          <button className={toTailwind(ABSOLUTE_FILL_STYLE)} onClick={handleClose} />
+      <div className={""}>
+        <div className={"" + " " + "opacity-[null]"}>
+          <button className={""} onClick={handleClose} />
         </div>
-        <div className={toTailwind([styles.container, {
-        backgroundColor: theme.isDark ? '#1e1e1e' : '#FFFFFF',
-        transform: [{
-          translateY: slideAnim
-        }]
-      }])}>
-          <div className={toTailwind(styles.handle)}>
-            <div className={toTailwind([styles.handleBar, {
-            backgroundColor: theme.isDark ? '#555' : '#CCC'
-          }])} />
+        <div className={"" + " " + ""}>
+          <div className={""}>
+            <div className={"" + " " + ""} />
           </div>
-          <span className={toTailwind([styles.title, {
-          color: theme.textPrimary
-        }])}>思考深度</span>
+          <span className={"" + " " + ""}>思考深度</span>
           {[{
           level: 'auto' as const,
           label: 'Auto'
@@ -90,9 +78,7 @@ function NarrowEffortSheetComponent({
           const isActive = item.level === thinkingPreference;
           return <button key={item.level} onClick={() => handleSelect(item.level)}>
                 <div>
-                  <span className={toTailwind([styles.label, {
-                color: isActive ? theme.accentColor : theme.textPrimary
-              }])}>
+                  <span className={"" + " " + ""}>
                     {item.label}
                   </span>
                 </div>

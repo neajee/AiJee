@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { X } from 'lucide-react';
 import { useSafeAreaInsets } from "@/platform/browser";
 import { Colors } from '@/constants/theme';
@@ -6,7 +5,6 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { useResponsiveLayout } from '@/hooks/use-responsive-layout';
 import { useEditWorkspaceController } from '../../hooks/use-edit-workspace-controller';
 import { EditWorkspaceForm } from './form-content';
-import { styles } from './style-tokens';
 import type { EditWorkspaceDialogProps } from './component-types';
 export function EditWorkspaceDialog({
   visible,
@@ -38,21 +36,12 @@ export function EditWorkspaceDialog({
   };
   if (!isWideScreen) {
     return <div visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-        <div className={toTailwind({
-        flex: 1
-      })} behavior={false ? 'padding' : undefined}>
-          <button className={toTailwind(styles.sheetOverlay)} onClick={onClose}>
-            <button className={toTailwind([styles.sheetContainer, {
-            backgroundColor: isDark ? '#1e1e1e' : '#FFFFFF',
-            paddingBottom: insets.bottom + 20
-          }])} onClick={event => event.stopPropagation()}>
-              <div className={toTailwind(styles.sheetHandle)}><div className={toTailwind([styles.sheetHandleBar, {
-                backgroundColor: isDark ? '#555' : '#CCC'
-              }])} /></div>
-              <span className={toTailwind([styles.sheetTitle, {
-              color: textPrimary
-            }])}>Edit Workspace</span>
-              <div className={toTailwind(styles.sheetBody)} keyboardShouldPersistTaps="handled">
+        <div className={"flex-1"} behavior={false ? 'padding' : undefined}>
+          <button className={""} onClick={onClose}>
+            <button className={"" + " " + "pb-[0]"} onClick={event => event.stopPropagation()}>
+              <div className={""}><div className={"" + " " + ""} /></div>
+              <span className={"" + " " + ""}>Edit Workspace</span>
+              <div className={""} keyboardShouldPersistTaps="handled">
                 <EditWorkspaceForm {...formProps} />
               </div>
             </button>
@@ -61,14 +50,10 @@ export function EditWorkspaceDialog({
       </div>;
   }
   return <div visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <button className={toTailwind(styles.overlay)} onClick={onClose}>
-        <button className={toTailwind([styles.dialog, {
-        backgroundColor: isDark ? '#1e1e1e' : '#FFFFFF'
-      }])} onClick={event => event.stopPropagation()}>
-          <div className={toTailwind(styles.header)}>
-            <span className={toTailwind([styles.title, {
-            color: textPrimary
-          }])}>Edit Workspace</span>
+      <button className={""} onClick={onClose}>
+        <button className={"" + " " + ""} onClick={event => event.stopPropagation()}>
+          <div className={""}>
+            <span className={"" + " " + ""}>Edit Workspace</span>
             <button onClick={onClose}>
               <X size={18} color={textMuted} strokeWidth={2} />
             </button>

@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { useEffect, useRef } from "react";
 import { Animated } from "@/platform/animation";
 import { TOOLBAR_ANDROID_MARGIN_TOP, TOOLBAR_BORDER_WIDTH, TOOLBAR_CONTROL_HEIGHT, TOOLBAR_CORNER_RADIUS, TOOLBAR_HORIZONTAL_MARGIN, TOOLBAR_MODE_TOGGLE_HEIGHT, TOOLBAR_VERTICAL_PADDING, TOOLBAR_WRAP_OFFSET } from "../../utils/toolbar-styles";
@@ -31,31 +30,16 @@ export function ToolbarSkeleton({
   const bg = isDark ? "#1a1a1a" : "#F6F6F6";
   const border = isDark ? "#3b3a39" : "rgba(0,0,0,0.12)";
   if (inline) {
-    return <div className={toTailwind([styles.inlineTrack, {
-      opacity
-    }])}>
-        <div className={toTailwind([styles.inlinePill, styles.pillWide, {
-        backgroundColor: fill
-      }])} />
-        <div className={toTailwind([styles.inlinePill, styles.pillNarrow, {
-        backgroundColor: fill
-      }])} />
+    return <div className={"" + " " + "opacity-[null]"}>
+        <div className={"" + " " + "" + " " + ""} />
+        <div className={"" + " " + "" + " " + ""} />
       </div>;
   }
-  return <div className={toTailwind(styles.wrap)}>
-      <div className={toTailwind([styles.toolbar, {
-      backgroundColor: bg,
-      borderColor: border
-    }])}>
-        <div className={toTailwind([styles.track, {
-        opacity
-      }])}>
-          <div className={toTailwind([styles.pill, styles.pillWide, {
-          backgroundColor: fill
-        }])} />
-          <div className={toTailwind([styles.pill, styles.pillNarrow, {
-          backgroundColor: fill
-        }])} />
+  return <div className={""}>
+      <div className={"" + " " + ""}>
+        <div className={"" + " " + "opacity-[null]"}>
+          <div className={"" + " " + "" + " " + ""} />
+          <div className={"" + " " + "" + " " + ""} />
         </div>
       </div>
     </div>;

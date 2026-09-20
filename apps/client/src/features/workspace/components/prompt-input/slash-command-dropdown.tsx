@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { useRef, useEffect } from 'react';
 import { Animated } from "@/platform/animation";
 import { Fonts } from '@/constants/theme';
@@ -26,32 +25,15 @@ export function SlashCommandDropdown({
       animated: true
     });
   }, [selectedIndex]);
-  return <div className={toTailwind([styles.container, overlay ? styles.overlayContainer : styles.stackedContainer, {
-    backgroundColor: theme.dropdownBg,
-    borderColor: theme.dropdownBorder,
-    opacity: dropdownAnim,
-    transform: [{
-      translateY: dropdownAnim.interpolate({
-        inputRange: [0, 1],
-        outputRange: [8, 0]
-      })
-    }],
-    ...(overlay ? {
-      boxShadow: '0px 10px 30px rgba(0, 0, 0, 0.14)'
-    } : {})
-  }])}>
-      <div ref={scrollRef} className={toTailwind(styles.scroll)} keyboardShouldPersistTaps="handled">
+  return <div className={"" + " " + (overlay ? "" : "") + " " + "opacity-[null]"}>
+      <div ref={scrollRef} className={""} keyboardShouldPersistTaps="handled">
         {commands.map((cmd, index) => <button key={cmd.name} onClick={() => onSelect(cmd)} role="menuitem" aria-label={`/${cmd.name} — ${cmd.description}`} accessibilityState={{
         selected: index === selectedIndex
       }}>
-            <span className={toTailwind([styles.name, {
-          color: theme.textPrimary
-        }])}>
+            <span className={"" + " " + ""}>
               /{cmd.name}
             </span>
-            <span className={toTailwind([styles.desc, {
-          color: theme.textMuted
-        }])}>
+            <span className={"" + " " + ""}>
               {cmd.description}
             </span>
           </button>)}

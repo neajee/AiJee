@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { X, FileText, ImageIcon } from 'lucide-react';
 import { Fonts } from '@/constants/theme';
 import { Attachment } from '../../utils/prompt-input';
@@ -15,41 +14,30 @@ export function AttachmentChips({
   if (attachments.length === 0) return null;
   const imageAtts = attachments.filter(a => a.type === 'image');
   const fileAtts = attachments.filter(a => a.type !== 'image');
-  return <div className={toTailwind(styles.container)}>
-      {imageAtts.length > 0 && <div className={toTailwind(styles.imageRow)}>
-          {imageAtts.map(att => <div key={att.id} className={toTailwind([styles.imageWrap, {
-        borderColor: theme.cardBorder
-      }])}>
+  return <div className={""}>
+      {imageAtts.length > 0 && <div className={""}>
+          {imageAtts.map(att => <div key={att.id} className={"" + " " + ""}>
               {att.preview ? <img src={{
           uri: att.preview
-        }} className={toTailwind(styles.thumb)} /> : <div className={toTailwind([styles.thumb, styles.thumbPlaceholder])}>
+        }} className={""} /> : <div className={"" + " " + ""}>
                   <ImageIcon size={18} color={theme.textMuted} strokeWidth={1.8} />
                 </div>}
-              <button onClick={() => onRemove(att.id)} className={toTailwind([styles.removeBadge, {
-          backgroundColor: theme.isDark ? 'rgba(0,0,0,0.6)' : 'rgba(255,255,255,0.92)'
-        }])} role="button" aria-label="Remove image" hitSlop={6}>
+              <button onClick={() => onRemove(att.id)} className={"" + " " + ""} role="button" aria-label="Remove image" hitSlop={6}>
                 <X size={11} color={theme.isDark ? '#fff' : '#333'} strokeWidth={2.5} />
               </button>
             </div>)}
         </div>}
 
-      {fileAtts.length > 0 && <div horizontal className={toTailwind(styles.fileRow)}>
-          {fileAtts.map(att => <div key={att.id} className={toTailwind([styles.chip, {
-        backgroundColor: theme.isDark ? '#252525' : '#E8E8E8',
-        borderColor: theme.isDark ? '#3b3a39' : 'rgba(0,0,0,0.08)'
-      }])}>
+      {fileAtts.length > 0 && <div horizontal className={""}>
+          {fileAtts.map(att => <div key={att.id} className={"" + " " + ""}>
               <FileText size={14} color={theme.textMuted} strokeWidth={1.8} />
-              <span className={toTailwind([styles.name, {
-          color: theme.textPrimary
-        }])}>
+              <span className={"" + " " + ""}>
                 {att.name}
               </span>
-              {att.size != null && <span className={toTailwind([styles.size, {
-          color: theme.textMuted
-        }])}>
+              {att.size != null && <span className={"" + " " + ""}>
                   {att.size > 1024 * 1024 ? `${(att.size / (1024 * 1024)).toFixed(1)}MB` : att.size > 1024 ? `${(att.size / 1024).toFixed(0)}KB` : `${att.size}B`}
                 </span>}
-              <button onClick={() => onRemove(att.id)} className={toTailwind(styles.remove)} role="button" aria-label={`Remove ${att.name}`}>
+              <button onClick={() => onRemove(att.id)} className={""} role="button" aria-label={`Remove ${att.name}`}>
                 <X size={12} color={theme.textMuted} strokeWidth={2} />
               </button>
             </div>)}

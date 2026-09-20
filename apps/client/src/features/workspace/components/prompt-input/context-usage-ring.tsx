@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { useState } from "react";
 import Svg, { Circle as SvgCircle } from "@/platform/svg";
 import { Fonts } from "@/constants/theme";
@@ -30,30 +29,21 @@ export function ContextUsageRing({
   const fillColor = isDark ? "#555" : "#AAA";
   const free = Math.max(total - used, 0);
   const pct = Math.round(ratio * 100);
-  return <div className={toTailwind(styles.wrap)}>
+  return <div className={""}>
       <button onClick={() => setShowTooltip(v => !v)}>
         <Svg width={size} height={size}>
           <SvgCircle cx={size / 2} cy={size / 2} r={radius} stroke={trackColor} strokeWidth={stroke} fill="none" />
           {ratio > 0 && <SvgCircle cx={size / 2} cy={size / 2} r={radius} stroke={fillColor} strokeWidth={stroke} fill="none" strokeDasharray={`${filled} ${circumference - filled}`} strokeDashoffset={circumference * 0.25} strokeLinecap="round" />}
         </Svg>
       </button>
-      {showTooltip && <button className={toTailwind([styles.tooltip, {
-      backgroundColor: isDark ? "#2A2A2A" : "#FFFFFF",
-      borderColor: isDark ? "#3A3A3A" : "#E0E0E0"
-    }])} onClick={() => setShowTooltip(false)}>
-          <span className={toTailwind([styles.tooltipTitle, {
-        color: isDark ? "#CCC" : "#333"
-      }])}>
+      {showTooltip && <button className={"" + " " + ""} onClick={() => setShowTooltip(false)}>
+          <span className={"" + " " + ""}>
             Context · {pct}%
           </span>
-          <span className={toTailwind([styles.tooltipRow, {
-        color: isDark ? "#999" : "#666"
-      }])}>
+          <span className={"" + " " + ""}>
             Used {formatTokens(used)} of {formatTokens(total)}
           </span>
-          <span className={toTailwind([styles.tooltipRow, {
-        color: isDark ? "#999" : "#666"
-      }])}>
+          <span className={"" + " " + ""}>
             Free {formatTokens(free)}
           </span>
         </button>}

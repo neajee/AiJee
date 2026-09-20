@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { formatAgentModeLabel, type AgentMode } from '@/features/agent/mode';
 import { styles } from '../../../utils/toolbar-styles';
 import type { ToolbarController } from './component-types';
@@ -12,10 +11,7 @@ export function ModeToggle({
   handleSelectMode
 }: ModeToggleProps) {
   if (appMode !== 'code') return null;
-  return <div className={toTailwind([styles.modeToggle, {
-    backgroundColor: theme.isDark ? '#242422' : '#ECEBE7',
-    borderColor: theme.toolbarBorder
-  }])}>
+  return <div className={"" + " " + ""}>
     {(['work', 'plan'] as AgentMode[]).map(mode => {
       const active = displayedMode === mode;
       const pending = pendingMode === mode;
@@ -23,11 +19,8 @@ export function ModeToggle({
         selected: active,
         disabled: toolbarDisabled || false
       }} disabled={toolbarDisabled || false} onClick={() => handleSelectMode(mode)}>
-        <span className={toTailwind([styles.modeButtonText, {
-          color: active ? theme.textPrimary : theme.textMuted,
-          opacity: pending ? 0 : 1
-        }])}>{formatAgentModeLabel(mode)}</span>
-        {pending && <span size="small" color={active ? theme.textPrimary : theme.textMuted} className={toTailwind(styles.modePendingIndicator)} />}
+        <span className={"" + " " + "opacity-[null]"}>{formatAgentModeLabel(mode)}</span>
+        {pending && <span size="small" color={active ? theme.textPrimary : theme.textMuted} className={""} />}
       </button>;
     })}
   </div>;

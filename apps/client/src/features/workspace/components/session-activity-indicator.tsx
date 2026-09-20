@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { useEffect, useRef } from "react";
 import { Animated } from "@/platform/animation";
 import { Minus } from "lucide-react";
@@ -55,17 +54,8 @@ export function SessionActivityIndicator({
   if (!isWorking) {
     return idlePlaceholder ? <Minus size={14} color={color} strokeWidth={2} /> : null;
   }
-  return <div className={toTailwind(styles.row)}>
-      {dotAnims.map((anim, index) => <div key={index} className={toTailwind([styles.dot, {
-      backgroundColor: color,
-      opacity: anim,
-      transform: [{
-        scale: anim.interpolate({
-          inputRange: [0.35, 1],
-          outputRange: [0.75, 1]
-        })
-      }]
-    }])} />)}
+  return <div className={""}>
+      {dotAnims.map((anim, index) => <div key={index} className={"" + " " + "opacity-[null]"} />)}
     </div>;
 }
 const styles = {

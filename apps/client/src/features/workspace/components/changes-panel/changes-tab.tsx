@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { useCallback, useMemo } from "react";
 import { Alert } from "@/platform/browser";
 import { Plus, Minus, Undo2, Check } from "lucide-react";
@@ -72,11 +71,9 @@ export function ChangesTab({
     }
   }, [onDiscard]);
   if (totalChanges === 0) {
-    return <div className={toTailwind(styles.cleanState)}>
+    return <div className={""}>
         <Check size={20} color={textMuted} strokeWidth={2} />
-        <span className={toTailwind([styles.emptyText, {
-        color: textMuted
-      }])}>
+        <span className={"" + " " + ""}>
           Working tree clean
         </span>
       </div>;
@@ -84,7 +81,7 @@ export function ChangesTab({
   return <>
       {staged.length > 0 && <FileList files={staged} keyPrefix="s" staged selectedFile={selectedFile} diffContent={diffContent} diffLoading={diffLoading} onFilePress={onFilePress} textPrimary={textPrimary} textMuted={textMuted} hoverBg={hoverBg} dividerColor={dividerColor} renderActions={path => <IconButton onClick={() => onUnstage([path])} title="Unstage" icon={<Minus size={13} color={textMuted} strokeWidth={2} />} />} />}
 
-      {changed.length > 0 && <FileList files={changed} keyPrefix="u" selectedFile={selectedFile} diffContent={diffContent} diffLoading={diffLoading} onFilePress={onFilePress} textPrimary={textPrimary} textMuted={textMuted} hoverBg={hoverBg} dividerColor={dividerColor} renderActions={(path, status) => <div className={toTailwind(styles.fileActions)}>
+      {changed.length > 0 && <FileList files={changed} keyPrefix="u" selectedFile={selectedFile} diffContent={diffContent} diffLoading={diffLoading} onFilePress={onFilePress} textPrimary={textPrimary} textMuted={textMuted} hoverBg={hoverBg} dividerColor={dividerColor} renderActions={(path, status) => <div className={""}>
               {/* An untracked file has no previous version to revert to. */}
               {status !== "?" && <IconButton onClick={() => confirmDiscard([path])} title="Discard changes" icon={<Undo2 size={12} color={textMuted} strokeWidth={2} />} />}
               <IconButton onClick={() => onStage([path])} title="Stage" icon={<Plus size={13} color={textMuted} strokeWidth={2} />} />

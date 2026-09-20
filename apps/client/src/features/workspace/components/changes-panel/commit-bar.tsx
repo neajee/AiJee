@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { useRef } from "react";
 import { Send } from "lucide-react";
 import { Fonts } from "@/constants/theme";
@@ -26,17 +25,10 @@ export function CommitBar({
     sendColor
   } = useChangesTheme();
   const commitInputRef = useRef<RNTextInput>(null);
-  return <div className={toTailwind([styles.commitBar, {
-    borderTopColor: dividerColor
-  }])}>
-      <div className={toTailwind([styles.commitInputBox, {
-      backgroundColor: inputBg,
-      borderColor: inputBorder
-    }])}>
-        <input ref={commitInputRef} className={toTailwind([styles.commitTextarea, {
-        color: textPrimary
-      }])} value={commitMsg} onChangeText={onChangeCommitMsg} placeholder={`Commit message for ${stagedCount} staged file${stagedCount !== 1 ? "s" : ""}...`} placeholderTextColor={textMuted} multiline textAlignVertical="top" editable={!isCommitting} />
-        <div className={toTailwind(styles.commitActions)}>
+  return <div className={"" + " " + ""}>
+      <div className={"" + " " + ""}>
+        <input ref={commitInputRef} className={"" + " " + ""} value={commitMsg} onChangeText={onChangeCommitMsg} placeholder={`Commit message for ${stagedCount} staged file${stagedCount !== 1 ? "s" : ""}...`} placeholderTextColor={textMuted} multiline textAlignVertical="top" editable={!isCommitting} />
+        <div className={""}>
           {isCommitting ? <span size="small" /> : <button onClick={onCommit} disabled={!commitMsg.trim()} aria-label="Commit" {...{
           title: "Commit"
         }}>

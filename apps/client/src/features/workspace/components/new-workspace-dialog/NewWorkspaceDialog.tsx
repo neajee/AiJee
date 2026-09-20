@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { VirtualList } from "@/components/ui/virtual-list";
 import { File, Folder } from "lucide-react";
 import type { PathCompletion } from "@aijee/client-sdk";
@@ -50,20 +49,11 @@ export function NewWorkspaceDialogView({
   } = controller;
   const formContent = <>
       {/* Path input */}
-      <div className={toTailwind([styles.field, {
-      zIndex: 10
-    }])}>
-        <span className={toTailwind([styles.label, {
-        color: textMuted
-      }])}>项目路径</span>
-        <div className={toTailwind([styles.inputRow, {
-        backgroundColor: inputBg,
-        borderColor: inputBorder
-      }])}>
+      <div className={"" + " " + "z-[10]"}>
+        <span className={"" + " " + ""}>项目路径</span>
+        <div className={"" + " " + ""}>
           <Folder size={16} color={textMuted} strokeWidth={1.8} />
-          <input ref={pathRef} className={toTailwind([styles.input, {
-          color: textPrimary
-        }])} focusStyle={{
+          <input ref={pathRef} className={"" + " " + ""} focusStyle={{
           outlineWidth: 0,
           borderWidth: 0,
           borderColor: 'transparent',
@@ -79,32 +69,23 @@ export function NewWorkspaceDialogView({
           {loadingSuggestions && <span size="small" color={textMuted} />}
         </div>
 
-        {pathPreview && !showSuggestions ? <div className={toTailwind(styles.pathPreview)}>
-            <span className={toTailwind([styles.pathPreviewLabel, {
-          color: textMuted
-        }])}>位置</span>
-            <span className={toTailwind([styles.pathPreviewValue, {
-          color: textPrimary
-        }])}>
+        {pathPreview && !showSuggestions ? <div className={""}>
+            <span className={"" + " " + ""}>位置</span>
+            <span className={"" + " " + ""}>
               {pathPreview}
             </span>
           </div> : null}
 
         {/* Path suggestions popover */}
-        {showSuggestions && suggestions.length > 0 && <div className={toTailwind([useInlineSuggestions ? styles.inlineSuggestionsPopover : styles.suggestionsPopover, {
-        backgroundColor: popoverBg,
-        borderColor: inputBorder
-      }])}>
+        {showSuggestions && suggestions.length > 0 && <div className={(useInlineSuggestions ? "" : "") + " " + ""}>
             {useInlineSuggestions ? <div>
                 {suggestions.map((item, index) => <button key={item.path} onClick={() => handleSelectSuggestion(item)}>
                     {item.is_dir ? <Folder size={14} color={textMuted} strokeWidth={1.8} /> : <File size={14} color={textMuted} strokeWidth={1.8} />}
-                    <span className={toTailwind([styles.suggestionText, {
-              color: textPrimary
-            }])}>
+                    <span className={"" + " " + ""}>
                       {item.path}
                     </span>
                   </button>)}
-              </div> : <VirtualList<PathCompletion> ref={suggestionsRef} data={suggestions} keyExtractor={item => item.path} className={toTailwind(styles.suggestionsScroll)} keyboardShouldPersistTaps="handled" nestedScrollEnabled scrollEnabled={suggestions.length > 4} getItemLayout={(_data, index) => ({
+              </div> : <VirtualList<PathCompletion> ref={suggestionsRef} data={suggestions} keyExtractor={item => item.path} className={""} keyboardShouldPersistTaps="handled" nestedScrollEnabled scrollEnabled={suggestions.length > 4} getItemLayout={(_data, index) => ({
           length: 40,
           offset: 40 * index,
           index
@@ -113,9 +94,7 @@ export function NewWorkspaceDialogView({
           index
         }) => <button onClick={() => handleSelectSuggestion(item)}>
                     {item.is_dir ? <Folder size={14} color={textMuted} strokeWidth={1.8} /> : <File size={14} color={textMuted} strokeWidth={1.8} />}
-                    <span className={toTailwind([styles.suggestionText, {
-            color: textPrimary
-          }])}>
+                    <span className={"" + " " + ""}>
                       {item.path}
                     </span>
                   </button>} />}
@@ -123,41 +102,28 @@ export function NewWorkspaceDialogView({
       </div>
 
       {/* Name input */}
-      <div className={toTailwind(styles.field)}>
-        <span className={toTailwind([styles.label, {
-        color: textMuted
-      }])}>项目名称</span>
-        <div className={toTailwind([styles.inputRow, {
-        backgroundColor: inputBg,
-        borderColor: inputBorder
-      }])}>
-          <input ref={nameRef} className={toTailwind([styles.input, styles.nameInput, {
-          color: textPrimary
-        }])} focusStyle={{
+      <div className={""}>
+        <span className={"" + " " + ""}>项目名称</span>
+        <div className={"" + " " + ""}>
+          <input ref={nameRef} className={"" + " " + "" + " " + ""} focusStyle={{
           outlineWidth: 0,
           borderWidth: 0,
           borderColor: 'transparent',
           boxShadow: 'none'
         } as any} value={name} onChangeText={handleNameChange} onKeyPress={handleNameKeyPress} placeholder="例如：My Project" placeholderTextColor={textMuted} />
         </div>
-        {!nameEdited && name.length > 0 && <span className={toTailwind([styles.hint, {
-        color: textMuted
-      }])}>
+        {!nameEdited && name.length > 0 && <span className={"" + " " + ""}>
             已根据路径自动生成
           </span>}
       </div>
 
       {/* Actions */}
-      <div className={toTailwind(styles.actions)}>
+      <div className={""}>
         <button onClick={onClose}>
-          <span className={toTailwind([styles.cancelText, {
-          color: textPrimary
-        }])}>取消</span>
+          <span className={"" + " " + ""}>取消</span>
         </button>
         <button onClick={handleCreate} disabled={!canCreate}>
-          <span className={toTailwind([styles.createText, {
-          color: canCreate ? isDark ? '#121212' : '#FFFFFF' : textMuted
-        }])}>
+          <span className={"" + " " + ""}>
             添加项目
           </span>
         </button>
@@ -167,23 +133,14 @@ export function NewWorkspaceDialogView({
   // Narrow: bottom sheet
   if (!isWideScreen) {
     return <div visible={visible} transparent animationType="slide" onRequestClose={onClose}>
-        <div className={toTailwind({
-        flex: 1
-      })} behavior={false ? 'padding' : undefined}>
-          <button className={toTailwind(styles.sheetOverlay)} onClick={onClose}>
-            <button className={toTailwind([styles.sheetContainer, {
-            backgroundColor: isDark ? '#1e1e1e' : '#FFFFFF',
-            paddingBottom: insets.bottom + 20
-          }])} onClick={e => e.stopPropagation()}>
-              <div className={toTailwind(styles.sheetHandle)}>
-                <div className={toTailwind([styles.sheetHandleBar, {
-                backgroundColor: isDark ? '#555' : '#CCC'
-              }])} />
+        <div className={"flex-1"} behavior={false ? 'padding' : undefined}>
+          <button className={""} onClick={onClose}>
+            <button className={"" + " " + "pb-[0]"} onClick={e => e.stopPropagation()}>
+              <div className={""}>
+                <div className={"" + " " + ""} />
               </div>
-              <span className={toTailwind([styles.sheetTitle, {
-              color: textPrimary
-            }])}>新建项目</span>
-              <div className={toTailwind(styles.sheetBody)} keyboardShouldPersistTaps="handled">
+              <span className={"" + " " + ""}>新建项目</span>
+              <div className={""} keyboardShouldPersistTaps="handled">
                 {formContent}
               </div>
             </button>
@@ -194,22 +151,13 @@ export function NewWorkspaceDialogView({
 
   // Desktop: centered dialog
   return <div visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <button className={toTailwind(styles.overlay)} onClick={onClose}>
-        <button className={toTailwind([styles.dialog, {
-        backgroundColor: isDark ? '#1e1e1e' : '#FFFFFF',
-        borderColor: inputBorder
-      }])} onClick={e => e.stopPropagation()}>
-          {showSuggestions && <button className={toTailwind([ABSOLUTE_FILL_STYLE, {
-          zIndex: 5
-        }])} onClick={dismissSuggestions} />}
-          <div className={toTailwind(styles.header)}>
-            <div className={toTailwind(styles.headerCopy)}>
-              <span className={toTailwind([styles.title, {
-              color: textPrimary
-            }])}>新建项目</span>
-              <span className={toTailwind([styles.subtitle, {
-              color: textMuted
-            }])}>添加本地目录，随时切换</span>
+      <button className={""} onClick={onClose}>
+        <button className={"" + " " + ""} onClick={e => e.stopPropagation()}>
+          {showSuggestions && <button className={"" + " " + "z-[5]"} onClick={dismissSuggestions} />}
+          <div className={""}>
+            <div className={""}>
+              <span className={"" + " " + ""}>新建项目</span>
+              <span className={"" + " " + ""}>添加本地目录，随时切换</span>
             </div>
           </div>
           {formContent}

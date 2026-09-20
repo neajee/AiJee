@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { memo, useRef, useState, useEffect } from 'react';
 import { Animated } from "@/platform/animation";
 import { Check, X } from 'lucide-react';
@@ -109,54 +108,34 @@ function NarrowModelSheetComponent({
     }));
   })();
   return <div visible={visible} transparent animationType="none" onRequestClose={handleClose}>
-      <div className={toTailwind(styles.modalRoot)}>
-        <div className={toTailwind([styles.overlay, {
-        opacity: overlayAnim
-      }])}>
-          <button className={toTailwind(ABSOLUTE_FILL_STYLE)} onClick={handleClose} />
+      <div className={""}>
+        <div className={"" + " " + "opacity-[null]"}>
+          <button className={""} onClick={handleClose} />
         </div>
-        <div className={toTailwind([styles.container, {
-        backgroundColor: theme.isDark ? '#1e1e1e' : '#FFFFFF',
-        transform: [{
-          translateY: slideAnim
-        }]
-      }])}>
-          <div className={toTailwind(styles.handle)}>
-            <div className={toTailwind([styles.handleBar, {
-            backgroundColor: theme.isDark ? '#555' : '#CCC'
-          }])} />
+        <div className={"" + " " + ""}>
+          <div className={""}>
+            <div className={"" + " " + ""} />
           </div>
-          <span className={toTailwind([styles.title, {
-          color: theme.textPrimary
-        }])}>
+          <span className={"" + " " + ""}>
             Select Model
           </span>
-          <div className={toTailwind([styles.searchRow, {
-          backgroundColor: theme.cardBg,
-          borderColor: theme.cardBorder
-        }])}>
-            <input ref={searchRef} className={toTailwind([styles.searchInput, {
-            color: theme.textPrimary
-          }])} value={search} onChangeText={setSearch} placeholder="Search models..." placeholderTextColor={theme.textMuted} autoCapitalize="none" autoCorrect={false} />
+          <div className={"" + " " + ""}>
+            <input ref={searchRef} className={"" + " " + ""} value={search} onChangeText={setSearch} placeholder="Search models..." placeholderTextColor={theme.textMuted} autoCapitalize="none" autoCorrect={false} />
             {search.length > 0 && <button onClick={() => setSearch('')}>
                 <X size={16} color={theme.textMuted} strokeWidth={2} />
               </button>}
           </div>
-          <div className={toTailwind(styles.scroll)} keyboardShouldPersistTaps="handled">
+          <div className={""} keyboardShouldPersistTaps="handled">
             {providers.map(provider => <div key={provider.name}>
-                <span className={toTailwind([styles.providerHeader, {
-              color: theme.sectionColor
-            }])}>
+                <span className={"" + " " + ""}>
                   {provider.name}
                 </span>
                 {provider.models.map(model => {
               const isActive = model.id === currentModel?.id;
               return <button key={model.id} onClick={() => handleSelect(model.provider, model.id)}>
-                      <div className={toTailwind(styles.modelRow)}>
+                      <div className={""}>
                         <ProviderIcon provider={model.provider} size={14} color={isActive ? theme.accentColor : theme.textMuted} />
-                        <span className={toTailwind([styles.modelName, {
-                    color: isActive ? theme.accentColor : theme.textPrimary
-                  }])}>
+                        <span className={"" + " " + ""}>
                           {model.name}
                         </span>
                       </div>

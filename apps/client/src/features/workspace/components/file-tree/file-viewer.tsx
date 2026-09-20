@@ -1,11 +1,9 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { X } from 'lucide-react';
 import { useFileRead } from '@aijee/client-sdk';
 import { CodePreview } from '@/features/agent/components/message-list/code-preview';
 import { Colors } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { basename, languageOf } from '../../utils/file-tree';
-import { styles } from './style-tokens';
 export function FileViewer({
   filePath,
   rootPath,
@@ -32,12 +30,9 @@ export function FileViewer({
     isLoading,
     error: fileError
   } = useFileRead(filePath);
-  return <div className={toTailwind(styles.viewerContainer)}>
+  return <div className={""}>
       {/* Sticky header */}
-      <div className={toTailwind([styles.viewerHeader, {
-      backgroundColor: headerBg,
-      borderBottomColor: headerBorder
-    }])}>
+      <div className={"" + " " + ""}>
         <button onClick={onClose} aria-label="Close file" {...{
         title: "Close file"
       }}>
@@ -45,31 +40,19 @@ export function FileViewer({
           <X size={13} color={textMuted} strokeWidth={2} />
         </button>
         {/* The trail may lose its middle; the filename never does. */}
-        <span className={toTailwind([styles.crumbTrail, {
-        color: textMuted
-      }])}>
+        <span className={"" + " " + ""}>
           {trail}
         </span>
-        <span className={toTailwind([styles.crumbSeparator, {
-        color: textMuted
-      }])}>›</span>
-        <span className={toTailwind([styles.crumbName, {
-        color: textPrimary
-      }])}>
+        <span className={"" + " " + ""}>›</span>
+        <span className={"" + " " + ""}>
           {fileName}
         </span>
-        {fileData?.truncated && <span className={toTailwind([styles.viewerMeta, {
-        color: textMuted
-      }])}>truncated</span>}
+        {fileData?.truncated && <span className={"" + " " + ""}>truncated</span>}
       </div>
 
       {/* Scrollable content */}
-      {isLoading ? <span className={toTailwind({
-      marginTop: 32
-    })} /> : fileError ? <div className={toTailwind(styles.viewerMessageWrap)}>
-          <span className={toTailwind([styles.emptyText, {
-        color: textMuted
-      }])}>
+      {isLoading ? <span className={"mt-[32px]"} /> : fileError ? <div className={""}>
+          <span className={"" + " " + ""}>
             {fileError.includes("non-UTF8") ? "Binary file preview is not available." : "Cannot read file"}
           </span>
         </div> : fileData ? <CodePreview code={fileData.content} isDark={isDark} language={languageOf(filePath)} bare fill /> : null}

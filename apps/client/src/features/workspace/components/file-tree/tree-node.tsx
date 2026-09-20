@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { useCallback } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useFileList, type FsEntry } from '@aijee/client-sdk';
@@ -8,7 +7,6 @@ import { FileTypeBadge } from '../file-type-badge';
 import { applyFilter } from '../../utils/file-tree';
 import type { FileTreeNodeProps } from './component-types';
 import { NODE_INDENT, NODE_STEP } from '../../utils/file-tree-constants';
-import { styles } from './style-tokens';
 export function FileTreeNode({
   entry,
   depth,
@@ -51,12 +49,10 @@ export function FileTreeNode({
     }}>
         {/* One glyph slot per row, bolt's: a caret for directories, the file's
             kind for files, so names line up at the same x within a level. */}
-        {entry.is_dir ? <div className={toTailwind(styles.iconSlot)}>
+        {entry.is_dir ? <div className={""}>
             {expanded ? <ChevronDown size={13} color={textMuted} strokeWidth={2} /> : <ChevronRight size={13} color={textMuted} strokeWidth={2} />}
           </div> : <FileTypeBadge path={entry.path} fallbackColor={iconColor} />}
-        <span className={toTailwind([styles.name, {
-        color: textPrimary
-      }, entry.is_dir && styles.dirName])}>
+        <span className={"" + " " + "" + " " + (entry.is_dir ? "" : "")}>
           {entry.name}
         </span>
       </button>
@@ -88,19 +84,12 @@ function ExpandedDir({
     isLoading
   } = useFileList(dirPath);
   if (isLoading) {
-    return <div className={toTailwind({
-      paddingLeft: NODE_INDENT + depth * NODE_STEP,
-      paddingTop: 4,
-      paddingBottom: 4
-    })}>
+    return <div className={"pl-[0] pt-[4px] pb-[4px]"}>
         <span size="small" />
       </div>;
   }
   if (!entries || entries.length === 0) {
-    return <span className={toTailwind([styles.emptyDir, {
-      color: textMuted,
-      paddingLeft: NODE_INDENT + depth * NODE_STEP
-    }])}>
+    return <span className={"" + " " + "pl-[0]"}>
         Empty
       </span>;
   }

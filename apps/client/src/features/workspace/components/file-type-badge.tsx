@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { Fonts } from "@/constants/theme";
 
 /**
@@ -130,10 +129,8 @@ export function FileTypeBadge({
   const known = TYPES[ext];
   // An unknown extension still identifies itself; a dot stands in for none.
   const label = known?.label ?? (ext ? ext.slice(0, 3).toUpperCase() : "·");
-  return <div className={toTailwind(styles.badge)}>
-      <span className={toTailwind([styles.label, {
-      color: known?.color ?? fallbackColor
-    }])}>
+  return <div className={""}>
+      <span className={"" + " " + ""}>
         {label}
       </span>
     </div>;

@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { useState } from "react";
 import { Fonts } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -72,53 +71,31 @@ export function FileRow({
 
         {/* Only the directory may be cut, and it is cut from its own end so the
             filename beside it always shows whole. */}
-        {dir.length > 0 && <span className={toTailwind([styles.dirText, {
-        color: textMuted
-      }])}>
+        {dir.length > 0 && <span className={"" + " " + ""}>
             {dir}
           </span>}
-        <span className={toTailwind([styles.nameText, {
-        color: textPrimary
-      }])}>
+        <span className={"" + " " + ""}>
           {name}
         </span>
 
-        {(additions ?? 0) > 0 && <span className={toTailwind([styles.stat, {
-        color: "#26A269"
-      }])}>+{additions}</span>}
-        {(deletions ?? 0) > 0 && <span className={toTailwind([styles.stat, {
-        color: "#E5484D"
-      }])}>−{deletions}</span>}
-        {showBadge && <span className={toTailwind([styles.statusBadge, {
-        color: badgeColor
-      }])}>
+        {(additions ?? 0) > 0 && <span className={"" + " " + ""}>+{additions}</span>}
+        {(deletions ?? 0) > 0 && <span className={"" + " " + ""}>−{deletions}</span>}
+        {showBadge && <span className={"" + " " + ""}>
             {badge}
           </span>}
 
-        <div className={toTailwind(styles.filler)} />
+        <div className={""} />
 
         {actions && (isWeb ?
       // Hovering means a pointer, and a pointer means the metadata can be
       // covered for a moment instead of surrendering 50px on every row.
-      <div className={toTailwind([styles.fileActionsOverlay, {
-        backgroundColor: isSelected ? selectedBg : hoverBg
-      }, !hovered && {
-        opacity: 0,
-        pointerEvents: "none"
-      } as any])}>
+      <div className={"" + " " + "" + " " + (!hovered ? "" : "")}>
               {actions}
-            </div> : <div className={toTailwind(styles.fileActionsWrap)}>{actions}</div>)}
+            </div> : <div className={""}>{actions}</div>)}
       </button>
 
-      {isSelected && <div className={toTailwind([styles.diffContainer, {
-      backgroundColor: isDark ? "#111" : "#F4F4F4"
-    }])}>
-          {diffLoading ? <span className={toTailwind({
-        paddingTop: 12,
-        paddingBottom: 12
-      })} size="small" /> : diffContent ? <DiffView diff={diffContent} /> : <span className={toTailwind([styles.diffEmpty, {
-        color: textMuted
-      }])}>
+      {isSelected && <div className={"" + " " + ""}>
+          {diffLoading ? <span className={"pt-[12px] pb-[12px]"} size="small" /> : diffContent ? <DiffView diff={diffContent} /> : <span className={"" + " " + ""}>
               No diff available
             </span>}
         </div>}
