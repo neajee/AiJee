@@ -58,28 +58,28 @@ export function ServersView({
   // First run: a list with an empty card and two action rows says less than one
   // clear invitation to connect.
   if (variant === "onboarding" && servers.length === 0) {
-    return <div className={""}>
-        <div className={""}>
-          <div className={"" + " " + ""}>
+    return <div className={"block"}>
+        <div className={"block"}>
+          <div className={" "}>
             <PiLogo size={36} color={isDark ? "#1a1a1a" : "#fff"} />
           </div>
-          <span className={"" + " " + ""}>
+          <span className={" "}>
             欢迎使用 AiJee
           </span>
-          <span className={"" + " " + ""}>
+          <span className={" "}>
             连接到运行 AiJee 的设备，{"\n"}
             使用设备授权后即可打开工作区。
           </span>
-          <div className={""}>
+          <div className={"block"}>
             <button onClick={() => setQrVisible(true)}>
               <QrCode size={16} color={p.text} strokeWidth={2} />
-              <span className={"" + " " + ""}>
+              <span className={" "}>
                 扫描授权码
               </span>
             </button>
             <button onClick={handleAdd}>
               <Plus size={16} color={isDark ? "#1a1a1a" : "#fff"} strokeWidth={2} />
-              <span className={"" + " " + ""}>
+              <span className={" "}>
                 添加服务器
               </span>
             </button>
@@ -88,14 +88,14 @@ export function ServersView({
         {modals}
       </div>;
   }
-  return <div className={"" + " " + "gap-[groupGap]"}>
-      <div className={""}>
-        <span className={"" + " " + ""}>我的设备 ({servers.length})</span>
-        <span className={"" + " " + ""}>设备令牌仅保存在本机，不会同步</span>
+  return <div className={"  gap-[var(--group-gap)]"}>
+      <div className={"block"}>
+        <span className={" "}>我的设备 ({servers.length})</span>
+        <span className={" "}>设备令牌仅保存在本机，不会同步</span>
       </div>
-      <div className={"" + " " + ""}>
-        {servers.length === 0 ? <div className={"pl-[gutter] pr-[gutter] pt-[0] pb-[0]"}>
-            <span className={"text-[descSize] font-sans"}>
+      <div className={" "}>
+        {servers.length === 0 ? <div className={"pl-[var(--gutter)] pr-[var(--gutter)] pt-0 pb-0"}>
+            <span className={"text-[var(--desc-size)] font-sans"}>
               尚未添加服务器。
             </span>
           </div> : servers.map((server, idx) => <ServerRow key={server.id} server={server} isActive={server.id === activeServerId} isConnecting={connecting === server.id} isFailed={failedServerId === server.id} lastConnectedAt={lastConnected[server.id]} isLast={idx === servers.length - 1} onClick={() => handleConnect(server)} onShowCode={handleShowCode} onToggleMenu={measure => {
@@ -121,14 +121,14 @@ export function ServersView({
     }} onSave={handleSave} initial={editingServer} isDark={isDark} loading={loginLoading} error={loginError} />
       <QrScanner visible={qrVisible} onClose={() => setQrVisible(false)} onNeedNewWorkspace={() => router.replace("/")} />
       <div transparent visible={!!menuServerId} animationType="fade" onRequestClose={() => setMenuServerId(null)}>
-        <button className={""} onClick={() => {
+        <button className={"block"} onClick={() => {
         setMenuServerId(null);
         setMenuPosition(null);
       }} aria-label="关闭服务器操作菜单">
           {(() => {
           const server = servers.find(entry => entry.id === menuServerId);
           if (!server) return null;
-          return <button className={"" + " " + "" + " " + ""} onClick={event => event.stopPropagation()}>
+          return <button className={" "} onClick={event => event.stopPropagation()}>
                 <MenuAction icon={Pencil} label="编辑" onClick={() => {
               setMenuServerId(null);
               handleEdit(server);
@@ -137,7 +137,7 @@ export function ServersView({
               setMenuServerId(null);
               logoutFromServer(server.id);
             }} color={p.text} />
-                <div className={"" + " " + ""} />
+                <div className={" "} />
                 <MenuAction icon={Trash2} label="删除" onClick={() => {
               setMenuServerId(null);
               handleDelete(server);
@@ -147,24 +147,24 @@ export function ServersView({
         </button>
       </div>
       <div visible={!!codeDialog} transparent animationType="fade" onRequestClose={() => setCodeDialog(null)}>
-        <button className={""} onClick={() => setCodeDialog(null)} aria-label="关闭授权对话框">
-          <button className={"" + " " + ""} onClick={e => e.stopPropagation()}>
-            <div className={""}>
-              <span className={"" + " " + ""}>设备授权二维码</span>
-              <button onClick={() => setCodeDialog(null)} aria-label="关闭授权二维码" hitSlop={8} className={""}>
+        <button className={"block"} onClick={() => setCodeDialog(null)} aria-label="关闭授权对话框">
+          <button className={" "} onClick={e => e.stopPropagation()}>
+            <div className={"block"}>
+              <span className={" "}>设备授权二维码</span>
+              <button onClick={() => setCodeDialog(null)} aria-label="关闭授权二维码" hitSlop={8} className={"block"}>
                 <X size={18} color={p.textTertiary} />
               </button>
             </div>
             {codeDialog && <img src={{
             uri: codeDialog.image
-          }} className={""} />}
-            <div className={""}>
-              <span className={"" + " " + ""}>授权码</span>
-              <span selectable className={"" + " " + ""}>{codeDialog?.code}</span>
-              <button onClick={() => codeDialog && Clipboard.setStringAsync(codeDialog.url)} aria-label="复制完整地址" accessibilityHint="复制设备连接地址" className={""}>
+          }} className={"block"} />}
+            <div className={"block"}>
+              <span className={" "}>授权码</span>
+              <span selectable className={" "}>{codeDialog?.code}</span>
+              <button onClick={() => codeDialog && Clipboard.setStringAsync(codeDialog.url)} aria-label="复制完整地址" accessibilityHint="复制设备连接地址" className={"block"}>
                 <Copy size={18} color={p.text} />
               </button>
-              <button onClick={handleRefreshCode} disabled={refreshingCode} aria-label="刷新授权码" accessibilityHint="生成新授权码并更新当前设备令牌" className={""}>
+              <button onClick={handleRefreshCode} disabled={refreshingCode} aria-label="刷新授权码" accessibilityHint="生成新授权码并更新当前设备令牌" className={"block"}>
                 {refreshingCode ? <span size="small" color={p.text} /> : <RefreshCw size={18} color={p.text} />}
               </button>
             </div>

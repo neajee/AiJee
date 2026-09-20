@@ -18,14 +18,14 @@ export function ServerFormFields({
   const textPrimary = isDark ? '#fefdfd' : '#1a1a1a';
   const inputBg = isDark ? '#2a2a2a' : '#F6F6F6';
   const borderColor = isDark ? '#3b3a39' : 'rgba(0,0,0,0.08)';
-  return <div className={""}>
-      <div className={""}>
-        <span className={"" + " " + ""}>Name</span>
-        <input className={"" + " " + ""} value={name} onChangeText={setName} placeholder="My Server" placeholderTextColor={isDark ? '#666' : '#bbb'} autoFocus={autoFocus} />
+  return <div className={"block"}>
+      <div className={"block"}>
+        <span className={" "}>Name</span>
+        <input className={" "} value={name} onChangeText={setName} placeholder="My Server" placeholderTextColor={isDark ? '#666' : '#bbb'} autoFocus={autoFocus} />
       </div>
-      <div className={""}>
-        <span className={"" + " " + ""}>Address</span>
-        <input className={"" + " " + ""} value={address} onChangeText={setAddress} placeholder="http://192.168.1.100:10088" placeholderTextColor={isDark ? '#666' : '#bbb'} autoCapitalize="none" autoCorrect={false} keyboardType="url" />
+      <div className={"block"}>
+        <span className={" "}>Address</span>
+        <input className={" "} value={address} onChangeText={setAddress} placeholder="http://192.168.1.100:10088" placeholderTextColor={isDark ? '#666' : '#bbb'} autoCapitalize="none" autoCorrect={false} keyboardType="url" />
       </div>
     </div>;
 }

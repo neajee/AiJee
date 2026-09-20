@@ -22,39 +22,39 @@ export function ServerSwitcher() {
   const borderColor = isDark ? '#3b3a39' : 'rgba(0,0,0,0.12)';
   const hoverBg = isDark ? '#333' : '#F5F5F5';
   const iconBg = isDark ? '#fefdfd' : '#1a1a1a';
-  return <div className={""} {...{
+  return <div className={"block"} {...{
     'data-server-popover': true
   } as any}>
       <button onClick={() => setPopoverVisible(value => !value)} role="button" aria-label="Switch server">
-        <div className={"" + " " + ""}>
+        <div className={" "}>
           <PiLogo size={14} color={isDark ? '#1a1a1a' : '#fff'} />
         </div>
-        <span className={"" + " " + ""}>{activeServer?.name ?? 'No Server'}</span>
+        <span className={" "}>{activeServer?.name ?? 'No Server'}</span>
         <ChevronDown size={12} color={textMuted} strokeWidth={2} />
       </button>
-      {popoverVisible && <div className={"" + " " + ""}>
-          <div className={""}><span className={"" + " " + ""}>Servers</span></div>
-          <div className={""}>
+      {popoverVisible && <div className={" "}>
+          <div className={"block"}><span className={" "}>Servers</span></div>
+          <div className={"block"}>
             {servers.map(server => {
           const isActive = server.id === activeServerId;
           const isSwitching = server.id === switchingId;
           return <button key={server.id} onClick={() => void handleSwitchServer(server)} disabled={isSwitching}>
-                  <div className={"" + " " + ""}><PiLogo size={10} color={isDark ? '#1a1a1a' : '#fff'} /></div>
-                  <div className={""}>
-                    <span className={"" + " " + ""}>{server.name}</span>
-                    <span className={"" + " " + ""}>{server.address}</span>
+                  <div className={" "}><PiLogo size={10} color={isDark ? '#1a1a1a' : '#fff'} /></div>
+                  <div className={"block"}>
+                    <span className={" "}>{server.name}</span>
+                    <span className={" "}>{server.address}</span>
                   </div>
                   {isActive && <Check size={14} color="#34C759" strokeWidth={2.5} />}
                 </button>;
         })}
           </div>
-          <div className={"" + " " + ""}>
+          <div className={" "}>
             <button onClick={() => {
           setPopoverVisible(false);
           router.push('/settings/servers');
         }}>
               <Settings size={13} color={textMuted} strokeWidth={1.8} />
-              <span className={"" + " " + ""}>管理服务器</span>
+              <span className={" "}>管理服务器</span>
             </button>
           </div>
         </div>}

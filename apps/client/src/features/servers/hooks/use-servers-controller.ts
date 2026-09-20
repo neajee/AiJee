@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import { Alert } from "@/platform/browser";
-import { useRouter } from "@/platform/router-adapter";
+import { useRouter } from "@/hooks/router";
 import QRCode from "qrcode";
 import { useOptionalPiClient } from "@aijee/client-sdk";
 import { useServersStore, type Server } from "@/features/servers/store";

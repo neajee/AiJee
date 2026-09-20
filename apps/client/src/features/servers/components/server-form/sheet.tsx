@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Keyboard, useWindowDimensions } from "@/platform/browser";
 import { useSafeAreaInsets } from "@/platform/browser";
-import Animated, { Easing, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from "@/platform/animation";
-import { Gesture } from "@/platform/animation";
+import Animated, { Easing, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from "@/styles/motion";
+import { Gesture } from "@/styles/motion";
 import { Colors } from '@/constants/theme';
 import { ABSOLUTE_FILL_STYLE } from '@/constants/layout';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -90,24 +90,24 @@ export function ServerFormSheet({
   return <div visible={visible} transparent animationType="none" onRequestClose={() => {
     if (!loading) dismiss();
   }}>
-      <div className={""}>
-        <div className={"" + " " + "" + " " + ""}>
-          <button className={""} onClick={loading ? undefined : dismiss} />
+      <div className={"block"}>
+        <div className={"  bg-black/50"}>
+          <button className={"block"} onClick={loading ? undefined : dismiss} />
         </div>
-        <div className={"" + " " + "pb-[0]"}>
+        <div className={"  pb-0"}>
           <div>
-            <div className={"" + " " + "pb-[0] max-h-[0]" + " " + ""}>
-              <div className={""}>
-                <div className={"" + " " + ""} />
+            <div className={"  pb-0 max-h-0"}>
+              <div className={"block"}>
+                <div className={"  bg-muted"} />
               </div>
-              <div className={""}>
-                <span className={"" + " " + ""}>
+              <div className={"block"}>
+                <span className={" "}>
                   {initial ? 'Edit Server' : 'Add Server'}
                 </span>
               </div>
               <div keyboardShouldPersistTaps="handled">
                 <ServerFormFields name={name} setName={setName} address={address} setAddress={setAddress} isDark={isDark} />
-                {error && <span className={"" + " " + ""}>
+                {error && <span className={" "}>
                     {error}
                   </span>}
                 <button onClick={() => {
@@ -115,8 +115,8 @@ export function ServerFormSheet({
                   name: name.trim(),
                   address: address.trim()
                 });
-              }} className={"" + " " + "" + " " + (!canSave ? "opacity-[0.4]" : "")} disabled={!canSave}>
-                  {loading ? <span size="small" color={isDark ? '#1a1a1a' : '#fff'} /> : <span className={"" + " " + ""}>
+              }} className={"  opacity-[0.4]"} disabled={!canSave}>
+                  {loading ? <span size="small" color={isDark ? '#1a1a1a' : '#fff'} /> : <span className={" "}>
                       {initial ? 'Save & Connect' : 'Add & Connect'}
                     </span>}
                 </button>

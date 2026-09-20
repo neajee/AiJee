@@ -26,31 +26,31 @@ export function ServerFormDesktopModal({
   const overlayBg = isDark ? 'rgba(0,0,0,0.6)' : 'rgba(0,0,0,0.3)';
   const canSave = Boolean(name.trim() && address.trim() && !loading);
   return <div visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <button className={"" + " " + ""} onClick={loading ? undefined : onClose}>
-        <button className={"" + " " + ""} onClick={() => {}}>
-          <div className={""}>
-            <span className={"" + " " + ""}>
+      <button className={" "} onClick={loading ? undefined : onClose}>
+        <button className={" "} onClick={() => {}}>
+          <div className={"block"}>
+            <span className={" "}>
               {initial ? 'Edit Server' : 'Add Server'}
             </span>
-            <button onClick={onClose} className={""} disabled={loading}>
+            <button onClick={onClose} className={"block"} disabled={loading}>
               <X size={18} color={textMuted} strokeWidth={1.8} />
             </button>
           </div>
           <ServerFormFields name={name} setName={setName} address={address} setAddress={setAddress} isDark={isDark} autoFocus />
-          {error && <span className={"" + " " + ""}>
+          {error && <span className={" "}>
               {error}
             </span>}
-          <div className={""}>
-            <button onClick={onClose} className={"" + " " + ""} disabled={loading}>
-              <span className={"" + " " + ""}>Cancel</span>
+          <div className={"block"}>
+            <button onClick={onClose} className={" "} disabled={loading}>
+              <span className={" "}>Cancel</span>
             </button>
             <button onClick={() => {
             if (canSave) onSave({
               name: name.trim(),
               address: address.trim()
             });
-          }} className={"" + " " + "" + " " + (!canSave ? "opacity-[0.4]" : "")} disabled={!canSave}>
-              {loading ? <span size="small" color="#fff" /> : <span className={"" + " " + ""}>
+          }} className={"  opacity-[0.4]"} disabled={!canSave}>
+              {loading ? <span size="small" color="#fff" /> : <span className={"  text-[#fff]"}>
                   {initial ? 'Save' : 'Add & Connect'}
                 </span>}
             </button>

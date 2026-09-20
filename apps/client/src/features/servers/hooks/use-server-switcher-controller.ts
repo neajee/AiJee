@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useRouter } from '@/platform/router-adapter';
+import { useRouter } from '@/hooks/router';
 
 import { useAuthStore } from '@/features/auth/store';
 import { useWorkspaceStore } from '@/features/workspace/store';
