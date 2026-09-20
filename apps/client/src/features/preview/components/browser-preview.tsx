@@ -17,8 +17,8 @@ export function BrowserPreview({
     sessionId,
     target
   }), [serverUrl, sessionId, target]);
-  return <div className={""}>
-      <iframe src={src} title={`Preview ${target.label}`} className={""} sandbox="allow-same-origin allow-scripts allow-forms allow-modals allow-popups allow-downloads" allow="clipboard-read; clipboard-write" />
+  return <div className={"block"}>
+      <iframe src={src} title={`Preview ${target.label}`} className={"block"} sandbox="allow-same-origin allow-scripts allow-forms allow-modals allow-popups allow-downloads" allow="clipboard-read; clipboard-write" />
     </div>;
 }
 const styles = {
