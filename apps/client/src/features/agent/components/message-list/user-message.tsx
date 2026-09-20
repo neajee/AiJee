@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { memo, useEffect, useMemo, useState } from "react";
 import { Check, ChevronDown, Pencil, X } from "lucide-react";
 import { Colors, Fonts } from "@/constants/theme";
@@ -58,53 +57,38 @@ export const UserMessage = memo(function UserMessage({
     window.addEventListener("blur", collapse);
     return () => window.removeEventListener("blur", collapse);
   }, []);
-  return <div className={toTailwind(styles.container)}>
-      <div className={toTailwind([styles.bubble, {
-      backgroundColor: colors.surfaceRaised
-    }])}>
-        {images.length > 0 && <div horizontal className={toTailwind(styles.images)}>
+  return <div className={""}>
+      <div className={"" + " " + ""}>
+        {images.length > 0 && <div horizontal className={""}>
             {images.map(img => <img key={img.id} src={{
           uri: `data:${img.mimeType || "image/png"};base64,${img.data}`
-        }} className={toTailwind(styles.image)} resizeMode="cover" />)}
+        }} className={""} resizeMode="cover" />)}
           </div>}
         {editing ? <>
-            <input autoFocus multiline value={editText} onChangeText={onChangeEdit} className={toTailwind([styles.editor, {
-          color: colors.text,
-          borderColor: colors.border
-        }])} selectionColor={colors.tint} />
-            <div className={toTailwind(styles.editActions)}>
-              <button onClick={onCancelEdit} aria-label="Cancel edit" className={toTailwind(styles.editButton)}>
+            <input autoFocus multiline value={editText} onChangeText={onChangeEdit} className={"" + " " + ""} selectionColor={colors.tint} />
+            <div className={""}>
+              <button onClick={onCancelEdit} aria-label="Cancel edit" className={""}>
                 <X size={14} color={colors.textTertiary} />
               </button>
-              <button onClick={onSubmitEdit} disabled={!editText.trim()} aria-label="Send edited message" className={toTailwind([styles.editButton, {
-            backgroundColor: colors.tint
-          }])}>
+              <button onClick={onSubmitEdit} disabled={!editText.trim()} aria-label="Send edited message" className={"" + " " + ""}>
                 <Check size={14} color={colors.background} />
               </button>
             </div>
           </> : !!message.text && <>
-            <span className={toTailwind([styles.text, {
-          color: colors.text
-        }])} selectable>
+            <span className={"" + " " + ""} selectable>
               {expanded || !collapsible ? message.text : preview}
             </span>
-            {collapsible && <div className={toTailwind(styles.disclosureRow)}>
-                <div className={toTailwind([styles.disclosureLine, {
-            backgroundColor: colors.border
-          }])} />
+            {collapsible && <div className={""}>
+                <div className={"" + " " + ""} />
                 <button onClick={() => setExpanded(value => !value)} role="button" aria-label={expanded ? "收起长消息" : "展开长消息"}>
-                  <span className={toTailwind([styles.disclosureText, {
-              color: colors.textTertiary
-            }])}>{expanded ? "收起" : "展开全文"}</span>
-                  <ChevronDown size={12} color={colors.textTertiary} className={toTailwind(expanded && styles.disclosureIconExpanded)} />
+                  <span className={"" + " " + ""}>{expanded ? "收起" : "展开全文"}</span>
+                  <ChevronDown size={12} color={colors.textTertiary} className={expanded ? "" : ""} />
                 </button>
-                <div className={toTailwind([styles.disclosureLine, {
-            backgroundColor: colors.border
-          }])} />
+                <div className={"" + " " + ""} />
               </div>}
           </>}
       </div>
-      {!editing && onEdit && <button onClick={onEdit} role="button" aria-label="Edit message" className={toTailwind(styles.editTrigger)}>
+      {!editing && onEdit && <button onClick={onEdit} role="button" aria-label="Edit message" className={""}>
           <Pencil size={13} color={colors.textTertiary} strokeWidth={1.8} />
         </button>}
     </div>;

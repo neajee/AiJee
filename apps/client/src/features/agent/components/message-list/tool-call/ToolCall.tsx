@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { memo, useMemo } from 'react';
 import type { ToolCallInfo } from '../agent-types';
 import { BashToolCall } from './bash-tool-call';
@@ -10,7 +9,6 @@ import { SubagentToolCall } from './subagent-tool-call';
 import { GenericToolCall } from './generic-tool-call';
 import { GroupedToolCalls } from './grouped-tool-calls';
 import { groupToolCalls } from '../../../utils/tool-call-grouping';
-import { styles } from './style-tokens';
 export const ToolCallGroup = memo(function ToolCallGroup({
   toolCalls,
   isDark
@@ -20,7 +18,7 @@ export const ToolCallGroup = memo(function ToolCallGroup({
 }) {
   const groups = useMemo(() => groupToolCalls(toolCalls), [toolCalls]);
   if (!groups.length) return null;
-  return <div className={toTailwind(styles.container)}>{groups.map(group => group.calls.length === 1 ? <SingleToolCall key={group.key} tc={group.calls[0]} isDark={isDark} /> : <GroupedToolCalls key={group.key} toolName={group.toolName} calls={group.calls} isDark={isDark} />)}</div>;
+  return <div className={""}>{groups.map(group => group.calls.length === 1 ? <SingleToolCall key={group.key} tc={group.calls[0]} isDark={isDark} /> : <GroupedToolCalls key={group.key} toolName={group.toolName} calls={group.calls} isDark={isDark} />)}</div>;
 });
 function SingleToolCall({
   tc,

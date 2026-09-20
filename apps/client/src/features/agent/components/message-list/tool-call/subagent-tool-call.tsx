@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { memo, useCallback, useMemo, useState } from "react";
 import { Colors, Fonts } from "@/constants/theme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
@@ -54,22 +53,16 @@ export const SubagentToolCall = memo(function SubagentToolCall({
   }, [active, meta, tc.progress, tc.status]);
   return <div>
       <ToolHeader expanded={expanded} expandable={hasDetail} onToggle={toggle} isDark={isDark} alignTop aria-label={`${expanded ? "Collapse" : "Expand"} details of ${agentName}`}>
-        <div className={toTailwind(styles.headerText)}>
-          <div className={toTailwind(styles.headerTopRow)}>
-            <span className={toTailwind([styles.agentName, {
-            color: colors.textSecondary
-          }])}>
+        <div className={""}>
+          <div className={""}>
+            <span className={"" + " " + ""}>
               {agentName}
             </span>
-            {!!metaItems.length && <span className={toTailwind([styles.metaInline, {
-            color: colors.textTertiary
-          }])}>
+            {!!metaItems.length && <span className={"" + " " + ""}>
                 {metaItems.join(" • ")}
               </span>}
           </div>
-          {task ? <span className={toTailwind([styles.task, {
-          color: colors.textTertiary
-        }])}>
+          {task ? <span className={"" + " " + ""}>
               {task}
             </span> : null}
         </div>
@@ -77,34 +70,24 @@ export const SubagentToolCall = memo(function SubagentToolCall({
 
       <ToolBody expanded={expanded && hasDetail}>
         <ToolSurface isDark={isDark}>
-          <div className={toTailwind(styles.scroll)} nestedScrollEnabled>
-            {recentTools.length > 0 && <div className={toTailwind(styles.section)}>
-                <span className={toTailwind([styles.sectionLabel, {
-              color: colors.textTertiary
-            }])}>Steps</span>
-                {recentTools.map((step, i) => <span key={i} className={toTailwind([styles.stepText, {
-              color: colors.textSecondary
-            }])}>
+          <div className={""} nestedScrollEnabled>
+            {recentTools.length > 0 && <div className={""}>
+                <span className={"" + " " + ""}>Steps</span>
+                {recentTools.map((step, i) => <span key={i} className={"" + " " + ""}>
                     {step.tool}({step.args})
                   </span>)}
               </div>}
 
-            {recentOutput.length > 0 && !transcript && <div className={toTailwind(styles.section)}>
-                <span className={toTailwind([styles.sectionLabel, {
-              color: colors.textTertiary
-            }])}>Output</span>
-                {recentOutput.map((line, i) => <span key={`o-${i}`} className={toTailwind([styles.outputText, {
-              color: colors.textSecondary
-            }])}>
+            {recentOutput.length > 0 && !transcript && <div className={""}>
+                <span className={"" + " " + ""}>Output</span>
+                {recentOutput.map((line, i) => <span key={`o-${i}`} className={"" + " " + ""}>
                     {line}
                   </span>)}
               </div>}
 
-            {!!transcript && <div className={toTailwind(styles.section)}>
-                {(recentTools.length > 0 || recentOutput.length > 0 || hasProgressMeta) && <span className={toTailwind([styles.sectionLabel, {
-              color: colors.textTertiary
-            }])}>Transcript</span>}
-                <div className={toTailwind(styles.markdownWrap)}>{markdownElements}</div>
+            {!!transcript && <div className={""}>
+                {(recentTools.length > 0 || recentOutput.length > 0 || hasProgressMeta) && <span className={"" + " " + ""}>Transcript</span>}
+                <div className={""}>{markdownElements}</div>
               </div>}
           </div>
         </ToolSurface>

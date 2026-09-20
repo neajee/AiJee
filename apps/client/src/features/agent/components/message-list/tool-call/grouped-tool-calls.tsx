@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { memo, useEffect, useRef, useState } from 'react';
 import { Animated } from "@/platform/animation";
 import { useThemeTokens } from '@/hooks/use-theme-tokens';
@@ -6,7 +5,6 @@ import type { ToolCallInfo } from '../agent-types';
 import { isToolActive } from '../../../utils/message-list';
 import { ToolBody, ToolHeader } from './tool-disclosure';
 import { formatSingleLine } from '../../../utils/tool-call-grouping';
-import { styles } from './style-tokens';
 const MAX_VISIBLE = 5;
 const GROUP_LABELS: Record<string, {
   before: string;
@@ -66,26 +64,16 @@ export const GroupedToolCalls = memo(function GroupedToolCalls({
   const visible = expanded ? showAll ? calls : calls.slice(0, MAX_VISIBLE) : [];
   return <div>
       <ToolHeader expanded={expanded} expandable onToggle={() => setExpanded(value => !value)} isDark={isDark} aria-label={`${expanded ? 'Collapse' : 'Expand'} ${calls.length} ${toolName} calls`}>
-        <div className={toTailwind(styles.labelRow)}>
-          <span className={toTailwind([styles.groupLabel, {
-          color: colors.text
-        }])}>{activeCall ? base.activeBefore ?? base.before : base.before}</span>
-          <AnimatedNumber value={calls.length} className={toTailwind([styles.groupLabel, {
-          color: colors.text
-        }])} />
-          <span className={toTailwind([styles.groupLabel, {
-          color: colors.text
-        }])}>{toolName === 'read' ? ' files' : base.after}</span>
+        <div className={""}>
+          <span className={"" + " " + ""}>{activeCall ? base.activeBefore ?? base.before : base.before}</span>
+          <AnimatedNumber value={calls.length} className={"" + " " + ""} />
+          <span className={"" + " " + ""}>{toolName === 'read' ? ' files' : base.after}</span>
         </div>
       </ToolHeader>
       <ToolBody expanded={expanded}>
-        <div className={toTailwind(styles.expandedList)}>
-          {visible.map(call => <div key={call.id} className={toTailwind(styles.expandedItem)}><span className={toTailwind([styles.expandedItemText, {
-            color: colors.textSecondary
-          }])}>{formatSingleLine(call)}</span></div>)}
-          {calls.length > MAX_VISIBLE && !showAll && <button role="button" onClick={() => setShowAll(true)}><span className={toTailwind([styles.showMoreText, {
-            color: colors.textTertiary
-          }])}>Show {calls.length - MAX_VISIBLE} more…</span></button>}
+        <div className={""}>
+          {visible.map(call => <div key={call.id} className={""}><span className={"" + " " + ""}>{formatSingleLine(call)}</span></div>)}
+          {calls.length > MAX_VISIBLE && !showAll && <button role="button" onClick={() => setShowAll(true)}><span className={"" + " " + ""}>Show {calls.length - MAX_VISIBLE} more…</span></button>}
         </div>
       </ToolBody>
     </div>;
@@ -116,8 +104,5 @@ function AnimatedNumber({
       }).start();
     });
   }, [opacity, value]);
-  return <span className={toTailwind([style, {
-    opacity,
-    fontVariant: ['tabular-nums']
-  }])}>{display}</span>;
+  return <span className={"" + " " + "opacity-[null]"}>{display}</span>;
 }

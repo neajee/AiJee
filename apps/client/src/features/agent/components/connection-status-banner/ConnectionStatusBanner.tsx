@@ -1,6 +1,4 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { Animated } from "@/platform/animation";
-import { styles } from './style-tokens';
 import type { ConnectionStatusBannerViewProps } from './component-types';
 export function ConnectionStatusBannerView({
   bottomPad,
@@ -13,21 +11,18 @@ export function ConnectionStatusBannerView({
   message,
   onRetry
 }: ConnectionStatusBannerViewProps) {
-  return <div className={toTailwind([styles.strip, {
-    height: heightAnim,
-    paddingBottom: bottomPad
-  }])}>
-      <div className={toTailwind([styles.content, isCompact && styles.contentCompact])}>
-        <span className={toTailwind(styles.text)}>
+  return <div className={"" + " " + "h-[0] pb-[0]"}>
+      <div className={"" + " " + (isCompact ? "" : "")}>
+        <span className={""}>
           {message}
         </span>
         <button role="button" accessibilityState={{
         busy: isAttemptInFlight,
         disabled: isAttemptInFlight
       }} disabled={isAttemptInFlight} onClick={onRetry}>
-          <div className={toTailwind(styles.retryButtonContent)}>
-            {isAttemptInFlight ? <span size="small" color="#A22E26" className={toTailwind(styles.retrySpinner)} /> : null}
-            <span className={toTailwind(styles.retryButtonText)}>
+          <div className={""}>
+            {isAttemptInFlight ? <span size="small" color="#A22E26" className={""} /> : null}
+            <span className={""}>
               {hasConnectionIssue ? isWaitingToRetry ? 'Retry now' : isAttemptInFlight ? 'Retrying…' : 'Retry' : 'Dismiss'}
             </span>
           </div>

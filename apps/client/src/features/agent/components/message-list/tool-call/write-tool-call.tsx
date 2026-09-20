@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { memo, useCallback, useState } from "react";
 import { Colors, Fonts } from "@/constants/theme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
@@ -28,14 +27,10 @@ export const WriteToolCall = memo(function WriteToolCall({
   const title = active ? "Writing" : "Wrote";
   return <div>
       <ToolHeader expanded={expanded} expandable={hasContent} onToggle={toggle} isDark={isDark} aria-label={`${expanded ? "Collapse" : "Expand"} contents of ${fileName || "file"}`}>
-        <span className={toTailwind([styles.fileName, {
-        color: colors.textSecondary
-      }])}>
+        <span className={"" + " " + ""}>
           {title} {fileName || filePath || "file"}
         </span>
-        {addedLines > 0 && <span className={toTailwind([styles.metaAdd, {
-        color: isDark ? "#3FB950" : "#1A7F37"
-      }])}>
+        {addedLines > 0 && <span className={"" + " " + ""}>
             +{addedLines}
           </span>}
       </ToolHeader>

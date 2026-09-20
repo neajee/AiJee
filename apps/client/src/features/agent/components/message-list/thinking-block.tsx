@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Brain, ChevronRight } from "lucide-react";
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withSequence, withTiming } from "@/platform/animation";
@@ -94,24 +93,20 @@ export const ThinkingBlock = memo(function ThinkingBlock({
   return <div>
       <button onClick={toggle} disabled={!text} role="button" aria-label={expanded ? "Collapse thinking" : "Expand thinking"} accessibilityState={{
       expanded
-    }} className={toTailwind(styles.header)}>
-        <div className={toTailwind(breathStyle)}>
+    }} className={""}>
+        <div className={""}>
           <Brain size={12} color={colors.textTertiary} strokeWidth={1.8} />
         </div>
-        <span className={toTailwind([styles.label, peek ? styles.peekText : null, {
-        color: colors.textTertiary
-      }, peek ? null : breathStyle])} ellipsizeMode="tail">
+        <span className={"" + " " + (peek ? "" : "") + " " + "" + " " + (peek ? "" : "")} ellipsizeMode="tail">
           {headline}
         </span>
-        {!!text && <div className={toTailwind(chevronStyle)}>
+        {!!text && <div className={""}>
             <ChevronRight size={11} color={colors.textTertiary} strokeWidth={2} />
           </div>}
       </button>
 
       <AnimatedCollapse expanded={expanded}>
-        <span className={toTailwind([styles.text, {
-        color: colors.textSecondary
-      }])} selectable>
+        <span className={"" + " " + ""} selectable>
           {text}
         </span>
       </AnimatedCollapse>

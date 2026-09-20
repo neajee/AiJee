@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import Animated, { Easing, FadeIn, useAnimatedStyle, useSharedValue, withTiming } from "@/platform/animation";
 import { ChevronRight, GitFork } from "lucide-react";
@@ -10,7 +9,6 @@ import { TurnSummary } from "./turn-summary";
 import { WorkActivityGroup } from "./work-activity-group";
 import { WorkStepView } from "./work-step";
 import { useTurnElapsed } from "../../hooks/use-turn-elapsed";
-import { styles } from "./style-tokens";
 
 /**
  * A whole assistant turn: the work history behind one "Worked for X" divider,
@@ -75,28 +73,20 @@ export const TurnBlock = memo(function TurnBlock({
   const timeLabel = active ? formatDuration(Math.max(1000, elapsedMs)) : settledMs ? formatDuration(settledMs) : null;
   const showDivider = hasWork || active || !!settledMs;
   const forkEntryId = turn.final?.entryId ?? turn.sourceEntryId;
-  const divider = <div className={toTailwind(styles.dividerWrap)}>
-      <div className={toTailwind([styles.dividerLine, {
-      backgroundColor: colors.border
-    }])} />
-      <div className={toTailwind(styles.dividerCenter)}>
-        <span className={toTailwind([styles.dividerText, {
-        color: colors.textTertiary
-      }])}>
+  const divider = <div className={""}>
+      <div className={"" + " " + ""} />
+      <div className={""}>
+        <span className={"" + " " + ""}>
           {label}
         </span>
-        {timeLabel && <span className={toTailwind([styles.dividerTime, {
-        color: colors.textTertiary
-      }])}>
+        {timeLabel && <span className={"" + " " + ""}>
             {timeLabel}
           </span>}
-        {hasWork && <div className={toTailwind([styles.dividerChevron, chevronStyle])}>
+        {hasWork && <div className={"" + " " + ""}>
             <ChevronRight size={12} color={colors.textTertiary} strokeWidth={2} />
           </div>}
       </div>
-      <div className={toTailwind([styles.dividerLine, {
-      backgroundColor: colors.border
-    }])} />
+      <div className={"" + " " + ""} />
     </div>;
   return <div {...true ? {
     onPointerEnter: () => setHovered(true),
@@ -106,27 +96,20 @@ export const TurnBlock = memo(function TurnBlock({
             {divider}
           </button> : divider)}
 
-      {hasWork && expanded && <div entering={FadeIn.duration(140)} className={toTailwind([styles.workLog, {
-      borderLeftColor: colors.border
-    }])}>
+      {hasWork && expanded && <div entering={FadeIn.duration(140)} className={"" + " " + ""}>
           {sections.map(section => section.kind === "activity" ? <WorkActivityGroup key={section.key} steps={section.steps} isDark={isDark} /> : <WorkStepView key={section.key} step={section.step} isDark={isDark} />)}
         </div>}
 
       {turn.final && <AssistantMessage message={turn.final} isDark={isDark} />}
-      {turn.aborted && <span className={toTailwind([styles.turnNotice, {
-      color: colors.textTertiary
-    }])}>
+      {turn.aborted && <span className={"" + " " + ""}>
           Stopped
         </span>}
       {turn.fileStats && <TurnSummary stats={turn.fileStats} changes={fileChanges} isDark={isDark} />}
       {/* Last in the turn: the answer, then what it changed, then the actions. */}
-      {turn.final && !turn.final.isStreaming && (turn.final.text || turn.final.errorMessage) && <div className={toTailwind(styles.turnToolbar)}>
+      {turn.final && !turn.final.isStreaming && (turn.final.text || turn.final.errorMessage) && <div className={""}>
           <MessageToolbar message={turn.final} isDark={isDark} hovered={hovered} />
-          {forkEntryId && onFork && <button onClick={() => onFork(forkEntryId)} disabled={active || !!forkingEntryId} role="button" aria-label="Fork from this reply" className={toTailwind(styles.actionButton)}>
-              {forkingEntryId === forkEntryId ? <span size="small" color={colors.textTertiary} className={toTailwind({
-          width: 12,
-          height: 12
-        })} /> : <GitFork size={14} color={colors.textTertiary} strokeWidth={1.8} />}
+          {forkEntryId && onFork && <button onClick={() => onFork(forkEntryId)} disabled={active || !!forkingEntryId} role="button" aria-label="Fork from this reply" className={""}>
+              {forkingEntryId === forkEntryId ? <span size="small" color={colors.textTertiary} className={"w-[12px] h-[12px]"} /> : <GitFork size={14} color={colors.textTertiary} strokeWidth={1.8} />}
             </button>}
         </div>}
     </div>;

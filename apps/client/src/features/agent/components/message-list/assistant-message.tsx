@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { memo, useCallback, useEffect, useState } from "react";
 import * as Clipboard from "@/platform/clipboard";
 import { Copy } from "lucide-react";
@@ -32,17 +31,13 @@ export const AssistantMessage = memo(function AssistantMessage({
   const hasText = !!message.text;
   const hasError = !!message.errorMessage;
   const isStreaming = !!message.isStreaming;
-  return <div className={toTailwind(styles.container)}>
-      {hasText && <div className={toTailwind(styles.textBlock)}>
+  return <div className={""}>
+      {hasText && <div className={""}>
           <AssistantMarkdown text={message.text} isStreaming={isStreaming} />
         </div>}
 
-      {hasError && <div className={toTailwind([styles.errorBlock, {
-      backgroundColor: isDark ? "rgba(255,69,58,0.08)" : "rgba(255,59,48,0.05)"
-    }])}>
-          <span className={toTailwind([styles.errorText, {
-        color: colors.destructive
-      }])}>
+      {hasError && <div className={"" + " " + ""}>
+          <span className={"" + " " + ""}>
             {message.errorMessage}
           </span>
         </div>}
@@ -79,15 +74,11 @@ export const MessageToolbar = memo(function MessageToolbar({
     setTimeout(() => setCopied(false), 1500);
   }, [message.text]);
   return <>
-      <div className={toTailwind(styles.toolbarWrap)}>
-        <div className={toTailwind([styles.toolbar, animStyle])}>
-          <div className={toTailwind(styles.toolbarBtns)}>
-            <button onClick={handleCopy} className={toTailwind([styles.toolbarBtn, copied && {
-            backgroundColor: colors.surfaceRaised
-          }])} hitSlop={4}>
-              {copied ? <span className={toTailwind([styles.copiedText, {
-              color: colors.textTertiary
-            }])}>✓</span> : <Copy size={13} color={colors.textTertiary} strokeWidth={1.8} />}
+      <div className={""}>
+        <div className={"" + " " + ""}>
+          <div className={""}>
+            <button onClick={handleCopy} className={"" + " " + (copied ? "" : "")} hitSlop={4}>
+              {copied ? <span className={"" + " " + ""}>✓</span> : <Copy size={13} color={colors.textTertiary} strokeWidth={1.8} />}
             </button>
           </div>
         </div>

@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { memo, useCallback, useMemo, useState } from "react";
 import { useWorkspaceStore } from "@/features/workspace/store";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
@@ -6,7 +5,8 @@ import type { TurnFileStats } from "../agent-types";
 import { basename, relativePath, type TurnFileChange } from "../../utils/message-list";
 import { ToolBody, ToolHeader, ToolSurface } from "./tool-call/tool-disclosure";
 import { FileChangeRow } from "./file-change-row";
-import { SUMMARY_BLOCKS, SUMMARY_ROW_HEIGHT, SUMMARY_SCROLL_AFTER, styles } from "./style-tokens";
+const SUMMARY_BLOCKS = 5;
+const SUMMARY_SCROLL_AFTER = 8;
 export const TurnSummary = memo(function TurnSummary({
   stats,
   changes,
@@ -45,45 +45,33 @@ export const TurnSummary = memo(function TurnSummary({
   }
   if (totalFiles === 0) return null;
   const expandable = ordered.length > 0;
-  return <div className={toTailwind(styles.summaryWrap)}>
+  return <div className={""}>
       <ToolSurface isDark={isDark} padded={false}>
-        <div className={toTailwind(styles.summaryHeader)}>
+        <div className={""}>
           <ToolHeader expanded={expanded} expandable={expandable} onToggle={toggle} isDark={isDark} aria-label={`${expanded ? "Collapse" : "Expand"} the list of changed files`}>
-            <span className={toTailwind([styles.summaryTitle, {
-            color: colors.textSecondary
-          }])}>
+            <span className={"" + " " + ""}>
               {totalFiles} {totalFiles === 1 ? "file" : "files"} changed
             </span>
             {/* Keeps the counts on the trailing edge, next to the chevron. */}
-            <div className={toTailwind(styles.summarySpacer)} />
-            <span className={toTailwind(styles.summaryLineCount)}>
-              {stats.linesAdded > 0 && <span className={toTailwind({
-              color: addColor
-            })}>+{stats.linesAdded}</span>}
+            <div className={""} />
+            <span className={""}>
+              {stats.linesAdded > 0 && <span className={""}>+{stats.linesAdded}</span>}
               {stats.linesAdded > 0 && stats.linesRemoved > 0 && " "}
-              {stats.linesRemoved > 0 && <span className={toTailwind({
-              color: removeColor
-            })}>{"−"}{stats.linesRemoved}</span>}
+              {stats.linesRemoved > 0 && <span className={""}>{"−"}{stats.linesRemoved}</span>}
             </span>
-            <div className={toTailwind(styles.summaryBlocks)}>
+            <div className={""}>
               {Array.from({
               length: addBlocks
-            }).map((_, i) => <div key={`a-${i}`} className={toTailwind([styles.summaryBlock, {
-              backgroundColor: addColor
-            }])} />)}
+            }).map((_, i) => <div key={`a-${i}`} className={"" + " " + ""} />)}
               {Array.from({
               length: removeBlocks
-            }).map((_, i) => <div key={`r-${i}`} className={toTailwind([styles.summaryBlock, {
-              backgroundColor: removeColor
-            }])} />)}
+            }).map((_, i) => <div key={`r-${i}`} className={"" + " " + ""} />)}
             </div>
           </ToolHeader>
         </div>
 
         {expandable && <ToolBody expanded={expanded}>
-            <div className={toTailwind([styles.summaryList, {
-          borderTopColor: colors.border
-        }])}
+            <div className={"" + " " + ""}
         // A turn can touch dozens of files; cap it like any tool body.
         nestedScrollEnabled scrollEnabled={ordered.length > SUMMARY_SCROLL_AFTER}>
               {ordered.map(change => <FileChangeRow key={change.path} change={change} root={root} addColor={addColor} removeColor={removeColor} isDark={isDark} />)}

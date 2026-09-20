@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { memo, type ReactNode } from "react";
 import { ChevronRight } from "lucide-react";
 import Animated, { Easing, useAnimatedStyle, useDerivedValue, withTiming } from "@/platform/animation";
@@ -51,7 +50,7 @@ export const ToolHeader = memo(function ToolHeader({
   }));
   const row = [styles.header, alignTop && styles.headerTop];
   if (!expandable) {
-    return <div className={toTailwind(row)}>{children}</div>;
+    return <div className={""}>{children}</div>;
   }
   return <button onClick={onToggle} role="button" aria-label={accessibilityLabel} accessibilityState={{
     expanded
@@ -62,7 +61,7 @@ export const ToolHeader = memo(function ToolHeader({
     right: 8
   }}>
       {children}
-      <div className={toTailwind([styles.chevron, alignTop && styles.chevronTop, chevronStyle])}>
+      <div className={"" + " " + (alignTop ? "" : "") + " " + ""}>
         <ChevronRight size={CHEVRON_SIZE} color={colors.textTertiary} strokeWidth={2} />
       </div>
     </button>;
@@ -81,7 +80,7 @@ export function ToolBody({
   children: ReactNode;
 }) {
   return <AnimatedCollapse expanded={expanded}>
-      <div className={toTailwind(styles.body)}>{children}</div>
+      <div className={""}>{children}</div>
     </AnimatedCollapse>;
 }
 
@@ -99,10 +98,7 @@ export function ToolSurface({
   children: ReactNode;
 }) {
   const colors = useThemeTokens();
-  return <div className={toTailwind([styles.surface, padded && styles.surfacePadded, {
-    backgroundColor: colors.surfaceRaised,
-    borderColor: colors.border
-  }])}>
+  return <div className={"" + " " + (padded ? "" : "") + " " + ""}>
       {children}
     </div>;
 }

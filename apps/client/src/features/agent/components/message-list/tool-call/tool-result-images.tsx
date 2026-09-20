@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { memo, useCallback, useState } from "react";
 import type { ToolResultImage } from "../agent-types";
 interface ToolResultImagesProps {
@@ -14,24 +13,22 @@ export const ToolResultImages = memo(function ToolResultImages({
   const closePreview = useCallback(() => setPreviewUri(null), []);
   if (!images.length) return null;
   return <>
-      <div className={toTailwind(styles.container)}>
+      <div className={""}>
         {images.map((img, i) => {
         const uri = img.data.startsWith("data:") ? img.data : `data:${img.mimeType};base64,${img.data}`;
-        return <button key={i} onClick={() => openPreview(uri)} className={toTailwind([styles.thumbWrap, {
-          backgroundColor: isDark ? "#1a1a1a" : "#f0f0f0"
-        }])}>
+        return <button key={i} onClick={() => openPreview(uri)} className={"" + " " + ""}>
               <img src={{
             uri
-          }} className={toTailwind(styles.thumb)} resizeMode="contain" />
+          }} className={""} resizeMode="contain" />
             </button>;
       })}
       </div>
       {previewUri && <div visible transparent animationType="fade" onRequestClose={closePreview}>
-          <button className={toTailwind(styles.overlay)} onClick={closePreview}>
-            <div className={toTailwind(styles.previewWrap)}>
+          <button className={""} onClick={closePreview}>
+            <div className={""}>
               <img src={{
             uri: previewUri
-          }} className={toTailwind(styles.previewImage)} resizeMode="contain" />
+          }} className={""} resizeMode="contain" />
             </div>
           </button>
         </div>}

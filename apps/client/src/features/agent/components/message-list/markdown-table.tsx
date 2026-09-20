@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { cloneElement, isValidElement, memo, type ReactElement, type ReactNode } from "react";
 import { Colors } from "@/constants/theme";
 import { HAIRLINE_WIDTH } from "@/constants/layout";
@@ -53,40 +52,25 @@ export const MarkdownTable = memo(function MarkdownTable({
     flex: 1,
     minWidth: 0
   };
-  const table = <div className={toTailwind([styles.table, {
-    borderColor: colors.border,
-    backgroundColor: colors.background,
-    minWidth: scrolls ? undefined : "100%"
-  }])}>
-      {header.length > 0 && <div className={toTailwind([styles.row, {
-      backgroundColor: colors.surfaceRaised
-    }])}>
-          {header.map((cell, index) => <div key={index} className={toTailwind([styles.cell, cellStyle, index > 0 && {
-        borderLeftWidth: HAIRLINE_WIDTH,
-        borderLeftColor: colors.border
-      }])}>
+  const table = <div className={"" + " " + ""}>
+      {header.length > 0 && <div className={"" + " " + ""}>
+          {header.map((cell, index) => <div key={index} className={"" + " " + "" + " " + (index > 0 ? "" : "")}>
               {/* Header cells arrive as inline nodes; wrapping in Text keeps the
                   emphasis without a second block-level box. */}
-              <span className={toTailwind([styles.cellText, styles.headerText])}>
+              <span className={"" + " " + ""}>
                 {normalizeCellTypography(cell)}
               </span>
             </div>)}
         </div>}
 
-      {rows.map((row, rowIndex) => <div key={rowIndex} className={toTailwind([styles.row, {
-      borderTopWidth: HAIRLINE_WIDTH,
-      borderTopColor: colors.border
-    }])}>
-          {row.map((cell, cellIndex) => <div key={cellIndex} className={toTailwind([styles.cell, cellStyle, cellIndex > 0 && {
-        borderLeftWidth: HAIRLINE_WIDTH,
-        borderLeftColor: colors.border
-      }])}>
+      {rows.map((row, rowIndex) => <div key={rowIndex} className={"" + " " + ""}>
+          {row.map((cell, cellIndex) => <div key={cellIndex} className={"" + " " + "" + " " + (cellIndex > 0 ? "" : "")}>
               {normalizeCellTypography(cell)}
             </div>)}
         </div>)}
     </div>;
-  if (!scrolls) return <div className={toTailwind(styles.wrap)}>{table}</div>;
-  return <div horizontal className={toTailwind(styles.wrap)}>
+  if (!scrolls) return <div className={""}>{table}</div>;
+  return <div horizontal className={""}>
       {table}
     </div>;
 });

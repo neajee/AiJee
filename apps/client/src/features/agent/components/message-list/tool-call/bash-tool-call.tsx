@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { memo, useCallback, useRef, useState } from "react";
 import { Colors, Fonts } from "@/constants/theme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
@@ -53,32 +52,22 @@ export const BashToolCall = memo(function BashToolCall({
   const hasOutput = !!displayOutput;
   return <div>
       <ToolHeader expanded={expanded} expandable={hasOutput} onToggle={toggle} isDark={isDark} aria-label={`${expanded ? "Collapse" : "Expand"} output of ${command || "bash"}`}>
-        <span className={toTailwind([styles.ranLabel, {
-        color: colors.textSecondary
-      }])} ellipsizeMode="tail">
-          Ran <span className={toTailwind([styles.command, {
-          color: colors.text
-        }])}>{command || "bash"}</span>
+        <span className={"" + " " + ""} ellipsizeMode="tail">
+          Ran <span className={"" + " " + ""}>{command || "bash"}</span>
           {cdPath ? <span>
               {" in "}
-              <span className={toTailwind([styles.command, {
-            color: colors.text
-          }])}>{cdPath}</span>
+              <span className={"" + " " + ""}>{cdPath}</span>
             </span> : null}
         </span>
       </ToolHeader>
 
       {hasOutput && <ToolBody expanded={expanded}>
           <ToolSurface isDark={isDark}>
-            <div ref={scrollRef} className={toTailwind(styles.scroll)} nestedScrollEnabled onContentSizeChange={handleOutputGrowth} onScrollBeginDrag={stopFollowing}>
-              <span className={toTailwind([styles.outputText, {
-            color: colors.textSecondary
-          }])} selectable>
+            <div ref={scrollRef} className={""} nestedScrollEnabled onContentSizeChange={handleOutputGrowth} onScrollBeginDrag={stopFollowing}>
+              <span className={"" + " " + ""} selectable>
                 {displayOutput}
               </span>
-              {truncated && <span className={toTailwind([styles.truncatedText, {
-            color: colors.textTertiary
-          }])}>
+              {truncated && <span className={"" + " " + ""}>
                   … output truncated
                 </span>}
             </div>

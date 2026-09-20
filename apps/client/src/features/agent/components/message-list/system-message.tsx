@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { memo, useState } from "react";
 import { Colors, Fonts } from "@/constants/theme";
 import { HAIRLINE_WIDTH } from "@/constants/layout";
@@ -16,33 +15,23 @@ export const SystemMessage = memo(function SystemMessage({
   const colors = useThemeTokens();
   const [expanded, setExpanded] = useState(false);
   if (message.systemKind === "compaction") {
-    return <div className={toTailwind(styles.compactionWrap)}>
-        <div className={toTailwind([styles.divider, {
-        backgroundColor: colors.border
-      }])} />
-        <button role="button" aria-label="Toggle compaction summary" onClick={() => setExpanded(value => !value)} className={toTailwind(styles.compactionTrigger)}>
-          <span className={toTailwind([styles.compactionLabel, {
-          color: colors.textTertiary
-        }])}>
+    return <div className={""}>
+        <div className={"" + " " + ""} />
+        <button role="button" aria-label="Toggle compaction summary" onClick={() => setExpanded(value => !value)} className={""}>
+          <span className={"" + " " + ""}>
             上下文已压缩{message.compactionTokensBefore !== undefined ? ` · ${message.compactionTokensBefore.toLocaleString()} tokens` : ""}
           </span>
         </button>
-        <div className={toTailwind([styles.divider, {
-        backgroundColor: colors.border
-      }])} />
-        {expanded && message.text ? <div className={toTailwind(styles.summary)}>
+        <div className={"" + " " + ""} />
+        {expanded && message.text ? <div className={""}>
             <AssistantMarkdown text={message.text} />
           </div> : null}
       </div>;
   }
   const label = message.systemKind === "bashExecution" ? `$ ${message.command || "command"}` : message.text || "System event";
-  return <div className={toTailwind(styles.container)}>
-      <div className={toTailwind([styles.pill, {
-      backgroundColor: colors.surfaceRaised
-    }])}>
-        <span className={toTailwind([styles.text, {
-        color: colors.textTertiary
-      }])}>
+  return <div className={""}>
+      <div className={"" + " " + ""}>
+        <span className={"" + " " + ""}>
           {label}
         </span>
       </div>

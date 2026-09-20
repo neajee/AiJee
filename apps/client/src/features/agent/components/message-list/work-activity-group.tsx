@@ -1,11 +1,9 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { memo, useEffect, useMemo, useState } from "react";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { formatTurnAction, summarizeTurnActions, type WorkStep } from "../../utils/turns";
 import { isToolActive } from "../../utils/message-list";
 import { ToolBody, ToolHeader } from "./tool-call/tool-disclosure";
 import { WorkStepView } from "./work-step";
-import { styles } from "./style-tokens";
 export const WorkActivityGroup = memo(function WorkActivityGroup({
   steps,
   isDark
@@ -29,16 +27,14 @@ export const WorkActivityGroup = memo(function WorkActivityGroup({
   const expanded = override ?? autoExpanded;
   const actions = useMemo(() => summarizeTurnActions(steps), [steps]);
   const label = actions.length ? actions.map(formatTurnAction).join(" · ") : running ? "Thinking" : "Thought";
-  return <div className={toTailwind(styles.activityGroup)}>
+  return <div className={""}>
       <ToolHeader expanded={expanded} expandable onToggle={() => setOverride(!expanded)} isDark={isDark} aria-label={`${expanded ? "Collapse" : "Expand"} ${label}`}>
-        <span className={toTailwind([styles.activityLabel, {
-        color: colors.textSecondary
-      }])}>
+        <span className={"" + " " + ""}>
           {label}
         </span>
       </ToolHeader>
       <ToolBody expanded={expanded}>
-        <div className={toTailwind(styles.activityBody)}>
+        <div className={""}>
           {steps.map(step => <WorkStepView key={step.key} step={step} isDark={isDark} />)}
         </div>
       </ToolBody>

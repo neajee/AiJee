@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { memo, useEffect } from "react";
 import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming, Easing } from "@/platform/animation";
 import type { ToolCallInfo } from "../agent-types";
@@ -12,16 +11,8 @@ export const ToolStatusDot = memo(function ToolStatusDot({
 }: ToolStatusDotProps) {
   const isActive = status === "streaming" || status === "pending" || status === "running";
   if (status === "running") {
-    return <div className={toTailwind({
-      width: size + 6,
-      height: size + 6,
-      alignItems: "center",
-      justifyContent: "center"
-    })}>
-        <span size="small" color="#999" className={toTailwind({
-        width: size + 4,
-        height: size + 4
-      })} />
+    return <div className={"w-[0] h-[0] items-center justify-center"}>
+        <span size="small" color="#999" className={"w-[0] h-[0]"} />
       </div>;
   }
   if (!isActive) return null;
@@ -45,10 +36,5 @@ function PulseDot({
   const style = useAnimatedStyle(() => ({
     opacity: opacity.value
   }));
-  return <div className={toTailwind([{
-    width: size,
-    height: size,
-    borderRadius: size / 2,
-    backgroundColor: "#999"
-  }, style])} />;
+  return <div className={"w-[0] h-[0] rounded-[0]" + " " + ""} />;
 }

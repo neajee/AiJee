@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { memo, useCallback, useState } from "react";
 import { Colors, Fonts } from "@/constants/theme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
@@ -24,9 +23,7 @@ export const GenericToolCall = memo(function GenericToolCall({
   const name = toolDisplayName(tc.name);
   return <div>
       <ToolHeader expanded={expanded} expandable={hasResult || hasImages} onToggle={toggle} isDark={isDark} aria-label={`${expanded ? "Collapse" : "Expand"} result of ${name}`}>
-        <span className={toTailwind([styles.name, {
-        color: colors.textSecondary
-      }])}>
+        <span className={"" + " " + ""}>
           {name}
         </span>
       </ToolHeader>
@@ -35,10 +32,8 @@ export const GenericToolCall = memo(function GenericToolCall({
 
       <ToolBody expanded={expanded && hasResult}>
         <ToolSurface isDark={isDark}>
-          <div className={toTailwind(styles.scroll)} nestedScrollEnabled>
-            <span className={toTailwind([styles.resultText, {
-            color: colors.textSecondary
-          }])} selectable>
+          <div className={""} nestedScrollEnabled>
+            <span className={"" + " " + ""} selectable>
               {resultText}
             </span>
           </div>

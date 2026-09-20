@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { memo, useEffect } from "react";
 import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming, withDelay, Easing } from "@/platform/animation";
 interface StreamingCursorProps {
@@ -40,17 +39,12 @@ function Dot({
       translateY: translateY.value
     }]
   }));
-  return <div className={toTailwind([{
-    width: SIZE,
-    height: SIZE,
-    borderRadius: SIZE / 2,
-    backgroundColor: color
-  }, style])} />;
+  return <div className={"w-[0] h-[0] rounded-[0]" + " " + ""} />;
 }
 export const StreamingCursor = memo(function StreamingCursor({
   color = "#888"
 }: StreamingCursorProps) {
-  return <div className={toTailwind(styles.container)}>
+  return <div className={""}>
       {Array.from({
       length: DOT_COUNT
     }, (_, i) => <Dot key={i} index={i} color={color} />)}

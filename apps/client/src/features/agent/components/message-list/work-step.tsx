@@ -1,11 +1,9 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { memo } from "react";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { AssistantMarkdown } from "./assistant-markdown";
 import { ToolCallGroup } from "./tool-call";
 import { ThinkingBlock } from "./thinking-block";
 import type { WorkStep } from "../../utils/turns";
-import { styles } from "./style-tokens";
 export const WorkStepView = memo(function WorkStepView({
   step,
   isDark
@@ -18,13 +16,11 @@ export const WorkStepView = memo(function WorkStepView({
     case "thinking":
       return <ThinkingBlock text={step.text} isStreaming={step.streaming} isDark={isDark} />;
     case "text":
-      return <div className={toTailwind(styles.stepText)}>
+      return <div className={""}>
           <AssistantMarkdown text={step.text} />
         </div>;
     case "error":
-      return <span className={toTailwind([styles.stepError, {
-        color: colors.destructive
-      }])}>
+      return <span className={"" + " " + ""}>
           {step.text}
         </span>;
     case "tools":

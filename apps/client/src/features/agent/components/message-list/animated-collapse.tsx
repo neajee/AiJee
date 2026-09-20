@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import { LayoutChangeEvent } from "@/types/dom";
 import Animated, { Easing, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from "@/platform/animation";
@@ -70,14 +69,14 @@ export function AnimatedCollapse({
   // opening motion has finished, hand the subtree back to a normal View so
   // nested disclosures grow the parent layout instead of being clipped.
   if (expanded && settled) {
-    return <div className={toTailwind(styles.container)}>
-        <div onLayout={handleLayout} className={toTailwind(styles.content)}>
+    return <div className={""}>
+        <div onLayout={handleLayout} className={""}>
           {children}
         </div>
       </div>;
   }
-  return <div className={toTailwind([styles.container, style])}>
-      <div onLayout={handleLayout} className={toTailwind(styles.content)}>
+  return <div className={"" + " " + ""}>
+      <div onLayout={handleLayout} className={""}>
         {children}
       </div>
     </div>;

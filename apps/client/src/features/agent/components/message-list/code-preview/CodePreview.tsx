@@ -1,8 +1,6 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { memo, useMemo } from 'react';
 import { useThemeTokens } from '@/hooks/use-theme-tokens';
 import { tokenizeLine } from '../../../utils/code-preview-tokens';
-import { styles } from './style-tokens';
 import type { CodePreviewProps } from './component-types';
 export const CodePreview = memo(function CodePreview({
   code,
@@ -30,31 +28,18 @@ export const CodePreview = memo(function CodePreview({
     diffRemove: colors.diffRemoved,
     diffMeta: colors.skill
   }), [colors, isDark]);
-  return <div className={toTailwind([bare ? styles.bareContainer : [styles.container, {
-    backgroundColor: colors.surfaceRaised,
-    borderColor: colors.border
-  }], fill && styles.fillContainer])}>
-      <div className={toTailwind(maxHeight ? {
-      maxHeight
-    } : undefined)} nestedScrollEnabled>
+  return <div className={(bare ? "" : "" + " " + "") + " " + (fill ? "" : "")}>
+      <div className={maxHeight ? "max-h-[0]" : ""} nestedScrollEnabled>
         <div horizontal>
           <div>
             {lines.map((line, index) => {
             const segments = tokenizeLine(line, language, diffLanguage);
-            return <div key={index} className={toTailwind(styles.row)}>
-                  {showLineNumbers ? <div className={toTailwind([styles.lineNoCol, {
-                borderRightColor: colors.border
-              }])}>
-                      <span className={toTailwind([styles.lineNo, {
-                  color: colors.textTertiary
-                }])}>{startLine + index}</span>
+            return <div key={index} className={""}>
+                  {showLineNumbers ? <div className={"" + " " + ""}>
+                      <span className={"" + " " + ""}>{startLine + index}</span>
                     </div> : null}
-                  <span className={toTailwind([styles.lineText, !showLineNumbers && styles.lineTextNoGutter, bare && styles.lineTextBare, {
-                color: tokenColors.plain
-              }])}>
-                    {segments.length ? segments.map((segment, segmentIndex) => <span key={`${index}-${segmentIndex}`} className={toTailwind({
-                  color: tokenColors[segment.kind]
-                })}>
+                  <span className={"" + " " + (!showLineNumbers ? "" : "") + " " + (bare ? "" : "") + " " + ""}>
+                    {segments.length ? segments.map((segment, segmentIndex) => <span key={`${index}-${segmentIndex}`} className={""}>
                             {segment.text || (segmentIndex === 0 ? ' ' : '')}
                           </span>) : ' '}
                   </span>

@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { memo, useCallback, useState } from "react";
 import { Colors, Fonts } from "@/constants/theme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
@@ -27,9 +26,7 @@ export const ReadToolCall = memo(function ReadToolCall({
   const hasImages = !!(tc.resultImages && tc.resultImages.length > 0);
   return <div>
       <ToolHeader expanded={expanded} expandable={!!content} onToggle={toggle} isDark={isDark} aria-label={`${expanded ? "Collapse" : "Expand"} contents of ${fileName || "file"}`}>
-        <span className={toTailwind([styles.fileName, {
-        color: colors.textSecondary
-      }])}>
+        <span className={"" + " " + ""}>
           Read {fileName || filePath || "file"}
         </span>
       </ToolHeader>

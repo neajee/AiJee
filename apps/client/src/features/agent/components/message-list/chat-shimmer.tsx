@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { useEffect, useRef } from "react";
 import { Animated } from "@/platform/animation";
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -26,19 +25,13 @@ function ShimmerBar({
     animation.start();
     return () => animation.stop();
   }, [delay, opacity]);
-  return <div className={toTailwind([styles.bar, {
-    width,
-    backgroundColor: isDark ? "#252525" : "#E5E5E5",
-    opacity
-  }])} />;
+  return <div className={"" + " " + "w-[0] opacity-[null]"} />;
 }
 function UserShimmer() {
   const colorScheme = useColorScheme() ?? "light";
   const isDark = colorScheme === "dark";
-  return <div className={toTailwind(styles.userRow)}>
-      <div className={toTailwind([styles.userBubble, {
-      backgroundColor: isDark ? "#2A2A2A" : "#F0F0F0"
-    }])}>
+  return <div className={""}>
+      <div className={"" + " " + ""}>
         <ShimmerBar width="100%" delay={0} />
       </div>
     </div>;
@@ -48,14 +41,14 @@ function AssistantShimmer({
 }: {
   lines: `${number}%`[];
 }) {
-  return <div className={toTailwind(styles.assistantRow)}>
-      <div className={toTailwind(styles.assistantBody)}>
+  return <div className={""}>
+      <div className={""}>
         {lines.map((w, i) => <ShimmerBar key={i} width={w} delay={i * 80} />)}
       </div>
     </div>;
 }
 export function ChatShimmer() {
-  return <div className={toTailwind(styles.container)}>
+  return <div className={""}>
       <UserShimmer />
       <AssistantShimmer lines={["92%", "100%", "78%", "55%"]} />
       <UserShimmer />

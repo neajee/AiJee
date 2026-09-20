@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { memo } from "react";
 import { Colors, Fonts } from "@/constants/theme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
@@ -16,15 +15,11 @@ export const DownloadToolCall = memo(function DownloadToolCall({
   const parsed = parseToolArguments(tc.arguments);
   const url = parsed.url as string || "";
   return <div>
-      <div className={toTailwind(styles.header)}>
-        <span className={toTailwind([styles.label, {
-        color: colors.textSecondary
-      }])}>
+      <div className={""}>
+        <span className={"" + " " + ""}>
           Download
         </span>
-        {url ? <span className={toTailwind([styles.url, {
-        color: colors.textTertiary
-      }])}>
+        {url ? <span className={"" + " " + ""}>
             {url}
           </span> : null}
       </div>

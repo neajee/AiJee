@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 import * as Clipboard from "@/platform/clipboard";
 import { Check, Copy } from "lucide-react";
@@ -37,19 +36,9 @@ export const MarkdownCodeBlock = memo(function MarkdownCodeBlock({
     timerRef.current = setTimeout(() => setCopied(false), 1500);
   }, [code]);
   const label = (language || "").trim().toLowerCase();
-  return <div className={toTailwind([styles.container,
-  // borderStrong, not border: the block also appears nested inside tool
-  // surfaces that already use surfaceRaised, where a 7% hairline vanishes.
-  {
-    backgroundColor: colors.surfaceRaised,
-    borderColor: colors.borderStrong
-  }])}>
-      <div className={toTailwind([styles.header, {
-      borderBottomColor: colors.border
-    }])}>
-        <span className={toTailwind([styles.language, {
-        color: colors.textTertiary
-      }])}>
+  return <div className={"" + " " + ""}>
+      <div className={"" + " " + ""}>
+        <span className={"" + " " + ""}>
           {label}
         </span>
         <button onClick={handleCopy} hitSlop={6} role="button" aria-label={copied ? "Code copied" : "Copy code"}>
@@ -57,7 +46,7 @@ export const MarkdownCodeBlock = memo(function MarkdownCodeBlock({
         </button>
       </div>
 
-      <div className={toTailwind(styles.body)}>
+      <div className={""}>
         <CodePreview code={code} language={language} isDark={isDark} showLineNumbers={false} bare />
       </div>
     </div>;
