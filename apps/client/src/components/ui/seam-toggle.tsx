@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Animated, Easing } from "@/platform/animation";
+import { Animated, Easing } from "@/styles/motion";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -85,10 +85,10 @@ export function SeamToggle({
     bottom: 10,
     left: 10,
     right: 10
-  }} className={""}>
-      <div pointerEvents="none" className={"" + " " + "w-[0] h-[0] rounded-[0]"}>
+  }} className={"block"}>
+      <div pointerEvents="none" className={"  w-0 h-0 rounded-none"}>
         {/* Held back until the bar has some width to hold it. */}
-        <div className={"opacity-[null]"}>
+        <div className={"opacity-100"}>
           <Chevron size={13} color={colors.text} strokeWidth={2} />
         </div>
       </div>

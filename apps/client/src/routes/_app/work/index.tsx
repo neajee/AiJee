@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useRouter } from "@/platform/router-adapter";
+import { useRouter } from "@/hooks/router";
 import { useSafeAreaInsets } from "@/platform/browser";
 import { Fonts } from "@/constants/theme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
@@ -58,12 +58,12 @@ export default function WorkIndex() {
     }
   }, [client, router]);
   const editorBg = colors.background;
-  return <div className={"" + " " + "pb-[0]"}>
-      <div className={"" + " " + ""}>
-        <div className={""}>
-          {sending ? <div className={""}>
+  return <div className={"  bg-background pb-0"}>
+      <div className={" "}>
+        <div className={"block"}>
+          {sending ? <div className={"block"}>
               <span size="small" color={colors.textSecondary} />
-              <span className={"" + " " + ""}>
+              <span className={"  text-text-secondary"}>
                 Starting Work…
               </span>
             </div> : <WorkspaceHero />}

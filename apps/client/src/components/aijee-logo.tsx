@@ -22,5 +22,5 @@ export function AiJeeLogo({
   return <img src={MARK}
   // `tintColor` as a prop (not a style) is the form supported on both
   // DOM compatibility layer.
-  tintColor={color} resizeMode="contain" className={"w-[0] h-[0] opacity-[null]" + " " + ""} accessibilityIgnoresInvertColors accessible={false} />;
+  tintColor={color} resizeMode="contain" className={"w-0 h-0 opacity-100  "} accessibilityIgnoresInvertColors accessible={false} />;
 }

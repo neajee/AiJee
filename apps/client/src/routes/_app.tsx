@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { AppState } from "@/platform/browser";
 import { type AppStateStatus } from "@/types/dom";
-import { Slot, usePathname, useRouter } from '@/platform/router-adapter';
+import { Slot, usePathname, useRouter } from '@/hooks/router';
 import { Fonts } from '@/constants/theme';
 import { useThemeTokens } from '@/hooks/use-theme-tokens';
 import { PiClientProvider, type PiClientConfig } from '@aijee/client-sdk';

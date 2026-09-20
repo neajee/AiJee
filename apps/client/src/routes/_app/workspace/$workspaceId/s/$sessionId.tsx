@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useLocalSearchParams, useRouter } from "@/platform/router-adapter";
+import { useLocalSearchParams, useRouter } from "@/hooks/router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSafeAreaInsets } from "@/platform/browser";
 import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
@@ -107,12 +107,12 @@ export default function SessionScreen() {
   const hasMessages = messages.length > 0;
   return <DiffPanelProvider messages={messages}>
       <NarrowDiffSheetProvider>
-      <div className={"" + " " + "pb-[0]"}>
-        <div className={""}>
-          <div className={"" + " " + ""}>
+      <div className={"  pb-0"}>
+        <div className={"block"}>
+          <div className={" "}>
             {agentSession.isReady && hasMessages && sessionId ? <MessageList key={sessionId} sessionId={sessionId} onForked={nextSessionId => {
               router.replace(`/workspace/${workspaceId}/s/${nextSessionId}`);
-            }} /> : agentSession.isLoading || !agentSession.isReady && sessionId ? <ChatShimmer /> : <div className={""} />}
+            }} /> : agentSession.isLoading || !agentSession.isReady && sessionId ? <ChatShimmer /> : <div className={"block"} />}
             <ExtensionUiDialog sessionId={sessionId} request={agentSession.pendingExtensionUiRequest as LegacyPendingUiRequest | null} />
             <PromptInput sessionId={sessionId} onSend={handleSend} isStreaming={agentSession.isStreaming} onAbort={handleAbort} sessionReady={agentSession.isReady} disabled={inputBlockedByConnection || !!agentSession.pendingExtensionUiRequest} allowTypingWhileDisabled={!inputBlockedByConnection} stackedAbove={!!agentSession.pendingExtensionUiRequest} errorMessage={alertMessage} onClearError={clearAlert} />
           </div>

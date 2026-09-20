@@ -29,8 +29,8 @@ export function Select<T extends string = string>({
   const border = tokens.borderStrong;
   const mutedColor = tokens.textTertiary;
   if (true) {
-    return <div className={"" + " " + ""}>
-        <select value={value} disabled={disabled} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => onChange(e.target.value as T)} className={""}>
+    return <div className={" "}>
+        <select value={value} disabled={disabled} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => onChange(e.target.value as T)} className={"block"}>
           {placeholder && <option value="" disabled>
               {placeholder}
             </option>}
@@ -40,8 +40,8 @@ export function Select<T extends string = string>({
         </select>
       </div>;
   }
-  return <div className={"" + " " + ""}>
-      <div className={"" + " " + "" + " " + (disabled ? "" : "")}>
+  return <div className={" "}>
+      <div className={" "}>
         </div>
     </div>;
 }

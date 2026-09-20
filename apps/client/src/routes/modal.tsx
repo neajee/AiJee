@@ -1,11 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Link } from '@/platform/router-adapter';
+import { Link } from '@/hooks/router';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 export default function ModalScreen() {
-  return <ThemedView className={""}>
+  return <ThemedView className={"block"}>
       <ThemedText type="title">This is a modal</ThemedText>
-      <Link href="/" dismissTo className={""}>
+      <Link href="/" dismissTo className={"block"}>
         <ThemedText type="link">Go to home screen</ThemedText>
       </Link>
     </ThemedView>;

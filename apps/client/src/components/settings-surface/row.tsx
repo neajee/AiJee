@@ -42,10 +42,10 @@ export function SettingsRow({
   const m = useSettingsMetrics();
   const p = useSettingsPalette();
   const [hovered, setHovered] = useState(false);
-  const body = <div flexDirection="row" alignItems="center" gap={m.rowMinHeight > 40 ? '$3' : '$2'} className={"pl-[gutter] pr-[gutter] pt-[rowPaddingV] pb-[rowPaddingV] min-h-[rowMinHeight]"} onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)}>
+  const body = <div flexDirection="row" alignItems="center" gap={m.rowMinHeight > 40 ? '$3' : '$2'} className={"pl-[var(--gutter)] pr-[var(--gutter)] pt-[var(--row-padding-v)] pb-[var(--row-padding-v)] min-h-[var(--row-min-height)]"} onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)}>
     {icon ? <SettingsIconTile icon={icon} tone={tone} /> : null}
-    <div className={"flex-1 gap-[2px] self-stretch justify-center"}><span className={"text-[labelSize] font-sans text-left"}>{label}</span>
-      {description ? <span className={"text-[descSize] font-sans leading-[0] text-left"}>{description}</span> : null}</div>
+    <div className={"flex-1 gap-[2px] self-stretch justify-center"}><span className={"text-[var(--label-size)] font-sans text-left"}>{label}</span>
+      {description ? <span className={"text-[var(--desc-size)] font-sans leading-[0] text-left"}>{description}</span> : null}</div>
     {right}
   </div>;
   const inset = icon ? m.gutter + m.tileSize + (m.rowMinHeight > 40 ? 12 : 8) : m.gutter;
@@ -66,5 +66,5 @@ export function SettingsSwitch({
     false: p.isDark ? '#3A3A3C' : '#E4E4E7',
     true: p.success
   }} thumbColor={false ? '#FFFFFF' : undefined} />;
-  return m.switchScale === 1 ? control : <div className={""}>{control}</div>;
+  return m.switchScale === 1 ? control : <div className={"block"}>{control}</div>;
 }

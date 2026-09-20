@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback } from 'react';
-import { Redirect, useLocalSearchParams, useRouter } from '@/platform/router-adapter';
+import { Redirect, useLocalSearchParams, useRouter } from '@/hooks/router';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { SettingsDetailScreen } from '@/features/settings/components/settings-screens';

@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useLocalSearchParams, useRouter } from "@/platform/router-adapter";
+import { useLocalSearchParams, useRouter } from "@/hooks/router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useSafeAreaInsets } from "@/platform/browser";
 import { Fonts } from "@/constants/theme";
@@ -108,15 +108,15 @@ export default function WorkspaceScreen() {
   }, [workspaceId, modesLoaded, sending, ensureSession, client, router]);
   const clearAlert = useCallback(() => setAlertMessage(null), []);
   const editorBg = colors.background;
-  return <div className={"" + " " + "pb-[0]"}>
-      <div className={""}>
-        <div className={"" + " " + ""}>
+  return <div className={"  pb-0"}>
+      <div className={"block"}>
+        <div className={" "}>
           {/* Hero and composer are one vertically centred group, so the mark,
               the greeting and the input read as a single focal block. */}
-          <div className={""}>
-            {sending ? <div className={""}>
+          <div className={"block"}>
+            {sending ? <div className={"block"}>
                 <span size="small" color={colors.textSecondary} />
-                <span className={"" + " " + ""}>
+                <span className={" "}>
                   Starting session…
                 </span>
               </div> : <WorkspaceHero />}

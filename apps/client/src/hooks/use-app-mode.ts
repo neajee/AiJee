@@ -1,4 +1,4 @@
-import { usePathname } from '@/platform/router-adapter';
+import { usePathname } from '@/hooks/router';
 
 export type AppMode = 'work' | 'code';
 

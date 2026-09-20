@@ -20,13 +20,13 @@ export default function ServersScreen() {
   const isDark = colorScheme === "dark";
   const p = useSettingsPalette();
   const empty = useServersStore(s => s.servers.length === 0);
-  return <div className={"" + " " + ""} edges={["top", "left", "right"]}>
-      {empty ? <ServersSection isDark={isDark} variant="onboarding" /> : <div className={""}>
-          <div className={""}>
+  return <div className={"  bg-background"} edges={["top", "left", "right"]}>
+      {empty ? <ServersSection isDark={isDark} variant="onboarding" /> : <div className={"block"}>
+          <div className={"block"}>
             {/* This route can render outside the app shell, so it carries its
                 own title instead of relying on a header bar. */}
-            <span className={"" + " " + ""}>连接</span>
-            <span className={"" + " " + ""}>
+            <span className={"  text-foreground"}>连接</span>
+            <span className={"  text-text-tertiary"}>
               选择要连接的 AiJee 电脑。
             </span>
             <ServersSection isDark={isDark} />

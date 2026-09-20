@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Redirect } from "@/platform/router-adapter";
+import { Redirect } from "@/hooks/router";
 import { useServersStore } from "@/features/servers/store";
 import { useAuthStore } from "@/features/auth/store";
 import { useWorkspaceStore } from "@/features/workspace/store";

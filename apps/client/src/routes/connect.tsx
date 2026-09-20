@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { useRouter } from "@/platform/router-adapter";
+import { useRouter } from "@/hooks/router";
 import { Fonts } from "@/constants/theme";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { useAuthStore } from "@/features/auth/store";
@@ -96,17 +96,17 @@ export default function DirectConnectScreen() {
     done: "Redirecting to your workspace.",
     error: error ?? "Unable to complete the direct login flow."
   };
-  return <div className={"" + " " + ""}>
-      <div className={"" + " " + ""}>
-        {status === "error" ? <div className={"" + " " + ""} /> : <span size="large" color={status === "done" ? colors.success : colors.text} />}
-        <span className={"" + " " + ""}>
+  return <div className={"  bg-background"}>
+      <div className={"  bg-surface border-border"}>
+        {status === "error" ? <div className={" "} /> : <span size="large" color={status === "done" ? colors.success : colors.text} />}
+        <span className={"  text-foreground"}>
           {titleByStatus[status]}
         </span>
-        <span className={"" + " " + ""}>
+        <span className={"  text-text-secondary"}>
           {descriptionByStatus[status]}
         </span>
         {status === "error" && <button onClick={() => router.replace("/servers")}>
-            <span className={"" + " " + ""}>
+            <span className={"  text-accent-content"}>
               Go to Servers
             </span>
           </button>}

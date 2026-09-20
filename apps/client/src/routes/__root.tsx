@@ -9,6 +9,8 @@ import { useAppSettingsStore } from "@/features/settings/store";
 import { useAuthStore } from "@/features/auth/store";
 import { useServersStore } from "@/features/servers/store";
 import { getBootstrapTarget } from "@/features/servers/bootstrap";
+import { useSettingsMetrics } from "@/components/settings-surface/metrics";
+import { useSettingsPalette } from "@/components/settings-surface/palette";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -35,6 +37,8 @@ function RootLayout() {
   const setBootstrapReady = useServersStore(s => s.setBootstrapReady);
   const claimLocalServer = useAuthStore(s => s.claimLocalServer);
   const authorizeWithCode = useAuthStore(s => s.authorizeWithCode);
+  const metrics = useSettingsMetrics();
+  const palette = useSettingsPalette();
   const bootstrapAttempted = useRef(false);
   useEffect(() => {
     if (typeof document === 'undefined') return;
@@ -52,7 +56,27 @@ function RootLayout() {
       '--aijee-ui-font-size': `${uiFontSize}px`,
       '--aijee-code-font-size': `${codeFontSize}px`,
       '--aijee-ui-font-family': themeTokens.uiFont,
-      '--aijee-code-font-family': themeTokens.codeFont
+      '--aijee-code-font-family': themeTokens.codeFont,
+      '--gutter': `${metrics.gutter}px`,
+      '--group-gap': `${metrics.groupGap}px`,
+      '--card-radius': `${metrics.cardRadius}px`,
+      '--row-min-height': `${metrics.rowMinHeight}px`,
+      '--row-padding-v': `${metrics.rowPaddingV}px`,
+      '--tile-size': `${metrics.tileSize}px`,
+      '--tile-radius': `${metrics.tileRadius}px`,
+      '--label-size': `${metrics.labelSize}px`,
+      '--desc-size': `${metrics.descSize}px`,
+      '--value-size': `${metrics.valueSize}px`,
+      '--header-size': `${metrics.headerSize}px`,
+      '--header-inset': `${metrics.headerInset}px`,
+      '--title-size': `${metrics.titleSize}px`,
+      '--content-max-width': `${metrics.contentMaxWidth ?? 9999}px`,
+      '--aijee-card': palette.card,
+      '--aijee-muted': palette.tile,
+      '--aijee-destructive': palette.destructive,
+      '--aijee-on-accent': palette.onAccent,
+      '--aijee-overlay': themeTokens.overlay,
+      '--bottom-inset': '0px'
     } as Record<string, string>;
     Object.entries(css).forEach(([key, value]) => root.style.setProperty(key, value));
     root.dataset.aijeeTheme = `${themePreset}-${colorScheme ?? 'light'}`;
@@ -60,7 +84,7 @@ function RootLayout() {
     document.body.style.color = themeTokens.text;
     document.body.style.fontSize = `${uiFontSize}px`;
     document.body.style.fontFamily = themeTokens.uiFont;
-  }, [codeFontSize, colorScheme, themePreset, themeTokens, uiFontSize]);
+  }, [codeFontSize, colorScheme, metrics, palette, themePreset, themeTokens, uiFontSize]);
   useEffect(() => {
     if (typeof document === 'undefined' || document.getElementById('aijee-web-defaults')) return;
     const style = document.createElement('style');

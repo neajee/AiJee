@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useRouter } from '@/platform/router-adapter';
+import { useRouter } from '@/hooks/router';
 
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { SettingsIndexScreen } from '@/features/settings/components/settings-screens';

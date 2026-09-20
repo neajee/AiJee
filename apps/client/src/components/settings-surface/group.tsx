@@ -16,8 +16,8 @@ export function SettingsGroup({
   const p = useSettingsPalette();
   const headingVisible = useSettingsHeadingVisible();
   return <div gap={m.rowMinHeight > 40 ? '$2' : 5}>
-    {header && headingVisible ? <span className={"text-[headerSize] font-sans pl-[headerInset] pr-[headerInset] text-left"}>{header}</span> : null}
+    {header && headingVisible ? <span className={"text-[var(--header-size)] font-sans pl-[var(--header-inset)] pr-[var(--header-inset)] text-left"}>{header}</span> : null}
     <div borderRadius={m.cardRadius === 12 ? '$3' : 7} className={"border-[0.5px] overflow-hidden"}>{children}</div>
-    {footer ? <span className={"text-[descSize] font-sans pl-[headerInset] pr-[headerInset] text-left"}>{footer}</span> : null}
+    {footer ? <span className={"text-[var(--desc-size)] font-sans pl-[var(--header-inset)] pr-[var(--header-inset)] text-left"}>{footer}</span> : null}
   </div>;
 }
