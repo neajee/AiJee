@@ -20,13 +20,13 @@ export function Segmented({
 }) {
   const m = useSettingsMetrics();
   const p = useSettingsPalette();
-  return <div className={"" + " " + "rounded-[0]"}>
+  return <div className={"  rounded-none"}>
       {options.map(option => {
       const active = option.value === value;
       return <button key={option.value} onClick={() => onChange(option.value)} role="button" accessibilityState={{
         selected: active
-      }} aria-label={option.label} className={""}>
-            <span className={"text-[descSize] font-sans"}>
+      }} aria-label={option.label} className={"block"}>
+            <span className={"text-[var(--desc-size)] font-sans"}>
               {option.label}
             </span>
           </button>;
@@ -44,10 +44,10 @@ export function SearchField({
 }) {
   const m = useSettingsMetrics();
   const p = useSettingsPalette();
-  return <div className={"" + " " + "rounded-[tileRadius]"}>
+  return <div className={"  rounded-[var(--tile-radius)]"}>
       <Search size={14} color={p.textTertiary} strokeWidth={1.8} />
-      <input value={value} onChangeText={onChangeText} onSubmitEditing={onSubmit} placeholder="搜索插件名称或关键词" placeholderTextColor={p.textTertiary} returnKeyType="search" autoCapitalize="none" autoCorrect={false} aria-label="搜索插件" className={"" + " " + "text-[valueSize]"} />
-      {value ? <button onClick={() => onChangeText('')} role="button" aria-label="清空搜索" hitSlop={6} className={""}>
+      <input value={value} onChangeText={onChangeText} onSubmitEditing={onSubmit} placeholder="搜索插件名称或关键词" placeholderTextColor={p.textTertiary} returnKeyType="search" autoCapitalize="none" autoCorrect={false} aria-label="搜索插件" className={"  text-[var(--value-size)]"} />
+      {value ? <button onClick={() => onChangeText('')} role="button" aria-label="清空搜索" hitSlop={6} className={"block"}>
           <X size={13} color={p.textTertiary} strokeWidth={2} />
         </button> : null}
     </div>;
@@ -65,8 +65,8 @@ export function Chip({
   const p = useSettingsPalette();
   return <button onClick={onPress} role="button" accessibilityState={{
     selected: active
-  }} aria-label={label} className={""}>
-      <span className={"text-[descSize] font-sans"}>
+  }} aria-label={label} className={"block"}>
+      <span className={"text-[var(--desc-size)] font-sans"}>
         {label}
       </span>
     </button>;
@@ -86,21 +86,21 @@ export function PackageCard({
 }) {
   const m = useSettingsMetrics();
   const p = useSettingsPalette();
-  return <button onClick={onPress} role="button" aria-label={`${pkg.name} 详情`} className={""}>
-      <div className={""}>
-        <span className={"" + " " + "text-[labelSize]"}>
+  return <button onClick={onPress} role="button" aria-label={`${pkg.name} 详情`} className={"block"}>
+      <div className={"block"}>
+        <span className={"  text-[var(--label-size)]"}>
           {pkg.name}
         </span>
-        <span className={"" + " " + ""}>v{pkg.version}</span>
+        <span className={" "}>v{pkg.version}</span>
       </div>
-      <span className={"" + " " + "text-[descSize]"}>
+      <span className={"  text-[var(--desc-size)]"}>
         {pkg.description || '作者未提供介绍'}
       </span>
-      <div className={""}>
-        <span className={"" + " " + ""}>
+      <div className={"block"}>
+        <span className={" "}>
           {pkg.package_types.join(' · ') || 'npm'}
         </span>
-        {pkg.downloads ? <span className={"" + " " + ""}>
+        {pkg.downloads ? <span className={" "}>
             {pkg.downloads.toLocaleString()} 次/周
           </span> : null}
       </div>

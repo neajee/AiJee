@@ -68,25 +68,25 @@ export function PackageDetail({
     height: phone ? '100%' : undefined,
     maxHeight: phone ? undefined : maxHeight
   }]}>
-        <div className={""}>
-          <div className={"" + " " + "p-[gutter]"}>
-            <div className={""}>
-              <span className={"" + " " + "text-[0]"}>
+        <div className={"block"}>
+          <div className={"  p-[var(--gutter)]"}>
+            <div className={"block"}>
+              <span className={"  text-[0px]"}>
                 {pkg.name}
               </span>
-              <span className={"" + " " + ""}>
+              <span className={" "}>
                 v{pkg.version}
                 {pkg.author ? ` · ${pkg.author}` : ''}
                 {pkg.package_types.length ? ` · ${pkg.package_types.join('、')}` : ''}
               </span>
             </div>
-            <button onClick={onClose} role="button" aria-label="关闭" hitSlop={8} className={""}>
+            <button onClick={onClose} role="button" aria-label="关闭" hitSlop={8} className={"block"}>
               <X size={16} color={p.textSecondary} strokeWidth={2} />
             </button>
           </div>
 
           <div>
-            <span className={"text-[valueSize] leading-[0]"}>
+            <span className={"text-[var(--value-size)] leading-[0]"}>
               {pkg.description || '作者未提供介绍'}
             </span>
 
@@ -94,10 +94,10 @@ export function PackageDetail({
 
           </div>
 
-          <div className={"" + " " + "p-[gutter]"}>
-            {pkg.repository || pkg.homepage ? <button onClick={() => Linking.openURL((pkg.repository ?? pkg.homepage)!)} role="link" aria-label="打开仓库" className={""}>
+          <div className={"  p-[var(--gutter)]"}>
+            {pkg.repository || pkg.homepage ? <button onClick={() => Linking.openURL((pkg.repository ?? pkg.homepage)!)} role="link" aria-label="打开仓库" className={"block"}>
                 <ExternalLink size={13} color={p.textSecondary} strokeWidth={1.8} />
-                <span className={"text-[descSize] font-sans"}>
+                <span className={"text-[var(--desc-size)] font-sans"}>
                   仓库
                 </span>
               </button> : <div />}

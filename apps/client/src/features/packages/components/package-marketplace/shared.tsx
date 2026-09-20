@@ -12,9 +12,9 @@ export function Notice({
   const p = useSettingsPalette();
   const color = tone === 'error' ? p.destructive : p.isDark ? '#D29922' : '#9A6700';
   const background = tone === 'error' ? p.isDark ? 'rgba(248,81,73,0.14)' : 'rgba(207,34,46,0.10)' : p.isDark ? 'rgba(210,153,34,0.14)' : 'rgba(154,103,0,0.10)';
-  return <div className={"" + " " + "rounded-[tileRadius]"}>
+  return <div className={"  rounded-[var(--tile-radius)]"}>
       <ShieldAlert size={13} color={color} strokeWidth={2} />
-      <span className={"flex-1 text-[descSize] leading-[0]"}>
+      <span className={"flex-1 text-[var(--desc-size)] leading-[0]"}>
         {text}
       </span>
     </div>;
@@ -36,10 +36,10 @@ export function PrimaryButton({
 }) {
   const m = useSettingsMetrics();
   const p = useSettingsPalette();
-  return <button onClick={onPress} disabled={busy} role="button" aria-label={label} className={""}>
+  return <button onClick={onPress} disabled={busy} role="button" aria-label={label} className={"block"}>
       {busy ? <span size="small" color={p.onAccent} /> : <>
           {Icon ? <Icon size={13} color={p.onAccent} strokeWidth={2.2} /> : null}
-          <span className={"text-[descSize] font-sans"}>
+          <span className={"text-[var(--desc-size)] font-sans"}>
             {label}
           </span>
         </>}
@@ -54,8 +54,8 @@ export function SecondaryButton({
 }) {
   const m = useSettingsMetrics();
   const p = useSettingsPalette();
-  return <button onClick={onPress} role="button" aria-label={label} className={""}>
-      <span className={"text-[descSize] font-sans"}>
+  return <button onClick={onPress} role="button" aria-label={label} className={"block"}>
+      <span className={"text-[var(--desc-size)] font-sans"}>
         {label}
       </span>
     </button>;

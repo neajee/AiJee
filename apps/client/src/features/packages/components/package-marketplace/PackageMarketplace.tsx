@@ -73,13 +73,13 @@ export function PackageMarketplace() {
     setTab('installed');
   }, []);
   const gutter = phone ? m.gutter : m.gutter + 6;
-  return <div className={"" + " " + ""}>
-      <div className={"" + " " + "pl-[0] pr-[0]"}>
-        <div className={""}>
-          <span className={"" + " " + "text-[0]"}>
+  return <div className={" "}>
+      <div className={"  pl-0 pr-0"}>
+        <div className={"block"}>
+          <span className={"  text-[0px]"}>
             插件广场
           </span>
-          <span className={"" + " " + "text-[descSize]"}>
+          <span className={"  text-[var(--desc-size)]"}>
             从 npm 发现 Pi 的扩展、技能与主题
           </span>
         </div>
@@ -92,21 +92,21 @@ export function PackageMarketplace() {
       }]} value={tab} onChange={value => setTab(value as MarketplaceTab)} />
       </div>
 
-      {tab === 'discover' ? <div className={""}>
+      {tab === 'discover' ? <div className={"block"}>
           <div className={"gap-[10px]"}>
             <SearchField value={query} onChangeText={setQuery} onSubmit={() => void search(query, category)} />
-            <div className={""}>
+            <div className={"block"}>
               {CATEGORIES.map(item => <Chip key={item.value} label={item.label} active={category === item.value} onClick={() => setCategory(item.value)} />)}
             </div>
           </div>
 
           {error ? <Notice text={error} tone="error" /> : null}
 
-          {loading ? <div className={""}>
+          {loading ? <div className={"block"}>
               <span size="small" color={p.textTertiary} />
-            </div> : items.length === 0 ? <span className={"" + " " + "text-[descSize]"}>
+            </div> : items.length === 0 ? <span className={"  text-[var(--desc-size)]"}>
               没有匹配的插件。
-            </span> : <div className={""}>
+            </span> : <div className={"block"}>
               {items.map(item => <PackageCard key={item.name} pkg={item} single={phone} onClick={() => void openDetail(item)} />)}
             </div>}
         </div> : <InstalledView output={installedOutput} loading={installedLoading} error={error} onRefresh={loadInstalled} gutter={gutter} single={phone} message={installedMessage} />}
