@@ -1,8 +1,6 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { ShieldAlert } from 'lucide-react';
 import { Fonts } from '@/constants/theme';
 import { useSettingsMetrics, useSettingsPalette } from '@/components/settings-surface';
-import { styles } from '../../utils/marketplace-styles';
 export function Notice({
   text,
   tone
@@ -14,17 +12,9 @@ export function Notice({
   const p = useSettingsPalette();
   const color = tone === 'error' ? p.destructive : p.isDark ? '#D29922' : '#9A6700';
   const background = tone === 'error' ? p.isDark ? 'rgba(248,81,73,0.14)' : 'rgba(207,34,46,0.10)' : p.isDark ? 'rgba(210,153,34,0.14)' : 'rgba(154,103,0,0.10)';
-  return <div className={toTailwind([styles.notice, {
-    backgroundColor: background,
-    borderRadius: m.tileRadius
-  }])}>
+  return <div className={"" + " " + "rounded-[tileRadius]"}>
       <ShieldAlert size={13} color={color} strokeWidth={2} />
-      <span className={toTailwind({
-      flex: 1,
-      fontSize: m.descSize,
-      color,
-      lineHeight: m.descSize * 1.45
-    })}>
+      <span className={"flex-1 text-[descSize] leading-[0]"}>
         {text}
       </span>
     </div>;
@@ -46,22 +36,10 @@ export function PrimaryButton({
 }) {
   const m = useSettingsMetrics();
   const p = useSettingsPalette();
-  return <button onClick={onPress} disabled={busy} role="button" aria-label={label} className={toTailwind(({
-    pressed
-  }) => [styles.button, {
-    backgroundColor: p.accent,
-    borderColor: p.accent,
-    borderRadius: m.tileRadius
-  }, (pressed || busy) && {
-    opacity: 0.6
-  }])}>
+  return <button onClick={onPress} disabled={busy} role="button" aria-label={label} className={""}>
       {busy ? <span size="small" color={p.onAccent} /> : <>
           {Icon ? <Icon size={13} color={p.onAccent} strokeWidth={2.2} /> : null}
-          <span className={toTailwind({
-        fontSize: m.descSize,
-        fontFamily: Fonts.sansMedium,
-        color: p.onAccent
-      })}>
+          <span className={"text-[descSize] font-sans"}>
             {label}
           </span>
         </>}
@@ -76,22 +54,8 @@ export function SecondaryButton({
 }) {
   const m = useSettingsMetrics();
   const p = useSettingsPalette();
-  return <button onClick={onPress} role="button" aria-label={label} className={toTailwind(({
-    pressed,
-    hovered
-  }: any) => [styles.button, {
-    borderColor: p.separator,
-    borderRadius: m.tileRadius
-  }, hovered && {
-    backgroundColor: p.pressed
-  }, pressed && {
-    opacity: 0.6
-  }])}>
-      <span className={toTailwind({
-      fontSize: m.descSize,
-      fontFamily: Fonts.sansMedium,
-      color: p.text
-    })}>
+  return <button onClick={onPress} role="button" aria-label={label} className={""}>
+      <span className={"text-[descSize] font-sans"}>
         {label}
       </span>
     </button>;

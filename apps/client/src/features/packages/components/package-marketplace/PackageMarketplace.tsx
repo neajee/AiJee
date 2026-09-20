@@ -1,10 +1,8 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { usePiClient } from '@aijee/client-sdk';
 import type { MarketplacePackage } from '@aijee/client-sdk';
 import { useSettingsMetrics, useSettingsPalette, useSettingsPhoneLayout } from '@/components/settings-surface';
 import { CATEGORIES, SEARCH_DEBOUNCE_MS, type MarketplaceTab } from '../../utils/marketplace-constants';
-import { styles } from '../../utils/marketplace-styles';
 import { Segmented, SearchField, Chip, PackageCard } from './controls';
 import { InstalledView } from './installed';
 import { PackageDetail } from './detail';
@@ -75,25 +73,13 @@ export function PackageMarketplace() {
     setTab('installed');
   }, []);
   const gutter = phone ? m.gutter : m.gutter + 6;
-  return <div className={toTailwind([styles.page, {
-    backgroundColor: p.bg
-  }])}>
-      <div className={toTailwind([styles.header, {
-      paddingLeft: gutter,
-      paddingRight: gutter,
-      borderBottomColor: p.separator
-    }])}>
-        <div className={toTailwind(styles.headerCopy)}>
-          <span className={toTailwind([styles.title, {
-          color: p.text,
-          fontSize: m.titleSize - 4
-        }])}>
+  return <div className={"" + " " + ""}>
+      <div className={"" + " " + "pl-[0] pr-[0]"}>
+        <div className={""}>
+          <span className={"" + " " + "text-[0]"}>
             插件广场
           </span>
-          <span className={toTailwind([styles.subtitle, {
-          color: p.textTertiary,
-          fontSize: m.descSize
-        }])}>
+          <span className={"" + " " + "text-[descSize]"}>
             从 npm 发现 Pi 的扩展、技能与主题
           </span>
         </div>
@@ -106,26 +92,21 @@ export function PackageMarketplace() {
       }]} value={tab} onChange={value => setTab(value as MarketplaceTab)} />
       </div>
 
-      {tab === 'discover' ? <div className={toTailwind(styles.scroll)}>
-          <div className={toTailwind({
-        gap: 10
-      })}>
+      {tab === 'discover' ? <div className={""}>
+          <div className={"gap-[10px]"}>
             <SearchField value={query} onChangeText={setQuery} onSubmit={() => void search(query, category)} />
-            <div className={toTailwind(styles.chips)}>
+            <div className={""}>
               {CATEGORIES.map(item => <Chip key={item.value} label={item.label} active={category === item.value} onClick={() => setCategory(item.value)} />)}
             </div>
           </div>
 
           {error ? <Notice text={error} tone="error" /> : null}
 
-          {loading ? <div className={toTailwind(styles.centered)}>
+          {loading ? <div className={""}>
               <span size="small" color={p.textTertiary} />
-            </div> : items.length === 0 ? <span className={toTailwind([styles.emptyText, {
-        color: p.textTertiary,
-        fontSize: m.descSize
-      }])}>
+            </div> : items.length === 0 ? <span className={"" + " " + "text-[descSize]"}>
               没有匹配的插件。
-            </span> : <div className={toTailwind(styles.grid)}>
+            </span> : <div className={""}>
               {items.map(item => <PackageCard key={item.name} pkg={item} single={phone} onClick={() => void openDetail(item)} />)}
             </div>}
         </div> : <InstalledView output={installedOutput} loading={installedLoading} error={error} onRefresh={loadInstalled} gutter={gutter} single={phone} message={installedMessage} />}

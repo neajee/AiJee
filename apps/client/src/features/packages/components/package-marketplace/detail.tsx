@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Linking, useWindowDimensions } from "@/platform/browser";
 import { Download, ExternalLink, X } from 'lucide-react';
@@ -7,7 +6,6 @@ import type { MarketplacePackage } from '@aijee/client-sdk';
 import { Fonts } from '@/constants/theme';
 import { AppModal } from '@/components/ui';
 import { useSettingsMetrics, useSettingsPalette, useSettingsPhoneLayout } from '@/components/settings-surface';
-import { styles } from '../../utils/marketplace-styles';
 import { Notice, PrimaryButton } from './shared';
 
 // ─── Detail dialog ────────────────────────────────────────────
@@ -62,7 +60,7 @@ export function PackageDetail({
   }, [client, pkg, target, onInstalled]);
   if (!pkg) return null;
   const maxHeight = Math.min(screenHeight - 64, 680);
-  return <AppModal visible onClose={onClose} contentStyle={[styles.dialog, {
+  return <AppModal visible onClose={onClose} contentStyle={[{
     backgroundColor: p.card,
     borderColor: p.border,
     borderRadius: phone ? 0 : m.cardRadius + 4,
@@ -70,44 +68,25 @@ export function PackageDetail({
     height: phone ? '100%' : undefined,
     maxHeight: phone ? undefined : maxHeight
   }]}>
-        <div className={toTailwind([styles.dialogInner])}>
-          <div className={toTailwind([styles.dialogHeader, {
-        borderBottomColor: p.separator,
-        padding: m.gutter
-      }])}>
-            <div className={toTailwind(styles.dialogTitleCol)}>
-              <span className={toTailwind([styles.dialogTitle, {
-            color: p.text,
-            fontSize: m.labelSize + 2
-          }])}>
+        <div className={""}>
+          <div className={"" + " " + "p-[gutter]"}>
+            <div className={""}>
+              <span className={"" + " " + "text-[0]"}>
                 {pkg.name}
               </span>
-              <span className={toTailwind([styles.meta, {
-            color: p.textTertiary
-          }])}>
+              <span className={"" + " " + ""}>
                 v{pkg.version}
                 {pkg.author ? ` · ${pkg.author}` : ''}
                 {pkg.package_types.length ? ` · ${pkg.package_types.join('、')}` : ''}
               </span>
             </div>
-            <button onClick={onClose} role="button" aria-label="关闭" hitSlop={8} className={toTailwind(({
-          pressed,
-          hovered
-        }: any) => [styles.iconButton, hovered && {
-          backgroundColor: p.pressed
-        }, pressed && {
-          opacity: 0.6
-        }])}>
+            <button onClick={onClose} role="button" aria-label="关闭" hitSlop={8} className={""}>
               <X size={16} color={p.textSecondary} strokeWidth={2} />
             </button>
           </div>
 
           <div>
-            <span className={toTailwind({
-          color: p.textSecondary,
-          fontSize: m.valueSize,
-          lineHeight: m.valueSize * 1.5
-        })}>
+            <span className={"text-[valueSize] leading-[0]"}>
               {pkg.description || '作者未提供介绍'}
             </span>
 
@@ -115,24 +94,10 @@ export function PackageDetail({
 
           </div>
 
-          <div className={toTailwind([styles.dialogFooter, {
-        borderTopColor: p.separator,
-        padding: m.gutter
-      }])}>
-            {pkg.repository || pkg.homepage ? <button onClick={() => Linking.openURL((pkg.repository ?? pkg.homepage)!)} role="link" aria-label="打开仓库" className={toTailwind(({
-          pressed,
-          hovered
-        }: any) => [styles.linkButton, hovered && {
-          backgroundColor: p.pressed
-        }, pressed && {
-          opacity: 0.6
-        }])}>
+          <div className={"" + " " + "p-[gutter]"}>
+            {pkg.repository || pkg.homepage ? <button onClick={() => Linking.openURL((pkg.repository ?? pkg.homepage)!)} role="link" aria-label="打开仓库" className={""}>
                 <ExternalLink size={13} color={p.textSecondary} strokeWidth={1.8} />
-                <span className={toTailwind({
-            fontSize: m.descSize,
-            fontFamily: Fonts.sans,
-            color: p.textSecondary
-          })}>
+                <span className={"text-[descSize] font-sans"}>
                   仓库
                 </span>
               </button> : <div />}
