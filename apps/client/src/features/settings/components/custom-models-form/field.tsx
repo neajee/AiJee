@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { Fonts } from '@/constants/theme';
 import { useColors } from '../../hooks/use-custom-models-theme';
 
@@ -21,18 +20,10 @@ export function Field({
   mono?: boolean;
   autoFocus?: boolean;
 }) {
-  return <div className={toTailwind(colors.s.field.container)}>
-      <span className={toTailwind([colors.s.field.label, {
-      color: colors.textMuted
-    }])}>
+  return <div className={""}>
+      <span className={"" + " " + ""}>
         {label}
       </span>
-      <input className={toTailwind([colors.s.field.input, {
-      color: colors.textPrimary,
-      backgroundColor: colors.inputBg,
-      borderColor: colors.borderColor
-    }, mono && {
-      fontFamily: Fonts.mono
-    }])} value={value} onChangeText={onChangeText} placeholder={placeholder} placeholderTextColor={colors.placeholder} autoCapitalize="none" autoCorrect={false} autoFocus={autoFocus} />
+      <input className={"" + " " + "" + " " + (mono ? "font-mono" : "")} value={value} onChangeText={onChangeText} placeholder={placeholder} placeholderTextColor={colors.placeholder} autoCapitalize="none" autoCorrect={false} autoFocus={autoFocus} />
     </div>;
 }

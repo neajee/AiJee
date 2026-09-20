@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import type { ReactNode } from "react";
 import { HAIRLINE_WIDTH } from '@/constants/layout';
 import { useSettingsMetrics, useSettingsPalette } from "@/components/settings-surface";
@@ -13,19 +12,9 @@ export function AboutGroup({
 }) {
   const m = useSettingsMetrics();
   const p = useSettingsPalette();
-  return <div className={toTailwind({
-    gap: 8
-  })}>
-      <span className={toTailwind([aboutStyles.groupTitle, {
-      color: p.textSecondary
-    }])}>{title}</span>
-      <div className={toTailwind({
-      backgroundColor: p.card,
-      borderRadius: m.cardRadius,
-      borderWidth: HAIRLINE_WIDTH,
-      borderColor: p.separator,
-      overflow: 'hidden'
-    })}>
+  return <div className={"gap-[8px]"}>
+      <span className={"" + " " + ""}>{title}</span>
+      <div className={"rounded-[cardRadius] border-[0] overflow-hidden"}>
         {children}
       </div>
     </div>;

@@ -1,11 +1,9 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { type ReactNode } from 'react';
 import { useSafeAreaInsets } from "@/platform/browser";
 import { ChevronLeft } from 'lucide-react';
 import { SettingsHeadingProvider, SettingsLayoutProvider, useSettingsContentStyle, useSettingsMetrics, useSettingsPalette, useSettingsPhoneLayout } from '@/components/settings-surface';
 import { type SettingsSection } from '../../sections';
 import { SettingsScroll } from './settings-scroll';
-import { desktopStyles, styles } from './style-tokens';
 export function SettingsDetailScreen({
   section,
   isDark,
@@ -38,19 +36,13 @@ function SettingsDesktopSection({
   const palette = useSettingsPalette();
   const Component = section.Component;
   const inset = metrics.gutter + 6;
-  return <div className={toTailwind(desktopStyles.detail)}>
-      <div className={toTailwind([desktopStyles.detailHeader, {
-      borderBottomColor: palette.separator,
-      paddingLeft: inset,
-      paddingRight: inset
-    }])}>
-        <div className={toTailwind(desktopStyles.detailHeaderCopy)}>
-          <span className={toTailwind([desktopStyles.detailTitle, {
-          color: palette.text
-        }])}>{section.title}</span>
+  return <div className={""}>
+      <div className={"" + " " + "pl-[0] pr-[0]"}>
+        <div className={""}>
+          <span className={"" + " " + ""}>{section.title}</span>
         </div>
       </div>
-      <div className={toTailwind(desktopStyles.detailScroll)}>
+      <div className={""}>
         <SettingsHeadingProvider visible={false}>
           <Component isDark={isDark} />
         </SettingsHeadingProvider>
@@ -70,27 +62,15 @@ function SettingsDetailChrome({
   const metrics = useSettingsMetrics();
   const palette = useSettingsPalette();
   const contentStyle = useSettingsContentStyle(insets.bottom);
-  return <div className={toTailwind([styles.screen, {
-    backgroundColor: palette.bg
-  }])}>
-      <div className={toTailwind([styles.navBar, {
-      borderBottomColor: palette.separator
-    }])}>
-        <div className={toTailwind([styles.navBarInner, {
-        paddingLeft: metrics.gutter - 6,
-        paddingRight: metrics.gutter - 6,
-        maxWidth: metrics.contentMaxWidth,
-        minHeight: metrics.rowMinHeight + 4
-      }])}>
+  return <div className={"" + " " + ""}>
+      <div className={"" + " " + ""}>
+        <div className={"" + " " + "pl-[0] pr-[0] max-w-[contentMaxWidth] min-h-[0]"}>
           <button onClick={onBack} role="button" aria-label="返回设置" hitSlop={8}>
             <ChevronLeft size={metrics.chevronSize + 6} color={palette.text} strokeWidth={2} />
           </button>
-          <span className={toTailwind([styles.navTitle, {
-          fontSize: metrics.labelSize + 1,
-          color: palette.text
-        }])}>{title}</span>
+          <span className={"" + " " + "text-[0]"}>{title}</span>
         </div>
       </div>
-      <div className={toTailwind(styles.scroll)}>{children}</div>
+      <div className={""}>{children}</div>
     </div>;
 }

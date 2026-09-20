@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { useEffect, useMemo, useState } from 'react';
 import { Cpu, Pencil, Trash2 } from 'lucide-react';
 import { HAIRLINE_WIDTH } from '@/constants/layout';
@@ -45,39 +44,29 @@ export function ModelEntryRow({
     return parts.join(' · ');
   }, [model.name, model.contextWindow, model.input, model.reasoning]);
   if (editing) {
-    return <div className={toTailwind([colors.s.model.editWrap, {
-      backgroundColor: colors.accentBg
-    }])}>
-        <div className={toTailwind(colors.s.model.editGrid)}>
-          <div className={toTailwind({
-          flex: 1
-        })}>
+    return <div className={"" + " " + ""}>
+        <div className={""}>
+          <div className={"flex-1"}>
             <Field label="模型 ID" value={draft.id} onChangeText={v => setDraft({
             ...draft,
             id: v
           })} placeholder="llama3.1:8b" colors={colors} mono />
           </div>
-          <div className={toTailwind({
-          flex: 1
-        })}>
+          <div className={"flex-1"}>
             <Field label="显示名称" value={draft.name ?? ''} onChangeText={v => setDraft({
             ...draft,
             name: v || undefined
           })} placeholder="可选" colors={colors} />
           </div>
         </div>
-        <div className={toTailwind(colors.s.model.editGrid)}>
-          <div className={toTailwind({
-          flex: 1
-        })}>
+        <div className={""}>
+          <div className={"flex-1"}>
             <Field label="上下文窗口" value={draft.contextWindow?.toString() ?? ''} onChangeText={v => setDraft({
             ...draft,
             contextWindow: v ? parseInt(v, 10) || undefined : undefined
           })} placeholder={`${PI_DEFAULTS.contextWindow}（缺省）`} colors={colors} />
           </div>
-          <div className={toTailwind({
-          flex: 1
-        })}>
+          <div className={"flex-1"}>
             <Field label="最大 Token" value={draft.maxTokens?.toString() ?? ''} onChangeText={v => setDraft({
             ...draft,
             maxTokens: v ? parseInt(v, 10) || undefined : undefined
@@ -109,11 +98,9 @@ export function ModelEntryRow({
           reasoning: draft.reasoning === true ? undefined : true
         })
       }]} />
-        <div className={toTailwind(colors.s.model.editActions)}>
+        <div className={""}>
           <button onClick={() => setEditing(false)}>
-            <span className={toTailwind([colors.s.model.smallBtnText, {
-            color: colors.textMuted
-          }])}>
+            <span className={"" + " " + ""}>
               取消
             </span>
           </button>
@@ -126,29 +113,20 @@ export function ModelEntryRow({
             setEditing(false);
           }
         }}>
-            <span className={toTailwind([colors.s.model.smallBtnText, {
-            color: colors.isDark ? '#fefdfd' : '#fff'
-          }])}>
+            <span className={"" + " " + ""}>
               保存
             </span>
           </button>
         </div>
       </div>;
   }
-  return <div className={toTailwind([colors.s.model.row, !isLast && {
-    borderBottomWidth: HAIRLINE_WIDTH,
-    borderBottomColor: colors.separator
-  }])}>
+  return <div className={"" + " " + (!isLast ? "" : "")}>
       <Cpu size={colors.roomy ? 14 : 9} color={colors.textMuted} strokeWidth={1.8} />
-      <div className={toTailwind(colors.s.model.info)}>
-        <span className={toTailwind([colors.s.model.modelId, {
-        color: colors.textPrimary
-      }])}>
+      <div className={""}>
+        <span className={"" + " " + ""}>
           {model.id}
         </span>
-        {summary ? <span className={toTailwind([colors.s.model.modelMeta, {
-        color: colors.textMuted
-      }])}>
+        {summary ? <span className={"" + " " + ""}>
             {summary}
           </span> : null}
       </div>

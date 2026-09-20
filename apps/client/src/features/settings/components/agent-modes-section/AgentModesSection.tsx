@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { Fonts } from '@/constants/theme';
 import { useSettingsPalette, useSettingsPhoneLayout } from '@/components/settings-surface';
 import { useAgentModesController } from '../../hooks/use-agent-modes-controller';
@@ -23,30 +22,18 @@ export function AgentModesSection({
     save
   } = useAgentModesController();
   if (!loaded) return null;
-  return <div className={toTailwind([styles.wrap, roomy && styles.wrapRoomy])}>
-      <div className={toTailwind([styles.topline, roomy && styles.toplineRoomy])}>
-        <div className={toTailwind(styles.copy)}>
-          <span className={toTailwind([styles.title, {
-          color: palette.text
-        }])}>自定义指令</span>
-          <span className={toTailwind([styles.description, {
-          color: palette.textTertiary
-        }])}>向智能体提供适用于此主机上所有聊天的额外说明和上下文。</span>
+  return <div className={"" + " " + (roomy ? "" : "")}>
+      <div className={"" + " " + (roomy ? "" : "")}>
+        <div className={""}>
+          <span className={"" + " " + ""}>自定义指令</span>
+          <span className={"" + " " + ""}>向智能体提供适用于此主机上所有聊天的额外说明和上下文。</span>
         </div>
         <button onClick={save} disabled={!changed || saving} role="button" aria-label="保存自定义指令">
-          <span className={toTailwind([styles.saveText, {
-          color: changed ? palette.onAccent : palette.textTertiary
-        }])}>{saving ? '保存中' : '保存'}</span>
+          <span className={"" + " " + ""}>{saving ? '保存中' : '保存'}</span>
         </button>
       </div>
-      <textarea value={value} onChangeText={setValue} multiline textAlignVertical="top" placeholder="例如：回答时保持简洁；先说明结论，再给出关键步骤。" placeholderTextColor={palette.textTertiary} aria-label="自定义指令" className={toTailwind([styles.editor, roomy && styles.editorRoomy, {
-      color: palette.text,
-      backgroundColor: palette.tile,
-      borderColor: palette.separator
-    }])} />
-      <span className={toTailwind([styles.hint, {
-      color: palette.textTertiary
-    }])}>保存后，新建或重新载入的智能体会应用这些指令。</span>
+      <textarea value={value} onChangeText={setValue} multiline textAlignVertical="top" placeholder="例如：回答时保持简洁；先说明结论，再给出关键步骤。" placeholderTextColor={palette.textTertiary} aria-label="自定义指令" className={"" + " " + (roomy ? "" : "") + " " + ""} />
+      <span className={"" + " " + ""}>保存后，新建或重新载入的智能体会应用这些指令。</span>
     </div>;
 }
 const styles = {

@@ -1,10 +1,8 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { Redirect } from '@/platform/router-adapter';
 import { ChevronRight } from 'lucide-react';
 import { SettingsGroup, SettingsLayoutProvider, SettingsRow, useSettingsMetrics, useSettingsPalette, useSettingsPhoneLayout } from '@/components/settings-surface';
 import { SETTINGS_SECTIONS, type SettingsSection } from '../../sections';
 import { SettingsScroll } from './settings-scroll';
-import { styles } from './style-tokens';
 export function SettingsIndexScreen({
   onOpenSection
 }: {
@@ -20,12 +18,7 @@ export function SettingsIndexScreen({
   }
   return <SettingsLayoutProvider phone={phone}>
       <SettingsScroll>
-        <span className={toTailwind([styles.title, {
-        fontSize: metrics.titleSize,
-        color: palette.text,
-        paddingTop: metrics.gutter / 2,
-        paddingBottom: metrics.gutter / 2
-      }])}>设置</span>
+        <span className={"" + " " + "text-[titleSize] pt-[0] pb-[0]"}>设置</span>
         <SettingsGroup>
           {SETTINGS_SECTIONS.map((section, index) => {
           const isLast = index === SETTINGS_SECTIONS.length - 1;

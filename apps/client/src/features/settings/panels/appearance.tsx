@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { useEffect, type ComponentType } from "react";
 import { Monitor, Moon, Sun } from "lucide-react";
 import { HAIRLINE_WIDTH } from '@/constants/layout';
@@ -94,12 +93,7 @@ function ThemePicker({
   const p = useSettingsPalette();
   const phone = useSettingsPhoneLayout();
   const size = compact ? m.rowMinHeight - 12 : undefined;
-  return <div className={toTailwind([pickerStyles.group, !compact && pickerStyles.labeledGroup, wide && [pickerStyles.wideGroup, {
-    width: phone ? 260 : 440
-  }], {
-    backgroundColor: p.tile,
-    borderRadius: m.tileRadius + 2
-  }])}>
+  return <div className={"" + " " + (!compact ? "" : "") + " " + (wide ? "" + " " + "w-[0]" : "") + " " + "rounded-[0]"}>
       {THEMES.map(({
       key,
       icon: Icon,
@@ -110,11 +104,7 @@ function ThemePicker({
         selected: active
       }} aria-label={`主题：${label}`} hitSlop={4}>
             <Icon size={m.tileIcon + 2} color={active ? compact ? p.text : p.onAccent : p.textTertiary} strokeWidth={active ? 2.2 : 1.8} />
-            {!compact ? <span className={toTailwind({
-          color: active ? p.onAccent : p.textTertiary,
-          fontSize: m.descSize,
-          fontFamily: Fonts.sans
-        })}>{label}</span> : null}
+            {!compact ? <span className={"text-[descSize] font-sans"}>{label}</span> : null}
           </button>;
     })}
     </div>;
@@ -172,13 +162,13 @@ export function AppearancePanel() {
       label: item.label
     }))} onChange={value => update({
       themePreset: value
-    })} compact className={toTailwind(appearanceStyles.themeSelect)} />} />
+    })} compact className={""} />} />
       <SettingsRow label="强调色" right={<Select value={accentPreset} options={ACCENTS.map(item => ({
       value: item.key,
       label: item.label
     }))} onChange={value => update({
       accentPreset: value
-    })} compact className={toTailwind(appearanceStyles.accentSelect)} />} />
+    })} compact className={""} />} />
       <SettingsRow label="UI 字号" right={<SizeStepper value={uiFontSize} onChange={value => update({
       uiFontSize: value
     })} min={12} max={18} palette={p} />} />
@@ -200,19 +190,10 @@ function SizeStepper({
   max: number;
   palette: ReturnType<typeof useSettingsPalette>;
 }) {
-  return <div className={toTailwind([appearanceStyles.stepper, {
-    borderColor: palette.border,
-    backgroundColor: palette.tile
-  }])}>
-      <button onClick={() => onChange(Math.max(min, value - 1))} aria-label="减小字号"><span className={toTailwind({
-        color: palette.text
-      })}>−</span></button>
-      <span className={toTailwind([appearanceStyles.stepperValue, {
-      color: palette.text
-    }])}>{value}px</span>
-      <button onClick={() => onChange(Math.min(max, value + 1))} aria-label="增大字号"><span className={toTailwind({
-        color: palette.text
-      })}>+</span></button>
+  return <div className={"" + " " + ""}>
+      <button onClick={() => onChange(Math.max(min, value - 1))} aria-label="减小字号"><span className={""}>−</span></button>
+      <span className={"" + " " + ""}>{value}px</span>
+      <button onClick={() => onChange(Math.min(max, value + 1))} aria-label="增大字号"><span className={""}>+</span></button>
     </div>;
 }
 const appearanceStyles = {

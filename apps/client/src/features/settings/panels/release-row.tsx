@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { useState } from "react";
 import { HAIRLINE_WIDTH } from '@/constants/layout';
 import { ChevronDown, ChevronUp } from "lucide-react";
@@ -26,62 +25,39 @@ export function ReleaseRow({
       <button onClick={() => setOpen(value => !value)} role="button" aria-label={`${release.tag}，发布于 ${formatReleaseTime(release.published_at)}，${countText}`} accessibilityState={{
       expanded: open
     }}>
-        <div className={toTailwind([aboutStyles.timelineDot, {
-        backgroundColor: current ? p.accent : p.textTertiary
-      }])} />
-        <span className={toTailwind([aboutStyles.timelineTag, {
-        color: current ? p.text : p.textSecondary
-      }])}>
+        <div className={"" + " " + ""} />
+        <span className={"" + " " + ""}>
           {release.tag}
         </span>
-        <span className={toTailwind([aboutStyles.timelineTime, {
-        color: p.textTertiary
-      }])}>
+        <span className={"" + " " + ""}>
           {formatReleaseShort(release.published_at)}
         </span>
-        <span className={toTailwind([aboutStyles.releaseCount, {
-        color: p.textTertiary
-      }])}>
+        <span className={"" + " " + ""}>
           {countText}
         </span>
-        {current ? <div className={toTailwind([aboutStyles.currentBadge, {
-        backgroundColor: p.tile
-      }])}>
-            <span className={toTailwind([aboutStyles.currentBadgeText, {
-          color: p.textSecondary
-        }])}>当前</span>
+        {current ? <div className={"" + " " + ""}>
+            <span className={"" + " " + ""}>当前</span>
           </div> : null}
         {open ? <ChevronUp size={14} color={p.textTertiary} strokeWidth={2} /> : <ChevronDown size={14} color={p.textTertiary} strokeWidth={2} />}
       </button>
-      {open ? <div className={toTailwind([aboutStyles.releaseBody, {
-      borderTopWidth: HAIRLINE_WIDTH,
-      borderTopColor: p.separator
-    }])}>
+      {open ? <div className={"" + " " + ""}>
           {(['feature', 'fix', 'other'] as const).map(type => {
         const items = notes.filter(note => note.type === type);
         if (!items.length) return null;
         const label = type === 'feature' ? '新功能' : type === 'fix' ? '修复' : '其他';
-        return <div key={type} className={toTailwind(aboutStyles.noteGroup)}>
-                <span className={toTailwind([aboutStyles.noteCat, {
-            color: p.textSecondary
-          }])}>
+        return <div key={type} className={""}>
+                <span className={"" + " " + ""}>
                   {label} · {items.length}
                 </span>
-                {items.map((note, index) => <div key={`${note.commit}-${index}`} className={toTailwind(aboutStyles.noteRow)}>
-                    <span className={toTailwind([aboutStyles.noteTitle, {
-              color: p.text
-            }])}>
+                {items.map((note, index) => <div key={`${note.commit}-${index}`} className={""}>
+                    <span className={"" + " " + ""}>
                       {note.title}
                     </span>
-                    {note.commit ? <span className={toTailwind([aboutStyles.noteCommit, {
-              color: p.textTertiary
-            }])}>{note.commit}</span> : null}
+                    {note.commit ? <span className={"" + " " + ""}>{note.commit}</span> : null}
                   </div>)}
               </div>;
       })}
-          {!notes.length ? <span className={toTailwind([aboutStyles.timelineTime, {
-        color: p.textTertiary
-      }])}>无变更记录</span> : null}
+          {!notes.length ? <span className={"" + " " + ""}>无变更记录</span> : null}
         </div> : null}
     </div>;
 }

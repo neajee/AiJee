@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { providerPageStyles } from '../../utils/custom-models-styles';
 import { ProviderMark } from './provider-mark';
 import type { ProviderRowProps } from './component-types';
@@ -13,23 +12,15 @@ export function ProviderRow({
   disabled
 }: ProviderRowProps) {
   const content = <>
-      {connected ? <div className={toTailwind([providerPageStyles.statusDot, {
-      backgroundColor: colors.successColor
-    }])} /> : null}
+      {connected ? <div className={"" + " " + ""} /> : null}
       <ProviderMark name={name} id={id} colors={colors} />
-      <div className={toTailwind(providerPageStyles.rowCopy)}>
-        <span className={toTailwind([providerPageStyles.rowName, {
-        color: colors.textPrimary
-      }])}>{name}</span>
-        {meta ? <span className={toTailwind([providerPageStyles.rowMeta, {
-        color: colors.textMuted
-      }])}>{meta}</span> : null}
+      <div className={""}>
+        <span className={"" + " " + ""}>{name}</span>
+        {meta ? <span className={"" + " " + ""}>{meta}</span> : null}
       </div>
     </>;
   if (trailing) {
-    return <div className={toTailwind([providerPageStyles.row, disabled && {
-      opacity: 0.5
-    }])}>
+    return <div className={"" + " " + (disabled ? "opacity-[0.5]" : "")}>
         <button onClick={onPress} disabled={disabled} role="button" aria-label={name} accessibilityState={{
         disabled
       }}>

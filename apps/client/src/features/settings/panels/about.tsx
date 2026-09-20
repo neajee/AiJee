@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { useCallback, useEffect, useState } from "react";
 import { Linking } from "@/platform/browser";
 import { ArrowUpCircle, CheckCircle2, Info, RefreshCw } from "lucide-react";
@@ -22,11 +21,7 @@ export function AboutRow({
       if (data?.version) setServerVersion(data.version);
     }).catch(() => {});
   }, []);
-  return <SettingsRow icon={Info} label="关于" description={serverVersion ? `AiJee ${serverVersion}` : undefined} isLast={isLast} right={<span className={toTailwind({
-    fontSize: m.valueSize,
-    fontFamily: Fonts.sans,
-    color: p.textTertiary
-  })}>
+  return <SettingsRow icon={Info} label="关于" description={serverVersion ? `AiJee ${serverVersion}` : undefined} isLast={isLast} right={<span className={"text-[valueSize] font-sans"}>
           {serverVersion || '—'}
         </span>} />;
 }
@@ -78,45 +73,29 @@ export function AboutPanel() {
   const currentReleaseTag = timeline.find(release => release.tag === versionLabel)?.tag ?? timeline[0]?.tag ?? null;
   const latestLabel = release?.latest ? release.latest.replace(/^v/i, '') : null;
   const heroBuildMeta = `构建于 ${formatReleaseTime(versionInfo?.updated_at)}${versionSuffix ? ` · ${versionSuffix}` : ''}`;
-  return <div className={toTailwind({
-    gap: m.groupGap
-  })}>
+  return <div className={"gap-[groupGap]"}>
       {/* 1 · Hero: version number + build meta + update check */}
       <AboutGroup title="当前版本">
-        <div className={toTailwind(aboutStyles.hero)}>
-          <div className={toTailwind(aboutStyles.heroMain)}>
-            <span className={toTailwind([aboutStyles.heroVersion, {
-            color: p.text
-          }])}>{versionLabel}</span>
-            <span className={toTailwind([aboutStyles.heroMeta, {
-            color: p.textTertiary
-          }])}>
+        <div className={""}>
+          <div className={""}>
+            <span className={"" + " " + ""}>{versionLabel}</span>
+            <span className={"" + " " + ""}>
               {heroBuildMeta}
             </span>
           </div>
-          <div className={toTailwind(aboutStyles.heroAction)}>
-            {checkState === 'checking' ? <div className={toTailwind([aboutStyles.heroBtn, {
-            borderColor: p.separator
-          }])}>
+          <div className={""}>
+            {checkState === 'checking' ? <div className={"" + " " + ""}>
                 <span size="small" color={p.textTertiary} />
-                <span className={toTailwind([aboutStyles.heroBtnText, {
-              color: p.textTertiary
-            }])}>检查中…</span>
+                <span className={"" + " " + ""}>检查中…</span>
               </div> : checkState === 'error' ? <button onClick={() => void checkLatest()} role="button" aria-label="重新检查更新">
                 <RefreshCw size={14} color={p.textSecondary} strokeWidth={1.8} />
-                <span className={toTailwind([aboutStyles.heroBtnText, {
-              color: p.textSecondary
-            }])}>检查失败</span>
+                <span className={"" + " " + ""}>检查失败</span>
               </button> : release?.update_available && latestLabel ? <button onClick={openRelease} role="button" aria-label={`v${latestLabel} 可用，查看发布页`}>
                 <ArrowUpCircle size={16} color={p.onAccent} strokeWidth={1.8} />
-                <span className={toTailwind([aboutStyles.heroBtnTextAccent, {
-              color: p.onAccent
-            }])}>v{latestLabel} 可用</span>
+                <span className={"" + " " + ""}>v{latestLabel} 可用</span>
               </button> : <button onClick={() => void checkLatest()} role="button" aria-label="检查更新">
                 {checkState === 'checked' ? <CheckCircle2 size={14} color={p.success} strokeWidth={1.8} /> : <RefreshCw size={14} color={p.textSecondary} strokeWidth={1.8} />}
-                <span className={toTailwind([aboutStyles.heroBtnText, {
-              color: checkState === 'checked' ? p.success : p.textSecondary
-            }])}>
+                <span className={"" + " " + ""}>
                   {checkState === 'checked' ? '已是最新' : '检查更新'}
                 </span>
               </button>}
@@ -126,15 +105,11 @@ export function AboutPanel() {
 
       {/* 2 · Changelog timeline */}
       <AboutGroup title={`更新日志 (${timeline.length})`}>
-        {timeline.length ? <div className={toTailwind(aboutStyles.timelineBlock)}>
-            <div className={toTailwind([aboutStyles.timelineRail, {
-          backgroundColor: p.border
-        }])} />
+        {timeline.length ? <div className={""}>
+            <div className={"" + " " + ""} />
             {timeline.map((releaseEntry, index) => <ReleaseRow key={releaseEntry.tag} release={releaseEntry} current={releaseEntry.tag === currentReleaseTag} defaultOpen={index === 0} />)}
-          </div> : <div className={toTailwind(aboutStyles.timelineEmpty)}>
-            <span className={toTailwind([aboutStyles.timelineTime, {
-          color: p.textTertiary
-        }])}>当前构建未附带发布记录。</span>
+          </div> : <div className={""}>
+            <span className={"" + " " + ""}>当前构建未附带发布记录。</span>
           </div>}
       </AboutGroup>
 

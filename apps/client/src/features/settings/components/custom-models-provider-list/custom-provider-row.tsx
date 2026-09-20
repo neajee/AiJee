@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { API_TYPES, ApiTypeSelector, Field, ModelEntryRow } from '../custom-models-form';
@@ -21,31 +20,22 @@ export function CustomProviderRow({
     setHovered(false);
     setMenuOpen(false);
   }}>
-      <ProviderRow name={name} meta={`${apiLabel} · ${modelCount} 个模型`} colors={colors} onClick={() => setExpanded(value => !value)} trailing={hovered || menuOpen ? <div className={toTailwind(providerPageStyles.menuAnchor)}>
+      <ProviderRow name={name} meta={`${apiLabel} · ${modelCount} 个模型`} colors={colors} onClick={() => setExpanded(value => !value)} trailing={hovered || menuOpen ? <div className={""}>
             <button onClick={event => {
         event.stopPropagation?.();
         setMenuOpen(value => !value);
       }} role="button" aria-label={`管理 ${name}`}>
-              <span className={toTailwind([providerPageStyles.moreText, {
-          color: colors.textSecondary
-        }])}>•••</span>
+              <span className={"" + " " + ""}>•••</span>
             </button>
             {menuOpen ? <button onClick={event => {
         event.stopPropagation?.();
         onRemove();
         setMenuOpen(false);
-      }} role="button" aria-label={`删除 ${name}`} className={toTailwind([providerPageStyles.menu, {
-        backgroundColor: colors.cardBg,
-        borderColor: colors.borderColor
-      }])}>
-                <span className={toTailwind([providerPageStyles.menuText, {
-          color: colors.dangerColor
-        }])}>删除服务</span>
+      }} role="button" aria-label={`删除 ${name}`} className={"" + " " + ""}>
+                <span className={"" + " " + ""}>删除服务</span>
               </button> : null}
           </div> : null} />
-      {expanded ? <div className={toTailwind([providerPageStyles.inlinePanel, {
-      borderTopColor: colors.separator
-    }])}>
+      {expanded ? <div className={"" + " " + ""}>
           <Field label="Base URL" value={provider.baseUrl ?? ''} onChangeText={value => onUpdate({
         ...provider,
         baseUrl: value || undefined
@@ -58,10 +48,8 @@ export function CustomProviderRow({
         ...provider,
         apiKey: value || undefined
       })} placeholder="可选" colors={colors} />
-          <div className={toTailwind(providerPageStyles.modelEditorHeader)}>
-            <span className={toTailwind([providerPageStyles.rowMeta, {
-          color: colors.textSecondary
-        }])}>模型</span>
+          <div className={""}>
+            <span className={"" + " " + ""}>模型</span>
             <button onClick={() => onUpdate({
           ...provider,
           models: [...(provider.models ?? []), {
@@ -69,9 +57,7 @@ export function CustomProviderRow({
           }]
         })} role="button">
               <Plus size={14} color={colors.textSecondary} strokeWidth={2} />
-              <span className={toTailwind([providerPageStyles.linkText, {
-            color: colors.textSecondary
-          }])}>添加模型</span>
+              <span className={"" + " " + ""}>添加模型</span>
             </button>
           </div>
           {(provider.models ?? []).map((model, index) => <ModelEntryRow key={`${model.id}-${index}`} model={model} colors={colors} isLast={index === modelCount - 1} onUpdate={next => {
