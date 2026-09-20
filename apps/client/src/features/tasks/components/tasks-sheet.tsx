@@ -1,7 +1,7 @@
 import { useCallback, useEffect } from 'react';
 import { useSafeAreaInsets } from "@/platform/browser";
-import Animated, { Easing, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from "@/platform/animation";
-import { Gesture } from "@/platform/animation";
+import Animated, { Easing, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from "@/styles/motion";
+import { Gesture } from "@/styles/motion";
 import { Colors, Fonts } from '@/constants/theme';
 import { ABSOLUTE_FILL_STYLE } from '@/constants/layout';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -63,21 +63,21 @@ export function TasksSheet({
   }));
   return <div {...false ? {
     pointerEvents: visible ? 'auto' as const : 'none' as const
-  } : {}} className={"" + " " + (true ? "" : "")}>
-      <div className={"" + " " + "" + " " + ""}>
-        <button className={""} onClick={dismiss} />
+  } : {}} className={" "}>
+      <div className={"  bg-black/50"}>
+        <button className={"block"} onClick={dismiss} />
       </div>
 
-      <div className={"" + " " + "pb-[bottom]" + " " + ""}>
+      <div className={"  pb-[var(--bottom-inset)]"}>
         <div>
-          <div className={""}>
-            <div className={"" + " " + ""} />
+          <div className={"block"}>
+            <div className={"  bg-muted"} />
           </div>
         </div>
 
-        <span className={"" + " " + ""}>Tasks</span>
+        <span className={" "}>Tasks</span>
 
-        <div className={""}>
+        <div className={"block"}>
           <TasksPanelContent />
         </div>
       </div>

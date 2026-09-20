@@ -1,5 +1,5 @@
 import { useEffect, useRef, useCallback, useState } from 'react';
-import { PanResponder } from "@/platform/animation";
+import { PanResponder } from "@/styles/motion";
 import { X, Circle, Minus, Maximize2 } from 'lucide-react';
 import { Colors, Fonts } from '@/constants/theme';
 import { useColorScheme } from '@/hooks/use-color-scheme';
@@ -71,64 +71,64 @@ export function TaskOutputPanel() {
   if (!outputPanelVisible) return null;
   const statusColor = selectedInstance?.status === 'running' ? '#34C759' : selectedInstance?.status === 'failed' ? '#FF3B30' : '#8E8E93';
   if (minimized) {
-    return <div className={"" + " " + ""}>
-        <button onClick={handleToggleMinimize} className={""}>
-          <div className={""}>
+    return <div className={" "}>
+        <button onClick={handleToggleMinimize} className={"block"}>
+          <div className={"block"}>
             {selectedInstance && <>
                 <Circle size={8} color={statusColor} fill={statusColor} strokeWidth={0} />
-                <span className={"" + " " + ""}>
+                <span className={" "}>
                   {selectedInstance.label}
                 </span>
               </>}
-            {!selectedInstance && <span className={"" + " " + ""}>
+            {!selectedInstance && <span className={" "}>
                 No task selected
               </span>}
           </div>
-          <div className={""}>
-            <button onClick={handleToggleMinimize} className={""} aria-label="Maximize panel">
+          <div className={"block"}>
+            <button onClick={handleToggleMinimize} className={"block"} aria-label="Maximize panel">
               <Maximize2 size={12} color={textMuted} strokeWidth={2} />
             </button>
-            <button onClick={handleClose} className={""} aria-label="Close panel">
+            <button onClick={handleClose} className={"block"} aria-label="Close panel">
               <X size={12} color={textMuted} strokeWidth={2} />
             </button>
           </div>
         </button>
       </div>;
   }
-  return <div className={"" + " " + "h-[0]"}>
-      <div {...panResponder.panHandlers} className={""}>
-        <div className={"" + " " + ""} />
+  return <div className={"  h-0"}>
+      <div {...panResponder.panHandlers} className={"block"}>
+        <div className={" "} />
       </div>
 
-      <div className={"" + " " + ""}>
-        <div className={""}>
+      <div className={" "}>
+        <div className={"block"}>
           {selectedInstance && <>
               <Circle size={8} color={statusColor} fill={statusColor} strokeWidth={0} />
-              <span className={"" + " " + ""}>
+              <span className={" "}>
                 {selectedInstance.label}
               </span>
-              <span className={"" + " " + ""}>
+              <span className={" "}>
                 {selectedInstance.command}
               </span>
             </>}
-          {!selectedInstance && <span className={"" + " " + ""}>
+          {!selectedInstance && <span className={" "}>
               No task selected
             </span>}
         </div>
-        <div className={""}>
-          <button onClick={handleToggleMinimize} className={""} aria-label="Minimize panel">
+        <div className={"block"}>
+          <button onClick={handleToggleMinimize} className={"block"} aria-label="Minimize panel">
             <Minus size={12} color={textMuted} strokeWidth={2} />
           </button>
-          <button onClick={handleClose} className={""} aria-label="Close panel">
+          <button onClick={handleClose} className={"block"} aria-label="Close panel">
             <X size={12} color={textMuted} strokeWidth={2} />
           </button>
         </div>
       </div>
 
-      <div ref={logScrollRef} className={"" + " " + ""}>
-        {selectedLogs.length === 0 ? <span className={"" + " " + ""}>
+      <div ref={logScrollRef} className={" "}>
+        {selectedLogs.length === 0 ? <span className={" "}>
             {selectedInstance ? 'No output yet...' : 'Select a running task to view output'}
-          </span> : selectedLogs.map((line, i) => <span key={i} className={"" + " " + ""} selectable>
+          </span> : selectedLogs.map((line, i) => <span key={i} className={" "} selectable>
               {line}
             </span>)}
       </div>

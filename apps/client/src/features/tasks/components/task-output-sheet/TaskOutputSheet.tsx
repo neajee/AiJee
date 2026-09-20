@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useSafeAreaInsets } from "@/platform/browser";
-import Animated, { Easing, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from "@/platform/animation";
-import { Gesture } from "@/platform/animation";
+import Animated, { Easing, runOnJS, useAnimatedStyle, useSharedValue, withTiming } from "@/styles/motion";
+import { Gesture } from "@/styles/motion";
 import { Circle, X } from 'lucide-react';
 import { Colors, Fonts } from '@/constants/theme';
 import { ABSOLUTE_FILL_STYLE } from '@/constants/layout';
@@ -90,39 +90,39 @@ export function TaskOutputSheet({
   const statusColor = selectedInstance?.status === 'running' ? '#34C759' : selectedInstance?.status === 'failed' ? '#FF3B30' : '#8E8E93';
   return <div {...false ? {
     pointerEvents: visible ? 'auto' as const : 'none' as const
-  } : {}} className={"" + " " + (true ? "" : "")}>
-      <div className={"" + " " + "" + " " + ""}>
-        <button className={""} onClick={dismiss} />
+  } : {}} className={" "}>
+      <div className={"  bg-black/50"}>
+        <button className={"block"} onClick={dismiss} />
       </div>
 
-      <div className={"" + " " + "pb-[bottom] h-[0] max-h-[0]" + " " + ""}>
+      <div className={"  pb-[var(--bottom-inset)] h-0 max-h-0"}>
         <div>
-          <div className={""}>
-            <div className={"" + " " + ""} />
+          <div className={"block"}>
+            <div className={"  bg-muted"} />
           </div>
         </div>
 
-        <div className={"" + " " + ""}>
-          <div className={""}>
+        <div className={" "}>
+          <div className={"block"}>
             {selectedInstance ? <>
                 <Circle size={8} color={statusColor} fill={statusColor} strokeWidth={0} />
-                <span className={"" + " " + ""}>
+                <span className={" "}>
                   {selectedInstance.label}
                 </span>
-                <span className={"" + " " + ""}>
+                <span className={" "}>
                   {selectedInstance.command}
                 </span>
-              </> : <span className={"" + " " + ""}>Task Output</span>}
+              </> : <span className={" "}>Task Output</span>}
           </div>
-          <button onClick={dismiss} className={""}>
+          <button onClick={dismiss} className={"block"}>
             <X size={14} color={textMuted} strokeWidth={2} />
           </button>
         </div>
 
-        <div ref={logScrollRef} className={"" + " " + ""}>
-          {selectedLogs.length === 0 ? <span className={"" + " " + ""}>
+        <div ref={logScrollRef} className={" "}>
+          {selectedLogs.length === 0 ? <span className={" "}>
               {selectedInstance ? 'No output yet...' : 'Select a running task to view output'}
-            </span> : selectedLogs.map((line, i) => <span key={i} className={"" + " " + ""} selectable>
+            </span> : selectedLogs.map((line, i) => <span key={i} className={" "} selectable>
                 {line}
               </span>)}
         </div>

@@ -35,15 +35,15 @@ export function TasksDropdown({
   }, [setPanelOpen]);
   return <div {...{
     'data-tasks-panel': true
-  } as any} className={"" + " " + (placement === "above" ? "" : "") + " " + ""}>
-      <div className={"" + " " + ""}>
-        <span className={"" + " " + ""}>Tasks</span>
-        <button onClick={() => setPanelOpen(false)} className={""}>
+  } as any} className={" "}>
+      <div className={" "}>
+        <span className={" "}>Tasks</span>
+        <button onClick={() => setPanelOpen(false)} className={"block"}>
           <X size={14} color={textMuted} strokeWidth={2} />
         </button>
       </div>
 
-      <div className={""}>
+      <div className={"block"}>
         <TasksPanelContent />
       </div>
     </div>;

@@ -38,8 +38,8 @@ function SourceBadge({
   const bg = SOURCE_COLORS[source] ?? (isDark ? '#555' : '#999');
   const label = SOURCE_LABELS[source] ?? source;
   const textColor = source === 'bun' ? '#000' : '#fff';
-  return <div className={"" + " " + ""}>
-      <span className={"" + " " + ""}>
+  return <div className={" "}>
+      <span className={" "}>
         {label}
       </span>
     </div>;
@@ -75,30 +75,30 @@ export function TaskInstanceRow({
   hoverBg: string;
   isDark: boolean;
 }) {
-  return <button onClick={onSelect} className={""}>
+  return <button onClick={onSelect} className={"block"}>
       <StatusDot status={instance.status} />
       <SourceBadge source={instance.source ?? 'pi'} isDark={isDark} />
-      <div className={""}>
-        <span className={"" + " " + ""}>
+      <div className={"block"}>
+        <span className={" "}>
           {instance.label}
         </span>
-        <span className={"" + " " + ""}>
+        <span className={" "}>
           {instance.command}
         </span>
       </div>
-      <div className={""}>
+      <div className={"block"}>
         {instance.status === 'running' ? <>
-            <button onClick={onRestart} className={""} aria-label="Restart task">
+            <button onClick={onRestart} className={"block"} aria-label="Restart task">
               <RotateCcw size={12} color={textMuted} strokeWidth={2} />
             </button>
-            <button onClick={onStop} className={""} aria-label="Stop task">
+            <button onClick={onStop} className={"block"} aria-label="Stop task">
               <Square size={12} color="#FF3B30" strokeWidth={2} />
             </button>
           </> : <>
-            <button onClick={onRestart} className={""} aria-label="Restart task">
+            <button onClick={onRestart} className={"block"} aria-label="Restart task">
               <Play size={12} color="#34C759" strokeWidth={2} />
             </button>
-            <button onClick={onRemove} className={""} aria-label="Remove task">
+            <button onClick={onRemove} className={"block"} aria-label="Remove task">
               <Trash2 size={12} color={textMuted} strokeWidth={2} />
             </button>
           </>}
@@ -126,22 +126,22 @@ export function AvailableTaskRow({
   loading: boolean;
   isDark: boolean;
 }) {
-  return <button onClick={onSelect} disabled={loading} className={""}>
+  return <button onClick={onSelect} disabled={loading} className={"block"}>
       <SourceBadge source={definition.source ?? 'pi'} isDark={isDark} />
-      <div className={""}>
-        <span className={"" + " " + ""}>
+      <div className={"block"}>
+        <span className={" "}>
           {definition.label}
         </span>
-        <span className={"" + " " + ""}>
+        <span className={" "}>
           {definition.command}
         </span>
       </div>
-      {definition.group && <div className={"" + " " + ""}>
-          <span className={"" + " " + ""}>
+      {definition.group && <div className={" "}>
+          <span className={" "}>
             {definition.group}
           </span>
         </div>}
-      <button onClick={onStart} disabled={loading} className={""} aria-label="Start task">
+      <button onClick={onStart} disabled={loading} className={"block"} aria-label="Start task">
         <Play size={12} color="#34C759" strokeWidth={2.5} />
       </button>
     </button>;
