@@ -1,4 +1,3 @@
-import { toTailwind } from "@/styles/to-tailwind";
 import { useCallback, useState } from "react";
 import { Colors, Fonts } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -30,30 +29,18 @@ export function FilesPanel() {
     });
   }, []);
   if (!cwd) {
-    return <div className={toTailwind([styles.container, {
-      backgroundColor: surfaceBg
-    }])}>
-        <span className={toTailwind([styles.emptyText, {
-        color: textMuted
-      }])}>
+    return <div className={"" + " " + ""}>
+        <span className={"" + " " + ""}>
           No workspace selected
         </span>
       </div>;
   }
-  return <div className={toTailwind([styles.container, {
-    backgroundColor: surfaceBg
-  }])}>
-      <div className={toTailwind([styles.header, {
-      borderBottomColor: isDark ? "#323131" : "rgba(0,0,0,0.08)"
-    }])}>
-        <span className={toTailwind([styles.title, {
-        color: isDark ? "#fefdfd" : colors.text
-      }])}>
+  return <div className={"" + " " + ""}>
+      <div className={"" + " " + ""}>
+        <span className={"" + " " + ""}>
           Files
         </span>
-        <span className={toTailwind([styles.subtitle, {
-        color: textMuted
-      }])}>
+        <span className={"" + " " + ""}>
           {workspace?.title ?? cwd}
         </span>
       </div>
