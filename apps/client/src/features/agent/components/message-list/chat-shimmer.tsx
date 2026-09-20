@@ -30,7 +30,7 @@ function ShimmerBar({
 function UserShimmer() {
   const colorScheme = useColorScheme() ?? "light";
   const isDark = colorScheme === "dark";
-  return <div className={"block"}>
+  return <div className="flex flex-col">
       <div>
         <ShimmerBar width="100%" delay={0} />
       </div>
@@ -41,14 +41,14 @@ function AssistantShimmer({
 }: {
   lines: `${number}%`[];
 }) {
-  return <div className={"block"}>
-      <div className={"block"}>
+  return <div className="flex flex-col">
+      <div className="flex flex-col">
         {lines.map((w, i) => <ShimmerBar key={i} width={w} delay={i * 80} />)}
       </div>
     </div>;
 }
 export function ChatShimmer() {
-  return <div className={"block"}>
+  return <div className="flex flex-col">
       <UserShimmer />
       <AssistantShimmer lines={["92%", "100%", "78%", "55%"]} />
       <UserShimmer />

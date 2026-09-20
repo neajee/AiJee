@@ -22,13 +22,13 @@ export function BranchDialog({
 }: BranchDialogProps) {
   const theme = usePromptTheme();
   return <div visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <button className={"block"} onClick={onClose}>
+      <button className="inline-flex items-center" onClick={onClose}>
         <button className={"  bg-surface border-border"} onClick={event => event.stopPropagation()}>
           <span className={"  text-foreground"}>新建分支</span>
           <span className={"  text-text-secondary"}>将从当前分支 {currentBranch ?? 'HEAD'} 创建并立即切换。</span>
           <input value={branchName} onChange={event => setBranchName(event.target.value)} onKeyDown={event => event.key === "Enter" && onCreate(event)} autoFocus placeholder="例如：feat/new-flow" className={"  text-foreground border-border bg-muted"} />
           {error ? <span className={"  text-destructive"}>{error}</span> : null}
-          <div className={"block"}>
+          <div className="flex flex-col">
             <button onClick={onClose}><span className={"text-foreground"}>取消</span></button>
             <button disabled={!branchName.trim() || busy === 'new-branch'} onClick={onCreate}><span className={"  text-accent"}>{busy === 'new-branch' ? '创建中…' : '创建并切换'}</span></button>
           </div>

@@ -20,7 +20,7 @@ export function CustomProviderRow({
     setHovered(false);
     setMenuOpen(false);
   }}>
-      <ProviderRow name={name} meta={`${apiLabel} · ${modelCount} 个模型`} colors={colors} onClick={() => setExpanded(value => !value)} trailing={hovered || menuOpen ? <div className={"block"}>
+      <ProviderRow name={name} meta={`${apiLabel} · ${modelCount} 个模型`} colors={colors} onClick={() => setExpanded(value => !value)} trailing={hovered || menuOpen ? <div className="flex flex-col">
             <button onClick={event => {
         event.stopPropagation?.();
         setMenuOpen(value => !value);
@@ -48,7 +48,7 @@ export function CustomProviderRow({
         ...provider,
         apiKey: value || undefined
       }))(event.target.value)} placeholder="可选" colors={colors} />
-          <div className={"block"}>
+          <div className="flex flex-col">
             <span className={"  text-text-secondary"}>模型</span>
             <button onClick={() => onUpdate({
           ...provider,

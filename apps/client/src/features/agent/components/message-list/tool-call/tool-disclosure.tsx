@@ -50,7 +50,7 @@ export const ToolHeader = memo(function ToolHeader({
   }));
   const row = [styles.header, alignTop && styles.headerTop];
   if (!expandable) {
-    return <div className={"block"}>{children}</div>;
+    return <div className="flex flex-col">{children}</div>;
   }
   return <button onClick={onToggle} role="button" aria-label={accessibilityLabel}>
       {children}
@@ -73,7 +73,7 @@ export function ToolBody({
   children: ReactNode;
 }) {
   return <AnimatedCollapse expanded={expanded}>
-      <div className={"block"}>{children}</div>
+      <div className="flex flex-col">{children}</div>
     </AnimatedCollapse>;
 }
 

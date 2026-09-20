@@ -73,17 +73,17 @@ export function NarrowFilesSheet({
     pointerEvents: visible ? "auto" as const : "none" as const
   } : {}}>
       <div className={"  bg-black/50"}>
-        <button className={"block"} onClick={dismiss} />
+        <button className="inline-flex items-center" onClick={dismiss} />
       </div>
 
       <div className={"  pb-[var(--bottom-inset)] h-0 max-h-0"}>
         <div>
-          <div className={"block"}>
+          <div className="flex flex-col">
             <div className={"  bg-muted"} />
           </div>
         </div>
 
-        <div className={"block"}>
+        <div className="flex flex-col">
           <FilesPanel />
         </div>
       </div>

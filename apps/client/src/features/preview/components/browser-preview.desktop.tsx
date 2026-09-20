@@ -54,8 +54,8 @@ export function BrowserPreviewDesktop({
     };
   }, [targetUrl, accessToken, brokerUrl]);
   const send = (message: unknown) => socket.current?.send(JSON.stringify(message));
-  return <div className={"block"}>
-    {frame ? <img src={frame} alt={`Preview ${target.label}`} className={"block"} onClick={event => {
+  return <div className="flex flex-col">
+    {frame ? <img src={frame} alt={`Preview ${target.label}`} className="flex flex-col" onClick={event => {
       const rect = event.currentTarget.getBoundingClientRect();
       send({
         type: "click",
@@ -91,7 +91,7 @@ export function BrowserPreviewDesktop({
           modifiers
         }
       });
-    }} tabIndex={0} /> : <div className={"block"} />}
+    }} tabIndex={0} /> : <div className="flex flex-col" />}
   </div>;
 }
 const styles = {

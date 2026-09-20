@@ -49,10 +49,10 @@ export function SessionSheetContent({
   const textMuted = isDark ? '#cdc8c5' : '#999999';
   const textSecondary = isDark ? '#f1ece8' : '#666666';
   const btnBg = isDark ? '#252525' : '#F0F0F0';
-  return <div className={"block"}>
-      <div className={"block"}>
-        <div className={"block"}>
-          <div className={"block"}>
+  return <div className="flex flex-col">
+      <div className="flex flex-col">
+        <div className="flex flex-col">
+          <div className="flex flex-col">
             <span>{title}</span>
             {subtitle ? <span>
                 {subtitle}
@@ -64,14 +64,14 @@ export function SessionSheetContent({
         </div>
       </div>
 
-      <div className={"block"}>
+      <div className="flex flex-col">
         <button onClick={onNew} disabled={createPending}>
           {createPending ? <span className="size-3 animate-spin" /> : <SquarePen size={14 as any} color={textPrimary} strokeWidth={1.8} />}
           <span>{newButtonLabel}</span>
         </button>
       </div>
 
-      <div className={"block"}>
+      <div className="flex flex-col">
         {isLoading ? <span className={"mt-[24px]"} /> : sessions.length === 0 ? <span>{emptyLabel}</span> : sessions.map(session => <AnimatedListItem key={session.id}>
               <button onClick={() => onSelect(session.id)}>
                 <SessionActivityIndicator sessionId={session.id} color={textMuted} />

@@ -30,7 +30,7 @@ export function FileViewer({
     isLoading,
     error: fileError
   } = useFileRead(filePath);
-  return <div className={"block"}>
+  return <div className="flex flex-col">
       {/* Sticky header */}
       <div>
         <button onClick={onClose} aria-label="Close file" {...{
@@ -51,7 +51,7 @@ export function FileViewer({
       </div>
 
       {/* Scrollable content */}
-      {isLoading ? <span className={"mt-[32px]"} /> : fileError ? <div className={"block"}>
+      {isLoading ? <span className={"mt-[32px]"} /> : fileError ? <div className="flex flex-col">
           <span>
             {fileError.includes("non-UTF8") ? "Binary file preview is not available." : "Cannot read file"}
           </span>

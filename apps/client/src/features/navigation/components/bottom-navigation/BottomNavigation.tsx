@@ -30,14 +30,14 @@ export function BottomNavigation() {
     });
   };
   return <div className={"  bg-background pb-[var(--bottom-inset)]"}>
-      <div horizontal className={"block"}>
+      <div horizontal className="flex flex-col">
         {workspaces.map(ws => <WorkspaceAvatar key={ws.id} title={ws.title} color={ws.color} isActive={ws.id === selectedWorkspaceId} hasNotification={ws.hasNotifications} onClick={() => handleWorkspacePress(ws.id)} layout="horizontal" />)}
         <AddWorkspaceButton onClick={handleAddWorkspace} layout="horizontal" />
       </div>
 
       <div className={"  bg-muted"} />
 
-      <div className={"block"}>
+      <div className="flex flex-col">
         <BottomBarIcon icon="settings" isActive={isSettingsActive} onClick={() => router.push('/settings')} />
       </div>
     </div>;

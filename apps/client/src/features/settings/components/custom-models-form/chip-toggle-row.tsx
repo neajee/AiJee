@@ -24,11 +24,11 @@ export function ChipToggleRow({
   }[];
   colors: ReturnType<typeof useColors>;
 }) {
-  return <div className={"block"}>
+  return <div className="flex flex-col">
       <span className={"  text-text-secondary"}>
         {label}
       </span>
-      <div className={"block"}>
+      <div className="flex flex-col">
         {options.map(item => <button key={item.key} onClick={item.locked ? undefined : item.onToggle} disabled={item.locked} role="checkbox" className={"  opacity-[0.6]"}>
             <span>
               {item.label}

@@ -53,8 +53,8 @@ export const SubagentToolCall = memo(function SubagentToolCall({
   }, [active, meta, tc.progress, tc.status]);
   return <div>
       <ToolHeader expanded={expanded} expandable={hasDetail} onToggle={toggle} isDark={isDark} alignTop aria-label={`${expanded ? "Collapse" : "Expand"} details of ${agentName}`}>
-        <div className={"block"}>
-          <div className={"block"}>
+        <div className="flex flex-col">
+          <div className="flex flex-col">
             <span className={"  text-text-secondary"}>
               {agentName}
             </span>
@@ -70,24 +70,24 @@ export const SubagentToolCall = memo(function SubagentToolCall({
 
       <ToolBody expanded={expanded && hasDetail}>
         <ToolSurface isDark={isDark}>
-          <div className={"block"} nestedScrollEnabled>
-            {recentTools.length > 0 && <div className={"block"}>
+          <div className="flex flex-col" nestedScrollEnabled>
+            {recentTools.length > 0 && <div className="flex flex-col">
                 <span className={"  text-text-tertiary"}>Steps</span>
                 {recentTools.map((step, i) => <span key={i} className={"  text-text-secondary"}>
                     {step.tool}({step.args})
                   </span>)}
               </div>}
 
-            {recentOutput.length > 0 && !transcript && <div className={"block"}>
+            {recentOutput.length > 0 && !transcript && <div className="flex flex-col">
                 <span className={"  text-text-tertiary"}>Output</span>
                 {recentOutput.map((line, i) => <span key={`o-${i}`} className={"  text-text-secondary"}>
                     {line}
                   </span>)}
               </div>}
 
-            {!!transcript && <div className={"block"}>
+            {!!transcript && <div className="flex flex-col">
                 {(recentTools.length > 0 || recentOutput.length > 0 || hasProgressMeta) && <span className={"  text-text-tertiary"}>Transcript</span>}
-                <div className={"block"}>{markdownElements}</div>
+                <div className="flex flex-col">{markdownElements}</div>
               </div>}
           </div>
         </ToolSurface>

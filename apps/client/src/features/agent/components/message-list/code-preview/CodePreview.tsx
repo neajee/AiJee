@@ -34,12 +34,12 @@ export const CodePreview = memo(function CodePreview({
           <div>
             {lines.map((line, index) => {
             const segments = tokenizeLine(line, language, diffLanguage);
-            return <div key={index} className={"block"}>
+            return <div key={index} className="flex flex-col">
                   {showLineNumbers ? <div>
                       <span className={"  text-text-tertiary"}>{startLine + index}</span>
                     </div> : null}
                   <span className={"  text-foreground"}>
-                    {segments.length ? segments.map((segment, segmentIndex) => <span key={`${index}-${segmentIndex}`} className={"block"}>
+                    {segments.length ? segments.map((segment, segmentIndex) => <span key={`${index}-${segmentIndex}`} className="inline-block">
                             {segment.text || (segmentIndex === 0 ? ' ' : '')}
                           </span>) : ' '}
                   </span>

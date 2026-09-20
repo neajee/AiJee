@@ -39,12 +39,12 @@ function Dot({
       translateY: translateY.value
     }]
   }));
-  return <div className={"w-0 h-0 rounded-none  "} />;
+  return <div className="rounded-full bg-current" style={{ width: SIZE, height: SIZE, color, opacity: opacity.value, transform: `translateY(${translateY.value}px)` }} />;
 }
 export const StreamingCursor = memo(function StreamingCursor({
   color = "#888"
 }: StreamingCursorProps) {
-  return <div className={"block"}>
+  return <div className="flex items-center gap-1 py-1 px-0.5">
       {Array.from({
       length: DOT_COUNT
     }, (_, i) => <Dot key={i} index={i} color={color} />)}

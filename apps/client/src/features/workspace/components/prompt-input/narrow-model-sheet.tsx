@@ -108,12 +108,12 @@ function NarrowModelSheetComponent({
     }));
   })();
   return <div visible={visible} transparent animationType="none" onRequestClose={handleClose}>
-      <div className={"block"}>
+      <div className="flex flex-col">
         <div className={"  opacity-100"}>
-          <button className={"block"} onClick={handleClose} />
+          <button className="inline-flex items-center" onClick={handleClose} />
         </div>
         <div>
-          <div className={"block"}>
+          <div className="flex flex-col">
             <div />
           </div>
           <span className={"  text-foreground"}>
@@ -125,7 +125,7 @@ function NarrowModelSheetComponent({
                 <X size={16} color={theme.textMuted} strokeWidth={2} />
               </button>}
           </div>
-          <div className={"block"} keyboardShouldPersistTaps="handled">
+          <div className="flex flex-col" keyboardShouldPersistTaps="handled">
             {providers.map(provider => <div key={provider.name}>
                 <span className={"  text-foreground"}>
                   {provider.name}
@@ -133,7 +133,7 @@ function NarrowModelSheetComponent({
                 {provider.models.map(model => {
               const isActive = model.id === currentModel?.id;
               return <button key={model.id} onClick={() => handleSelect(model.provider, model.id)}>
-                      <div className={"block"}>
+                      <div className="flex flex-col">
                         <ProviderIcon provider={model.provider} size={14} color={isActive ? theme.accentColor : theme.textMuted} />
                         <span>
                           {model.name}

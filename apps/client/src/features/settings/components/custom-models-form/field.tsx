@@ -20,7 +20,7 @@ export function Field({
   mono?: boolean;
   autoFocus?: boolean;
 }) {
-  return <div className={"block"}>
+  return <div className="flex flex-col">
       <span className={"  text-text-secondary"}>
         {label}
       </span>

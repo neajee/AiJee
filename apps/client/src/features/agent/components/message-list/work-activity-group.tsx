@@ -27,14 +27,14 @@ export const WorkActivityGroup = memo(function WorkActivityGroup({
   const expanded = override ?? autoExpanded;
   const actions = useMemo(() => summarizeTurnActions(steps), [steps]);
   const label = actions.length ? actions.map(formatTurnAction).join(" · ") : running ? "Thinking" : "Thought";
-  return <div className={"block"}>
+  return <div className="flex flex-col">
       <ToolHeader expanded={expanded} expandable onToggle={() => setOverride(!expanded)} isDark={isDark} aria-label={`${expanded ? "Collapse" : "Expand"} ${label}`}>
         <span className={"  text-text-secondary"}>
           {label}
         </span>
       </ToolHeader>
       <ToolBody expanded={expanded}>
-        <div className={"block"}>
+        <div className="flex flex-col">
           {steps.map(step => <WorkStepView key={step.key} step={step} isDark={isDark} />)}
         </div>
       </ToolBody>

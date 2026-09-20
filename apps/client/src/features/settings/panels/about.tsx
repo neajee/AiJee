@@ -73,17 +73,17 @@ export function AboutPanel() {
   const currentReleaseTag = timeline.find(release => release.tag === versionLabel)?.tag ?? timeline[0]?.tag ?? null;
   const latestLabel = release?.latest ? release.latest.replace(/^v/i, '') : null;
   const heroBuildMeta = `构建于 ${formatReleaseTime(versionInfo?.updated_at)}${versionSuffix ? ` · ${versionSuffix}` : ''}`;
-  return <div className={"gap-[var(--group-gap)]"}>
+  return <div className={"flex flex-col gap-[var(--group-gap)]"}>
       {/* 1 · Hero: version number + build meta + update check */}
       <AboutGroup title="当前版本">
-        <div className={"block"}>
-          <div className={"block"}>
+        <div className="flex flex-col">
+          <div className="flex flex-col">
             <span>{versionLabel}</span>
             <span>
               {heroBuildMeta}
             </span>
           </div>
-          <div className={"block"}>
+          <div className="flex flex-col">
             {checkState === 'checking' ? <div>
                 <span className="size-3 animate-spin" />
                 <span>检查中…</span>
@@ -105,10 +105,10 @@ export function AboutPanel() {
 
       {/* 2 · Changelog timeline */}
       <AboutGroup title={`更新日志 (${timeline.length})`}>
-        {timeline.length ? <div className={"block"}>
+        {timeline.length ? <div className="flex flex-col">
             <div />
             {timeline.map((releaseEntry, index) => <ReleaseRow key={releaseEntry.tag} release={releaseEntry} current={releaseEntry.tag === currentReleaseTag} defaultOpen={index === 0} />)}
-          </div> : <div className={"block"}>
+          </div> : <div className="flex flex-col">
             <span>当前构建未附带发布记录。</span>
           </div>}
       </AboutGroup>

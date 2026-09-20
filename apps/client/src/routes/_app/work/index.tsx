@@ -60,8 +60,8 @@ export default function WorkIndex() {
   const editorBg = colors.background;
   return <div className={"  bg-background pb-0"}>
       <div>
-        <div className={"block"}>
-          {sending ? <div className={"block"}>
+        <div className="flex flex-col">
+          {sending ? <div className="flex flex-col">
               <span className="size-3 animate-spin" />
               <span className={"  text-text-secondary"}>
                 Starting Work…

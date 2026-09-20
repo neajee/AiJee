@@ -68,9 +68,9 @@ export function PackageDetail({
     height: phone ? '100%' : undefined,
     maxHeight: phone ? undefined : maxHeight
   }]}>
-        <div className={"block"}>
+        <div className="flex flex-col">
           <div className={"  p-[var(--gutter)]"}>
-            <div className={"block"}>
+            <div className="flex flex-col">
               <span className="text-lg font-semibold text-foreground">
                 {pkg.name}
               </span>
@@ -80,7 +80,7 @@ export function PackageDetail({
                 {pkg.package_types.length ? ` · ${pkg.package_types.join('、')}` : ''}
               </span>
             </div>
-            <button onClick={onClose} role="button" aria-label="关闭" className={"block"}>
+            <button onClick={onClose} role="button" aria-label="关闭" className="inline-flex items-center">
               <X size={16} color={p.textSecondary} strokeWidth={2} />
             </button>
           </div>
@@ -95,7 +95,7 @@ export function PackageDetail({
           </div>
 
           <div className={"  p-[var(--gutter)]"}>
-            {pkg.repository || pkg.homepage ? <button onClick={() => Linking.openURL((pkg.repository ?? pkg.homepage)!)} role="link" aria-label="打开仓库" className={"block"}>
+            {pkg.repository || pkg.homepage ? <button onClick={() => Linking.openURL((pkg.repository ?? pkg.homepage)!)} role="link" aria-label="打开仓库" className="inline-flex items-center">
                 <ExternalLink size={13} color={p.textSecondary} strokeWidth={1.8} />
                 <span className={"text-[var(--desc-size)] font-sans"}>
                   仓库

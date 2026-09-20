@@ -13,22 +13,22 @@ export const ToolResultImages = memo(function ToolResultImages({
   const closePreview = useCallback(() => setPreviewUri(null), []);
   if (!images.length) return null;
   return <>
-      <div className={"block"}>
+      <div className="flex flex-col">
         {images.map((img, i) => {
         const uri = img.data.startsWith("data:") ? img.data : `data:${img.mimeType};base64,${img.data}`;
         return <button key={i} onClick={() => openPreview(uri)}>
               <img src={{
             uri
-          }} className={"block"} resizeMode="contain" />
+          }} className="flex flex-col" resizeMode="contain" />
             </button>;
       })}
       </div>
       {previewUri && <div visible transparent animationType="fade" onRequestClose={closePreview}>
-          <button className={"block"} onClick={closePreview}>
-            <div className={"block"}>
+          <button className="inline-flex items-center" onClick={closePreview}>
+            <div className="flex flex-col">
               <img src={{
             uri: previewUri
-          }} className={"block"} resizeMode="contain" />
+          }} className="flex flex-col" resizeMode="contain" />
             </div>
           </button>
         </div>}

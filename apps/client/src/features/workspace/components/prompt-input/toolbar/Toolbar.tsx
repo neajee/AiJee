@@ -21,7 +21,7 @@ export function ToolbarView(controller: ToolbarController) {
     showTaskSelector
   } = controller;
   if (configError && !agentState) {
-    return <div className={"block"}>
+    return <div className="flex flex-col">
         <div className={"  bg-surface border-border"}>
           <span className={"  text-text-secondary"}>Failed to load</span>
           <button onClick={configRetry} role="button" aria-label="Retry loading toolbar">
@@ -35,8 +35,8 @@ export function ToolbarView(controller: ToolbarController) {
       <div className={"  bg-surface border-border"}>
         <ModelPicker {...controller} />
         <EffortPicker {...controller} />
-        {!inline && <div className={"block"} />}
-        {showTaskSelector && appMode === 'code' && isWideScreen && <div className={"block"}><TaskSelector placement="above" /></div>}
+        {!inline && <div className="flex flex-col" />}
+        {showTaskSelector && appMode === 'code' && isWideScreen && <div className="flex flex-col"><TaskSelector placement="above" /></div>}
         <ModeToggle {...controller} />
       </div>
     </div>;

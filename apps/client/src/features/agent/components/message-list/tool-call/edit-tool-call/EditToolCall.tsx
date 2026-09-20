@@ -43,10 +43,10 @@ export const EditToolCall = memo(function EditToolCall({
   return <div>
       <ToolHeader expanded={expanded} expandable={hasDiff} onToggle={toggle} isDark={isDark} aria-label={`${expanded ? 'Collapse' : 'Expand'} diff of ${fileName || 'file'}`}>
         <span>{title} {fileName || filePath || 'file'}</span>
-        {(addedLines > 0 || removedLines > 0) && <div className={"block"}><span>+{addedLines}</span><span>-{removedLines}</span></div>}
+        {(addedLines > 0 || removedLines > 0) && <div className="flex flex-col"><span>+{addedLines}</span><span>-{removedLines}</span></div>}
       </ToolHeader>
       <ToolBody expanded={expanded && hasDiff}>
-        <div ref={previewRef} className={"block"}>
+        <div ref={previewRef} className="flex flex-col">
           <button onClick={openFullscreen} role="button" aria-label="Open diff fullscreen">
             <Maximize2 size={12} color={colors.textSecondary} strokeWidth={2} /><span>Fullscreen</span>
           </button>
@@ -54,16 +54,16 @@ export const EditToolCall = memo(function EditToolCall({
         </div>
       </ToolBody>
       <div visible={fullscreenOpen} transparent animationType="none" onRequestClose={closeFullscreen}>
-        <div className={"block"}>
+        <div className="flex flex-col">
           <div className={"  opacity-100"} />
-          <button className={"block"} onClick={closeFullscreen} />
-          <div className={"  w-0 h-0 rounded-none"}>
+          <button className="inline-flex items-center" onClick={closeFullscreen} />
+          <div className="flex-1 min-h-0">
             <div className={"flex-1 opacity-100"}>
               <div>
                 <span>{fileName || filePath || 'Diff'}</span>
-                <button onClick={closeFullscreen} className={"block"}><X size={16} color={colors.textSecondary} strokeWidth={2} /></button>
+                <button onClick={closeFullscreen} className="inline-flex items-center"><X size={16} color={colors.textSecondary} strokeWidth={2} /></button>
               </div>
-              <div className={"block"}><CodePreview code={diffText} isDark={isDark} maxHeight={Math.max(320, height - 88)} language="diff" diffLanguage={detectedLanguage} showLineNumbers={false} /></div>
+              <div className="flex flex-col"><CodePreview code={diffText} isDark={isDark} maxHeight={Math.max(320, height - 88)} language="diff" diffLanguage={detectedLanguage} showLineNumbers={false} /></div>
             </div>
           </div>
         </div>

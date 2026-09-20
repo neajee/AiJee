@@ -57,17 +57,17 @@ export const UserMessage = memo(function UserMessage({
     window.addEventListener("blur", collapse);
     return () => window.removeEventListener("blur", collapse);
   }, []);
-  return <div className={"block"}>
+  return <div className="flex flex-col">
       <div className={"  bg-surface-raised"}>
-        {images.length > 0 && <div horizontal className={"block"}>
+        {images.length > 0 && <div horizontal className="flex flex-col">
             {images.map(img => <img key={img.id} src={{
           uri: `data:${img.mimeType || "image/png"};base64,${img.data}`
-        }} className={"block"} resizeMode="cover" />)}
+        }} className="flex flex-col" resizeMode="cover" />)}
           </div>}
         {editing ? <>
             <input autoFocus multiline value={editText} onChange={event => onChangeEdit(event.target.value)} className={"  text-foreground border-border"} />
-            <div className={"block"}>
-              <button onClick={onCancelEdit} aria-label="Cancel edit" className={"block"}>
+            <div className="flex flex-col">
+              <button onClick={onCancelEdit} aria-label="Cancel edit" className="inline-flex items-center">
                 <X size={14} color={colors.textTertiary} />
               </button>
               <button onClick={onSubmitEdit} disabled={!editText.trim()} aria-label="Send edited message" className={"  bg-accent"}>
@@ -78,17 +78,17 @@ export const UserMessage = memo(function UserMessage({
             <span className={"  text-foreground"}>
               {expanded || !collapsible ? message.text : preview}
             </span>
-            {collapsible && <div className={"block"}>
+            {collapsible && <div className="flex flex-col">
                 <div className={"  bg-muted"} />
                 <button onClick={() => setExpanded(value => !value)} role="button" aria-label={expanded ? "收起长消息" : "展开长消息"}>
                   <span className={"  text-text-tertiary"}>{expanded ? "收起" : "展开全文"}</span>
-                  <ChevronDown size={12} color={colors.textTertiary} className={"block"} />
+                  <ChevronDown size={12} color={colors.textTertiary} className="flex flex-col" />
                 </button>
                 <div className={"  bg-muted"} />
               </div>}
           </>}
       </div>
-      {!editing && onEdit && <button onClick={onEdit} role="button" aria-label="Edit message" className={"block"}>
+      {!editing && onEdit && <button onClick={onEdit} role="button" aria-label="Edit message" className="inline-flex items-center">
           <Pencil size={13} color={colors.textTertiary} strokeWidth={1.8} />
         </button>}
     </div>;

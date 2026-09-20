@@ -169,17 +169,17 @@ export function PromptInputView({
           </span>
         </button>}
 
-      <div className={"block"}>
+      <div className="flex flex-col">
         {queuedCount > 0 && <div className={"  border-border"}>
-            <div className={"block"}>
+            <div className="flex flex-col">
               <span className={"  text-text-secondary"}>
                 {queuedCount} queued message{queuedCount === 1 ? "" : "s"}
               </span>
-              <div className={"block"}>
+              <div className="flex flex-col">
                 {isStreaming && <button onClick={() => {
               void requestAbort();
             }} role="button" aria-label="Stop generation">
-                    <div className={"block"}>
+                    <div className="flex flex-col">
                       <Square size={10} color={theme.textMuted} strokeWidth={2} fill={theme.textMuted} />
                       <span className={"  text-text-secondary"}>Stop</span>
                     </div>
@@ -189,7 +189,7 @@ export function PromptInputView({
             {queuedMessages.map(({
           message,
           kind
-        }, index) => <div key={`${kind}-${index}`} className={"block"}>
+        }, index) => <div key={`${kind}-${index}`} className="flex flex-col">
                 <span className={"  text-text-secondary"}>{kind}</span>
                 <span className={"  text-text-secondary"}>
                   {message}

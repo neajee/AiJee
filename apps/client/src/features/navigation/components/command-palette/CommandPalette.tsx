@@ -40,18 +40,18 @@ export function CommandPalette({
   if (!visible) return null;
   let flatIndex = 0;
   return <div visible transparent animationType="none" onRequestClose={handleClose}>
-      <div className={"block"}>
+      <div className="flex flex-col">
         <AnimatedOverlay animation={overlayAnim} onClick={handleClose} />
         <div className={"  opacity-100"}>
           <div>
             <Search size={16} color={textMuted} strokeWidth={2} />
             <input ref={inputRef} value={search} onChange={event => setSearch(event.target.value)} onKeyPress={handleKeyPress} placeholder="搜索对话…" />
           </div>
-          <div ref={scrollRef} className={"block"} keyboardShouldPersistTaps="handled">
+          <div ref={scrollRef} className="flex flex-col" keyboardShouldPersistTaps="handled">
             <div ref={scrollContentRef}>
-              {sessionsLoading ? <div className={"block"}>
+              {sessionsLoading ? <div className="flex flex-col">
                   <span className="size-3 animate-spin" />
-                </div> : sections.length === 0 ? <div className={"block"}>
+                </div> : sections.length === 0 ? <div className="flex flex-col">
                   <span>
                     {search.trim() ? '没有匹配的对话' : '暂无最近对话'}
                   </span>
@@ -66,7 +66,7 @@ export function CommandPalette({
                   itemRefs.current[index] = ref as any;
                 }} onClick={item.onSelect}>
                         <Icon size={15} color={isSelected ? textPrimary : textMuted} strokeWidth={1.8} />
-                        <div className={"block"}>
+                        <div className="flex flex-col">
                           <span>
                             {item.label}
                           </span>
@@ -94,6 +94,6 @@ function AnimatedOverlay({
   onPress: () => void;
 }) {
   return <div className={"  opacity-100"}>
-      <button className={"block"} onClick={onPress} />
+      <button className="inline-flex items-center" onClick={onPress} />
     </div>;
 }

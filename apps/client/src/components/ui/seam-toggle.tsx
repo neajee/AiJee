@@ -80,8 +80,13 @@ export function SeamToggle({
     title: label
   }} {...webHoverProps}
   // The mark is small; the hit area is the whole seam segment plus slop.
-  className={"block"}>
-      <div className={"  w-0 h-0 rounded-none"}>
+  className="inline-flex items-center">
+      <div className="flex items-center justify-center rounded-md" style={{
+      width: active ? ACTIVE_WIDTH : REST_WIDTH,
+      height: active ? ACTIVE_HEIGHT : REST_HEIGHT,
+      backgroundColor: active ? activeColor : restColor,
+      borderColor: activeBorder
+    }}>
         {/* Held back until the bar has some width to hold it. */}
         <div className={"opacity-100"}>
           <Chevron size={13} color={colors.text} strokeWidth={2} />

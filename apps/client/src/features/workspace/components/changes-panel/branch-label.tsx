@@ -21,18 +21,18 @@ export function BranchLabel({
     textSecondary,
     textMuted
   } = useChangesTheme();
-  return <div className={"block"}>
+  return <div className="flex flex-col">
       <GitBranch size={12} color={textMuted} strokeWidth={2} />
       <span {...{
       title: branch
     }}>
         {branch}
       </span>
-      {ahead > 0 && <div className={"block"}>
+      {ahead > 0 && <div className="flex flex-col">
           <ArrowUp size={9} color={textMuted} strokeWidth={2.5} />
           <span>{ahead}</span>
         </div>}
-      {behind > 0 && <div className={"block"}>
+      {behind > 0 && <div className="flex flex-col">
           <ArrowDown size={9} color={textMuted} strokeWidth={2.5} />
           <span>{behind}</span>
         </div>}

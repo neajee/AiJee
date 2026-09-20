@@ -74,17 +74,17 @@ export function ServerRow({
     label: minutes ? `上次连接 ${minutes} 分钟前` : '离线 · 尚无连接记录',
     color: p.textTertiary
   };
-  return <div className={"block"}>
+  return <div className="flex flex-col">
       {isActive ? <div /> : null}
       <button onClick={onPress} onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)} role="button" aria-label={`连接到 ${server.name}，${status.label}`}>
       <ConnectionStatusDot label={status.label} color={status.color} connecting={isConnecting} />
-      <div className={"w-[30px] h-[30px] rounded-[8px] items-center justify-center"}>
+      <div className={"flex items-center justify-center w-[30px] h-[30px] rounded-[8px]"}>
         {isConnecting ? <span className="size-3 animate-spin" /> : <PiLogo size={16} color={p.textSecondary} />}
       </div>
 
-      <div className={"flex-1 self-stretch justify-center gap-[2px]"}>
+      <div className={"flex flex-1 flex-col self-stretch justify-center gap-[2px]"}>
         <span className={"text-[13px] font-sans text-left"}>{server.name}</span>
-        <div className={"block"}>
+        <div className="flex flex-col">
           <span className={"text-[12px] font-mono opacity-[0.55] text-left"}>{status.label}</span>
         </div>
       </div>

@@ -31,8 +31,8 @@ export const AssistantMessage = memo(function AssistantMessage({
   const hasText = !!message.text;
   const hasError = !!message.errorMessage;
   const isStreaming = !!message.isStreaming;
-  return <div className={"block"}>
-      {hasText && <div className={"block"}>
+  return <div className="flex flex-col">
+      {hasText && <div className="flex flex-col">
           <AssistantMarkdown text={message.text} isStreaming={isStreaming} />
         </div>}
 
@@ -74,9 +74,9 @@ export const MessageToolbar = memo(function MessageToolbar({
     setTimeout(() => setCopied(false), 1500);
   }, [message.text]);
   return <>
-      <div className={"block"}>
+      <div className="flex flex-col">
         <div>
-          <div className={"block"}>
+          <div className="flex flex-col">
             <button onClick={handleCopy} className={"  bg-surface-raised"}>
               {copied ? <span className={"  text-text-tertiary"}>✓</span> : <Copy size={13} color={colors.textTertiary} strokeWidth={1.8} />}
             </button>

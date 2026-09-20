@@ -65,9 +65,9 @@ export function TasksPanelContent() {
   }, [setSelectedTaskLabel, setSelectedTaskId, setOutputPanelVisible, setPanelOpen]);
   const runningLabels = new Set(instances.filter(i => i.status === 'running').map(i => i.label));
   const availableTasks = definitions.filter(d => !runningLabels.has(d.label));
-  return <div className={"block"}>
+  return <div className="flex flex-col">
       {instances.length > 0 && <>
-          <button onClick={() => setExpandedSection(expandedSection === 'running' ? null : 'running')} className={"block"}>
+          <button onClick={() => setExpandedSection(expandedSection === 'running' ? null : 'running')} className="inline-flex items-center">
             {expandedSection === 'running' ? <ChevronDown size={12} color={textMuted} strokeWidth={2} /> : <ChevronRight size={12} color={textMuted} strokeWidth={2} />}
             <span>
               ACTIVE ({instances.length})
@@ -77,7 +77,7 @@ export function TasksPanelContent() {
         </>}
 
       {availableTasks.length > 0 && <>
-          <button onClick={() => setExpandedSection(expandedSection === 'available' ? null : 'available')} className={"block"}>
+          <button onClick={() => setExpandedSection(expandedSection === 'available' ? null : 'available')} className="inline-flex items-center">
             {expandedSection === 'available' ? <ChevronDown size={12} color={textMuted} strokeWidth={2} /> : <ChevronRight size={12} color={textMuted} strokeWidth={2} />}
             <span>
               AVAILABLE ({availableTasks.length})
@@ -86,7 +86,7 @@ export function TasksPanelContent() {
           {expandedSection === 'available' && availableTasks.map(def => <AvailableTaskRow key={def.label} definition={def} isSelected={def.label === selectedTaskLabel} onSelect={() => handleSelectTask(def.label)} onStart={() => handleStart(def.label)} textPrimary={textPrimary} textMuted={textMuted} hoverBg={hoverBg} loading={loading} isDark={isDark} />)}
         </>}
 
-      {instances.length === 0 && availableTasks.length === 0 && <div className={"block"}>
+      {instances.length === 0 && availableTasks.length === 0 && <div className="flex flex-col">
           <span>
             No tasks configured.{'\n'}Add .pi/tasks.json to your workspace.
           </span>

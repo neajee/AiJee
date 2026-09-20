@@ -63,7 +63,7 @@ export const BashToolCall = memo(function BashToolCall({
 
       {hasOutput && <ToolBody expanded={expanded}>
           <ToolSurface isDark={isDark}>
-            <div ref={scrollRef} className={"block"} nestedScrollEnabled onContentSizeChange={handleOutputGrowth} onScrollBeginDrag={stopFollowing}>
+            <div ref={scrollRef} className="flex flex-col" nestedScrollEnabled onContentSizeChange={handleOutputGrowth} onScrollBeginDrag={stopFollowing}>
               <span className={"  text-text-secondary"}>
                 {displayOutput}
               </span>

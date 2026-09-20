@@ -40,20 +40,20 @@ function PreviewPanelComponent({
         <span>
           Add a port to preview a running app.
         </span>
-        <div className={"block"}>
+        <div className="flex flex-col">
           <input placeholder="Port (e.g. 3000)" value={portInput} onChange={event => setPortInput(event.target.value)} onKeyDown={event => event.key === "Enter" && handleAddPort(event)} />
-          <button onClick={handleAddPort} disabled={!portInput.trim()} className={"block"}>
+          <button onClick={handleAddPort} disabled={!portInput.trim()} className="inline-flex items-center">
             <span>
               Add
             </span>
           </button>
         </div>
-        {suggestions.length > 0 && <div className={"block"}>
+        {suggestions.length > 0 && <div className="flex flex-col">
             <span>
               Detected ports
             </span>
-            <div className={"block"}>
-              {suggestions.map(s => <button key={s.id} onClick={() => handleAddSuggestion(s)} className={"block"}>
+            <div className="flex flex-col">
+              {suggestions.map(s => <button key={s.id} onClick={() => handleAddSuggestion(s)} className="inline-flex items-center">
                   <span>
                     {s.label}
                   </span>
@@ -68,23 +68,23 @@ function PreviewPanelComponent({
         <div horizontal>
           {targets.map(target => {
           const active = selectedTarget?.id === target.id;
-          return <button key={target.id} onClick={() => selectTarget(sessionId, target.id)} className={"block"}>
+          return <button key={target.id} onClick={() => selectTarget(sessionId, target.id)} className="inline-flex items-center">
                 <span>
                   {target.label}
                 </span>
               </button>;
         })}
-          {showPortInput ? <div className={"block"}>
+          {showPortInput ? <div className="flex flex-col">
               <input autoFocus placeholder="Port" value={portInput} onChange={event => setPortInput(event.target.value)} onKeyDown={event => event.key === "Enter" && handleAddPort(event)} onBlur={() => {
             if (!portInput.trim()) setShowPortInput(false);
           }} />
-            </div> : <button onClick={() => setShowPortInput(true)} className={"block"}>
+            </div> : <button onClick={() => setShowPortInput(true)} className="inline-flex items-center">
               <Plus size={14} color={isDark ? "#8B8685" : "#999"} strokeWidth={1.8} />
             </button>}
         </div>
       </div>
-      <div className={"block"}>
-        {selectedTarget ? <BrowserPreview serverUrl={serverUrl} accessToken={accessToken} sessionId={sessionId} target={selectedTarget} /> : <div className={"block"}>
+      <div className="flex flex-col">
+        {selectedTarget ? <BrowserPreview serverUrl={serverUrl} accessToken={accessToken} sessionId={sessionId} target={selectedTarget} /> : <div className="flex flex-col">
             <span className="size-3 animate-spin" />
           </div>}
       </div>

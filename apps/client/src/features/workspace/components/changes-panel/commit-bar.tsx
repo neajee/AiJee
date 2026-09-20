@@ -28,7 +28,7 @@ export function CommitBar({
   return <div>
       <div>
         <input ref={commitInputRef} value={commitMsg} onChange={event => onChangeCommitMsg(event.target.value)} placeholder={`Commit message for ${stagedCount} staged file${stagedCount !== 1 ? "s" : ""}...`} multiline editable={!isCommitting} />
-        <div className={"block"}>
+        <div className="flex flex-col">
           {isCommitting ? <span className="size-3 animate-spin" /> : <button onClick={onCommit} disabled={!commitMsg.trim()} aria-label="Commit" {...{
           title: "Commit"
         }}>

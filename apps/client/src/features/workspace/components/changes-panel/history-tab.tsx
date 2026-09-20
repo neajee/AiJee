@@ -18,22 +18,22 @@ export function HistoryTab({
   } = useChangesTheme();
   const bins = useMemo(() => binEntries(entries), [entries]);
   if (entries.length === 0) {
-    return <div className={"block"}><History size={20} color={textMuted} strokeWidth={2} /><span>No commits yet</span></div>;
+    return <div className="flex flex-col"><History size={20} color={textMuted} strokeWidth={2} /><span>No commits yet</span></div>;
   }
   return <>{bins.map(bin => <div key={bin.label}>
     <span>{bin.label}</span>
     {bin.entries.map((entry, index) => {
         const previous = index > 0 ? bin.entries[index - 1] : null;
         const showAuthor = !previous || previous.author !== entry.author;
-        return <div key={entry.hash} className={"block"}>
-        <div className={"block"}>
+        return <div key={entry.hash} className="flex flex-col">
+        <div className="flex flex-col">
           {index > 0 && <div />}
           {index < bin.entries.length - 1 && <div />}
           <div />
         </div>
-        <div className={"block"}>
+        <div className="flex flex-col">
           <span>{entry.message}</span>
-          <div className={"block"}>
+          <div className="flex flex-col">
             <span>{entry.short_hash}</span>
             {showAuthor && <span>{entry.author}</span>}
             <div className={"flex-1"} />
@@ -66,6 +66,6 @@ export function LogSection({
       <History size={12} color={textMuted} strokeWidth={2} /><span>Log</span><div className={"flex-1"} />
       {isOpen ? <ChevronDown size={13} color={textMuted} strokeWidth={2} /> : <ChevronUp size={13} color={textMuted} strokeWidth={2} />}
     </button>
-    {isOpen && <div className={"block"}>{isLoading ? <span className={"mt-[16px] mb-[16px]" + " size-3 animate-spin"} /> : <HistoryTab entries={entries} />}</div>}
+    {isOpen && <div className="flex flex-col">{isLoading ? <span className={"mt-[16px] mb-[16px]" + " size-3 animate-spin"} /> : <HistoryTab entries={entries} />}</div>}
   </div>;
 }

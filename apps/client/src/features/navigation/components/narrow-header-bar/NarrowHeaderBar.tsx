@@ -17,17 +17,17 @@ export function NarrowHeaderBar(props: NarrowHeaderBarProps) {
   } = useNarrowHeaderController(props);
   return <>
       <div className={"  bg-background"}>
-        <div className={"block"}>
+        <div className="flex flex-col">
           <button onClick={props.onWorkspacePress} role="button" aria-label="Open workspace switcher">
             {workspace && <div className={"  bg-background"}>
-                <span className={"block"}>{workspace.title.charAt(0).toUpperCase()}</span>
+                <span className="inline-block">{workspace.title.charAt(0).toUpperCase()}</span>
               </div>}
             <span>
               {workspace?.title ?? 'Workspace'}
             </span>
           </button>
         </div>
-        <div className={"block"}>
+        <div className="flex flex-col">
           <button onClick={props.onFilesPress} role="button" aria-label="Files">
             <FolderOpen size={16} color={textPrimary} strokeWidth={1.8} />
           </button>

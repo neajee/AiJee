@@ -17,7 +17,7 @@ export function AppModal({
   const isDark = (useColorScheme() ?? 'light') === 'dark';
   const contentStyles = Array.isArray(contentStyle) ? contentStyle : contentStyle ? [contentStyle] : [];
   return <div visible={visible} transparent animationType="fade" onRequestClose={onClose} statusBarTranslucent>
-      <div className={"block"}>
+      <div className="flex flex-col">
         <button onClick={closeOnBackdrop ? onClose : undefined} aria-label="关闭弹窗" />
         <button onClick={event => event.stopPropagation()}>
           {children}

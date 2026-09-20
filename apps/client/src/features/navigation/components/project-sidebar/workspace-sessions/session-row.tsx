@@ -63,12 +63,12 @@ export function SessionRow({
       Alert.alert('归档失败', '无法归档该对话，请重试。');
     }
   }, [busy, onArchive]);
-  const status = <div className={"block"}>{isWorking ? <SessionActivityIndicator sessionId={session.id} color={colors.textSecondary} idlePlaceholder={false} /> : hasUnread ? <div /> : null}</div>;
+  const status = <div className="flex flex-col">{isWorking ? <SessionActivityIndicator sessionId={session.id} color={colors.textSecondary} idlePlaceholder={false} /> : hasUnread ? <div /> : null}</div>;
   return <div onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)}>
-      {editing ? <div className={"block"}>{status}<input autoFocus value={draft} onChange={event => setDraft(event.target.value)} onKeyDown={event => event.key === "Enter" && (() => void commitRename())(event)} onKeyPress={event => {
+      {editing ? <div className="flex flex-col">{status}<input autoFocus value={draft} onChange={event => setDraft(event.target.value)} onKeyDown={event => event.key === "Enter" && (() => void commitRename())(event)} onKeyPress={event => {
         if (event.nativeEvent.key === 'Escape') setEditing(false);
       }} editable={busy !== 'rename'} maxLength={200} className={"  font-sans"} /></div> : <button onClick={onPress}>{status}<span className={"  font-sans"}>{title}</span></button>}
-      {showActions && !editing && <div className={"block"}>
+      {showActions && !editing && <div className="flex flex-col">
         <RowAction label="重命名对话" onClick={() => setEditing(true)} isDark={isDark}><Pencil size={11} color={colors.textTertiary} strokeWidth={1.8} /></RowAction>
         <RowAction label="归档对话" onClick={() => void handleArchive()} isDark={isDark}>{busy === 'archive' ? <span className={"w-[10px] h-[10px]" + " size-3 animate-spin"} /> : <ArchiveIcon size={11} color={colors.textTertiary} strokeWidth={1.8} />}</RowAction>
       </div>}

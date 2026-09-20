@@ -75,7 +75,7 @@ export function PackageMarketplace() {
   const gutter = phone ? m.gutter : m.gutter + 6;
   return <div>
       <div className={"  pl-0 pr-0"}>
-        <div className={"block"}>
+        <div className="flex flex-col">
           <span className="text-lg font-semibold text-foreground">
             插件广场
           </span>
@@ -92,21 +92,21 @@ export function PackageMarketplace() {
       }]} value={tab} onChange={value => setTab(value as MarketplaceTab)} />
       </div>
 
-      {tab === 'discover' ? <div className={"block"}>
-          <div className={"gap-[10px]"}>
+      {tab === 'discover' ? <div className="flex flex-col">
+          <div className={"flex flex-col gap-[10px]"}>
             <SearchField value={query} onChange={event => setQuery(event.target.value)} onSubmit={() => void search(query, category)} />
-            <div className={"block"}>
+            <div className="flex flex-col">
               {CATEGORIES.map(item => <Chip key={item.value} label={item.label} active={category === item.value} onClick={() => setCategory(item.value)} />)}
             </div>
           </div>
 
           {error ? <Notice text={error} tone="error" /> : null}
 
-          {loading ? <div className={"block"}>
+          {loading ? <div className="flex flex-col">
               <span className="size-3 animate-spin" />
             </div> : items.length === 0 ? <span className={"  text-[var(--desc-size)]"}>
               没有匹配的插件。
-            </span> : <div className={"block"}>
+            </span> : <div className="flex flex-col">
               {items.map(item => <PackageCard key={item.name} pkg={item} single={phone} onClick={() => void openDetail(item)} />)}
             </div>}
         </div> : <InstalledView output={installedOutput} loading={installedLoading} error={error} onRefresh={loadInstalled} gutter={gutter} single={phone} message={installedMessage} />}

@@ -26,8 +26,8 @@ export function ModeOption({
   const extensionCount = Array.isArray(mode?.extensions) ? mode.extensions.length : 0;
   if (extensionCount) parts.push(`${extensionCount} ext`);
   return <button onClick={onPress}>
-      <div className={"block"}>
-        <div className={"block"}>
+      <div className="flex flex-col">
+        <div className="flex flex-col">
           {mode ? <span>{mode.name}</span> : <><CircleOff size={14} color={textMuted} strokeWidth={1.8} /><span>Default</span></>}
           {mode?.is_default && <Star size={12} color="#E8A300" fill="#E8A300" strokeWidth={1.8} />}
         </div>

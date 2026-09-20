@@ -13,7 +13,7 @@ export default function AppIndex() {
   const selectedWorkspaceId = useWorkspaceStore(s => s.selectedWorkspaceId);
   const workspaceLoading = useWorkspaceStore(s => s.loading);
   if (!serversLoaded || !bootstrapReady || !authLoaded || workspaceLoading) {
-    return <div className={"flex-1 justify-center items-center"}>
+    return <div className={"flex flex-1 flex-col justify-center items-center"}>
         <MorphLoading size="lg" />
       </div>;
   }

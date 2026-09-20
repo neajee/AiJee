@@ -41,7 +41,7 @@ export function WorkspaceAvatar({
   const innerBorderColor = isDark ? '#3b3a39' : 'rgba(0,0,0,0.1)';
   const letterColor = getLighterColor(color);
   return <div>
-      <div className={"block"}>
+      <div className="flex flex-col">
         <button onClick={onPress} role="button" aria-label={title}>
           <div>
             <span>{initial}</span>

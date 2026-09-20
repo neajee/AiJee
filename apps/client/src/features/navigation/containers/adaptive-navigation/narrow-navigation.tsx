@@ -42,7 +42,7 @@ export function NarrowNavigation({
   return <div className={"  bg-background"}>
       <div className={"  bg-background"}>
         {hasServer && <NarrowHeaderBar onWorkspacePress={() => setSheetVisible(true)} onFilesPress={openFiles} onGitPress={openGit} onPreviewPress={openPreview} onTasksPress={() => setTasksSheetVisible(true)} onTaskOutputPress={() => setTaskOutputSheetVisible(true)} />}
-        <div className={"block"}>{children}</div>
+        <div className="flex flex-col">{children}</div>
         {hasServer && <ConnectionStatusBanner />}
       </div>
       {hasServer && isCodeMode && <>

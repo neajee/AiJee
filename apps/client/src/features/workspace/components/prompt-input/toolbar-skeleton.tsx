@@ -35,7 +35,7 @@ export function ToolbarSkeleton({
         <div />
       </div>;
   }
-  return <div className={"block"}>
+  return <div className="flex flex-col">
       <div>
         <div className={"  opacity-100"}>
           <div />

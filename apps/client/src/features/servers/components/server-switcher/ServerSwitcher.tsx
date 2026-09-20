@@ -22,7 +22,7 @@ export function ServerSwitcher() {
   const borderColor = isDark ? '#3b3a39' : 'rgba(0,0,0,0.12)';
   const hoverBg = isDark ? '#333' : '#F5F5F5';
   const iconBg = isDark ? '#fefdfd' : '#1a1a1a';
-  return <div className={"block"} {...{
+  return <div className="flex flex-col" {...{
     'data-server-popover': true
   } as any}>
       <button onClick={() => setPopoverVisible(value => !value)} role="button" aria-label="Switch server">
@@ -33,14 +33,14 @@ export function ServerSwitcher() {
         <ChevronDown size={12} color={textMuted} strokeWidth={2} />
       </button>
       {popoverVisible && <div>
-          <div className={"block"}><span>Servers</span></div>
-          <div className={"block"}>
+          <div className="flex flex-col"><span>Servers</span></div>
+          <div className="flex flex-col">
             {servers.map(server => {
           const isActive = server.id === activeServerId;
           const isSwitching = server.id === switchingId;
           return <button key={server.id} onClick={() => void handleSwitchServer(server)} disabled={isSwitching}>
                   <div><PiLogo size={10} color={isDark ? '#1a1a1a' : '#fff'} /></div>
-                  <div className={"block"}>
+                  <div className="flex flex-col">
                     <span>{server.name}</span>
                     <span>{server.address}</span>
                   </div>

@@ -17,17 +17,17 @@ export function EditWorkspaceForm({
   onClose
 }: EditWorkspaceFormProps) {
   return <>
-      <div className={"block"}>
+      <div className="flex flex-col">
         <span>Workspace Name</span>
         <div>
           <input ref={nameRef} value={name} onChange={event => setName(event.target.value)} onKeyPress={handleKeyPress} placeholder="My Project" />
         </div>
       </div>
-      <div className={"block"}>
+      <div className="flex flex-col">
         <span>Path</span>
         <span>{workspace?.path}</span>
       </div>
-      <div className={"block"}>
+      <div className="flex flex-col">
         <button onClick={onClose}>
           <span>Cancel</span>
         </button>

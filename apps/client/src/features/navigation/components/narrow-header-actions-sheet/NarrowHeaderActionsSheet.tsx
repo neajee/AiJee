@@ -20,24 +20,24 @@ export function NarrowHeaderActionsSheetView({
     pointerEvents: visible ? 'auto' : 'none'
   } : {}}>
       <div>
-        <button className={"block"} onClick={onDismiss} />
+        <button className="inline-flex items-center" onClick={onDismiss} />
       </div>
 
       <div className={"  pb-0"}>
         <div>
-          <div className={"block"}>
+          <div className="flex flex-col">
             <div />
           </div>
         </div>
 
-        <div className={"block"}>
+        <div className="flex flex-col">
           <span>More</span>
           <span>Quick actions for this screen</span>
         </div>
 
-        <div className={"block"}>
+        <div className="flex flex-col">
           {items.map((item, index) => <button key={item.key} onClick={item.onPress} role="button" aria-label={item.label}>
-              <div className={"block"}>{item.icon}</div>
+              <div className="flex flex-col">{item.icon}</div>
               <span>{item.label}</span>
             </button>)}
         </div>

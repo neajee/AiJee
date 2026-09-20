@@ -42,14 +42,14 @@ export function TaskSelector({
       startTask(selectedTaskLabel, workspace.id);
     }
   };
-  return <div className={"block"}>
-      <div className={"block"}>
-        <button onClick={handleToggle} disabled={!selectedTaskLabel} className={"block"} aria-label={isRunning ? 'Stop task' : 'Start task'}>
+  return <div className="flex flex-col">
+      <div className="flex flex-col">
+        <button onClick={handleToggle} disabled={!selectedTaskLabel} className="inline-flex items-center" aria-label={isRunning ? 'Stop task' : 'Start task'}>
           {isRunning ? <Square size={10} color="#FF3B30" fill="#FF3B30" strokeWidth={0} /> : <Play size={10} color="#34C759" fill="#34C759" strokeWidth={0} />}
         </button>
 
-        <button onClick={togglePanel} className={"block"} aria-label="Select task">
-          <span className={"block"}>
+        <button onClick={togglePanel} className="inline-flex items-center" aria-label="Select task">
+          <span className="inline-block">
             {displayLabel}
           </span>
           <ChevronDown size={10} color="#888" strokeWidth={2} />

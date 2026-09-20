@@ -14,7 +14,7 @@ export function ProviderRow({
   const content = <>
       {connected ? <div className={"  bg-success"} /> : null}
       <ProviderMark name={name} id={id} colors={colors} />
-      <div className={"block"}>
+      <div className="flex flex-col">
         <span className={"  text-foreground"}>{name}</span>
         {meta ? <span className={"  text-text-secondary"}>{meta}</span> : null}
       </div>

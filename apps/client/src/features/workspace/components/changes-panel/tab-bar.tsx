@@ -47,7 +47,7 @@ export function TabBar({
           </button>;
     })}
       {!!right && <>
-          <div className={"block"} />
+          <div className="flex flex-col" />
           {right}
         </>}
     </div>;

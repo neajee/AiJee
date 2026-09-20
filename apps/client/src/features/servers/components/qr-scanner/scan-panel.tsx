@@ -10,7 +10,7 @@ interface QrScannerScanPanelProps {
 export function QrScannerScanPanel({
   textMuted
 }: QrScannerScanPanelProps) {
-  return <div className={"block"}>
+  return <div className="flex flex-col">
       <QrCode size={36} color={textMuted} strokeWidth={1.2} />
       <span>
         Camera scanning is not available on the web client. Paste the connect

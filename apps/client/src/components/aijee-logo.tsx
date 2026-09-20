@@ -11,7 +11,7 @@ interface AiJeeLogoProps {
   /** Tint applied to the monochrome mark. Omit to keep the asset as-is. */
   color?: string;
   opacity?: number;
-  style?: React.CSSProperties<React.CSSProperties>;
+  style?: React.CSSProperties;
 }
 export function AiJeeLogo({
   size = 56,
@@ -20,8 +20,5 @@ export function AiJeeLogo({
   style
 }: AiJeeLogoProps) {
   const box = Math.round(size * CANVAS_TO_MARK);
-  return <img src={MARK}
-  // `tintColor` as a prop (not a style) is the form supported on both
-  // DOM compatibility layer.
-  tintColor={color} resizeMode="contain" className={"w-0 h-0 opacity-100  "} accessibilityIgnoresInvertColors accessible={false} />;
+  return <img src={MARK} alt="AiJee" className="object-contain" style={{ width: box, height: box, opacity, ...style }} />;
 }

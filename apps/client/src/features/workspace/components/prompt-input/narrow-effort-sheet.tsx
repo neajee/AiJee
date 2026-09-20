@@ -62,12 +62,12 @@ function NarrowEffortSheetComponent({
     animateClose(() => onClose());
   };
   return <div visible={visible} transparent animationType="none" onRequestClose={handleClose}>
-      <div className={"block"}>
+      <div className="flex flex-col">
         <div className={"  opacity-100"}>
-          <button className={"block"} onClick={handleClose} />
+          <button className="inline-flex items-center" onClick={handleClose} />
         </div>
         <div>
-          <div className={"block"}>
+          <div className="flex flex-col">
             <div />
           </div>
           <span className={"  text-foreground"}>思考深度</span>

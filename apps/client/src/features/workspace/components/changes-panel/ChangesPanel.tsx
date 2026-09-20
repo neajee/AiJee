@@ -53,7 +53,7 @@ export function ChangesPanel({
     discard
   } = controller;
   return <div>
-      {activeExtraTab ? <div className={"block"}>{renderExtraTab?.(activeExtraTab)}</div> : <div className={"block"}>
+      {activeExtraTab ? <div className="flex flex-col">{renderExtraTab?.(activeExtraTab)}</div> : <div className="flex flex-col">
           <div {...false ? {
         pointerEvents: currentTab === 'files' ? 'auto' as const : 'none' as const
       } : {}}>
@@ -71,7 +71,7 @@ export function ChangesPanel({
                   {gitData && <BranchLabel branch={gitData.branch} ahead={gitData.ahead} behind={gitData.behind} />}
                   {changesOpen ? <ChevronUp size={13} color={textMuted} strokeWidth={2} /> : <ChevronDown size={13} color={textMuted} strokeWidth={2} />}
                 </button>
-                {changesOpen && <div className={"block"}>
+                {changesOpen && <div className="flex flex-col">
                     {isLoading ? <span className={"mt-[32px]"} /> : <ChangesTab staged={staged} unstaged={unstaged} untracked={untracked} selectedFile={selectedFile} diffContent={fileDiff} diffLoading={diffLoading} onFilePress={handleFilePress} onStage={stage} onUnstage={unstage} onDiscard={discard} />}
                   </div>}
               </div>

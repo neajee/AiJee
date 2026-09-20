@@ -51,12 +51,12 @@ export function WorkspaceSheet({
     pointerEvents: visible ? 'auto' as const : 'none' as const
   } : {}}>
       <div className={"  bg-black/50"}>
-        <button className={"block"} onClick={dismiss} />
+        <button className="inline-flex items-center" onClick={dismiss} />
       </div>
 
       <div className={"  bg-surface pb-0 h-0 max-h-0"}>
         <div>
-          <div className={"block"}>
+          <div className="flex flex-col">
             <div className={"  bg-muted"} />
           </div>
         </div>
@@ -68,7 +68,7 @@ export function WorkspaceSheet({
             return <button key={workspace.id} onClick={() => handleWorkspacePress(workspace.id, index)}>
                   <div className={"  border-[2px]"}>
                     <div className={"  bg-background"}>
-                      <span className={"block"}>
+                      <span className="inline-block">
                         {workspace.title.charAt(0).toUpperCase()}
                       </span>
                     </div>
@@ -88,8 +88,8 @@ export function WorkspaceSheet({
           </div>
         </div>
 
-        <Pager ref={pagerRef} className={"block"} initialPage={Math.max(0, selectedIndex)} onPageSelected={event => handlePageSelected(event.nativeEvent.position)} overdrag>
-          {workspaces.map(workspace => <div key={workspace.id} className={"block"}>
+        <Pager ref={pagerRef} className="flex flex-col" initialPage={Math.max(0, selectedIndex)} onPageSelected={event => handlePageSelected(event.nativeEvent.position)} overdrag>
+          {workspaces.map(workspace => <div key={workspace.id} className="flex flex-col">
               <SessionPage workspaceId={workspace.id} onSessionPress={sessionId => {
             router.navigate(`/workspace/${workspace.id}/s/${sessionId}`);
             dismiss();

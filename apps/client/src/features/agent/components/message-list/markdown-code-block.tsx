@@ -46,7 +46,7 @@ export const MarkdownCodeBlock = memo(function MarkdownCodeBlock({
         </button>
       </div>
 
-      <div className={"block"}>
+      <div className="flex flex-col">
         <CodePreview code={code} language={language} isDark={isDark} showLineNumbers={false} bare />
       </div>
     </div>;

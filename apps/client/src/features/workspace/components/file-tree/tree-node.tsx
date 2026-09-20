@@ -49,7 +49,7 @@ export function FileTreeNode({
     }}>
         {/* One glyph slot per row, bolt's: a caret for directories, the file's
             kind for files, so names line up at the same x within a level. */}
-        {entry.is_dir ? <div className={"block"}>
+        {entry.is_dir ? <div className="flex flex-col">
             {expanded ? <ChevronDown size={13} color={textMuted} strokeWidth={2} /> : <ChevronRight size={13} color={textMuted} strokeWidth={2} />}
           </div> : <FileTypeBadge path={entry.path} fallbackColor={iconColor} />}
         <span>

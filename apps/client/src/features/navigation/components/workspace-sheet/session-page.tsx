@@ -38,22 +38,22 @@ export function SessionPage({
     onDismiss();
     setCreatePending(false);
   }, [createPending, onDismiss, router, workspaceId]);
-  return <div className={"block"}>
-      <div className={"block"}>
+  return <div className="flex flex-col">
+      <div className="flex flex-col">
         <span>Sessions</span>
         <button onClick={() => refetch()} disabled={isRefetching}>
           {isRefetching ? <span className={"w-[13px] h-[13px]" + " size-3 animate-spin"} /> : <RefreshCw size={13} color={textMuted} strokeWidth={1.8} />}
         </button>
       </div>
 
-      <div className={"block"}>
+      <div className="flex flex-col">
         <button onClick={handleNewSession} disabled={createPending}>
           {createPending ? <span className={"w-[14px] h-[14px]" + " size-3 animate-spin"} /> : <SquarePen size={14} color={textPrimary} strokeWidth={1.8} />}
           <span>New session</span>
         </button>
       </div>
 
-      <div className={"block"} nestedScrollEnabled>
+      <div className="flex flex-col" nestedScrollEnabled>
         {isLoading ? <span className={"mt-[24px]"} /> : sessions.length === 0 ? <span>No sessions yet</span> : sessions.map(session => <AnimatedListItem key={session.id}>
               <button onClick={() => onSessionPress(session.id)}>
                 <SessionActivityIndicator sessionId={session.id} color={textMuted} />

@@ -43,11 +43,11 @@ export function ReleaseRow({
         const items = notes.filter(note => note.type === type);
         if (!items.length) return null;
         const label = type === 'feature' ? '新功能' : type === 'fix' ? '修复' : '其他';
-        return <div key={type} className={"block"}>
+        return <div key={type} className="flex flex-col">
                 <span className={"  text-text-secondary"}>
                   {label} · {items.length}
                 </span>
-                {items.map((note, index) => <div key={`${note.commit}-${index}`} className={"block"}>
+                {items.map((note, index) => <div key={`${note.commit}-${index}`} className="flex flex-col">
                     <span className={"  text-foreground"}>
                       {note.title}
                     </span>

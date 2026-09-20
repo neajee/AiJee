@@ -28,11 +28,11 @@ export function ServerFormDesktopModal({
   return <div visible={visible} transparent animationType="fade" onRequestClose={onClose}>
       <button onClick={loading ? undefined : onClose}>
         <button onClick={() => {}}>
-          <div className={"block"}>
+          <div className="flex flex-col">
             <span>
               {initial ? 'Edit Server' : 'Add Server'}
             </span>
-            <button onClick={onClose} className={"block"} disabled={loading}>
+            <button onClick={onClose} className="inline-flex items-center" disabled={loading}>
               <X size={18} color={textMuted} strokeWidth={1.8} />
             </button>
           </div>
@@ -40,7 +40,7 @@ export function ServerFormDesktopModal({
           {error && <span>
               {error}
             </span>}
-          <div className={"block"}>
+          <div className="flex flex-col">
             <button onClick={onClose} disabled={loading}>
               <span>Cancel</span>
             </button>

@@ -17,9 +17,9 @@ export function SettingsSidebar() {
   const handleBack = () => router.replace(selectedWorkspaceId ? `/workspace/${selectedWorkspaceId}` : "/");
   return <div className={"  bg-background"}>
       <div><SidebarHeader /></div>
-      <div className={"block"}><SidebarRow icon={<ChevronLeft size={15} color={colors.textSecondary} strokeWidth={1.8} />} label="返回" onClick={handleBack} isDark={isDark} /></div>
-      <div className={"block"}><span className={"  text-foreground"}>设置</span></div>
-      <div className={"block"}>
+      <div className="flex flex-col"><SidebarRow icon={<ChevronLeft size={15} color={colors.textSecondary} strokeWidth={1.8} />} label="返回" onClick={handleBack} isDark={isDark} /></div>
+      <div className="flex flex-col"><span className={"  text-foreground"}>设置</span></div>
+      <div className="flex flex-col">
         {SETTINGS_SECTIONS.map(section => {
         const Icon = section.icon;
         return <SidebarRow key={section.slug} icon={<Icon size={15} color={section.slug === activeSlug ? colors.text : colors.textSecondary} strokeWidth={1.8} />} label={section.title} isActive={section.slug === activeSlug} onClick={() => router.push(`/settings/${section.slug}` as any)} isDark={isDark} />;

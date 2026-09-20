@@ -77,9 +77,9 @@ export function CustomModelsView({
     borderColor: colors.borderColor
   }]}>
       <div>
-        <div className={"block"}>
+        <div className="flex flex-col">
           <ProviderMark name={provider.name} id={provider.id} colors={colors} />
-          <div className={"block"}>
+          <div className="flex flex-col">
             <span>{provider.name}</span>
             <span>{oauthPrompt ? '完成浏览器授权' : '配置连接凭据'}</span>
           </div>
@@ -88,13 +88,13 @@ export function CustomModelsView({
           <X size={16} color={colors.textMuted} strokeWidth={1.8} />
         </button>
       </div>
-      <div className={"block"}>
+      <div className="flex flex-col">
       {!provider.configured && provider.supports_oauth && (!provider.supports_api_key || builtinAuthMode === 'oauth') ? <button disabled={oauthProviderId === provider.id} onClick={() => void beginOAuth(provider.id)}>
           <LogIn size={15} color={colors.textSecondary} />
           <span>{oauthProviderId === provider.id ? '正在登录…' : '使用账号登录'}</span>
         </button> : null}
       {provider.supports_api_key && (provider.configured || !provider.supports_oauth || builtinAuthMode === 'apiKey') ? <Field label={`${provider.name} API Key`} value={builtinKey} onChange={event => setBuiltinKey(event.target.value)} placeholder={provider.configured ? '输入新 Key 可替换当前凭据' : '粘贴 API Key'} colors={colors} /> : null}
-      <div className={"block"}>
+      <div className="flex flex-col">
         {provider.configured && canDisconnect(provider) ? <button onClick={() => void disconnectBuiltin(provider.id)} role="button">
             <span>断开连接</span>
           </button> : null}
@@ -140,8 +140,8 @@ export function CustomModelsView({
   if (parseError || builtinsError) {
     return <span role="alert">{parseError ? `无法读取 models.json：${parseError}` : builtinsError}</span>;
   }
-  return <div className={"block"}>
-      {headingVisible ? <div className={"block"}>
+  return <div className="flex flex-col">
+      {headingVisible ? <div className="flex flex-col">
           <span>模型服务</span>
           <span>模型接入点、凭据与聊天模型列表</span>
         </div> : null}
@@ -162,7 +162,7 @@ export function CustomModelsView({
                     <LogOut size={15} color={colors.textMuted} strokeWidth={1.8} />
                   </button> : null} />
             {renderBuiltinPanel(provider)}
-          </div>) : <div className={"block"}><span>尚未连接服务，从下方选择一个即可开始。</span></div>}
+          </div>) : <div className="flex flex-col"><span>尚未连接服务，从下方选择一个即可开始。</span></div>}
       </ModelSection>
 
       <ModelSection title="可添加" colors={colors}>
@@ -186,7 +186,7 @@ export function CustomModelsView({
             <CustomProviderRow name={name} provider={provider} colors={colors} onUpdate={next => updateProvider(name, next)} onRemove={() => removeProvider(name)} />
           </div>)}
         {providerEntries.length ? <RowDivider colors={colors} /> : null}
-        {adding ? <div className={"block"}><AddProviderForm colors={colors} onAdd={(name, baseUrl, api) => {
+        {adding ? <div className="flex flex-col"><AddProviderForm colors={colors} onAdd={(name, baseUrl, api) => {
           void addProvider(name, {
             baseUrl: baseUrl || undefined,
             api,

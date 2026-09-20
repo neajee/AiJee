@@ -24,8 +24,8 @@ export function BrowserPreview({
     serverUrl
   }), [sessionId, target.hostname, target.port, serverUrl]);
   const key = `${sessionId}_${target.hostname}_${target.port}`;
-  return <div className={"block"}>
-      <iframe key={key} src={src} title={`Preview ${target.label}`} className={"block"} sandbox="allow-same-origin allow-scripts allow-forms allow-modals allow-popups allow-downloads" allow="clipboard-read; clipboard-write" />
+  return <div className="flex flex-col">
+      <iframe key={key} src={src} title={`Preview ${target.label}`} className="flex flex-col" sandbox="allow-same-origin allow-scripts allow-forms allow-modals allow-popups allow-downloads" allow="clipboard-read; clipboard-write" />
     </div>;
 }
 const styles = {

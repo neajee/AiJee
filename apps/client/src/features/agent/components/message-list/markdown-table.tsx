@@ -69,8 +69,8 @@ export const MarkdownTable = memo(function MarkdownTable({
             </div>)}
         </div>)}
     </div>;
-  if (!scrolls) return <div className={"block"}>{table}</div>;
-  return <div horizontal className={"block"}>
+  if (!scrolls) return <div className="flex flex-col">{table}</div>;
+  return <div horizontal className="flex flex-col">
       {table}
     </div>;
 });

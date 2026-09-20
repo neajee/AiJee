@@ -73,9 +73,9 @@ export const TurnBlock = memo(function TurnBlock({
   const timeLabel = active ? formatDuration(Math.max(1000, elapsedMs)) : settledMs ? formatDuration(settledMs) : null;
   const showDivider = hasWork || active || !!settledMs;
   const forkEntryId = turn.final?.entryId ?? turn.sourceEntryId;
-  const divider = <div className={"block"}>
+  const divider = <div className="flex flex-col">
       <div />
-      <div className={"block"}>
+      <div className="flex flex-col">
         <span>
           {label}
         </span>
@@ -106,9 +106,9 @@ export const TurnBlock = memo(function TurnBlock({
         </span>}
       {turn.fileStats && <TurnSummary stats={turn.fileStats} changes={fileChanges} isDark={isDark} />}
       {/* Last in the turn: the answer, then what it changed, then the actions. */}
-      {turn.final && !turn.final.isStreaming && (turn.final.text || turn.final.errorMessage) && <div className={"block"}>
+      {turn.final && !turn.final.isStreaming && (turn.final.text || turn.final.errorMessage) && <div className="flex flex-col">
           <MessageToolbar message={turn.final} isDark={isDark} hovered={hovered} />
-          {forkEntryId && onFork && <button onClick={() => onFork(forkEntryId)} disabled={active || !!forkingEntryId} role="button" aria-label="Fork from this reply" className={"block"}>
+          {forkEntryId && onFork && <button onClick={() => onFork(forkEntryId)} disabled={active || !!forkingEntryId} role="button" aria-label="Fork from this reply" className="inline-flex items-center">
               {forkingEntryId === forkEntryId ? <span className={"w-[12px] h-[12px]" + " size-3 animate-spin"} /> : <GitFork size={14} color={colors.textTertiary} strokeWidth={1.8} />}
             </button>}
         </div>}

@@ -18,12 +18,12 @@ export function ServerFormFields({
   const textPrimary = isDark ? '#fefdfd' : '#1a1a1a';
   const inputBg = isDark ? '#2a2a2a' : '#F6F6F6';
   const borderColor = isDark ? '#3b3a39' : 'rgba(0,0,0,0.08)';
-  return <div className={"block"}>
-      <div className={"block"}>
+  return <div className="flex flex-col">
+      <div className="flex flex-col">
         <span>Name</span>
         <input value={name} onChange={event => setName(event.target.value)} placeholder="My Server" autoFocus={autoFocus} />
       </div>
-      <div className={"block"}>
+      <div className="flex flex-col">
         <span>Address</span>
         <input value={address} onChange={event => setAddress(event.target.value)} placeholder="http://192.168.1.100:10088" />
       </div>

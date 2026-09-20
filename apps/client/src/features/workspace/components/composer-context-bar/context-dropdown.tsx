@@ -59,15 +59,15 @@ export function ContextDropdown({
       {icon}<span className={"  text-text-secondary"}>{label}</span>
       {!disabled && <ChevronDown size={12} color={theme.textMuted} strokeWidth={1.8} />}
     </button>;
-  return <div className={"block"}>
-      <div className={"block"}>
+  return <div className="flex flex-col">
+      <div className="flex flex-col">
         {renderControl('project', <FolderGit2 size={13} color={theme.textMuted} strokeWidth={1.8} />, workspaces.find(w => w.id === selectedWorkspaceId)?.title ?? 'Project', 'Project: change project.')}
-        {open === 'project' && <div role="menu" aria-label="Project selection" className={"block"}>
-          <div className={"block"}>
+        {open === 'project' && <div role="menu" aria-label="Project selection" className="flex flex-col">
+          <div className="flex flex-col">
             {workspaces.map(workspace => {
             const active = workspace.id === selectedWorkspaceId;
             return <button key={workspace.id} onClick={() => onSelectProject(workspace.id)} role="menuitem">
-                <div className={"block"}><div className={"  bg-background"} /><span>{workspace.title}</span></div>
+                <div className="flex flex-col"><div className={"  bg-background"} /><span>{workspace.title}</span></div>
                 {active && <Check size={13} color={theme.accentColor} strokeWidth={2} />}
               </button>;
           })}
@@ -77,24 +77,24 @@ export function ContextDropdown({
           </button>
         </div>}
       </div>
-      <div className={"block"}>
+      <div className="flex flex-col">
         {renderControl('environment', <Globe size={13} color={theme.textMuted} strokeWidth={1.8} />, activeServer?.name ?? 'Local', `Environment: ${activeServer?.name ?? 'Local'}. Press to change.`, servers.length === 0)}
-        {open === 'environment' && <div role="menu" aria-label="Environment selection" className={"block"}>
-          <div className={"block"}>
+        {open === 'environment' && <div role="menu" aria-label="Environment selection" className="flex flex-col">
+          <div className="flex flex-col">
             {servers.map(server => {
             const active = server.id === activeServerId;
             return <button key={server.id} onClick={() => void onSelectServer(server)} role="menuitem">
-                <div className={"block"}><Globe size={13} color={active ? theme.accentColor : theme.textMuted} strokeWidth={1.8} /><div className={"block"}><span>{server.name}</span><span className={"  text-text-secondary"}>{server.address}</span></div></div>
+                <div className="flex flex-col"><Globe size={13} color={active ? theme.accentColor : theme.textMuted} strokeWidth={1.8} /><div className="flex flex-col"><span>{server.name}</span><span className={"  text-text-secondary"}>{server.address}</span></div></div>
                 {busy === server.id ? <span className="size-3 animate-spin" /> : active && <Check size={13} color={theme.accentColor} strokeWidth={2} />}
               </button>;
           })}
           </div>
         </div>}
       </div>
-      {isGitRepo && <div className={"block"}>
+      {isGitRepo && <div className="flex flex-col">
         {renderControl('branch', <GitBranch size={13} color={theme.textMuted} strokeWidth={1.8} />, currentBranch ?? '—', `Branch: ${currentBranch ?? 'unknown'}. Press to change.`)}
-        {open === 'branch' && <div role="menu" aria-label="Branch selection" className={"block"}>
-          {branchesLoading && !branches ? <div className={"block"}><span className="size-3 animate-spin" /></div> : localBranches.length === 0 ? <span className={"  text-text-secondary"}>No branches found</span> : <><div className={"block"}>{localBranches.map(branch => <button key={branch.name} onClick={() => void onSelectBranch(branch)} role="menuitem"><div className={"block"}><GitBranch size={13} color={branch.is_current ? theme.accentColor : theme.textMuted} strokeWidth={1.8} /><span>{branch.name}</span></div>{busy === branch.name ? <span className="size-3 animate-spin" /> : branch.is_current && <Check size={13} color={theme.accentColor} strokeWidth={2} />}</button>)}</div><button onClick={onAddBranch}><Plus size={13} color={theme.textMuted} strokeWidth={1.8} /><span className={"  text-text-secondary"}>新建分支</span></button></>}</div>}
+        {open === 'branch' && <div role="menu" aria-label="Branch selection" className="flex flex-col">
+          {branchesLoading && !branches ? <div className="flex flex-col"><span className="size-3 animate-spin" /></div> : localBranches.length === 0 ? <span className={"  text-text-secondary"}>No branches found</span> : <><div className="flex flex-col">{localBranches.map(branch => <button key={branch.name} onClick={() => void onSelectBranch(branch)} role="menuitem"><div className="flex flex-col"><GitBranch size={13} color={branch.is_current ? theme.accentColor : theme.textMuted} strokeWidth={1.8} /><span>{branch.name}</span></div>{busy === branch.name ? <span className="size-3 animate-spin" /> : branch.is_current && <Check size={13} color={theme.accentColor} strokeWidth={2} />}</button>)}</div><button onClick={onAddBranch}><Plus size={13} color={theme.textMuted} strokeWidth={1.8} /><span className={"  text-text-secondary"}>新建分支</span></button></>}</div>}
       </div>}
     </div>;
 }

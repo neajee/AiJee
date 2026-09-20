@@ -30,7 +30,7 @@ export function Select<T extends string = string>({
   const mutedColor = tokens.textTertiary;
   if (true) {
     return <div>
-        <select value={value} disabled={disabled} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => onChange(e.target.value as T)} className={"block"}>
+        <select value={value} disabled={disabled} onChange={(e: React.ChangeEvent<HTMLSelectElement>) => onChange(e.target.value as T)} className="flex flex-col">
           {placeholder && <option value="" disabled>
               {placeholder}
             </option>}

@@ -14,12 +14,12 @@ export function AttachmentChips({
   if (attachments.length === 0) return null;
   const imageAtts = attachments.filter(a => a.type === 'image');
   const fileAtts = attachments.filter(a => a.type !== 'image');
-  return <div className={"block"}>
-      {imageAtts.length > 0 && <div className={"block"}>
+  return <div className="flex flex-col">
+      {imageAtts.length > 0 && <div className="flex flex-col">
           {imageAtts.map(att => <div key={att.id} className={"  border-border"}>
               {att.preview ? <img src={{
           uri: att.preview
-        }} className={"block"} /> : <div>
+        }} className="flex flex-col" /> : <div>
                   <ImageIcon size={18} color={theme.textMuted} strokeWidth={1.8} />
                 </div>}
               <button onClick={() => onRemove(att.id)} role="button" aria-label="Remove image">
@@ -28,7 +28,7 @@ export function AttachmentChips({
             </div>)}
         </div>}
 
-      {fileAtts.length > 0 && <div horizontal className={"block"}>
+      {fileAtts.length > 0 && <div horizontal className="flex flex-col">
           {fileAtts.map(att => <div key={att.id}>
               <FileText size={14} color={theme.textMuted} strokeWidth={1.8} />
               <span className={"  text-foreground"}>
@@ -37,7 +37,7 @@ export function AttachmentChips({
               {att.size != null && <span className={"  text-text-secondary"}>
                   {att.size > 1024 * 1024 ? `${(att.size / (1024 * 1024)).toFixed(1)}MB` : att.size > 1024 ? `${(att.size / 1024).toFixed(0)}KB` : `${att.size}B`}
                 </span>}
-              <button onClick={() => onRemove(att.id)} className={"block"} role="button" aria-label={`Remove ${att.name}`}>
+              <button onClick={() => onRemove(att.id)} className="inline-flex items-center" role="button" aria-label={`Remove ${att.name}`}>
                 <X size={12} color={theme.textMuted} strokeWidth={2} />
               </button>
             </div>)}

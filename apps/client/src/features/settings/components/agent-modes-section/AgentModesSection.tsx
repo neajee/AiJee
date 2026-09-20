@@ -24,7 +24,7 @@ export function AgentModesSection({
   if (!loaded) return null;
   return <div>
       <div>
-        <div className={"block"}>
+        <div className="flex flex-col">
           <span className={"  text-foreground"}>自定义指令</span>
           <span className={"  text-text-tertiary"}>向智能体提供适用于此主机上所有聊天的额外说明和上下文。</span>
         </div>

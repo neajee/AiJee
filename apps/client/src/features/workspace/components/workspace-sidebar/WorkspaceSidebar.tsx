@@ -45,11 +45,11 @@ export function WorkspaceSidebar({
     setActiveTab: setActivePaneTab
   }}>
       <div className={"  w-0"}>
-        {!collapsed && <div className={"block"}>
+        {!collapsed && <div className="flex flex-col">
             {contentMounted && <div className={"w-0 flex-1"}>{children}</div>}
           </div>}
 
-        {!locked && <div className={"block"}>
+        {!locked && <div className="flex flex-col">
             <RailButton label="Open files" active={activePaneTab === 'files'} onClick={() => openPane('files')}>
               <Files size={17} color={colors.textSecondary} strokeWidth={1.8} />
             </RailButton>
@@ -65,7 +65,7 @@ export function WorkspaceSidebar({
             <SeamToggle chevron="right" onClick={toggleCollapsed} label="Close side panel" />
           </div>}
 
-        {!collapsed && <div {...panelResizer.panHandlers} {...webSeamHoverProps} className={"block"}>
+        {!collapsed && <div {...panelResizer.panHandlers} {...webSeamHoverProps} className="flex flex-col">
             <div />
           </div>}
       </div>

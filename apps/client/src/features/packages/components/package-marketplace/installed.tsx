@@ -23,12 +23,12 @@ export function InstalledView({
   const client = usePiClient();
   const m = useSettingsMetrics();
   const p = useSettingsPalette();
-  return <div className={"block"}>
-      <div className={"block"}>
+  return <div className="flex flex-col">
+      <div className="flex flex-col">
         <span className={"text-[var(--header-size)] font-sans"}>
           服务器上已安装的插件
         </span>
-        <div className={"block"}><SecondaryButton label="全部更新" onClick={() => void client.api.marketplaceOperation({
+        <div className="flex flex-col"><SecondaryButton label="全部更新" onClick={() => void client.api.marketplaceOperation({
           operation: 'update',
           name: '*',
           scope: 'user'
@@ -38,7 +38,7 @@ export function InstalledView({
       {message ? <span className={"  rounded-[var(--tile-radius)]"}>{message}</span> : null}
       {error ? <Notice text={error} tone="error" /> : null}
 
-      {loading ? <div className={"block"}><span className="size-3 animate-spin" /></div> : output === '暂无已安装插件' ? <span className={"  text-[var(--desc-size)]"}>暂无已安装插件。</span> : <div className={"block"}>
+      {loading ? <div className="flex flex-col"><span className="size-3 animate-spin" /></div> : output === '暂无已安装插件' ? <span className={"  text-[var(--desc-size)]"}>暂无已安装插件。</span> : <div className="flex flex-col">
           {parseInstalledPackages(output).map((pkg, index) => <InstalledPackageCard key={`${pkg.name}-${index}`} pkg={pkg} single={single} onUpdate={() => void client.api.marketplaceOperation({
         operation: 'update',
         name: pkg.name,
@@ -78,8 +78,8 @@ function InstalledPackageCard({
   const m = useSettingsMetrics();
   const p = useSettingsPalette();
   return <div className={"  rounded-[var(--card-radius)] p-[var(--gutter)] w-0"}>
-      <div className={"block"}>
-        <div className={"block"}>
+      <div className="flex flex-col">
+        <div className="flex flex-col">
           <span className={"  text-[var(--label-size)]"}>{pkg.name}</span>
           {pkg.detail ? <span>{pkg.detail}</span> : null}
         </div>
@@ -102,7 +102,7 @@ function InstalledAction({
   const m = useSettingsMetrics();
   const p = useSettingsPalette();
   const color = destructive ? p.destructive : p.textSecondary;
-  return <button onClick={onPress} role="button" aria-label={label} className={"block"}>
+  return <button onClick={onPress} role="button" aria-label={label} className="inline-flex items-center">
       <span className={"text-[var(--desc-size)] font-sans"}>{label}</span>
     </button>;
 }

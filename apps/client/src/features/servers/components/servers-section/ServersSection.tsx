@@ -58,8 +58,8 @@ export function ServersView({
   // First run: a list with an empty card and two action rows says less than one
   // clear invitation to connect.
   if (variant === "onboarding" && servers.length === 0) {
-    return <div className={"block"}>
-        <div className={"block"}>
+    return <div className="flex flex-col">
+        <div className="flex flex-col">
           <div>
             <PiLogo size={36} color={isDark ? "#1a1a1a" : "#fff"} />
           </div>
@@ -70,7 +70,7 @@ export function ServersView({
             连接到运行 AiJee 的设备，{"\n"}
             使用设备授权后即可打开工作区。
           </span>
-          <div className={"block"}>
+          <div className="flex flex-col">
             <button onClick={() => setQrVisible(true)}>
               <QrCode size={16} color={p.text} strokeWidth={2} />
               <span>
@@ -88,8 +88,8 @@ export function ServersView({
         {modals}
       </div>;
   }
-  return <div className={"  gap-[var(--group-gap)]"}>
-      <div className={"block"}>
+  return <div className={"flex flex-col gap-[var(--group-gap)]"}>
+      <div className="flex flex-col">
         <span>我的设备 ({servers.length})</span>
         <span>设备令牌仅保存在本机，不会同步</span>
       </div>
@@ -121,7 +121,7 @@ export function ServersView({
     }} onSave={handleSave} initial={editingServer} isDark={isDark} loading={loginLoading} error={loginError} />
       <QrScanner visible={qrVisible} onClose={() => setQrVisible(false)} onNeedNewWorkspace={() => router.replace("/")} />
       <div transparent visible={!!menuServerId} animationType="fade" onRequestClose={() => setMenuServerId(null)}>
-        <button className={"block"} onClick={() => {
+        <button className="inline-flex items-center" onClick={() => {
         setMenuServerId(null);
         setMenuPosition(null);
       }} aria-label="关闭服务器操作菜单">
@@ -147,24 +147,24 @@ export function ServersView({
         </button>
       </div>
       <div visible={!!codeDialog} transparent animationType="fade" onRequestClose={() => setCodeDialog(null)}>
-        <button className={"block"} onClick={() => setCodeDialog(null)} aria-label="关闭授权对话框">
+        <button className="inline-flex items-center" onClick={() => setCodeDialog(null)} aria-label="关闭授权对话框">
           <button onClick={e => e.stopPropagation()}>
-            <div className={"block"}>
+            <div className="flex flex-col">
               <span>设备授权二维码</span>
-              <button onClick={() => setCodeDialog(null)} aria-label="关闭授权二维码" className={"block"}>
+              <button onClick={() => setCodeDialog(null)} aria-label="关闭授权二维码" className="inline-flex items-center">
                 <X size={18} color={p.textTertiary} />
               </button>
             </div>
             {codeDialog && <img src={{
             uri: codeDialog.image
-          }} className={"block"} />}
-            <div className={"block"}>
+          }} className="flex flex-col" />}
+            <div className="flex flex-col">
               <span>授权码</span>
               <span>{codeDialog?.code}</span>
-              <button onClick={() => codeDialog && Clipboard.setStringAsync(codeDialog.url)} aria-label="复制完整地址" accessibilityHint="复制设备连接地址" className={"block"}>
+              <button onClick={() => codeDialog && Clipboard.setStringAsync(codeDialog.url)} aria-label="复制完整地址" accessibilityHint="复制设备连接地址" className="inline-flex items-center">
                 <Copy size={18} color={p.text} />
               </button>
-              <button onClick={handleRefreshCode} disabled={refreshingCode} aria-label="刷新授权码" accessibilityHint="生成新授权码并更新当前设备令牌" className={"block"}>
+              <button onClick={handleRefreshCode} disabled={refreshingCode} aria-label="刷新授权码" accessibilityHint="生成新授权码并更新当前设备令牌" className="inline-flex items-center">
                 {refreshingCode ? <span className="size-3 animate-spin" /> : <RefreshCw size={18} color={p.text} />}
               </button>
             </div>

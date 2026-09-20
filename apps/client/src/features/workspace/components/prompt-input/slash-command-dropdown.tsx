@@ -26,7 +26,7 @@ export function SlashCommandDropdown({
     });
   }, [selectedIndex]);
   return <div className={"  bg-surface border-border opacity-100"}>
-      <div ref={scrollRef} className={"block"} keyboardShouldPersistTaps="handled">
+      <div ref={scrollRef} className="flex flex-col" keyboardShouldPersistTaps="handled">
         {commands.map((cmd, index) => <button key={cmd.name} onClick={() => onSelect(cmd)} role="menuitem" aria-label={`/${cmd.name} — ${cmd.description}`}>
             <span className={"  text-foreground"}>
               /{cmd.name}

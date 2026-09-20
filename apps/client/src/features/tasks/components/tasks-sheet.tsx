@@ -65,19 +65,19 @@ export function TasksSheet({
     pointerEvents: visible ? 'auto' as const : 'none' as const
   } : {}}>
       <div className={"  bg-black/50"}>
-        <button className={"block"} onClick={dismiss} />
+        <button className="inline-flex items-center" onClick={dismiss} />
       </div>
 
       <div className={"  pb-[var(--bottom-inset)]"}>
         <div>
-          <div className={"block"}>
+          <div className="flex flex-col">
             <div className={"  bg-muted"} />
           </div>
         </div>
 
         <span>Tasks</span>
 
-        <div className={"block"}>
+        <div className="flex flex-col">
           <TasksPanelContent />
         </div>
       </div>

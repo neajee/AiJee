@@ -12,27 +12,27 @@ export function TerminalPanel() {
   return <div>
       {/* Tab bar */}
       <div>
-        <div className={"block"}>
+        <div className="flex flex-col">
           <div>
             <span>
               Terminal 1
             </span>
-            <button className={"block"}>
+            <button className="inline-flex items-center">
               <X size={12} color={textMuted} strokeWidth={2} />
             </button>
           </div>
 
-          <button className={"block"}>
+          <button className="inline-flex items-center">
             <Plus size={18} color={textMuted} strokeWidth={1.8} />
           </button>
         </div>
       </div>
 
       {/* Terminal content */}
-      <div className={"block"}>
+      <div className="flex flex-col">
         <span className={"  font-mono"}>
           <span className={"text-success"}>~</span>{' '}
-          <span className={"block"}>$</span> _
+          <span className="inline-block">$</span> _
         </span>
       </div>
     </div>;

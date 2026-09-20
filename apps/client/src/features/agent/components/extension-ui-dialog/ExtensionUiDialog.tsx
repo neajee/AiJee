@@ -20,10 +20,10 @@ export function ExtensionUiView({
     canSubmitSelect
   } = controller;
   if (!request) return null;
-  return <div className={"block"}>
+  return <div className="flex flex-col">
       <div className={"  bg-surface border-border"}>
         <div>
-          <div className={"block"}>
+          <div className="flex flex-col">
             <span className={"  text-foreground"}>
               {title}
             </span>
@@ -40,7 +40,7 @@ export function ExtensionUiView({
           </button>
         </div>
 
-        {request.method === "select" && <div className={"block"} keyboardShouldPersistTaps="handled">
+        {request.method === "select" && <div className="flex flex-col" keyboardShouldPersistTaps="handled">
             {request.options.map(option => {
           const isSelected = selectedOption === option;
           return <button key={`${request.id}-${option}`} onClick={() => setSelectedOption(option)}>
@@ -52,8 +52,8 @@ export function ExtensionUiView({
         })}
           </div>}
 
-        {request.method === "confirm" && <div className={"block"}>
-            <div className={"block"}>
+        {request.method === "confirm" && <div className="flex flex-col">
+            <div className="flex flex-col">
               <button onClick={() => submit({
             confirmed: false
           })} disabled={mutation.isPending} className={"  border-border"}>
@@ -72,13 +72,13 @@ export function ExtensionUiView({
             </div>
           </div>}
 
-        {request.method === "input" && <div className={"block"}>
+        {request.method === "input" && <div className="flex flex-col">
             <input value={draft} onChange={event => setDraft(event.target.value)} placeholder={request.placeholder ?? "Type your response"} className={"  text-foreground bg-card border-border"} autoFocus editable={!mutation.isPending} onKeyDown={event => event.key === "Enter" && (() => submit({
           value: draft
         }))(event)} />
           </div>}
 
-        {request.method === "editor" && <div className={"block"}>
+        {request.method === "editor" && <div className="flex flex-col">
             <input value={draft} onChange={event => setDraft(event.target.value)} placeholder="Edit the text" className={"  text-foreground bg-card border-border"} autoFocus multiline editable={!mutation.isPending} />
           </div>}
 
@@ -97,7 +97,7 @@ export function ExtensionUiView({
             </button>
           </div>}
 
-        {mutation.isError && <div className={"block"}>
+        {mutation.isError && <div className="flex flex-col">
             <span className={"  text-destructive"}>
               {mutation.error instanceof Error ? mutation.error.message : "Failed to send the response"}
             </span>

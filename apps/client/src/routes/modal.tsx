@@ -3,9 +3,9 @@ import { Link } from '@/hooks/router';
 import { ThemedText } from '@/components/themed-text';
 import { ThemedView } from '@/components/themed-view';
 export default function ModalScreen() {
-  return <ThemedView className={"block"}>
+  return <ThemedView className="flex flex-col">
       <ThemedText type="title">This is a modal</ThemedText>
-      <Link href="/" dismissTo className={"block"}>
+      <Link href="/" dismissTo className="flex flex-col">
         <ThemedText type="link">Go to home screen</ThemedText>
       </Link>
     </ThemedView>;

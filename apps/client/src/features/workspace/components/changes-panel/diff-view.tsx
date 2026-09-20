@@ -8,7 +8,7 @@ export function DiffView({
   const colorScheme = useColorScheme() ?? "light";
   const isDark = colorScheme === "dark";
   const lines = diff.split("\n");
-  return <div className={"block"} nestedScrollEnabled>
+  return <div className="flex flex-col" nestedScrollEnabled>
       {lines.map((line, i) => {
       let bg = "transparent";
       let color = isDark ? "#CCC" : "#333";

@@ -64,15 +64,15 @@ export const GroupedToolCalls = memo(function GroupedToolCalls({
   const visible = expanded ? showAll ? calls : calls.slice(0, MAX_VISIBLE) : [];
   return <div>
       <ToolHeader expanded={expanded} expandable onToggle={() => setExpanded(value => !value)} isDark={isDark} aria-label={`${expanded ? 'Collapse' : 'Expand'} ${calls.length} ${toolName} calls`}>
-        <div className={"block"}>
+        <div className="flex flex-col">
           <span className={"  text-foreground"}>{activeCall ? base.activeBefore ?? base.before : base.before}</span>
           <AnimatedNumber value={calls.length} className={"  text-foreground"} />
           <span className={"  text-foreground"}>{toolName === 'read' ? ' files' : base.after}</span>
         </div>
       </ToolHeader>
       <ToolBody expanded={expanded}>
-        <div className={"block"}>
-          {visible.map(call => <div key={call.id} className={"block"}><span className={"  text-text-secondary"}>{formatSingleLine(call)}</span></div>)}
+        <div className="flex flex-col">
+          {visible.map(call => <div key={call.id} className="flex flex-col"><span className={"  text-text-secondary"}>{formatSingleLine(call)}</span></div>)}
           {calls.length > MAX_VISIBLE && !showAll && <button role="button" onClick={() => setShowAll(true)}><span className={"  text-text-tertiary"}>Show {calls.length - MAX_VISIBLE} more…</span></button>}
         </div>
       </ToolBody>

@@ -32,7 +32,7 @@ export const GenericToolCall = memo(function GenericToolCall({
 
       <ToolBody expanded={expanded && hasResult}>
         <ToolSurface isDark={isDark}>
-          <div className={"block"} nestedScrollEnabled>
+          <div className="flex flex-col" nestedScrollEnabled>
             <span className={"  text-text-secondary"}>
               {resultText}
             </span>

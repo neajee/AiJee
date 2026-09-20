@@ -84,14 +84,14 @@ export function FileRow({
             {badge}
           </span>}
 
-        <div className={"block"} />
+        <div className="flex flex-col" />
 
         {actions && (isWeb ?
       // Hovering means a pointer, and a pointer means the metadata can be
       // covered for a moment instead of surrendering 50px on every row.
       <div>
               {actions}
-            </div> : <div className={"block"}>{actions}</div>)}
+            </div> : <div className="flex flex-col">{actions}</div>)}
       </button>
 
       {isSelected && <div>

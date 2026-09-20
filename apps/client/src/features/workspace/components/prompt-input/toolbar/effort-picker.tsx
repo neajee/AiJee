@@ -21,7 +21,7 @@ export function EffortPicker({
   popoverIndex,
   handleSelectThinking
 }: EffortPickerProps) {
-  return <div className={"block"}>
+  return <div className="flex flex-col">
       <button onClick={() => isWideScreen ? toggleDropdown('effort') : onOpenNarrowSheet('effort')} disabled={toolbarDisabled || thinkingDisabled} role="button" aria-label={thinkingDisabled ? `Thinking not supported by ${currentModel?.name ?? 'this model'}` : `Thinking: ${thinkingLabel}. Press to change.`}>
         <span className={"  text-text-secondary"}>{thinkingLabel}</span>
         {!thinkingDisabled && <ChevronDown size={14} color={theme.textMuted} strokeWidth={1.8} />}
@@ -31,7 +31,7 @@ export function EffortPicker({
         const highlighted = index === popoverIndex;
         const active = item.level === thinkingPreference;
         return <button key={item.level} onClick={() => handleSelectThinking(item.level)} role="menuitem" aria-label={item.description ? `${item.label} — ${item.description}` : item.label}>
-            <div className={"block"}><span>{item.label}</span></div>
+            <div className="flex flex-col"><span>{item.label}</span></div>
           </button>;
       })}
       </div>}

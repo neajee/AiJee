@@ -37,11 +37,11 @@ export function EditWorkspaceDialog({
   if (!isWideScreen) {
     return <div visible={visible} transparent animationType="slide" onRequestClose={onClose}>
         <div className={"flex-1"} behavior={false ? 'padding' : undefined}>
-          <button className={"block"} onClick={onClose}>
+          <button className="inline-flex items-center" onClick={onClose}>
             <button className={"  pb-0"} onClick={event => event.stopPropagation()}>
-              <div className={"block"}><div /></div>
+              <div className="flex flex-col"><div /></div>
               <span>Edit Workspace</span>
-              <div className={"block"} keyboardShouldPersistTaps="handled">
+              <div className="flex flex-col" keyboardShouldPersistTaps="handled">
                 <EditWorkspaceForm {...formProps} />
               </div>
             </button>
@@ -50,9 +50,9 @@ export function EditWorkspaceDialog({
       </div>;
   }
   return <div visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <button className={"block"} onClick={onClose}>
+      <button className="inline-flex items-center" onClick={onClose}>
         <button onClick={event => event.stopPropagation()}>
-          <div className={"block"}>
+          <div className="flex flex-col">
             <span>Edit Workspace</span>
             <button onClick={onClose}>
               <X size={18} color={textMuted} strokeWidth={2} />

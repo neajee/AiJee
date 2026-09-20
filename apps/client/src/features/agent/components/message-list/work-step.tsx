@@ -16,7 +16,7 @@ export const WorkStepView = memo(function WorkStepView({
     case "thinking":
       return <ThinkingBlock text={step.text} isStreaming={step.streaming} isDark={isDark} />;
     case "text":
-      return <div className={"block"}>
+      return <div className="flex flex-col">
           <AssistantMarkdown text={step.text} />
         </div>;
     case "error":

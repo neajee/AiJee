@@ -29,7 +29,7 @@ export function ContextUsageRing({
   const fillColor = isDark ? "#555" : "#AAA";
   const free = Math.max(total - used, 0);
   const pct = Math.round(ratio * 100);
-  return <div className={"block"}>
+  return <div className="flex flex-col">
       <button onClick={() => setShowTooltip(v => !v)}>
         <Svg width={size} height={size}>
           <SvgCircle cx={size / 2} cy={size / 2} r={radius} stroke={trackColor} strokeWidth={stroke} fill="none" />

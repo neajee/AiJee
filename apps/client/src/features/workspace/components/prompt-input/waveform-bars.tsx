@@ -21,7 +21,7 @@ export function WaveformBars({
       }).start();
     });
   }, [anims, audioLevel]);
-  return <div className={"block"}>
+  return <div className="flex flex-col">
       {anims.map((anim, i) => <div key={i} className={"  bg-[#EF4444] h-0"} />)}
     </div>;
 }

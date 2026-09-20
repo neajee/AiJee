@@ -160,13 +160,13 @@ export function AppearancePanel() {
       label: item.label
     }))} onChange={value => update({
       themePreset: value
-    })} compact className={"block"} />} />
+    })} compact className="flex flex-col" />} />
       <SettingsRow label="强调色" right={<Select value={accentPreset} options={ACCENTS.map(item => ({
       value: item.key,
       label: item.label
     }))} onChange={value => update({
       accentPreset: value
-    })} compact className={"block"} />} />
+    })} compact className="flex flex-col" />} />
       <SettingsRow label="UI 字号" right={<SizeStepper value={uiFontSize} onChange={value => update({
       uiFontSize: value
     })} min={12} max={18} palette={p} />} />
@@ -189,9 +189,9 @@ function SizeStepper({
   palette: ReturnType<typeof useSettingsPalette>;
 }) {
   return <div>
-      <button onClick={() => onChange(Math.max(min, value - 1))} aria-label="减小字号"><span className={"block"}>−</span></button>
+      <button onClick={() => onChange(Math.max(min, value - 1))} aria-label="减小字号"><span className="inline-block">−</span></button>
       <span>{value}px</span>
-      <button onClick={() => onChange(Math.min(max, value + 1))} aria-label="增大字号"><span className={"block"}>+</span></button>
+      <button onClick={() => onChange(Math.min(max, value + 1))} aria-label="增大字号"><span className="inline-block">+</span></button>
     </div>;
 }
 const appearanceStyles = {

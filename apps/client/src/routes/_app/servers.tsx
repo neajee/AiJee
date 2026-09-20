@@ -21,8 +21,8 @@ export default function ServersScreen() {
   const p = useSettingsPalette();
   const empty = useServersStore(s => s.servers.length === 0);
   return <div className={"  bg-background"}>
-      {empty ? <ServersSection isDark={isDark} variant="onboarding" /> : <div className={"block"}>
-          <div className={"block"}>
+      {empty ? <ServersSection isDark={isDark} variant="onboarding" /> : <div className="flex flex-col">
+          <div className="flex flex-col">
             {/* This route can render outside the app shell, so it carries its
                 own title instead of relying on a header bar. */}
             <span className={"  text-foreground"}>连接</span>

@@ -27,13 +27,13 @@ export function ModePickerDialog({
     backgroundColor: bg,
     borderColor
   }]}>
-      <div className={"block"}><Layers size={18} color={textPrimary} strokeWidth={1.8} /><span>Select Mode</span></div>
+      <div className="flex flex-col"><Layers size={18} color={textPrimary} strokeWidth={1.8} /><span>Select Mode</span></div>
       <span>Choose how the agent should be configured for this session.</span>
-      <div className={"block"}>
+      <div className="flex flex-col">
         <ModeOption selected={selectedId === noModeId} borderColor={borderColor} selectedBg={selectedBg} selectedBorder={selectedBorder} textPrimary={textPrimary} textMuted={textMuted} onClick={() => setSelectedId(noModeId)} />
         {modes.map(mode => <ModeOption key={mode.id} mode={mode} selected={selectedId === mode.id} borderColor={borderColor} selectedBg={selectedBg} selectedBorder={selectedBorder} textPrimary={textPrimary} textMuted={textMuted} onClick={() => setSelectedId(mode.id)} />)}
       </div>
-      <div className={"block"}>
+      <div className="flex flex-col">
         <button onClick={handleConfirm}>
           <span>Start Session</span>
         </button>

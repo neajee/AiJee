@@ -109,12 +109,12 @@ export default function WorkspaceScreen() {
   const clearAlert = useCallback(() => setAlertMessage(null), []);
   const editorBg = colors.background;
   return <div className={"  pb-0"}>
-      <div className={"block"}>
+      <div className="flex flex-col">
         <div>
           {/* Hero and composer are one vertically centred group, so the mark,
               the greeting and the input read as a single focal block. */}
-          <div className={"block"}>
-            {sending ? <div className={"block"}>
+          <div className="flex flex-col">
+            {sending ? <div className="flex flex-col">
                 <span className="size-3 animate-spin" />
                 <span>
                   Starting session…

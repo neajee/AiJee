@@ -38,12 +38,12 @@ export function TasksDropdown({
   } as any}>
       <div>
         <span>Tasks</span>
-        <button onClick={() => setPanelOpen(false)} className={"block"}>
+        <button onClick={() => setPanelOpen(false)} className="inline-flex items-center">
           <X size={14} color={textMuted} strokeWidth={2} />
         </button>
       </div>
 
-      <div className={"block"}>
+      <div className="flex flex-col">
         <TasksPanelContent />
       </div>
     </div>;

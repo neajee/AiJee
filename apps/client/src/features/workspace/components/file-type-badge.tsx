@@ -129,7 +129,7 @@ export function FileTypeBadge({
   const known = TYPES[ext];
   // An unknown extension still identifies itself; a dot stands in for none.
   const label = known?.label ?? (ext ? ext.slice(0, 3).toUpperCase() : "·");
-  return <div className={"block"}>
+  return <div className="flex flex-col">
       <span>
         {label}
       </span>

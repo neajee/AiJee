@@ -36,7 +36,7 @@ function StartupScreen({
   onSecondaryPress?: () => void;
 }) {
   const colors = useThemeTokens();
-  return <div className={"flex-1 justify-center items-center p-[24px]"}>
+  return <div className={"flex flex-1 flex-col justify-center items-center p-[24px]"}>
       <div className={"w-full max-w-[420px] pl-[24px] pr-[24px] pt-[28px] pb-[28px] rounded-[24px] border"}>
         <span className={"font-sans text-[24px] leading-[30px]"}>
           {title}
@@ -66,7 +66,7 @@ function UnconnectedNotice({
 }) {
   const colors = useThemeTokens();
   return <div className={"flex-1 p-[16px]"}>
-      <div className={"self-center w-full max-w-[760px] flex-row items-center justify-between gap-[16px] pl-[18px] pr-[18px] pt-[14px] pb-[14px] rounded-[12px]"}>
+      <div className={"self-center w-full max-w-[760px] flex flex-row items-center justify-between gap-[16px] pl-[18px] pr-[18px] pt-[14px] pb-[14px] rounded-[12px]"}>
         <span className={"flex-1 font-sans text-[14px]"}>
           未连接 AiJee 设备。连接后即可同步工作区与会话。
         </span>
@@ -194,7 +194,7 @@ export default function AppLayout() {
     };
   }, [serversLoaded, bootstrapReady, authLoaded, activeServerId, servers, hasToken, activateServer, switchServer, fetchWorkspaces, retryNonce]);
   if (!serversLoaded || !authLoaded || !bootstrapReady || status === 'loading') {
-    return <div className={"flex-1 justify-center items-center"}>
+    return <div className={"flex flex-1 flex-col justify-center items-center"}>
         <MorphLoading size="lg" />
       </div>;
   }

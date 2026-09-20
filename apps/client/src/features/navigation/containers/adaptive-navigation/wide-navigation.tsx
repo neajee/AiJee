@@ -39,15 +39,15 @@ export function WideNavigation({
     onMouseLeave: handleHoverZoneOut
   } : {};
   return <div>
-      <div className={"block"}>
+      <div className="flex flex-col">
         {hasServer && showPersistentSidebar && <div className={"w-0 overflow-hidden h-full"}>
             <div className={"w-[280px] flex-1"}>{settingsMode ? <SettingsSidebar /> : <ProjectSidebar />}</div>
           </div>}
         <div>
-          <div className={"block"}>{children}</div>
+          <div className="flex flex-col">{children}</div>
           {isCodeMode && <TaskOutputPanel />}
           {hasServer && !isPersistent && <>
-              <div {...webHoverProps} className={"block"} />
+              <div {...webHoverProps} className="flex flex-col" />
               <div className={"  opacity-100"} />
               <div {...webSidebarHoverProps}>
                 {settingsMode ? <SettingsSidebar /> : <ProjectSidebar />}

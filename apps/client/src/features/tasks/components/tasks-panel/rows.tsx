@@ -75,10 +75,10 @@ export function TaskInstanceRow({
   hoverBg: string;
   isDark: boolean;
 }) {
-  return <button onClick={onSelect} className={"block"}>
+  return <button onClick={onSelect} className="inline-flex items-center">
       <StatusDot status={instance.status} />
       <SourceBadge source={instance.source ?? 'pi'} isDark={isDark} />
-      <div className={"block"}>
+      <div className="flex flex-col">
         <span>
           {instance.label}
         </span>
@@ -86,19 +86,19 @@ export function TaskInstanceRow({
           {instance.command}
         </span>
       </div>
-      <div className={"block"}>
+      <div className="flex flex-col">
         {instance.status === 'running' ? <>
-            <button onClick={onRestart} className={"block"} aria-label="Restart task">
+            <button onClick={onRestart} className="inline-flex items-center" aria-label="Restart task">
               <RotateCcw size={12} color={textMuted} strokeWidth={2} />
             </button>
-            <button onClick={onStop} className={"block"} aria-label="Stop task">
+            <button onClick={onStop} className="inline-flex items-center" aria-label="Stop task">
               <Square size={12} color="#FF3B30" strokeWidth={2} />
             </button>
           </> : <>
-            <button onClick={onRestart} className={"block"} aria-label="Restart task">
+            <button onClick={onRestart} className="inline-flex items-center" aria-label="Restart task">
               <Play size={12} color="#34C759" strokeWidth={2} />
             </button>
-            <button onClick={onRemove} className={"block"} aria-label="Remove task">
+            <button onClick={onRemove} className="inline-flex items-center" aria-label="Remove task">
               <Trash2 size={12} color={textMuted} strokeWidth={2} />
             </button>
           </>}
@@ -126,9 +126,9 @@ export function AvailableTaskRow({
   loading: boolean;
   isDark: boolean;
 }) {
-  return <button onClick={onSelect} disabled={loading} className={"block"}>
+  return <button onClick={onSelect} disabled={loading} className="inline-flex items-center">
       <SourceBadge source={definition.source ?? 'pi'} isDark={isDark} />
-      <div className={"block"}>
+      <div className="flex flex-col">
         <span>
           {definition.label}
         </span>
@@ -141,7 +141,7 @@ export function AvailableTaskRow({
             {definition.group}
           </span>
         </div>}
-      <button onClick={onStart} disabled={loading} className={"block"} aria-label="Start task">
+      <button onClick={onStart} disabled={loading} className="inline-flex items-center" aria-label="Start task">
         <Play size={12} color="#34C759" strokeWidth={2.5} />
       </button>
     </button>;

@@ -69,7 +69,7 @@ export function NewWorkspaceDialogView({
           {loadingSuggestions && <span className="size-3 animate-spin" />}
         </div>
 
-        {pathPreview && !showSuggestions ? <div className={"block"}>
+        {pathPreview && !showSuggestions ? <div className="flex flex-col">
             <span>位置</span>
             <span>
               {pathPreview}
@@ -85,7 +85,7 @@ export function NewWorkspaceDialogView({
                       {item.path}
                     </span>
                   </button>)}
-              </div> : <VirtualList<PathCompletion> ref={suggestionsRef} data={suggestions} keyExtractor={item => item.path} className={"block"} keyboardShouldPersistTaps="handled" nestedScrollEnabled scrollEnabled={suggestions.length > 4} getItemLayout={(_data, index) => ({
+              </div> : <VirtualList<PathCompletion> ref={suggestionsRef} data={suggestions} keyExtractor={item => item.path} className="flex flex-col" keyboardShouldPersistTaps="handled" nestedScrollEnabled scrollEnabled={suggestions.length > 4} getItemLayout={(_data, index) => ({
           length: 40,
           offset: 40 * index,
           index
@@ -102,7 +102,7 @@ export function NewWorkspaceDialogView({
       </div>
 
       {/* Name input */}
-      <div className={"block"}>
+      <div className="flex flex-col">
         <span>项目名称</span>
         <div>
           <input ref={nameRef} focusStyle={{
@@ -118,7 +118,7 @@ export function NewWorkspaceDialogView({
       </div>
 
       {/* Actions */}
-      <div className={"block"}>
+      <div className="flex flex-col">
         <button onClick={onClose}>
           <span>取消</span>
         </button>
@@ -134,13 +134,13 @@ export function NewWorkspaceDialogView({
   if (!isWideScreen) {
     return <div visible={visible} transparent animationType="slide" onRequestClose={onClose}>
         <div className={"flex-1"} behavior={false ? 'padding' : undefined}>
-          <button className={"block"} onClick={onClose}>
+          <button className="inline-flex items-center" onClick={onClose}>
             <button className={"  pb-0"} onClick={e => e.stopPropagation()}>
-              <div className={"block"}>
+              <div className="flex flex-col">
                 <div />
               </div>
               <span>新建项目</span>
-              <div className={"block"} keyboardShouldPersistTaps="handled">
+              <div className="flex flex-col" keyboardShouldPersistTaps="handled">
                 {formContent}
               </div>
             </button>
@@ -151,11 +151,11 @@ export function NewWorkspaceDialogView({
 
   // Desktop: centered dialog
   return <div visible={visible} transparent animationType="fade" onRequestClose={onClose}>
-      <button className={"block"} onClick={onClose}>
+      <button className="inline-flex items-center" onClick={onClose}>
         <button onClick={e => e.stopPropagation()}>
           {showSuggestions && <button className={"  z-[5]"} onClick={dismissSuggestions} />}
-          <div className={"block"}>
-            <div className={"block"}>
+          <div className="flex flex-col">
+            <div className="flex flex-col">
               <span>新建项目</span>
               <span>添加本地目录，随时切换</span>
             </div>

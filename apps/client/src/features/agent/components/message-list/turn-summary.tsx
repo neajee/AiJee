@@ -45,21 +45,21 @@ export const TurnSummary = memo(function TurnSummary({
   }
   if (totalFiles === 0) return null;
   const expandable = ordered.length > 0;
-  return <div className={"block"}>
+  return <div className="flex flex-col">
       <ToolSurface isDark={isDark} padded={false}>
-        <div className={"block"}>
+        <div className="flex flex-col">
           <ToolHeader expanded={expanded} expandable={expandable} onToggle={toggle} isDark={isDark} aria-label={`${expanded ? "Collapse" : "Expand"} the list of changed files`}>
             <span className={"  text-text-secondary"}>
               {totalFiles} {totalFiles === 1 ? "file" : "files"} changed
             </span>
             {/* Keeps the counts on the trailing edge, next to the chevron. */}
-            <div className={"block"} />
-            <span className={"block"}>
-              {stats.linesAdded > 0 && <span className={"block"}>+{stats.linesAdded}</span>}
+            <div className="flex flex-col" />
+            <span className="inline-block">
+              {stats.linesAdded > 0 && <span className="inline-block">+{stats.linesAdded}</span>}
               {stats.linesAdded > 0 && stats.linesRemoved > 0 && " "}
-              {stats.linesRemoved > 0 && <span className={"block"}>{"−"}{stats.linesRemoved}</span>}
+              {stats.linesRemoved > 0 && <span className="inline-block">{"−"}{stats.linesRemoved}</span>}
             </span>
-            <div className={"block"}>
+            <div className="flex flex-col">
               {Array.from({
               length: addBlocks
             }).map((_, i) => <div key={`a-${i}`} />)}

@@ -39,7 +39,7 @@ export function QrScanner({
     return <div {...modalProps} animationType="fade">
         <button onClick={handleClose} aria-label="关闭配对弹窗">
           <button onClick={event => event.stopPropagation()}>
-            <div className={"block"}>
+            <div className="flex flex-col">
               <span className="size-3 animate-spin" />
               <span>Connecting to AiJee</span>
               <span>Completing secure pairing…</span>
@@ -55,7 +55,7 @@ export function QrScanner({
     return <div {...modalProps} animationType="fade">
         <button onClick={handleClose} aria-label="关闭配对成功弹窗">
           <button onClick={event => event.stopPropagation()}>
-            <div className={"block"}>
+            <div className="flex flex-col">
               <div>
                 <Check size={28} color="#fff" strokeWidth={2.5} />
               </div>
@@ -69,14 +69,14 @@ export function QrScanner({
     return <div {...modalProps} animationType="fade">
         <button onClick={handleClose} aria-label="关闭配对失败弹窗">
           <button onClick={event => event.stopPropagation()}>
-            <div className={"block"}>
+            <div className="flex flex-col">
               <div>
                 <AlertCircle size={28} color="#fff" strokeWidth={2} />
               </div>
               <span>Pairing Failed</span>
               <span>{error}</span>
             </div>
-            <div className={"block"}>
+            <div className="flex flex-col">
               <button onClick={reset}>
                 <span>Try Again</span>
               </button>
@@ -92,19 +92,19 @@ export function QrScanner({
     return <div {...modalProps} animationType="fade">
         <button onClick={handleClose} aria-label="关闭网络选择弹窗">
           <button onClick={event => event.stopPropagation()}>
-            <div className={"block"}>
+            <div className="flex flex-col">
               <span>Select Network</span>
-              <button onClick={handleClose} className={"block"}>
+              <button onClick={handleClose} className="inline-flex items-center">
                 <X size={18} color={textMuted} strokeWidth={1.8} />
               </button>
             </div>
             <span>
               {connectParams.hostname ? `"${connectParams.hostname}" is available on multiple addresses:` : 'Multiple addresses found:'}
             </span>
-            <div className={"block"}>
+            <div className="flex flex-col">
               {connectParams.ips.map(ip => <button key={ip} onClick={() => handleSelectIp(ip)}>
                   <Wifi size={16} color={textMuted} strokeWidth={1.8} />
-                  <div className={"block"}>
+                  <div className="flex flex-col">
                     <span>{ip}</span>
                     <span>Port {connectParams.port}</span>
                   </div>
@@ -117,18 +117,18 @@ export function QrScanner({
   return <div {...modalProps} animationType="fade">
       <button onClick={handleClose} aria-label="关闭扫码弹窗">
         <button onClick={event => event.stopPropagation()}>
-          <div className={"block"}>
+          <div className="flex flex-col">
             <span>Scan QR Code</span>
-            <button onClick={handleClose} className={"block"}>
+            <button onClick={handleClose} className="inline-flex items-center">
               <X size={18} color={textMuted} strokeWidth={1.8} />
             </button>
           </div>
           <QrScannerScanPanel visible={visible} scanned={scanned} isDark={isDark} textMuted={textMuted} onBarcodeData={handleBarCodeScanned} />
-          <div className={"block"}>
+          <div className="flex flex-col">
             <span>
               {true ? 'Paste connect URL' : 'Or paste URL manually'}
             </span>
-            <div className={"block"}>
+            <div className="flex flex-col">
               <input value={manualUrl} onChange={event => handleManualUrlChange(event.target.value)} placeholder="http://设备地址/?k=授权码" />
               <button onClick={handleManualSubmit} className={"  opacity-[0.4]"} disabled={!manualUrl.trim()}>
                 <span>Connect</span>

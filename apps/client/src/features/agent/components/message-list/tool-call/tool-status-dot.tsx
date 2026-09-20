@@ -11,8 +11,8 @@ export const ToolStatusDot = memo(function ToolStatusDot({
 }: ToolStatusDotProps) {
   const isActive = status === "streaming" || status === "pending" || status === "running";
   if (status === "running") {
-    return <div className={"w-0 h-0 items-center justify-center"}>
-        <span className={"w-0 h-0" + " size-3 animate-spin"} />
+    return <div className="flex items-center justify-center size-3">
+        <span className="size-3 animate-spin rounded-full bg-current" />
       </div>;
   }
   if (!isActive) return null;
@@ -36,5 +36,5 @@ function PulseDot({
   const style = useAnimatedStyle(() => ({
     opacity: opacity.value
   }));
-  return <div className={"w-0 h-0 rounded-none  "} />;
+  return <div className="rounded-full bg-current" style={{ width: size, height: size, opacity: opacity.value }} />;
 }

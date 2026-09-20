@@ -69,14 +69,14 @@ export function AnimatedCollapse({
   // opening motion has finished, hand the subtree back to a normal View so
   // nested disclosures grow the parent layout instead of being clipped.
   if (expanded && settled) {
-    return <div className={"block"}>
-        <div onLayout={handleLayout} className={"block"}>
+    return <div className="flex flex-col">
+        <div onLayout={handleLayout} className="flex flex-col">
           {children}
         </div>
       </div>;
   }
   return <div>
-      <div onLayout={handleLayout} className={"block"}>
+      <div onLayout={handleLayout} className="flex flex-col">
         {children}
       </div>
     </div>;

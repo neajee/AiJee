@@ -45,7 +45,7 @@ export function ModelEntryRow({
   }, [model.name, model.contextWindow, model.input, model.reasoning]);
   if (editing) {
     return <div>
-        <div className={"block"}>
+        <div className="flex flex-col">
           <div className={"flex-1"}>
             <Field label="模型 ID" value={draft.id} onChange={event => (v => setDraft({
             ...draft,
@@ -59,7 +59,7 @@ export function ModelEntryRow({
           }))(event.target.value)} placeholder="可选" colors={colors} />
           </div>
         </div>
-        <div className={"block"}>
+        <div className="flex flex-col">
           <div className={"flex-1"}>
             <Field label="上下文窗口" value={draft.contextWindow?.toString() ?? ''} onChange={event => (v => setDraft({
             ...draft,
@@ -98,7 +98,7 @@ export function ModelEntryRow({
           reasoning: draft.reasoning === true ? undefined : true
         })
       }]} />
-        <div className={"block"}>
+        <div className="flex flex-col">
           <button onClick={() => setEditing(false)}>
             <span>
               取消
@@ -122,7 +122,7 @@ export function ModelEntryRow({
   }
   return <div>
       <Cpu size={colors.roomy ? 14 : 9} color={colors.textMuted} strokeWidth={1.8} />
-      <div className={"block"}>
+      <div className="flex flex-col">
         <span>
           {model.id}
         </span>

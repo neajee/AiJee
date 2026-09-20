@@ -15,7 +15,7 @@ export const DownloadToolCall = memo(function DownloadToolCall({
   const parsed = parseToolArguments(tc.arguments);
   const url = parsed.url as string || "";
   return <div>
-      <div className={"block"}>
+      <div className="flex flex-col">
         <span className={"  text-text-secondary"}>
           Download
         </span>

@@ -44,7 +44,7 @@ function MorphBlock({
       }]
     };
   });
-  return <div />;
+  return <div className="absolute size-4" style={{ backgroundColor: color, ...animatedStyle }} />;
 }
 export default function MorphLoading({
   size = 'md',
@@ -54,7 +54,7 @@ export default function MorphLoading({
   const dimension = SIZES[size];
   const scale = dimension / SIZES.md;
   const color = colorScheme === 'dark' ? '#FFFFFF' : '#000000';
-  return <div className={"  w-0 h-0"}>
+  return <div className="relative flex items-center justify-center" style={{ width: dimension, height: dimension, ...style }}>
       {[0, 1, 2, 3].map(index => <MorphBlock key={index} index={index} color={color} scale={scale} />)}
     </div>;
 }

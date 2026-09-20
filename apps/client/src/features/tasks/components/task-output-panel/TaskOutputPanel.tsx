@@ -72,8 +72,8 @@ export function TaskOutputPanel() {
   const statusColor = selectedInstance?.status === 'running' ? '#34C759' : selectedInstance?.status === 'failed' ? '#FF3B30' : '#8E8E93';
   if (minimized) {
     return <div>
-        <button onClick={handleToggleMinimize} className={"block"}>
-          <div className={"block"}>
+        <button onClick={handleToggleMinimize} className="inline-flex items-center">
+          <div className="flex flex-col">
             {selectedInstance && <>
                 <Circle size={8} color={statusColor} fill={statusColor} strokeWidth={0} />
                 <span>
@@ -84,11 +84,11 @@ export function TaskOutputPanel() {
                 No task selected
               </span>}
           </div>
-          <div className={"block"}>
-            <button onClick={handleToggleMinimize} className={"block"} aria-label="Maximize panel">
+          <div className="flex flex-col">
+            <button onClick={handleToggleMinimize} className="inline-flex items-center" aria-label="Maximize panel">
               <Maximize2 size={12} color={textMuted} strokeWidth={2} />
             </button>
-            <button onClick={handleClose} className={"block"} aria-label="Close panel">
+            <button onClick={handleClose} className="inline-flex items-center" aria-label="Close panel">
               <X size={12} color={textMuted} strokeWidth={2} />
             </button>
           </div>
@@ -96,12 +96,12 @@ export function TaskOutputPanel() {
       </div>;
   }
   return <div className={"  h-0"}>
-      <div {...panResponder.panHandlers} className={"block"}>
+      <div {...panResponder.panHandlers} className="flex flex-col">
         <div />
       </div>
 
       <div>
-        <div className={"block"}>
+        <div className="flex flex-col">
           {selectedInstance && <>
               <Circle size={8} color={statusColor} fill={statusColor} strokeWidth={0} />
               <span>
@@ -115,11 +115,11 @@ export function TaskOutputPanel() {
               No task selected
             </span>}
         </div>
-        <div className={"block"}>
-          <button onClick={handleToggleMinimize} className={"block"} aria-label="Minimize panel">
+        <div className="flex flex-col">
+          <button onClick={handleToggleMinimize} className="inline-flex items-center" aria-label="Minimize panel">
             <Minus size={12} color={textMuted} strokeWidth={2} />
           </button>
-          <button onClick={handleClose} className={"block"} aria-label="Close panel">
+          <button onClick={handleClose} className="inline-flex items-center" aria-label="Close panel">
             <X size={12} color={textMuted} strokeWidth={2} />
           </button>
         </div>

@@ -91,14 +91,14 @@ export const ThinkingBlock = memo(function ThinkingBlock({
   // whole line saying "Thinking", which the moving text already says.
   const headline = peek || label;
   return <div>
-      <button onClick={toggle} disabled={!text} role="button" aria-label={expanded ? "Collapse thinking" : "Expand thinking"} className={"block"}>
-        <div className={"block"}>
+      <button onClick={toggle} disabled={!text} role="button" aria-label={expanded ? "Collapse thinking" : "Expand thinking"} className="inline-flex items-center">
+        <div className="flex flex-col">
           <Brain size={12} color={colors.textTertiary} strokeWidth={1.8} />
         </div>
         <span className={"  text-text-tertiary"}>
           {headline}
         </span>
-        {!!text && <div className={"block"}>
+        {!!text && <div className="flex flex-col">
             <ChevronRight size={11} color={colors.textTertiary} strokeWidth={2} />
           </div>}
       </button>

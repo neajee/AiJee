@@ -36,7 +36,7 @@ export function PrimaryButton({
 }) {
   const m = useSettingsMetrics();
   const p = useSettingsPalette();
-  return <button onClick={onPress} disabled={busy} role="button" aria-label={label} className={"block"}>
+  return <button onClick={onPress} disabled={busy} role="button" aria-label={label} className="inline-flex items-center">
       {busy ? <span className="size-3 animate-spin" /> : <>
           {Icon ? <Icon size={13} color={p.onAccent} strokeWidth={2.2} /> : null}
           <span className={"text-[var(--desc-size)] font-sans"}>
@@ -54,7 +54,7 @@ export function SecondaryButton({
 }) {
   const m = useSettingsMetrics();
   const p = useSettingsPalette();
-  return <button onClick={onPress} role="button" aria-label={label} className={"block"}>
+  return <button onClick={onPress} role="button" aria-label={label} className="inline-flex items-center">
       <span className={"text-[var(--desc-size)] font-sans"}>
         {label}
       </span>

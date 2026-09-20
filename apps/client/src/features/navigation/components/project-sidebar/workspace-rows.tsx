@@ -58,7 +58,7 @@ export function WorkspaceRow({
      */
     <div onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)}>
       <button onClick={onPress} onLongPress={onLongPress} delayLongPress={400} aria-label={isOpen ? `收起 ${workspace.title}` : `展开 ${workspace.title}`}>
-        <div className={"block"}>
+        <div className="flex flex-col">
           <Folder size={15} color={colors.text} strokeWidth={1.8} />
         </div>
         <span className={"  font-sans"}>
@@ -66,7 +66,7 @@ export function WorkspaceRow({
         </span>
       </button>
 
-      <div className={"block"}>
+      <div className="flex flex-col">
         {showActions && <RowAction label={`在 ${workspace.title} 中新建对话`} onClick={onNewSession} isDark={isDark}>
             <SquarePen size={13} color={colors.textTertiary} strokeWidth={1.8} />
           </RowAction>}

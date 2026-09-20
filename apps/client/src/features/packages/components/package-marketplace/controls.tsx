@@ -23,7 +23,7 @@ export function Segmented({
   return <div className={"  rounded-none"}>
       {options.map(option => {
       const active = option.value === value;
-      return <button key={option.value} onClick={() => onChange(option.value)} role="button" aria-label={option.label} className={"block"}>
+      return <button key={option.value} onClick={() => onChange(option.value)} role="button" aria-label={option.label} className="inline-flex items-center">
             <span className={"text-[var(--desc-size)] font-sans"}>
               {option.label}
             </span>
@@ -45,7 +45,7 @@ export function SearchField({
   return <div className={"  rounded-[var(--tile-radius)]"}>
       <Search size={14} color={p.textTertiary} strokeWidth={1.8} />
       <input value={value} onChange={event => onChangeText(event.target.value)} onKeyDown={event => event.key === "Enter" && onSubmit(event)} placeholder="搜索插件名称或关键词" aria-label="搜索插件" className={"  text-[var(--value-size)]"} />
-      {value ? <button onClick={() => onChangeText('')} role="button" aria-label="清空搜索" className={"block"}>
+      {value ? <button onClick={() => onChangeText('')} role="button" aria-label="清空搜索" className="inline-flex items-center">
           <X size={13} color={p.textTertiary} strokeWidth={2} />
         </button> : null}
     </div>;
@@ -61,7 +61,7 @@ export function Chip({
 }) {
   const m = useSettingsMetrics();
   const p = useSettingsPalette();
-  return <button onClick={onPress} role="button" aria-label={label} className={"block"}>
+  return <button onClick={onPress} role="button" aria-label={label} className="inline-flex items-center">
       <span className={"text-[var(--desc-size)] font-sans"}>
         {label}
       </span>
@@ -82,8 +82,8 @@ export function PackageCard({
 }) {
   const m = useSettingsMetrics();
   const p = useSettingsPalette();
-  return <button onClick={onPress} role="button" aria-label={`${pkg.name} 详情`} className={"block"}>
-      <div className={"block"}>
+  return <button onClick={onPress} role="button" aria-label={`${pkg.name} 详情`} className="inline-flex items-center">
+      <div className="flex flex-col">
         <span className={"  text-[var(--label-size)]"}>
           {pkg.name}
         </span>
@@ -92,7 +92,7 @@ export function PackageCard({
       <span className={"  text-[var(--desc-size)]"}>
         {pkg.description || '作者未提供介绍'}
       </span>
-      <div className={"block"}>
+      <div className="flex flex-col">
         <span>
           {pkg.package_types.join(' · ') || 'npm'}
         </span>

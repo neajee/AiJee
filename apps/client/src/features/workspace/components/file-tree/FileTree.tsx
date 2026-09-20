@@ -29,7 +29,7 @@ export function FileTree({
   const isNarrow = width > 0 && width < NARROW_PANEL_WIDTH;
   const treeWidth = isNarrow ? TREE_COLUMN_NARROW : TREE_COLUMN_WIDTH;
   const tree = <>
-      <div className={"block"}>
+      <div className="flex flex-col">
         <div>
           <Search size={13} color={textMuted} strokeWidth={2} />
           <input value={query} onChange={event => setQuery(event.target.value)} placeholder="Filter files…" aria-label="Filter files" />
@@ -42,13 +42,13 @@ export function FileTree({
       </div>
       <FileTreeRoot rootPath={rootPath} textMuted={textMuted} onFilePress={p => onViewFile(p)} expandedDirs={expandedDirs} onToggleDir={onToggleDir} query={query.trim()} selectedPath={viewingFile} />
     </>;
-  return <div className={"block"} onLayout={e => setWidth(e.nativeEvent.layout.width)}>
+  return <div className="flex flex-col" onLayout={e => setWidth(e.nativeEvent.layout.width)}>
       {isNarrow ?
     // One column: the file takes the panel while it is open, the tree
     // returns when it is closed.
-    viewingFile ? <FileViewer filePath={viewingFile} rootPath={rootPath} onClose={() => onViewFile(null)} /> : tree : <div className={"block"}>
-          <div className={"block"}>
-            {viewingFile ? <FileViewer filePath={viewingFile} rootPath={rootPath} onClose={() => onViewFile(null)} /> : <div className={"block"}>
+    viewingFile ? <FileViewer filePath={viewingFile} rootPath={rootPath} onClose={() => onViewFile(null)} /> : tree : <div className="flex flex-col">
+          <div className="flex flex-col">
+            {viewingFile ? <FileViewer filePath={viewingFile} rootPath={rootPath} onClose={() => onViewFile(null)} /> : <div className="flex flex-col">
                 <FolderOpen size={26} color={textMuted} strokeWidth={1.5} />
                 <span>
                   Open a file

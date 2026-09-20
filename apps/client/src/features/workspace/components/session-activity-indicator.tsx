@@ -54,7 +54,7 @@ export function SessionActivityIndicator({
   if (!isWorking) {
     return idlePlaceholder ? <Minus size={14} color={color} strokeWidth={2} /> : null;
   }
-  return <div className={"block"}>
+  return <div className="flex flex-col">
       {dotAnims.map((anim, index) => <div key={index} className={"  opacity-100"} />)}
     </div>;
 }

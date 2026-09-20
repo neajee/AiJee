@@ -90,17 +90,17 @@ export function ServerFormSheet({
   return <div visible={visible} transparent animationType="none" onRequestClose={() => {
     if (!loading) dismiss();
   }}>
-      <div className={"block"}>
+      <div className="flex flex-col">
         <div className={"  bg-black/50"}>
-          <button className={"block"} onClick={loading ? undefined : dismiss} />
+          <button className="inline-flex items-center" onClick={loading ? undefined : dismiss} />
         </div>
         <div className={"  pb-0"}>
           <div>
             <div className={"  pb-0 max-h-0"}>
-              <div className={"block"}>
+              <div className="flex flex-col">
                 <div className={"  bg-muted"} />
               </div>
-              <div className={"block"}>
+              <div className="flex flex-col">
                 <span>
                   {initial ? 'Edit Server' : 'Add Server'}
                 </span>
