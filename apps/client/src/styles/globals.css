@@ -2,8 +2,6 @@
 
 @theme {
   --color-background: var(--aijee-background, #ffffff);
-  --color-surface: var(--aijee-surface, #ffffff);
-  --color-surface-raised: var(--aijee-surface-raised, #f7f7f8);
   --color-foreground: var(--aijee-text, #1c1c1c);
   --color-text-secondary: var(--aijee-text-secondary, #60646c);
   --color-text-tertiary: var(--aijee-text-tertiary, #8b8d98);
@@ -13,13 +11,12 @@
   --color-surface: var(--aijee-surface, #ffffff);
   --color-surface-raised: var(--aijee-surface-raised, #f7f7f8);
   --color-card: var(--aijee-card, #ffffff);
-  --color-text-secondary: var(--aijee-text-secondary, #60646c);
-  --color-text-tertiary: var(--aijee-text-tertiary, #8b8d98);
   --color-destructive: var(--aijee-destructive, #e5484d);
   --color-accent: var(--aijee-accent, #2563eb);
   --color-accent-content: var(--aijee-on-accent, #ffffff);
   --color-muted: var(--aijee-muted, #f1f3f5);
   --color-overlay: var(--aijee-overlay, rgba(0, 0, 0, 0.4));
+  --color-success: var(--aijee-success, #30a46c);
   --spacing-bottom-inset: var(--bottom-inset, 0px);
   --color-code: var(--aijee-code-background, #f6f8fa);
   --font-sans: var(--aijee-ui-font-family, system-ui, sans-serif);

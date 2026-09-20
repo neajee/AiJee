@@ -73,10 +73,12 @@ function RootLayout() {
       '--content-max-width': `${metrics.contentMaxWidth ?? 9999}px`,
       '--aijee-card': palette.card,
       '--aijee-muted': palette.tile,
+      '--aijee-success': palette.success,
       '--aijee-destructive': palette.destructive,
       '--aijee-on-accent': palette.onAccent,
       '--aijee-overlay': themeTokens.overlay,
-      '--bottom-inset': '0px'
+      '--bottom-inset': '0px',
+      '--row-gap': `${metrics.rowMinHeight > 40 ? 12 : 8}px`
     } as Record<string, string>;
     Object.entries(css).forEach(([key, value]) => root.style.setProperty(key, value));
     root.dataset.aijeeTheme = `${themePreset}-${colorScheme ?? 'light'}`;

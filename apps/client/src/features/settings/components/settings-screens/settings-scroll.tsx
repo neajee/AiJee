@@ -1,17 +1,13 @@
 import { type ReactNode } from 'react';
-import { useSafeAreaInsets } from "@/platform/browser";
-import { useSettingsContentStyle, useSettingsPalette, useSettingsPhoneLayout } from '@/components/settings-surface';
+import { useSettingsPalette } from '@/components/settings-surface';
 export function SettingsScroll({
   children
 }: {
   children: ReactNode;
 }) {
-  const insets = useSafeAreaInsets();
   const palette = useSettingsPalette();
-  const phone = useSettingsPhoneLayout();
-  const contentStyle = useSettingsContentStyle(insets.bottom);
-  return <div className={"  bg-background"}>
-      <div className={"block"}>
+  return <div className="min-h-full bg-background">
+      <div className="flex flex-col gap-[var(--group-gap)] px-[var(--gutter)] pt-[calc(var(--gutter)/2)] pb-[calc(var(--bottom-inset)+32px)] w-full max-w-[var(--content-max-width)] self-center">
         {children}
       </div>
     </div>;

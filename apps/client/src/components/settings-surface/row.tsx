@@ -16,7 +16,7 @@ export const SettingsIconTile = memo(function SettingsIconTile({
 }) {
   const m = useSettingsMetrics();
   const p = useSettingsPalette();
-  return <div width={m.tileSize} height={m.tileSize} borderRadius={m.tileRadius === 8 ? '$2' : 5} className={"items-center justify-center"}>
+  return <div className="flex items-center justify-center w-[var(--tile-size)] h-[var(--tile-size)] rounded-[var(--tile-radius)]">
     <IconComponent size={m.tileIcon} color={tone === 'destructive' ? p.destructive : p.textSecondary} strokeWidth={1.8} />
   </div>;
 });
@@ -42,14 +42,13 @@ export function SettingsRow({
   const m = useSettingsMetrics();
   const p = useSettingsPalette();
   const [hovered, setHovered] = useState(false);
-  const body = <div flexDirection="row" alignItems="center" gap={m.rowMinHeight > 40 ? '$3' : '$2'} className={"pl-[var(--gutter)] pr-[var(--gutter)] pt-[var(--row-padding-v)] pb-[var(--row-padding-v)] min-h-[var(--row-min-height)]"} onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)}>
+  const body = <div className="flex items-center gap-[var(--row-gap)] pl-[var(--gutter)] pr-[var(--gutter)] pt-[var(--row-padding-v)] pb-[var(--row-padding-v)] min-h-[var(--row-min-height)]" onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)}>
     {icon ? <SettingsIconTile icon={icon} tone={tone} /> : null}
     <div className={"flex-1 gap-[2px] self-stretch justify-center"}><span className={"text-[var(--label-size)] font-sans text-left"}>{label}</span>
       {description ? <span className={"text-[var(--desc-size)] font-sans leading-[0] text-left"}>{description}</span> : null}</div>
     {right}
   </div>;
-  const inset = icon ? m.gutter + m.tileSize + (m.rowMinHeight > 40 ? 12 : 8) : m.gutter;
-  return <div>{onPress ? <button onClick={onPress} role="button" aria-label={accessibilityLabel ?? label}>{body}</button> : body}{!isLast ? <div className={"h-[0.5px] ml-[0]"} /> : null}</div>;
+  return <div>{onPress ? <button onClick={onPress} role="button" aria-label={accessibilityLabel ?? label}>{body}</button> : body}{!isLast ? <div className="h-px ml-[var(--gutter)] bg-border" /> : null}</div>;
 }
 export function SettingsSwitch({
   value,
@@ -60,11 +59,5 @@ export function SettingsSwitch({
   onValueChange: (value: boolean) => void;
   accessibilityLabel?: string;
 }) {
-  const m = useSettingsMetrics();
-  const p = useSettingsPalette();
-  const control = <input value={value} onValueChange={onValueChange} aria-label={accessibilityLabel} trackColor={{
-    false: p.isDark ? '#3A3A3C' : '#E4E4E7',
-    true: p.success
-  }} thumbColor={false ? '#FFFFFF' : undefined} />;
-  return m.switchScale === 1 ? control : <div className={"block"}>{control}</div>;
+  return <input type="checkbox" checked={value} onChange={event => onValueChange(event.target.checked)} aria-label={accessibilityLabel} className="size-4 accent-primary" />;
 }

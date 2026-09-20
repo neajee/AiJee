@@ -7,5 +7,8 @@ export default function MaterialIcons({
   size?: number;
   color?: string;
 }) {
-  return <span className={"text-[0px]"}>{name === "close" ? "×" : "•"}</span>;
+  return <span className="text-[var(--label-size)]" style={{
+    color,
+    fontSize: size
+  }}>{name === "close" ? "×" : "•"}</span>;
 }
