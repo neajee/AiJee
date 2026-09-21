@@ -17,6 +17,7 @@ export interface AgentSessionHandle extends SessionState {
   steer: (message: string, options?: { images?: ImageContent[] }) => Promise<void>;
   followUp: (message: string, options?: { images?: ImageContent[] }) => Promise<void>;
   abort: () => Promise<void>;
+  clearQueue: () => Promise<{ steering: string[]; followUp: string[] }>;
   fork: (entryId: string, position?: "before" | "at") => Promise<{ session?: { sessionId: string; sessionFile?: string }; cancelled: boolean }>;
   loadOlderMessages: () => Promise<void>;
   sendExtensionUiResponse: (params: {
@@ -122,6 +123,11 @@ export function useAgentSession(
     return client.abort(sessionId);
   }, [client, sessionId]);
 
+  const clearQueue = useCallback(() => {
+    if (!sessionId) return Promise.resolve({ steering: [], followUp: [] });
+    return client.clearQueue(sessionId);
+  }, [client, sessionId]);
+
   const fork = useCallback((entryId: string, position: "before" | "at" = "before") => {
     if (!sessionId) return Promise.resolve({ cancelled: false });
     return client.fork(sessionId, entryId, position);
@@ -146,6 +152,7 @@ export function useAgentSession(
     steer,
     followUp,
     abort,
+    clearQueue,
     fork,
     loadOlderMessages,
     sendExtensionUiResponse,

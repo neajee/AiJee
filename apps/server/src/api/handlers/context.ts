@@ -2,6 +2,7 @@ import type { EngineSession } from "@aijee/engine";
 import type { Workspace as ProtocolWorkspace } from "@aijee/protocol";
 import type { PersistedSession } from "../../storage/state-store.ts";
 import type { IncomingMessage, ServerResponse } from "node:http";
+import type { WebSocket } from "ws";
 
 export interface HandlerContext {
   [key: string]: any;
@@ -12,6 +13,16 @@ export interface HandlerContext {
   safePath(input: string): string;
 }
 export type Workspace = ProtocolWorkspace;
+/**
+ * A live client event connection. The client names the session it is currently
+ * viewing via `/api/stream-active-session`; high-frequency delta events are only
+ * pushed to the connection that is viewing their session.
+ */
+export type StreamConnection = {
+  activeSessionId: string | null;
+  response?: ServerResponse;
+  socket?: WebSocket;
+};
 export type ManagedSession = { key: string; workspaceId: string; session: EngineSession; createdAt: string; lastActive: number; modeId?: string; systemPrompt?: string; draft?: boolean };
 export type Mode = { id: string; name: string; description?: string; model?: string; thinking_level?: string; system_prompt?: string; extensions?: string[]; skills?: string[]; extra_args?: string[]; is_default?: boolean; sort_order?: number };
 export type OAuthLogin = { id: string; providerId: string; url: string | null; instructions: string | null; status: "pending" | "complete" | "failed"; error: string | null; controller: AbortController; expiresAt: number; prompt: { id: string; message: string; type: string; options?: Array<{ id: string; label: string; description?: string }> } | null; resolvePrompt: ((value: string) => void) | null };

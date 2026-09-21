@@ -64,8 +64,18 @@ export class PiClient {
       this._handleInstanceId(instanceId);
     });
 
+    // A connection id is per-handshake, so the backend loses the active-session
+    // binding on every (re)connect. Flush a session that was opened before the
+    // handshake finished, and re-register the one currently on screen; otherwise
+    // the backend would keep filtering this connection's deltas away.
     this._stream.connectionId$.subscribe(() => {
+      const pending = this._pendingActiveSession;
       this._pendingActiveSession = undefined;
+      if (pending !== undefined) {
+        this._sendActiveSession(pending);
+      } else if (this._viewedSessionId) {
+        this._sendActiveSession(this._viewedSessionId);
+      }
     });
 
     this._stream.activeSessions$.subscribe((sessionIds) => {
@@ -99,6 +109,10 @@ export class PiClient {
 
   disconnect(): void {
     this._stream.disconnect();
+  }
+
+  stop(): void {
+    this._stream.stop();
   }
 
   reconnect(): void {
@@ -144,6 +158,13 @@ export class PiClient {
   updateToken(accessToken: string): void {
     (this._config as { accessToken: string }).accessToken = accessToken;
     this.api.updateToken(accessToken);
+  }
+
+  updateConfig(serverUrl: string, accessToken: string): void {
+    (this._config as { serverUrl: string; accessToken: string }).serverUrl = serverUrl;
+    this._config.accessToken = accessToken;
+    this.api.updateConfig(serverUrl, accessToken);
+    this._stream.updateServerUrl(serverUrl);
   }
 
   get events$(): Observable<StreamEventEnvelope> {
@@ -416,6 +437,30 @@ export class PiClient {
 
   async abort(sessionId: string): Promise<void> {
     return this.api.abort(sessionId);
+  }
+
+  async clearQueue(sessionId: string): Promise<{ steering: string[]; followUp: string[] }> {
+    const cleared = await this.api.clearQueue(sessionId);
+    const counts = new Map<string, number>();
+    for (const message of [...cleared.steering, ...cleared.followUp]) {
+      counts.set(message, (counts.get(message) ?? 0) + 1);
+    }
+    const subject = this._sessionStates.get(sessionId);
+    if (subject && counts.size > 0) {
+      const state = subject.getValue();
+      const messages = [...state.messages];
+      const lastAssistant = messages.map((message) => message.role).lastIndexOf("assistant");
+      for (let index = messages.length - 1; index > lastAssistant; index -= 1) {
+        const message = messages[index];
+        if (message?.role !== "user") continue;
+        const remaining = counts.get(message.text) ?? 0;
+        if (remaining <= 0) continue;
+        counts.set(message.text, remaining - 1);
+        messages.splice(index, 1);
+      }
+      subject.next({ ...state, messages });
+    }
+    return cleared;
   }
 
   async fork(sessionId: string, entryId: string, position: "before" | "at" = "before") {

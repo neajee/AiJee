@@ -112,6 +112,10 @@ export function reduceStreamEvent(state: SessionState, envelope: StreamEventEnve
         const content = raw["content"] as unknown[] | undefined;
         const images = extractImagesFromContent(content);
         if ((!text && !images?.length) || isModeSlashCommand(text)) break;
+        // Pi emits queue_update before it forwards a queued user message into
+        // the agent. Keep that message in the queue affordance, not in chat:
+        // it has not actually been processed as a conversation turn yet.
+        if (steeringQueue.includes(text) || followUpQueue.includes(text)) break;
         const entryId = extractMessageEntryId(raw);
         const attachments = images?.map((image, index) => ({
           id: `img-${envelope.id}-${index}`,
@@ -324,6 +328,13 @@ export function reduceStreamEvent(state: SessionState, envelope: StreamEventEnve
       }
       if (endIdx !== -1) {
         const msg = messages[endIdx]!;
+        // The message is stamped at `message_start`, so the gap to `message_end`
+        // is the time the model actually spent generating it. This is the only
+        // trustworthy source for output throughput: turn-level timestamp spans
+        // measure time-to-first-token plus tool waits, not generation.
+        const generationMs = msg.generationMs ?? (
+          envelope.timestamp > msg.timestamp ? envelope.timestamp - msg.timestamp : undefined
+        );
         const updated: ChatMessage = {
           ...msg,
           isStreaming: false,
@@ -334,6 +345,7 @@ export function reduceStreamEvent(state: SessionState, envelope: StreamEventEnve
           api: (endMsg?.["api"] as string) ?? msg.api,
           responseId: (endMsg?.["responseId"] as string) ?? msg.responseId,
           usage: extractUsage(endMsg as Record<string, unknown> ?? {}) ?? msg.usage,
+          ...(generationMs !== undefined ? { generationMs } : {}),
         };
         if (endMsg && Array.isArray(endMsg["content"])) {
           const content = endMsg["content"] as Record<string, unknown>[];
@@ -439,6 +451,49 @@ export function reduceStreamEvent(state: SessionState, envelope: StreamEventEnve
       if (event.type !== "queue_update") break;
       steeringQueue = event.steering;
       followUpQueue = event.followUp;
+      // queue_update and user message_start may arrive in either order. Remove
+      // any just-rendered queued user entries here as a second pass so pending
+      // instructions stay exclusively in the composer queue.
+      const queuedCounts = new Map<string, number>();
+      for (const text of [...steeringQueue, ...followUpQueue]) {
+        queuedCounts.set(text, (queuedCounts.get(text) ?? 0) + 1);
+      }
+      const lastAssistant = messages.map((message) => message.role).lastIndexOf("assistant");
+      for (let index = messages.length - 1; index > lastAssistant; index -= 1) {
+        const message = messages[index];
+        if (message?.role !== "user") continue;
+        const remaining = queuedCounts.get(message.text) ?? 0;
+        if (remaining <= 0) continue;
+        queuedCounts.set(message.text, remaining - 1);
+        messages = [...messages.slice(0, index), ...messages.slice(index + 1)];
+      }
+      break;
+    }
+
+    case "entry_appended": {
+      if (event.type !== "entry_appended") break;
+      const entry = event.entry;
+      const entryId = typeof entry.id === "string" && entry.id.trim() ? entry.id : null;
+      const rawMessage = entry.message as Record<string, unknown> | undefined;
+      const role = rawMessage?.role;
+      if (!entryId || (role !== "user" && role !== "assistant")) break;
+      const content = rawMessage.content;
+      const text = typeof content === "string"
+        ? content
+        : extractTextFromContent(Array.isArray(content) ? content : undefined);
+      let index = -1;
+      for (let i = messages.length - 1; i >= 0; i -= 1) {
+        const message = messages[i];
+        if (message?.role !== role || message.entryId) continue;
+        if (text && message.text !== text) continue;
+        index = i;
+        break;
+      }
+      if (index >= 0) {
+        const next = [...messages];
+        next[index] = { ...next[index]!, entryId };
+        messages = next;
+      }
       break;
     }
 

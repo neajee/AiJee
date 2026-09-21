@@ -20,22 +20,14 @@ export function PiClientProvider({ config, children }: PiClientProviderProps) {
 
   useEffect(() => {
     if (!config?.serverUrl || !config.accessToken) return;
+    client.updateConfig(config.serverUrl, config.accessToken);
     client.connect();
-    return () => client.disconnect();
+    return () => client.stop();
   }, [client, config?.accessToken, config?.serverUrl]);
 
   useEffect(() => {
     if (!config) return;
-    const tokenChanged = client.api.accessToken !== config.accessToken;
-    client.updateToken(config.accessToken);
-    // If the token changed while disconnected (e.g. after a refresh),
-    // reconnect the SSE stream with the fresh token.
-    if (tokenChanged && config.accessToken) {
-      const conn = client.connectionSnapshot;
-      if (conn.status === "disconnected" || conn.status === "idle") {
-        client.reconnect();
-      }
-    }
+    client.updateConfig(config.serverUrl, config.accessToken);
   }, [client, config]);
 
   return (

@@ -170,6 +170,12 @@ export async function setThinkingLevel(transport: ApiTransport, sessionId: strin
     });
     unwrapResult(result);
   }
+export async function clearQueue(transport: ApiTransport, sessionId: string): Promise<{ steering: string[]; followUp: string[] }> {
+    const result = await transport.request("clearQueue", {
+      body: { session_id: sessionId },
+    });
+    return unwrapResult<{ steering: string[]; followUp: string[] }>(result);
+  }
 export async function cycleThinkingLevel(transport: ApiTransport, sessionId: string): Promise<void> {
     const result = await transport.request("cycleThinkingLevel", {
       body: { session_id: sessionId },

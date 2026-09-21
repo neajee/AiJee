@@ -5,7 +5,7 @@ export function fakeSession(sessionId: string, options: { cwd?: string; sessionF
   const cwd = options.cwd ?? "/tmp/a";
   const sessionFile = options.sessionFile ?? `${sessionId}.jsonl`;
   const messages = options.messages ?? [];
-  const listeners = new Set<(event: { type: string; data: null; timestamp: number }) => void>();
+  const listeners = new Set<(event: { type: string; data: unknown; timestamp: number }) => void>();
   const descriptor = { sessionId, sessionFile, cwd, streaming: false };
   let sessionName: string | undefined;
   const session = {
@@ -13,9 +13,12 @@ export function fakeSession(sessionId: string, options: { cwd?: string; sessionF
     sessionId,
     sessionFile,
     isStreaming: false,
-    subscribe(listener: (event: { type: string; data: null; timestamp: number }) => void) {
+    subscribe(listener: (event: { type: string; data: unknown; timestamp: number }) => void) {
       listeners.add(listener);
       return () => listeners.delete(listener);
+    },
+    emit(type: string, data: unknown = null, timestamp = Date.now()) {
+      for (const listener of listeners) listener({ type, data, timestamp });
     },
     describe: () => descriptor,
     prompt: async () => undefined,

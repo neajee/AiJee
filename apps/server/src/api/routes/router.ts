@@ -102,6 +102,7 @@ export async function dispatchRoute(ctx: RouteContext, request: IncomingMessage,
   if (request.method === "POST" && url.pathname === "/api/agent/prompt") return ctx.prompt(request, response, "prompt");
   if (request.method === "POST" && url.pathname === "/api/agent/steer") return ctx.prompt(request, response, "steer");
   if (request.method === "POST" && url.pathname === "/api/agent/follow-up") return ctx.prompt(request, response, "followUp");
+  if (request.method === "POST" && url.pathname === "/api/agent/clear-queue") return ctx.sessionCommand(request, response, (session: any) => session.clearQueue());
   if (request.method === "POST" && url.pathname === "/api/agent/abort") return ctx.abort(request, response);
   if (request.method === "POST" && url.pathname === "/api/agent/cycle-model") return ctx.sessionCommand(request, response, (session: any) => session.cycleModel(), "models");
   if (request.method === "POST" && url.pathname === "/api/agent/bash") return ctx.agentBash(request, response);
@@ -140,7 +141,7 @@ export async function dispatchRoute(ctx: RouteContext, request: IncomingMessage,
   const streamMatch = /^\/api\/stream\/([^/]+)$/.exec(url.pathname);
   if (request.method === "GET" && streamMatch) return ctx.stream(request, streamMatch[1], response);
   if (request.method === "GET" && url.pathname === "/api/stream") return ctx.globalStream(request, response);
-  if (request.method === "POST" && url.pathname === "/api/stream-active-session") return ctx.ok(response, null);
+  if (request.method === "POST" && url.pathname === "/api/stream-active-session") return ctx.setActiveStreamSession(request, response);
   const chatSessionMatch = /^\/api\/chat\/sessions\/([^/]+)(?:\/touch)?$/.exec(url.pathname);
   if (chatSessionMatch && request.method === "DELETE") return ctx.deleteSession(chatSessionMatch[1], response);
   if (chatSessionMatch && request.method === "POST") return ctx.touchChatSession(request, response, chatSessionMatch[1]);

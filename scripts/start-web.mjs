@@ -95,6 +95,7 @@ if (webResolution.reuse) {
   const webPort = webResolution.port;
   const childEnv = {
     ...process.env,
+    NODE_OPTIONS: `${process.env.NODE_OPTIONS ?? ""} --max-old-space-size=8192`.trim(),
     AIJEE_API_PORT: String(apiPort),
     AIJEE_FRONTEND_PORT: String(frontendPort),
     AIJEE_WEB_PORT: String(webPort),

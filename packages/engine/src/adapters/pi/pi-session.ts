@@ -58,6 +58,10 @@ export class PiSession implements EngineSession {
     await this.session.followUp(text, images);
   }
 
+  clearQueue(): { steering: string[]; followUp: string[] } {
+    return this.session.clearQueue();
+  }
+
   async abort(): Promise<void> {
     await this.session.abort();
   }

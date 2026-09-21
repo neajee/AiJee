@@ -33,6 +33,29 @@ export async function fsList(ctx: HandlerContext, url: URL, response: ServerResp
 
 export async function fsComplete(ctx: HandlerContext, url: URL, response: ServerResponse): Promise<void> {
     const input = url.searchParams.get("q") ?? "";
+    if (input.startsWith("@")) {
+      const query = input.slice(1).toLowerCase();
+      const roots = [...ctx.workspaces.values()]
+        .filter((workspace) => workspace.status === "active")
+        .map((workspace) => resolve(workspace.path));
+      const matches: Array<{ path: string; is_dir: boolean }> = [];
+      const walk = async (root: string, directory: string, depth: number): Promise<void> => {
+        if (matches.length >= 200 || depth > 8) return;
+        let entries;
+        try { entries = await readdir(directory, { withFileTypes: true }); } catch { return; }
+        for (const entry of entries) {
+          if (matches.length >= 200 || entry.name === "node_modules" || entry.name === ".git" || entry.name === "dist") continue;
+          const path = join(directory, entry.name);
+          const relative = relativePath(root, path) || basename(path);
+          if (entry.name.toLowerCase().includes(query) || relative.toLowerCase().includes(query)) {
+            matches.push({ path: relative, is_dir: entry.isDirectory() });
+          }
+          if (entry.isDirectory()) await walk(root, path, depth + 1);
+        }
+      };
+      for (const root of roots) await walk(root, root, 0);
+      return ctx.ok(response, matches.sort((a, b) => a.path.localeCompare(b.path)));
+    }
     const expanded = input.startsWith("~/") ? join(homedir(), input.slice(2)) : input;
     const directoryQuery = expanded.length > 1 && expanded.endsWith("/");
     const parent = directoryQuery ? expanded : dirname(expanded || ".");

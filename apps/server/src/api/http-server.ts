@@ -17,7 +17,7 @@ import { PreviewBroker } from "./preview-broker.ts";
 import { WebSocketServer, WebSocket } from "ws";
 import type { AgentStreamEvent, StreamEventEnvelope } from "@aijee/protocol";
 import { createHandlerContext } from "./handlers/index.ts";
-import type { HandlerContext, ManagedSession, Mode, OAuthLogin, Workspace, PersistedSession } from "./handlers/context.ts";
+import type { HandlerContext, ManagedSession, Mode, OAuthLogin, StreamConnection, Workspace, PersistedSession } from "./handlers/context.ts";
 
 export class AiJeeHttpServer {
   private server?: Server;
@@ -32,6 +32,9 @@ export class AiJeeHttpServer {
   private readonly sessionStreams = new Map<string, Set<ServerResponse>>();
   private readonly globalSockets = new Set<WebSocket>();
   private readonly sessionSockets = new Map<string, Set<WebSocket>>();
+  private readonly streamConnections = new Map<string, StreamConnection>();
+  private readonly responseConnections = new Map<ServerResponse, string>();
+  private readonly socketConnections = new Map<WebSocket, string>();
   private readonly wsServer = new WebSocketServer({ noServer: true });
   private readonly previewBroker = new PreviewBroker();
   private readonly sessionEventUnsubscribers = new Map<string, () => void>();
@@ -146,6 +149,9 @@ export class AiJeeHttpServer {
     for (const sockets of this.sessionSockets.values()) for (const socket of sockets) socket.close();
     this.globalSockets.clear();
     this.sessionSockets.clear();
+    this.streamConnections.clear();
+    this.responseConnections.clear();
+    this.socketConnections.clear();
     await this.previewBroker.close();
     if (!this.server) return;
     await new Promise<void>((resolve, reject) => this.server?.close((error) => error ? reject(error) : resolve()));

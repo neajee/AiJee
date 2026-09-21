@@ -72,6 +72,10 @@ export class StreamConnection {
     this._config = config;
   }
 
+  updateServerUrl(serverUrl: string): void {
+    this._config.serverUrl = serverUrl;
+  }
+
   get events$(): Observable<StreamEventEnvelope> {
     return this._events$.asObservable();
   }
@@ -122,6 +126,15 @@ export class StreamConnection {
     this._instanceId$.complete();
     this._connectionId$.complete();
     this._activeSessions$.complete();
+  }
+
+  /** Stop the transport without disposing the client. React effect cleanup and
+   * configuration changes must remain reconnectable (including StrictMode). */
+  stop(): void {
+    if (this._destroyed) return;
+    this._clearReconnectTimer();
+    this._close();
+    this._setConnection({ status: "idle" });
   }
 
   reconnect(): void {

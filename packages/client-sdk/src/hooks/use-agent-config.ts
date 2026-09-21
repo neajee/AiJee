@@ -6,7 +6,10 @@ import type {
   ModelThinkingLevel,
 } from "@aijee/protocol";
 import type { ProductAgentMode } from "../types/chat-message";
-import { getSupportedThinkingLevels } from "../utils/thinking-levels";
+import {
+  ALL_THINKING_LEVELS,
+  getSupportedThinkingLevels,
+} from "../utils/thinking-levels";
 import {
   getContextWindow,
   supportsImageInput,
@@ -67,6 +70,7 @@ export function useAgentConfig(
   const [models, setModels] = useState<ModelInfo[] | null>(
     options?.seedModels ?? null,
   );
+  const [nativeThinkingLevels, setNativeThinkingLevels] = useState<ModelThinkingLevel[] | null>(null);
   // Read through refs so a new seed object every render cannot re-trigger the
   // seeding effect and undo live data.
   const seedStateRef = useRef(options?.seedState ?? null);
@@ -96,6 +100,7 @@ export function useAgentConfig(
   useEffect(() => {
     setState(seedStateRef.current);
     setModels((prev) => prev ?? seedModelsRef.current);
+    setNativeThinkingLevels(null);
   }, [sessionId]);
 
   // Subscribe to agent_state from SSE
@@ -119,9 +124,10 @@ export function useAgentConfig(
       setError(null);
 
       try {
-        const [modelsResult, agentState] = await Promise.all([
+        const [modelsResult, agentState, thinkingResult] = await Promise.all([
           client.api.getAvailableModels(sessionId),
           client.api.getAgentState(sessionId),
+          client.api.getAvailableThinkingLevels(sessionId).catch(() => null),
         ]);
         if (sessionIdRef.current !== sessionId) return;
         setState(agentState);
@@ -138,6 +144,11 @@ export function useAgentConfig(
           return;
         }
         setModels(availableModels);
+        const nativeLevels = thinkingResult?.levels.filter(
+          (level): level is ModelThinkingLevel =>
+            (ALL_THINKING_LEVELS as readonly string[]).includes(level),
+        ) ?? [];
+        setNativeThinkingLevels(nativeLevels.length > 0 ? nativeLevels : null);
         attemptRef.current = 0;
         setIsLoading(false);
       } catch (err) {
@@ -278,8 +289,8 @@ export function useAgentConfig(
   }, [state?.model, models]);
 
   const availableThinkingLevels = useMemo(
-    () => getSupportedThinkingLevels(activeModel),
-    [activeModel],
+    () => nativeThinkingLevels ?? getSupportedThinkingLevels(activeModel),
+    [activeModel, nativeThinkingLevels],
   );
 
   const canThink = useMemo(

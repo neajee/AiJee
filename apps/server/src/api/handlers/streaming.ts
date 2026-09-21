@@ -3,7 +3,7 @@ import type { Duplex } from "node:stream";
 import { WebSocket } from "ws";
 import type { EngineSession } from "@aijee/engine";
 import type { StreamEventEnvelope, AgentStreamEvent, ServerEvent } from "@aijee/protocol";
-import type { HandlerContext, Workspace, ManagedSession, Mode, OAuthLogin, PersistedSession } from "./context.ts";
+import type { HandlerContext, StreamConnection, Workspace, ManagedSession, Mode, OAuthLogin, PersistedSession } from "./context.ts";
 import { execFileSync } from "node:child_process";
 import { createReadStream, existsSync, readFileSync } from "node:fs";
 import { mkdir, readdir, readFile, rename, rm, stat, writeFile } from "node:fs/promises";
@@ -17,6 +17,85 @@ import { normalizeImageAttachments } from "../prompt-images.ts";
 import { keepAliveFrame, openSse, sseFrame } from "../stream/serializer.ts";
 import { recordTelemetry } from "../../telemetry/index.ts";
 import { ModelRuntime } from "@earendil-works/pi-coding-agent";
+
+/**
+ * The high-frequency events a client only needs for the session it is actually
+ * looking at. Everything else is broadcast to every connection so that session
+ * lists and streaming indicators stay live without the token-level chatter.
+ */
+const DELTA_EVENT_TYPES: ReadonlySet<string> = new Set(["message_update", "tool_execution_update"]);
+
+function isDeltaEvent(event: StreamEventEnvelope): boolean {
+  return DELTA_EVENT_TYPES.has(event.type);
+}
+
+function registerStreamConnection(ctx: HandlerContext, sink: { response?: ServerResponse; socket?: WebSocket }): string {
+    const connectionId = randomUUID();
+    ctx.streamConnections.set(connectionId, { activeSessionId: null, ...sink } satisfies StreamConnection);
+    if (sink.response) ctx.responseConnections.set(sink.response, connectionId);
+    if (sink.socket) ctx.socketConnections.set(sink.socket, connectionId);
+    return connectionId;
+  }
+
+
+function unregisterStreamConnection(ctx: HandlerContext, connectionId: string): void {
+    const connection = ctx.streamConnections.get(connectionId) as StreamConnection | undefined;
+    if (!connection) return;
+    ctx.streamConnections.delete(connectionId);
+    if (connection.response) ctx.responseConnections.delete(connection.response);
+    if (connection.socket) ctx.socketConnections.delete(connection.socket);
+  }
+
+
+function isConnectionActiveFor(ctx: HandlerContext, sink: ServerResponse | WebSocket, sessionId: string): boolean {
+    const connectionId = (ctx.responseConnections.get(sink) ?? ctx.socketConnections.get(sink)) as string | undefined;
+    if (!connectionId) return false;
+    const connection = ctx.streamConnections.get(connectionId) as StreamConnection | undefined;
+    return connection?.activeSessionId === sessionId;
+  }
+
+
+function writeToConnection(ctx: HandlerContext, connection: StreamConnection, event: StreamEventEnvelope): void {
+    if (connection.response) {
+      try { connection.response.write(sseFrame(event)); } catch { /* The connection closed mid-replay. */ }
+    } else if (connection.socket) {
+      ctx.sendSocket(connection.socket, event);
+    }
+  }
+
+
+function replayActiveSessionEvents(ctx: HandlerContext, connection: StreamConnection, sessionId: string, fromEventId: number | undefined, fromDeltaEventId: number | undefined): void {
+    const fromEvent = fromEventId ?? 0;
+    const fromDelta = fromDeltaEventId ?? 0;
+    // eventHistory is append-ordered by id, so a single forward pass keeps the
+    // coarse and delta streams interleaved exactly as they were produced.
+    for (const event of ctx.eventHistory as StreamEventEnvelope[]) {
+      if (event.session_id !== sessionId) continue;
+      if (event.id <= (isDeltaEvent(event) ? fromDelta : fromEvent)) continue;
+      writeToConnection(ctx, connection, event);
+    }
+  }
+
+
+export async function setActiveStreamSession(ctx: HandlerContext, request: IncomingMessage, response: ServerResponse): Promise<void> {
+    const body = await ctx.body(request) as { connection_id?: unknown; session_id?: unknown; from_event_id?: unknown; from_delta_event_id?: unknown };
+    const connectionId = typeof body.connection_id === "string" ? body.connection_id : "";
+    const connection = (connectionId ? ctx.streamConnections.get(connectionId) : undefined) as StreamConnection | undefined;
+    if (!connection) return ctx.error(response, 404, "Unknown stream connection");
+    const sessionId = typeof body.session_id === "string" && body.session_id ? body.session_id : null;
+    connection.activeSessionId = sessionId;
+    if (sessionId) {
+      replayActiveSessionEvents(
+        ctx,
+        connection,
+        sessionId,
+        typeof body.from_event_id === "number" && Number.isFinite(body.from_event_id) ? body.from_event_id : undefined,
+        typeof body.from_delta_event_id === "number" && Number.isFinite(body.from_delta_event_id) ? body.from_delta_event_id : undefined,
+      );
+    }
+    ctx.ok(response, null);
+  }
+
 
 export async function stream(ctx: HandlerContext, request: IncomingMessage, sessionId: string, response: ServerResponse): Promise<void> {
     const managed = await ctx.restoreSession(sessionId);
@@ -35,14 +114,15 @@ export async function stream(ctx: HandlerContext, request: IncomingMessage, sess
 
 export function globalStream(ctx: HandlerContext, request: IncomingMessage, response: ServerResponse): void {
     openSse(response);
-    const hello: ServerEvent = { type: "server_hello", instance_id: ctx.instanceId, connection_id: randomUUID() };
+    const connectionId = registerStreamConnection(ctx, { response });
+    const hello: ServerEvent = { type: "server_hello", instance_id: ctx.instanceId, connection_id: connectionId };
     const active: ServerEvent = { type: "active_sessions", data: { session_ids: ctx.activeStreamingSessionIds() } };
     response.write(sseFrame(hello));
     response.write(sseFrame(active));
     ctx.replayEvents(response, request.headers["last-event-id"], undefined, new URL(request.url ?? "/", "http://localhost").searchParams.get("from"));
     ctx.globalStreams.add(response);
     const keepalive = setInterval(() => response.write(keepAliveFrame()), 15_000);
-    response.once("close", () => { clearInterval(keepalive); ctx.globalStreams.delete(response); });
+    response.once("close", () => { clearInterval(keepalive); ctx.globalStreams.delete(response); unregisterStreamConnection(ctx, connectionId); });
   }
 
 
@@ -91,9 +171,10 @@ export function handleUpgrade(ctx: HandlerContext, request: IncomingMessage, soc
 
 export function attachGlobalSocket(ctx: HandlerContext, socket: WebSocket): void {
     ctx.globalSockets.add(socket);
-    ctx.sendSocket(socket, { type: "server_hello", instance_id: ctx.instanceId, connection_id: randomUUID() });
+    const connectionId = registerStreamConnection(ctx, { socket });
+    ctx.sendSocket(socket, { type: "server_hello", instance_id: ctx.instanceId, connection_id: connectionId });
     ctx.sendSocket(socket, { type: "active_sessions", data: { session_ids: ctx.activeStreamingSessionIds() } });
-    socket.once("close", () => ctx.globalSockets.delete(socket));
+    socket.once("close", () => { ctx.globalSockets.delete(socket); unregisterStreamConnection(ctx, connectionId); });
   }
 
 
@@ -125,10 +206,19 @@ export function publishEvent(ctx: HandlerContext, payload: StreamEventEnvelope):
     ctx.eventHistory.push(payload);
     if (ctx.eventHistory.length > 5000) ctx.eventHistory.splice(0, ctx.eventHistory.length - 5000);
     const frame = sseFrame(payload);
-    for (const stream of ctx.globalStreams) try { stream.write(frame); } catch { ctx.globalStreams.delete(stream); }
     const sessionId = typeof payload.session_id === "string" ? payload.session_id : "";
+    const delta = isDeltaEvent(payload);
+    // Coarse events go to every connection; deltas only to the one viewing the
+    // session they belong to. Session-scoped streams already target one session.
+    for (const stream of ctx.globalStreams) {
+      if (delta && !isConnectionActiveFor(ctx, stream, sessionId)) continue;
+      try { stream.write(frame); } catch { ctx.globalStreams.delete(stream); }
+    }
     for (const stream of ctx.sessionStreams.get(sessionId) ?? []) try { stream.write(frame); } catch { ctx.sessionStreams.get(sessionId)?.delete(stream); }
-    for (const socket of ctx.globalSockets) ctx.sendSocket(socket, payload);
+    for (const socket of ctx.globalSockets) {
+      if (delta && !isConnectionActiveFor(ctx, socket, sessionId)) continue;
+      ctx.sendSocket(socket, payload);
+    }
     for (const socket of ctx.sessionSockets.get(sessionId) ?? []) ctx.sendSocket(socket, payload);
   }
 

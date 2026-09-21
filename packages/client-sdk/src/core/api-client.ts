@@ -50,6 +50,7 @@ export class ApiClient {
   readonly cycleModel: Delegate<typeof agent.cycleModel> = (...args) => agent.cycleModel(this.transport, ...args);
   readonly getAvailableModels: Delegate<typeof agent.getAvailableModels> = (...args) => agent.getAvailableModels(this.transport, ...args);
   readonly setThinkingLevel: Delegate<typeof agent.setThinkingLevel> = (...args) => agent.setThinkingLevel(this.transport, ...args);
+  readonly clearQueue: Delegate<typeof agent.clearQueue> = (...args) => agent.clearQueue(this.transport, ...args);
   readonly cycleThinkingLevel: Delegate<typeof agent.cycleThinkingLevel> = (...args) => agent.cycleThinkingLevel(this.transport, ...args);
   readonly getAvailableThinkingLevels: Delegate<typeof agent.getAvailableThinkingLevels> = (...args) => agent.getAvailableThinkingLevels(this.transport, ...args);
   readonly setSteeringMode: Delegate<typeof agent.setSteeringMode> = (...args) => agent.setSteeringMode(this.transport, ...args);

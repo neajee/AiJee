@@ -9,6 +9,7 @@ export interface EngineSession {
   prompt(text: string, options?: PromptInput): Promise<void>;
   steer(text: string, images?: ImageAttachment[]): Promise<void>;
   followUp(text: string, images?: ImageAttachment[]): Promise<void>;
+  clearQueue(): { steering: string[]; followUp: string[] };
   abort(): Promise<void>;
   subscribe(listener: SessionEventListener): () => void;
   state(): JsonObject;
