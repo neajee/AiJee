@@ -10,28 +10,22 @@ export interface SettingsMetrics {
   tileSize: number;
   tileRadius: number;
   tileIcon: number;
-  labelSize: number;
-  descSize: number;
-  valueSize: number;
-  headerSize: number;
   headerInset: number;
-  titleSize: number;
   chevronSize: number;
   switchScale: number;
   contentMaxWidth?: number;
 }
 
 const PHONE_METRICS: SettingsMetrics = {
-  gutter: 16, groupGap: 22, cardRadius: 12, rowMinHeight: 48, rowPaddingV: 11,
-  tileSize: 30, tileRadius: 8, tileIcon: 16, labelSize: 16, descSize: 13,
-  valueSize: 15, headerSize: 13, headerInset: 16, titleSize: 30, chevronSize: 18, switchScale: 1,
+  gutter: 16, groupGap: 20, cardRadius: 9, rowMinHeight: 42, rowPaddingV: 9,
+  tileSize: 24, tileRadius: 6, tileIcon: 13,
+  headerInset: 16, chevronSize: 14, switchScale: 0.85,
 };
 
 const DESKTOP_METRICS: SettingsMetrics = {
-  gutter: 10, groupGap: 10, cardRadius: 7, rowMinHeight: 32, rowPaddingV: 6,
-  tileSize: 20, tileRadius: 5, tileIcon: 12, labelSize: 12, descSize: 10.5,
-  valueSize: 12, headerSize: 10, headerInset: 2, titleSize: 18, chevronSize: 13,
-  switchScale: 0.75, contentMaxWidth: 640,
+  gutter: 14, groupGap: 12, cardRadius: 6, rowMinHeight: 32, rowPaddingV: 7,
+  tileSize: 18, tileRadius: 4, tileIcon: 10,
+  headerInset: 14, chevronSize: 11, switchScale: 0.7, contentMaxWidth: 640,
 };
 
 export function useSettingsPhoneLayout(): boolean {

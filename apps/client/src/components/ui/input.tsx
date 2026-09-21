@@ -4,5 +4,5 @@ export function Input({
   className,
   ...props
 }: InputHTMLAttributes<HTMLInputElement>) {
-  return <input className={cn("h-10 w-full rounded-md border border-border bg-transparent px-3 text-sm outline-none focus:ring-2 focus:ring-primary/30", className)} {...props} />;
+  return <input className={cn("h-10 w-full rounded-md border border-border bg-transparent px-3 text-body outline-none focus:ring-2 focus:ring-primary/30", className)} {...props} />;
 }

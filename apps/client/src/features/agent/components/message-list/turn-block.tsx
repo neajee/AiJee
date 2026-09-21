@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 import { ChevronRight, GitFork } from "lucide-react";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { AssistantMessage, MessageToolbar } from "./assistant-message";
@@ -30,17 +30,8 @@ export const TurnBlock = memo(function TurnBlock({
 }) {
   const colors = useThemeTokens();
   const [override, setOverride] = useState<boolean | null>(null);
-  /**
-   * Once the turn is seen running, keep its work log open for the rest of its
-   * life. Following `active` directly would collapse the log the moment the
-   * turn finishes (or the next turn claims the list tail), taking the tool
-   * output the reader was looking at with it.
-   */
-  const [autoExpanded, setAutoExpanded] = useState(active);
-  useEffect(() => {
-    if (active) setAutoExpanded(true);
-  }, [active]);
-  const expanded = override ?? autoExpanded;
+  // Work details are collapsed by default; the final assistant answer remains visible.
+  const expanded = override ?? false;
   const hasWork = turn.steps.length > 0;
   const toggle = useCallback(() => setOverride(!expanded), [expanded]);
 
@@ -62,7 +53,7 @@ export const TurnBlock = memo(function TurnBlock({
   const forkEntryId = turn.final?.entryId ?? turn.sourceEntryId;
   const divider = <div className="flex w-full items-center px-4 py-2.5">
       <span className="h-px flex-1 bg-border opacity-60" />
-      <span className="flex min-w-0 items-center gap-1 px-2 text-xs text-text-secondary">
+      <span className="flex min-w-0 items-center gap-1 px-2 text-caption text-text-secondary">
         <span className="truncate">{label}</span>
         {timeLabel && <span className="font-mono text-meta text-text-tertiary">{timeLabel}</span>}
         {hasWork && <ChevronRight className={`shrink-0 transition-transform ${expanded ? 'rotate-90' : ''}`} size={12} color={colors.textTertiary} strokeWidth={2} />}
@@ -82,7 +73,7 @@ export const TurnBlock = memo(function TurnBlock({
         </div>}
 
       {turn.final && <AssistantMessage message={turn.final} isDark={isDark} />}
-      {turn.aborted && <span className="px-4 py-0.5 text-xs leading-[18px] text-text-tertiary">
+      {turn.aborted && <span className="px-4 py-0.5 text-caption leading-[18px] text-text-tertiary">
           Stopped
         </span>}
       {turn.fileStats && <TurnSummary stats={turn.fileStats} changes={fileChanges} isDark={isDark} />}
@@ -90,7 +81,7 @@ export const TurnBlock = memo(function TurnBlock({
       {turn.final && !turn.final.isStreaming && (turn.final.text || turn.final.errorMessage) && <div className="flex items-center justify-between gap-1 px-4 pt-1.5">
           <div className="flex items-center gap-0.5">
             <MessageToolbar message={turn.final} isDark={isDark} hovered={hovered} />
-            {forkEntryId && onFork && <button onClick={() => onFork(forkEntryId)} disabled={active || !!forkingEntryId} role="button" aria-label="Fork from this reply" className="flex size-[26px] items-center justify-center rounded-md hover:bg-hover disabled:opacity-40">
+            {forkEntryId && onFork && <button onClick={() => onFork(forkEntryId)} disabled={active || !!forkingEntryId} role="button" aria-label="Fork from this reply" className={`flex size-[26px] items-center justify-center rounded-md transition-opacity hover:bg-hover disabled:opacity-40 ${hovered ? 'opacity-100' : 'pointer-events-none opacity-0'}`}>
                 {forkingEntryId === forkEntryId ? <span className="size-3 animate-spin rounded-full border-2 border-border border-t-text-tertiary" /> : <GitFork size={14} color={colors.textTertiary} strokeWidth={1.8} />}
               </button>}
           </div>

@@ -71,31 +71,6 @@ export default function WorkIndex() {
         </div>
       </div>
     </div>;
-}
-const styles = {
-  container: {
-    flex: 1
-  },
-  editorColumn: {
-    flex: 1
-  },
-  centerStack: {
-    flex: 1,
-    justifyContent: "center",
-    gap: 20
-  },
-  sendingContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 12,
-    paddingTop: 24,
-    paddingBottom: 24
-  },
-  sendingText: {
-    fontSize: 14,
-    fontFamily: Fonts.sansMedium
-  }
-} as const;
-export const Route = createFileRoute("/_app/work/")({
+}export const Route = createFileRoute("/_app/work/")({
   component: WorkIndex
 });

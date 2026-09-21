@@ -18,7 +18,7 @@ export function SettingsIndexScreen({
   }
   return <SettingsLayoutProvider phone={phone}>
       <SettingsScroll>
-        <span className={"  text-[var(--title-size)] text-foreground pt-0 pb-0"}>设置</span>
+        <div className="flex items-end justify-between"><span className="font-sans text-xl font-semibold tracking-tight text-foreground">设置</span><span className="text-xs text-text-secondary">偏好设置</span></div>
         <SettingsGroup>
           {SETTINGS_SECTIONS.map((section, index) => {
           const isLast = index === SETTINGS_SECTIONS.length - 1;

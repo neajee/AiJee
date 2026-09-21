@@ -33,7 +33,7 @@ export function FileTreeNode({
     }
   }, [entry, onFilePress, onToggleDir]);
   return <div>
-      <button onClick={handlePress} title={entry.path} style={{ paddingLeft: NODE_INDENT + depth * NODE_STEP }} className={`flex min-h-[22px] w-full items-center gap-1.5 py-0.5 pr-1.5 text-left text-[13px] hover:bg-hover ${isSelected ? 'bg-active' : ''}`}>
+      <button onClick={handlePress} title={entry.path} style={{ paddingLeft: NODE_INDENT + depth * NODE_STEP }} className={`flex min-h-[22px] w-full items-center gap-1.5 py-0.5 pr-1.5 text-left text-body hover:bg-hover ${isSelected ? 'bg-active' : ''}`}>
         {/* One glyph slot per row: a caret for directories, the file's kind for
             files, so names line up at the same x within a level. */}
         <span className="flex w-[22px] shrink-0 items-center justify-center">
@@ -73,7 +73,7 @@ function ExpandedDir({
       </div>;
   }
   if (!entries || entries.length === 0) {
-    return <span className="block py-1 text-xs italic text-text-tertiary" style={{ paddingLeft: NODE_INDENT + depth * NODE_STEP }}>
+    return <span className="block py-1 text-caption italic text-text-tertiary" style={{ paddingLeft: NODE_INDENT + depth * NODE_STEP }}>
         Empty
       </span>;
   }

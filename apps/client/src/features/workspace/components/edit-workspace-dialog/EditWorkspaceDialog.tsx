@@ -36,6 +36,6 @@ export function EditWorkspaceDialog({
     onClose
   };
   return <AppModal visible={visible} onClose={onClose} contentStyle={!isWideScreen ? { alignSelf: 'end', marginBottom: 0 } : undefined}>
-      <div className="flex flex-col gap-4"><header className="flex items-center justify-between"><h2 className="text-lg font-semibold">Edit Workspace</h2><button className="rounded p-1 hover:bg-hover" onClick={onClose} aria-label="Close"><X size={18} color={textMuted} strokeWidth={2} /></button></header><EditWorkspaceForm {...formProps} /></div>
+      <div className="flex flex-col gap-4"><header className="flex items-center justify-between"><h2 className="text-title font-semibold">Edit Workspace</h2><button className="rounded p-1 hover:bg-hover" onClick={onClose} aria-label="Close"><X size={18} color={textMuted} strokeWidth={2} /></button></header><EditWorkspaceForm {...formProps} /></div>
     </AppModal>;
 }

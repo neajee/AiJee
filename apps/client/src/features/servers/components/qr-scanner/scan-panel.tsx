@@ -1,33 +1,12 @@
 import { QrCode } from "lucide-react";
-import { Fonts } from "@/constants/theme";
-interface QrScannerScanPanelProps {
-  visible: boolean;
-  scanned: boolean;
-  isDark: boolean;
-  textMuted: string;
-  onBarcodeData: (data: string) => void;
-}
-export function QrScannerScanPanel({
-  textMuted
-}: QrScannerScanPanelProps) {
-  return <div className="flex flex-col">
-      <QrCode size={36} color={textMuted} strokeWidth={1.2} />
-      <span>
+export function QrScannerScanPanel() {
+  return <div className="flex items-start gap-3 rounded-lg border border-border bg-surface-raised p-3">
+      <div className="flex size-9 shrink-0 items-center justify-center rounded-md bg-background">
+        <QrCode size={20} className="text-text-tertiary" strokeWidth={1.8} />
+      </div>
+      <p className="text-caption leading-5 text-text-secondary">
         Camera scanning is not available on the web client. Paste the connect
         URL manually.
-      </span>
+      </p>
     </div>;
 }
-const styles = {
-  permissionWrap: {
-    height: 200,
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 12
-  },
-  permissionText: {
-    fontSize: 14,
-    fontFamily: Fonts.sans,
-    textAlign: "center"
-  }
-} as const;

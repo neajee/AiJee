@@ -27,5 +27,5 @@ export function DropdownMenuItem({
   children: ReactNode;
   onClick?: () => void;
 }) {
-  return <button className="block w-full rounded px-3 py-2 text-left text-sm hover:bg-black/5" onClick={onClick}>{children}</button>;
+  return <button className="block w-full rounded px-3 py-2 text-left text-body hover:bg-black/5" onClick={onClick}>{children}</button>;
 }

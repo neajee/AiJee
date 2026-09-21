@@ -71,21 +71,19 @@ export function ChangesTab({
     }
   }, [onDiscard]);
   if (totalChanges === 0) {
-    return <div className="flex flex-col">
+    return <div className="flex flex-col items-center gap-2 py-8">
         <Check size={20} color={textMuted} strokeWidth={2} />
-        <span>
-          Working tree clean
-        </span>
+        <span className="text-caption text-text-secondary">Working tree clean</span>
       </div>;
   }
   return <>
-      {staged.length > 0 && <FileList files={staged} keyPrefix="s" staged selectedFile={selectedFile} diffContent={diffContent} diffLoading={diffLoading} onFilePress={onFilePress} textPrimary={textPrimary} textMuted={textMuted} hoverBg={hoverBg} dividerColor={dividerColor} renderActions={path => <IconButton onClick={() => onUnstage([path])} title="Unstage" icon={<Minus size={13} color={textMuted} strokeWidth={2} />} />} />}
+      {staged.length > 0 && <section><FileList files={staged} keyPrefix="s" staged selectedFile={selectedFile} diffContent={diffContent} diffLoading={diffLoading} onFilePress={onFilePress} textPrimary={textPrimary} textMuted={textMuted} hoverBg={hoverBg} dividerColor={dividerColor} renderActions={path => <IconButton onClick={() => onUnstage([path])} title="Unstage" icon={<Minus size={13} color={textMuted} strokeWidth={2} />} />} /></section>}
 
-      {changed.length > 0 && <FileList files={changed} keyPrefix="u" selectedFile={selectedFile} diffContent={diffContent} diffLoading={diffLoading} onFilePress={onFilePress} textPrimary={textPrimary} textMuted={textMuted} hoverBg={hoverBg} dividerColor={dividerColor} renderActions={(path, status) => <div className="flex flex-col">
+      {changed.length > 0 && <section><FileList files={changed} keyPrefix="u" selectedFile={selectedFile} diffContent={diffContent} diffLoading={diffLoading} onFilePress={onFilePress} textPrimary={textPrimary} textMuted={textMuted} hoverBg={hoverBg} dividerColor={dividerColor} renderActions={(path, status) => <div className="flex items-center gap-0.5">
               {/* An untracked file has no previous version to revert to. */}
               {status !== "?" && <IconButton onClick={() => confirmDiscard([path])} title="Discard changes" icon={<Undo2 size={12} color={textMuted} strokeWidth={2} />} />}
               <IconButton onClick={() => onStage([path])} title="Stage" icon={<Plus size={13} color={textMuted} strokeWidth={2} />} />
-            </div>} />}
+            </div>} /></section>}
     </>;
 }
 
@@ -131,20 +129,3 @@ function FileList({
     })}
     </>;
 }
-const styles = {
-  cleanState: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingTop: 48,
-    gap: 8
-  },
-  emptyText: {
-    fontSize: 13,
-    fontFamily: Fonts.sans,
-    textAlign: "center"
-  },
-  fileActions: {
-    flexDirection: "row",
-    gap: 2
-  }
-} as const;

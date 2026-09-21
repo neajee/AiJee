@@ -3,7 +3,6 @@ import { NewWorkspaceDialog } from '@/features/workspace/components/new-workspac
 import { useComposerContextController } from '../../hooks/use-composer-context-controller';
 import { BranchDialog } from './branch-dialog';
 import { ContextDropdown } from './context-dropdown';
-import { styles } from '../../utils/composer-context-bar-styles';
 export function ComposerContextBar() {
   const theme = usePromptTheme();
   const controller = useComposerContextController();

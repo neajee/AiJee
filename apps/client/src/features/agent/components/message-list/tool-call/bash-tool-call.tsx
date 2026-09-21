@@ -36,18 +36,18 @@ export const BashToolCall = memo(function BashToolCall({
   const hasOutput = !!displayOutput;
   return <div className="flex flex-col">
       <ToolHeader expanded={expanded} expandable={hasOutput} onToggle={toggle} isDark={isDark} icon={Terminal} aria-label={`${expanded ? "Collapse" : "Expand"} output of ${command || "bash"}`}>
-        <span className="block truncate text-text-secondary">
-          Ran <span className="font-mono text-foreground">{command || "bash"}</span>
+        <span className="block truncate text-caption leading-4 text-text-secondary">
+          Ran <span className="font-mono text-caption leading-4 text-foreground">{command || "bash"}</span>
           {cdPath ? <span>
               {" in "}
-              <span className="font-mono text-foreground">{cdPath}</span>
+              <span className="font-mono text-caption leading-4 text-foreground">{cdPath}</span>
             </span> : null}
         </span>
       </ToolHeader>
 
       {hasOutput && <ToolBody expanded={expanded}>
           <ToolSurface isDark={isDark}>
-            <div ref={scrollRef} className="max-h-[420px] overflow-auto"><pre className="whitespace-pre-wrap break-words font-mono text-meta leading-4 text-text-secondary">{displayOutput}</pre>{truncated && <p className="mt-1 font-mono text-[10px] italic text-text-tertiary">… output truncated</p>}</div>
+            <div ref={scrollRef} className="max-h-[420px] overflow-auto"><pre className="whitespace-pre-wrap break-words font-mono text-meta leading-4 text-text-secondary">{displayOutput}</pre>{truncated && <p className="mt-1 font-mono text-meta italic text-text-tertiary">… output truncated</p>}</div>
           </ToolSurface>
         </ToolBody>}
 

@@ -3,46 +3,38 @@ import { ChevronDown, ChevronUp, History } from 'lucide-react';
 import { timeAgo } from '../../utils/changes-panel';
 import { useChangesTheme } from '../../hooks/use-changes-theme';
 import { binEntries, type LogEntry } from '../../utils/changes-history';
-import { styles } from '../../utils/changes-history-styles';
 export function HistoryTab({
   entries
 }: {
   entries: LogEntry[];
 }) {
-  const {
-    textPrimary,
-    textSecondary,
-    textMuted,
-    dividerColor,
-    hashColor
-  } = useChangesTheme();
+  const { textMuted } = useChangesTheme();
   const bins = useMemo(() => binEntries(entries), [entries]);
   if (entries.length === 0) {
-    return <div className="flex flex-col"><History size={20} color={textMuted} strokeWidth={2} /><span>No commits yet</span></div>;
+    return <div className="flex flex-col items-center gap-1.5 py-6 text-caption text-text-tertiary"><History size={18} color={textMuted} strokeWidth={2} /><span>No commits yet</span></div>;
   }
-  return <>{bins.map(bin => <div key={bin.label}>
-    <span>{bin.label}</span>
-    {bin.entries.map((entry, index) => {
+  return <div className="flex flex-col">
+    {bins.map(bin => <section key={bin.label}>
+      <div className="px-2 pb-1 pt-2 text-[10px] font-semibold uppercase tracking-wide text-text-tertiary">{bin.label}</div>
+      <div className="relative ml-3 border-l border-border">
+      {bin.entries.map((entry, index) => {
         const previous = index > 0 ? bin.entries[index - 1] : null;
         const showAuthor = !previous || previous.author !== entry.author;
-        return <div key={entry.hash} className="flex flex-col">
-        <div className="flex flex-col">
-          {index > 0 && <div />}
-          {index < bin.entries.length - 1 && <div />}
-          <div />
-        </div>
-        <div className="flex flex-col">
-          <span>{entry.message}</span>
-          <div className="flex flex-col">
-            <span>{entry.short_hash}</span>
-            {showAuthor && <span>{entry.author}</span>}
-            <div className={"flex-1"} />
-            <span>{timeAgo(entry.date)}</span>
+        return <article key={entry.hash} className="relative border-b border-border/60 px-2.5 py-2 last:border-b-0">
+          <span className="absolute -left-[4px] top-3 size-1.5 rounded-full border border-border bg-card" />
+          <div className="flex min-w-0 items-start gap-2">
+            <span className="min-w-0 flex-1 break-words text-[11px] leading-4 text-text-secondary" title={entry.message}>{entry.message}</span>
+            <span className="shrink-0 text-[10px] leading-4 text-text-tertiary">{timeAgo(entry.date)}</span>
           </div>
-        </div>
-      </div>;
+          <div className="mt-0.5 flex min-w-0 items-center gap-1.5 text-[10px] leading-4 text-text-tertiary">
+            <span className="font-mono">{entry.short_hash}</span>
+            {showAuthor && <><span aria-hidden="true">·</span><span className="truncate">{entry.author}</span></>}
+          </div>
+        </article>;
       })}
-  </div>)}</>;
+      </div>
+    </section>)}
+  </div>;
 }
 export function LogSection({
   entries,

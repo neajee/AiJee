@@ -11,7 +11,7 @@ export function RailButton({
   onClick,
   children
 }: RailButtonProps) {
-  return <button className={`flex size-8 items-center justify-center rounded-md text-text-secondary hover:bg-hover ${active ? 'bg-hover' : ''}`} role="button" aria-label={label} onClick={onClick}>
+  return <button className={`flex size-8 items-center justify-center rounded-md text-text-tertiary hover:bg-hover ${active ? 'bg-hover' : ''}`} role="button" aria-label={label} onClick={onClick}>
       {children}
     </button>;
 }

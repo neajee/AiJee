@@ -1,10 +1,7 @@
-import { useEffect, useRef, useState } from "react";
-import { Animated } from "@/styles/motion";
-import { MoreHorizontal, Pencil, QrCode, X, Trash2 } from "lucide-react";
-import { Fonts } from "@/constants/theme";
+import { useRef } from "react";
+import { MoreHorizontal, QrCode } from "lucide-react";
 import { PiLogo } from "@/components/pi-logo";
 import { useSettingsPalette } from "@/components/settings-surface";
-import { useIsSessionStreaming } from "@aijee/client-sdk";
 import type { Server } from "@/features/servers/store";
 function ConnectionStatusDot({
   label,
@@ -15,25 +12,7 @@ function ConnectionStatusDot({
   color: string;
   connecting: boolean;
 }) {
-  const opacity = useRef(new Animated.Value(1)).current;
-  useEffect(() => {
-    if (!connecting) {
-      opacity.setValue(1);
-      return;
-    }
-    const animation = Animated.loop(Animated.sequence([Animated.timing(opacity, {
-      toValue: 0.35,
-      duration: 700,
-      useNativeDriver: true
-    }), Animated.timing(opacity, {
-      toValue: 1,
-      duration: 700,
-      useNativeDriver: true
-    })]));
-    animation.start();
-    return () => animation.stop();
-  }, [connecting, opacity]);
-  return <div aria-label={label} className={"  opacity-100"} />;
+  return <span aria-label={label} className="size-2 shrink-0 rounded-full" style={{ backgroundColor: color, opacity: connecting ? 0.5 : 1 }} />;
 }
 export function ServerRow({
   server,
@@ -41,7 +20,6 @@ export function ServerRow({
   isConnecting,
   isFailed,
   lastConnectedAt,
-  isLast,
   onClick,
   onShowCode,
   onToggleMenu
@@ -57,8 +35,7 @@ export function ServerRow({
   onToggleMenu: (measure: (callback: (x: number, y: number, width: number, height: number) => void) => void) => void;
 }) {
   const p = useSettingsPalette();
-  const [hovered, setHovered] = useState(false);
-  const moreRef = useRef<any>(null);
+  const moreRef = useRef<HTMLButtonElement>(null);
   const address = server.address.replace(/^https?:\/\//, '');
   const minutes = lastConnectedAt ? Math.max(1, Math.floor((Date.now() - lastConnectedAt) / 60_000)) : null;
   const status = isConnecting ? {
@@ -75,36 +52,34 @@ export function ServerRow({
     color: p.textTertiary
   };
   return <div className="flex flex-col">
-      {isActive ? <div /> : null}
-      <button onClick={onClick} onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)} role="button" aria-label={`连接到 ${server.name}，${status.label}`}>
-      <ConnectionStatusDot label={status.label} color={status.color} connecting={isConnecting} />
-      <div className={"flex items-center justify-center w-[30px] h-[30px] rounded-[8px]"}>
-        {isConnecting ? <span className="size-3 animate-spin" /> : <PiLogo size={16} color={p.textSecondary} />}
-      </div>
+      <div className="flex min-h-[var(--row-min-height)] items-center gap-1 pr-2 hover:bg-hover">
+        <button onClick={onClick} role="button" aria-label={`连接到 ${server.name}，${status.label}`} className="flex min-w-0 flex-1 items-center gap-[var(--row-gap)] pl-[var(--gutter)] text-left">
+          <ConnectionStatusDot label={status.label} color={status.color} connecting={isConnecting} />
+          <div className="flex size-[30px] shrink-0 items-center justify-center rounded-lg bg-muted">
+            {isConnecting ? <span className="size-3 animate-spin rounded-full border-2 border-border border-t-text-tertiary" /> : <PiLogo size={16} color={p.textSecondary} />}
+          </div>
+          <div className="flex min-w-0 flex-1 flex-col justify-center gap-0.5">
+            <span className="truncate font-sans text-body text-foreground">{server.name}</span>
+            <span className="truncate font-mono text-caption text-text-tertiary">{status.label}</span>
+          </div>
+        </button>
 
-      <div className={"flex flex-1 flex-col self-stretch justify-center gap-[2px]"}>
-        <span className={"text-[13px] font-sans text-left"}>{server.name}</span>
-        <div className="flex flex-col">
-          <span className={"text-[12px] font-mono opacity-[0.55] text-left"}>{status.label}</span>
-        </div>
+        <button onClick={onShowCode} role="button" aria-label={`显示 ${server.name} 授权二维码`} className="flex size-8 shrink-0 items-center justify-center rounded-md text-text-secondary hover:bg-hover">
+          <QrCode size={18} strokeWidth={1.5} />
+        </button>
+        <button ref={moreRef} onClick={() => onToggleMenu(callback => {
+        const rect = moreRef.current?.getBoundingClientRect();
+        if (rect) callback(rect.left, rect.top, rect.width, rect.height);
+      })} role="button" aria-label={`管理 ${server.name}`} className="flex size-8 shrink-0 items-center justify-center rounded-md text-text-secondary hover:bg-hover">
+          <MoreHorizontal size={18} strokeWidth={1.8} />
+        </button>
       </div>
-      </button>
-
-      <button onClick={onShowCode} role="button" aria-label={`显示 ${server.name} 授权二维码`}>
-        <QrCode size={20} color={p.textSecondary} strokeWidth={1.5} />
-      </button>
-      <button ref={moreRef} onClick={() => onToggleMenu(callback => moreRef.current?.measureInWindow((x: number, y: number, width: number, height: number) => callback(x, y, width, height)))} role="button" aria-label={`管理 ${server.name}`}>
-        <MoreHorizontal size={20} color={p.textSecondary} strokeWidth={1.8} />
-      </button>
-      {!isLast ? <div /> : null}
     </div>;
 }
 export function FooterAction({
   icon: Icon,
   label,
-  onClick,
-  isLast = false,
-  isFirst = false
+  onClick
 }: {
   icon: any;
   label: string;
@@ -113,8 +88,7 @@ export function FooterAction({
   isFirst?: boolean;
 }) {
   const p = useSettingsPalette();
-  return <button onClick={onClick} role="button" aria-label={label}>
-      {isFirst ? <div /> : null}
+  return <button onClick={onClick} role="button" aria-label={label} className="flex min-h-[var(--row-min-height)] w-full items-center justify-center gap-1.5 px-[var(--gutter)] text-caption text-text-secondary hover:bg-hover">
       <Icon size={16} color={p.textSecondary} strokeWidth={1.8} />
       <span>{label}</span>
     </button>;
@@ -130,5 +104,5 @@ export function MenuAction({
   onClick: () => void;
   color: string;
 }) {
-  return <button onClick={onClick} role="button" aria-label={label}><Icon size={16} color={color} strokeWidth={1.8} /><span>{label}</span></button>;
+  return <button onClick={onClick} role="button" aria-label={label} className="flex h-8 w-full items-center gap-2 rounded-md px-2 text-left text-caption text-foreground hover:bg-hover"><Icon size={16} color={color} strokeWidth={1.8} /><span>{label}</span></button>;
 }

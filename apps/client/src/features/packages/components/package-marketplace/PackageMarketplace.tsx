@@ -73,12 +73,9 @@ export function PackageMarketplace() {
   }, []);
   return <div className={`flex h-full min-h-0 flex-col ${p.isDark ? 'bg-background' : 'bg-surface-raised'}`}>
       <div className="flex min-h-[52px] items-center justify-between gap-3 border-b border-border px-4 py-2">
-        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+        <div className="flex min-w-0 flex-1 flex-col">
           <span className="font-sans text-[calc(var(--title-size)-4px)] font-semibold text-foreground">
             插件广场
-          </span>
-          <span className="font-sans text-[var(--desc-size)] text-text-tertiary">
-            从 npm 发现 Pi 的扩展、技能与主题
           </span>
         </div>
         <Segmented options={[{

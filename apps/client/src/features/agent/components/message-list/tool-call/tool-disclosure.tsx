@@ -40,9 +40,9 @@ export const ToolHeader = memo(function ToolHeader({
   const colors = useThemeTokens();
   const glyph = Icon ? <Icon size={12} strokeWidth={1.8} color={colors.textTertiary} className={`shrink-0 ${alignTop ? 'mt-[3px]' : ''}`} /> : null;
   if (!expandable) {
-    return <div className="flex min-h-7 items-center gap-1.5 py-1">{glyph}<div className="min-w-0 flex-1">{children}</div></div>;
+    return <div className="flex min-h-7 items-center gap-1.5 py-1 text-caption leading-4">{glyph}<div className="min-w-0 flex-1">{children}</div></div>;
   }
-  return <button className={`flex min-h-7 w-full items-center justify-between gap-1.5 rounded-md py-1 text-left text-xs hover:bg-hover ${alignTop ? 'items-start' : ''}`} onClick={onToggle} role="button" aria-label={ariaLabel}>
+  return <button className={`flex min-h-7 w-full items-center justify-between gap-1.5 rounded-md py-1 text-left text-caption leading-4 hover:bg-hover ${alignTop ? 'items-start' : ''}`} onClick={onToggle} role="button" aria-label={ariaLabel}>
       {glyph}
       <div className="min-w-0 flex-1">{children}</div>
       <ChevronRight className={`shrink-0 transition-transform ${alignTop ? 'mt-[3px]' : ''} ${expanded ? 'rotate-90' : ''}`} size={CHEVRON_SIZE} color={colors.textTertiary} strokeWidth={2} />

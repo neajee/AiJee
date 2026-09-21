@@ -63,16 +63,16 @@ export function FileRow({
 
         {/* Only the directory may be cut, and it is cut from its own end so the
             filename beside it always shows whole. */}
-        {dir.length > 0 && <span className="min-w-0 shrink truncate text-xs text-text-tertiary">
+        {dir.length > 0 && <span className="min-w-0 shrink truncate text-caption text-text-tertiary">
             {dir}
           </span>}
-        <span className="shrink-0 text-xs font-medium text-foreground">
+        <span className="shrink-0 text-caption font-medium text-foreground">
           {name}
         </span>
 
         {(additions ?? 0) > 0 && <span className="shrink-0 font-mono text-meta text-success">+{additions}</span>}
         {(deletions ?? 0) > 0 && <span className="shrink-0 font-mono text-meta text-destructive">−{deletions}</span>}
-        {showBadge && <span className="ml-1.5 shrink-0 font-mono text-[10.5px]" style={{ color: badgeColor }}>
+        {showBadge && <span className="ml-1.5 shrink-0 font-mono text-meta" style={{ color: badgeColor }}>
             {badge}
           </span>}
 
@@ -84,7 +84,7 @@ export function FileRow({
       {isSelected && <div className="mx-2 mb-1">
           {diffLoading ? <div className="flex justify-center py-3">
               <span className="size-3 animate-spin rounded-full border-2 border-border border-t-text-tertiary" />
-            </div> : sides && (sides.oldValue || sides.newValue) ? <DiffPreview oldValue={sides.oldValue} newValue={sides.newValue} isDark={isDark} maxHeight={300} language={languageOf(path)} title={name} /> : <div className="py-3 text-center text-xs text-text-tertiary">
+            </div> : sides && (sides.oldValue || sides.newValue) ? <DiffPreview oldValue={sides.oldValue} newValue={sides.newValue} isDark={isDark} maxHeight={300} language={languageOf(path)} title={name} /> : <div className="py-3 text-center text-caption text-text-tertiary">
               No diff available
             </div>}
         </div>}

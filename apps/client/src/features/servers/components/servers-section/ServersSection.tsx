@@ -1,8 +1,7 @@
-import { Copy, Pencil, Plus, QrCode, RefreshCw, Trash2, X } from "lucide-react";
+import { Copy, Pencil, Plus, QrCode, RefreshCw, X } from "lucide-react";
 import * as Clipboard from "@/platform/clipboard";
-import { Fonts } from "@/constants/theme";
 import { PiLogo } from "@/components/pi-logo";
-import { useSettingsMetrics, useSettingsPalette } from "@/components/settings-surface";
+import { useSettingsPalette } from "@/components/settings-surface";
 import { QrScanner } from "@/features/servers/components/qr-scanner";
 import { ServerFormModal } from "../server-form";
 import { FooterAction, MenuAction, ServerRow } from "./rows";
@@ -16,7 +15,6 @@ export function ServersView({
   isDark: boolean;
   variant: "settings" | "onboarding";
 }) {
-  const m = useSettingsMetrics();
   const p = useSettingsPalette();
   const {
     router,
@@ -42,7 +40,6 @@ export function ServersView({
     logoutFromServer,
     handleAdd,
     handleEdit,
-    handleDelete,
     handleShowCode,
     handleRefreshCode,
     handleConnect,
@@ -58,46 +55,36 @@ export function ServersView({
   // First run: a list with an empty card and two action rows says less than one
   // clear invitation to connect.
   if (variant === "onboarding" && servers.length === 0) {
-    return <div className="flex flex-col">
-        <div className="flex flex-col">
-          <div>
-            <PiLogo size={36} color={isDark ? "#1a1a1a" : "#fff"} />
-          </div>
-          <span>
-            欢迎使用 AiJee
+    return <div className="flex min-h-full flex-col items-center justify-center gap-6 px-[var(--gutter)] py-16 text-center">
+        <div className="flex size-16 items-center justify-center rounded-2xl bg-muted">
+          <PiLogo size={36} color={isDark ? "#1a1a1a" : "#fff"} />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <span className="text-[var(--title-size)] font-semibold text-foreground">欢迎使用 AiJee</span>
+          <span className="max-w-md text-[var(--desc-size)] text-text-secondary">
+            连接到运行 AiJee 的设备，使用设备授权后即可打开工作区。
           </span>
-          <span>
-            连接到运行 AiJee 的设备，{"\n"}
-            使用设备授权后即可打开工作区。
-          </span>
-          <div className="flex flex-col">
-            <button onClick={() => setQrVisible(true)}>
-              <QrCode size={16} color={p.text} strokeWidth={2} />
-              <span>
-                扫描授权码
-              </span>
-            </button>
-            <button onClick={handleAdd}>
-              <Plus size={16} color={isDark ? "#1a1a1a" : "#fff"} strokeWidth={2} />
-              <span>
-                添加服务器
-              </span>
-            </button>
-          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <button onClick={() => setQrVisible(true)} className="flex h-9 items-center gap-1.5 rounded-lg border border-border px-4 text-caption font-medium text-text-secondary hover:bg-hover">
+            <QrCode size={16} strokeWidth={2} />
+            <span>扫描授权码</span>
+          </button>
+          <button onClick={handleAdd} className="flex h-9 items-center gap-1.5 rounded-lg bg-accent px-4 text-caption font-medium text-accent-content hover:opacity-90">
+            <Plus size={16} strokeWidth={2} />
+            <span>添加服务器</span>
+          </button>
         </div>
         {modals}
       </div>;
   }
-  return <div className={"flex flex-col gap-[var(--group-gap)]"}>
-      <div className="flex flex-col">
-        <span>我的设备 ({servers.length})</span>
-        <span>设备令牌仅保存在本机，不会同步</span>
+  return <div className="flex flex-col gap-[var(--group-gap)]">
+      <div className="flex flex-col gap-0.5 px-[var(--gutter)]">
+        <span className="text-[var(--title-size)] font-semibold text-foreground">我的设备 ({servers.length})</span>
       </div>
-      <div>
-        {servers.length === 0 ? <div className={"pl-[var(--gutter)] pr-[var(--gutter)] pt-0 pb-0"}>
-            <span className={"text-[var(--desc-size)] font-sans"}>
-              尚未添加服务器。
-            </span>
+      <div className="overflow-hidden rounded-[var(--card-radius)]">
+        {servers.length === 0 ? <div className="px-[var(--gutter)] py-3 text-[var(--desc-size)] text-text-tertiary">
+            尚未添加服务器。
           </div> : servers.map((server, idx) => <ServerRow key={server.id} server={server} isActive={server.id === activeServerId} isConnecting={connecting === server.id} isFailed={failedServerId === server.id} lastConnectedAt={lastConnected[server.id]} isLast={idx === servers.length - 1} onClick={() => handleConnect(server)} onShowCode={handleShowCode} onToggleMenu={measure => {
         if (menuServerId === server.id) {
           setMenuServerId(null);
@@ -116,58 +103,51 @@ export function ServersView({
         <FooterAction icon={QrCode} label="扫描授权码" onClick={() => setQrVisible(true)} isLast />
       </div>
 
-      <ServerFormModal visible={formVisible} onClose={() => {
-      if (!loginLoading) setFormVisible(false);
-    }} onSave={handleSave} initial={editingServer} isDark={isDark} loading={loginLoading} error={loginError} />
-      <QrScanner visible={qrVisible} onClose={() => setQrVisible(false)} onNeedNewWorkspace={() => router.replace("/")} />
-      <div hidden={!menuServerId}>
-        <button className="inline-flex items-center" onClick={() => {
-        setMenuServerId(null);
-        setMenuPosition(null);
-      }} aria-label="关闭服务器操作菜单">
+      {modals}
+      {menuServerId && menuPosition ? <div className="fixed inset-0 z-40" onClick={() => {
+      setMenuServerId(null);
+      setMenuPosition(null);
+    }}>
+        <div className="absolute z-50 w-[220px] rounded-md border border-border bg-card p-1 shadow-xl" style={{ left: menuPosition.left, top: menuPosition.top }} onClick={event => event.stopPropagation()}>
           {(() => {
           const server = servers.find(entry => entry.id === menuServerId);
           if (!server) return null;
-          return <button onClick={event => event.stopPropagation()}>
+          return <>
                 <MenuAction icon={Pencil} label="编辑" onClick={() => {
               setMenuServerId(null);
+              setMenuPosition(null);
               handleEdit(server);
             }} color={p.text} />
                 <MenuAction icon={X} label="断开连接" onClick={() => {
               setMenuServerId(null);
+              setMenuPosition(null);
               logoutFromServer(server.id);
             }} color={p.text} />
-                <div />
-                <MenuAction icon={Trash2} label="删除" onClick={() => {
-              setMenuServerId(null);
-              handleDelete(server);
-            }} color={p.destructive} />
-              </button>;
+              </>;
         })()}
-        </button>
-      </div>
+        </div>
+      </div> : null}
       {codeDialog && <div className="fixed inset-0 z-50 grid place-items-center bg-black/40 p-4" role="dialog" aria-modal="true">
         <button className="absolute inset-0 size-full cursor-default" onClick={() => setCodeDialog(null)} aria-label="关闭授权对话框" />
-          <section className="relative w-full max-w-sm rounded-lg bg-card p-5 shadow-xl">
-            <div className="flex flex-col">
-              <span>设备授权二维码</span>
-              <button onClick={() => setCodeDialog(null)} aria-label="关闭授权二维码" className="inline-flex items-center">
-                <X size={18} color={p.textTertiary} />
+          <section className="relative w-full max-w-sm rounded-lg border border-border bg-card p-5 shadow-xl">
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-[var(--label-size)] font-medium text-foreground">设备授权二维码</span>
+              <button onClick={() => setCodeDialog(null)} aria-label="关闭授权二维码" className="flex size-7 items-center justify-center rounded-md text-text-tertiary hover:bg-hover">
+                <X size={18} />
               </button>
             </div>
-            <img src={codeDialog.image} alt="设备授权二维码" className="mx-auto max-h-64 max-w-full object-contain" />
-            <div className="flex flex-col">
-              <span>授权码</span>
-              <span>{codeDialog?.code}</span>
-              <button onClick={() => codeDialog && Clipboard.setStringAsync(codeDialog.url)} aria-label="复制完整地址" accessibilityHint="复制设备连接地址" className="inline-flex items-center">
-                <Copy size={18} color={p.text} />
+            <img src={codeDialog.image} alt="设备授权二维码" className="mx-auto my-4 max-h-64 max-w-full object-contain" />
+            <div className="flex items-center gap-2">
+              <span className="shrink-0 text-[var(--desc-size)] text-text-secondary">授权码</span>
+              <span className="min-w-0 flex-1 truncate font-mono text-caption text-foreground">{codeDialog?.code}</span>
+              <button onClick={() => codeDialog && Clipboard.setStringAsync(codeDialog.url)} aria-label="复制完整地址" className="flex size-7 shrink-0 items-center justify-center rounded-md text-text-secondary hover:bg-hover">
+                <Copy size={18} />
               </button>
-              <button onClick={handleRefreshCode} disabled={refreshingCode} aria-label="刷新授权码" accessibilityHint="生成新授权码并更新当前设备令牌" className="inline-flex items-center">
-                {refreshingCode ? <span className="size-3 animate-spin" /> : <RefreshCw size={18} color={p.text} />}
+              <button onClick={handleRefreshCode} disabled={refreshingCode} aria-label="刷新授权码" className="flex size-7 shrink-0 items-center justify-center rounded-md text-text-secondary hover:bg-hover disabled:opacity-50">
+                {refreshingCode ? <span className="size-3 animate-spin rounded-full border-2 border-border border-t-text-tertiary" /> : <RefreshCw size={18} />}
               </button>
             </div>
           </section>
-      </div>
-      }
+      </div>}
     </div>;
 }

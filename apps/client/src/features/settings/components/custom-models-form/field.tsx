@@ -1,4 +1,3 @@
-import { Fonts } from '@/constants/theme';
 import { useColors } from '../../hooks/use-custom-models-theme';
 
 // ─── Field ────────────────────────────────────────────────────
@@ -8,7 +7,6 @@ export function Field({
   value,
   onChange,
   placeholder,
-  colors,
   mono,
   autoFocus
 }: {
@@ -20,10 +18,8 @@ export function Field({
   mono?: boolean;
   autoFocus?: boolean;
 }) {
-  return <div className="flex flex-col">
-      <span className={"  text-text-secondary"}>
-        {label}
-      </span>
-      <input className={"  text-foreground bg-background border-border font-mono"} value={value} onChange={event => onChange(event.target.value)} placeholder={placeholder} autoFocus={autoFocus} />
+  return <div className="flex min-w-0 flex-col gap-1">
+      <span className="text-[var(--desc-size)] text-text-secondary">{label}</span>
+      <input value={value} onChange={event => onChange(event.target.value)} placeholder={placeholder} autoFocus={autoFocus} className={`h-8 w-full min-w-0 rounded-md border border-border bg-background px-2.5 text-[var(--value-size)] text-foreground outline-none placeholder:text-text-tertiary focus:border-border-strong ${mono ? 'font-mono' : 'font-sans'}`} />
     </div>;
 }

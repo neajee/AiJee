@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
+import type { PointerEvent as ReactPointerEvent } from 'react';
 import { useWindowDimensions } from "@/platform/browser";
-import { Animated, Easing, PanResponder } from "@/styles/motion";
+import { Animated, Easing } from "@/styles/motion";
 import * as SecureStore from '@/platform/storage';
 import { usePanelCoordination } from '@/features/navigation/store/panel-coordination';
 import { useWorkspaceStore } from '@/features/workspace/store';
@@ -83,7 +84,7 @@ export function useWorkspaceSidebarController({
     tab: WorkspacePaneTab;
     revision: number;
   } | null>(null);
-  const [activePaneTab, setActivePaneTab] = useState<WorkspacePaneTab>('git');
+  const [activePaneTab, setActivePaneTab] = useState<WorkspacePaneTab>('files');
   const openedSide = usePanelCoordination(state => state.openedSide);
   const panelRevision = usePanelCoordination(state => state.revision);
   const notifyPanelOpened = usePanelCoordination(state => state.notifyOpened);
@@ -158,43 +159,37 @@ export function useWorkspaceSidebarController({
     panelWidthRef.current = nextWidth;
     void saveStoredWidth(nextWidth, storageScope);
   };
-  const panelResizer = useRef(PanResponder.create({
-    onStartShouldSetPanResponder: () => !collapsed && !locked,
-    onMoveShouldSetPanResponder: () => !collapsed && !locked,
-    onPanResponderGrant: () => {
+  const panelResizer = {
+    onPointerDown: (event: ReactPointerEvent<HTMLDivElement>) => {
+      if (collapsed || locked || typeof window === 'undefined') return;
+      event.preventDefault();
       panelStartRef.current = panelWidthRef.current;
       isResizingRef.current = true;
       setIsResizing(true);
-      if (true) {
-        document.body.style.cursor = 'col-resize';
-        document.body.style.userSelect = 'none';
-      }
-    },
-    onPanResponderMove: (_event, gestureState) => {
-      const nextWidth = Math.max(PANEL_MIN, Math.min(maxWidthRef.current, panelStartRef.current - gestureState.dx));
-      panelWidthRef.current = nextWidth;
-      widthAnim.setValue(nextWidth);
-      setPanelWidth(nextWidth);
-    },
-    onPanResponderRelease: () => {
-      isResizingRef.current = false;
-      setIsResizing(false);
-      persistWidth(panelWidthRef.current);
-      if (true) {
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+      const startX = event.clientX;
+      const move = (moveEvent: PointerEvent) => {
+        const nextWidth = Math.max(PANEL_MIN, Math.min(maxWidthRef.current, panelStartRef.current - (moveEvent.clientX - startX)));
+        panelWidthRef.current = nextWidth;
+        widthAnim.setValue(nextWidth);
+        setPanelWidth(nextWidth);
+      };
+      const finish = () => {
+        window.removeEventListener('pointermove', move);
+        window.removeEventListener('pointerup', finish);
+        window.removeEventListener('pointercancel', finish);
+        isResizingRef.current = false;
+        setIsResizing(false);
+        persistWidth(panelWidthRef.current);
         document.body.style.cursor = '';
         document.body.style.userSelect = '';
-      }
-    },
-    onPanResponderTerminate: () => {
-      isResizingRef.current = false;
-      setIsResizing(false);
-      persistWidth(panelWidthRef.current);
-      if (true) {
-        document.body.style.cursor = '';
-        document.body.style.userSelect = '';
-      }
+      };
+      window.addEventListener('pointermove', move);
+      window.addEventListener('pointerup', finish);
+      window.addEventListener('pointercancel', finish);
     }
-  })).current;
+  };
   const seamActive = isSeamHovered || isResizing;
   const webSeamHoverProps = true ? {
     onMouseEnter: () => setIsSeamHovered(true),

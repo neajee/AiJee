@@ -16,7 +16,7 @@ export const CodePreview = memo(function CodePreview({
   // only the bottom corners round off.
   return <div className={`overflow-hidden bg-muted ${bare ? '' : 'rounded-b-md'}`}>
       <div className={fill ? "overflow-auto" : "max-h-80 overflow-auto"} style={maxHeight ? { maxHeight } : undefined}>
-        <div className="min-w-max p-3 font-mono text-xs leading-5">
+        <div className="min-w-max p-3 font-mono text-caption leading-5">
             {lines.map((line, index) => {
             const segments = tokenizeLine(line, language, diffLanguage);
             return <div key={index} className="flex">

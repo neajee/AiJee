@@ -49,7 +49,7 @@ export function AppMenuItem({
   onClick: () => void;
   danger?: boolean;
 }) {
-  return <button type="button" data-menu-item role="menuitem" className={`flex h-7 w-full items-center gap-1.5 rounded px-1.5 text-left text-xs outline-none transition-colors hover:bg-hover focus:bg-hover ${danger ? "text-error" : "text-foreground"}`} onClick={onClick}>
+  return <button type="button" data-menu-item role="menuitem" className={`flex h-7 w-full items-center gap-1.5 rounded px-1.5 text-left text-caption outline-none transition-colors hover:bg-hover focus:bg-hover ${danger ? "text-error" : "text-foreground"}`} onClick={onClick}>
     {Icon ? <Icon size={14} strokeWidth={1.8} /> : null}
     <span className="min-w-0 flex-1 truncate">{children}</span>
   </button>;

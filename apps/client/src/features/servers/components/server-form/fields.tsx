@@ -3,7 +3,6 @@ interface ServerFormFieldsProps {
   setName: (value: string) => void;
   address: string;
   setAddress: (value: string) => void;
-  isDark: boolean;
   autoFocus?: boolean;
 }
 export function ServerFormFields({
@@ -11,21 +10,16 @@ export function ServerFormFields({
   setName,
   address,
   setAddress,
-  isDark,
   autoFocus
 }: ServerFormFieldsProps) {
-  const textMuted = isDark ? '#cdc8c5' : '#888';
-  const textPrimary = isDark ? '#fefdfd' : '#1a1a1a';
-  const inputBg = isDark ? '#2a2a2a' : '#F6F6F6';
-  const borderColor = isDark ? '#3b3a39' : 'rgba(0,0,0,0.08)';
-  return <div className="flex flex-col">
-      <div className="flex flex-col">
+  return <div className="flex flex-col gap-4">
+      <label className="flex flex-col gap-1.5 text-caption text-text-secondary">
         <span>Name</span>
-        <input value={name} onChange={event => setName(event.target.value)} placeholder="My Server" autoFocus={autoFocus} />
-      </div>
-      <div className="flex flex-col">
+        <input className="h-10 w-full rounded-md border border-border bg-surface-raised px-3 text-body text-foreground outline-none placeholder:text-text-tertiary focus:border-primary focus:ring-2 focus:ring-primary/25" value={name} onChange={event => setName(event.target.value)} placeholder="My Server" autoFocus={autoFocus} />
+      </label>
+      <label className="flex flex-col gap-1.5 text-caption text-text-secondary">
         <span>Address</span>
-        <input value={address} onChange={event => setAddress(event.target.value)} placeholder="http://192.168.1.100:10088" />
-      </div>
+        <input className="h-10 w-full rounded-md border border-border bg-surface-raised px-3 text-body text-foreground outline-none placeholder:text-text-tertiary focus:border-primary focus:ring-2 focus:ring-primary/25" value={address} onChange={event => setAddress(event.target.value)} placeholder="http://192.168.1.100:10088" />
+      </label>
     </div>;
 }

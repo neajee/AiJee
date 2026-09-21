@@ -19,32 +19,24 @@ export function SettingsDetailScreen({
           <SettingsHeadingProvider visible={false}>
             <Component isDark={isDark} />
           </SettingsHeadingProvider>
-        </SettingsDetailChrome> : <SettingsScroll>
-          <SettingsDesktopSection section={section} isDark={isDark} />
-        </SettingsScroll>}
+        </SettingsDetailChrome> : <SettingsDesktopSection section={section} isDark={isDark} onBack={onBack} />}
     </SettingsLayoutProvider>;
 }
 function SettingsDesktopSection({
   section,
-  isDark
+  isDark,
+  onBack
 }: {
   section: SettingsSection;
   isDark: boolean;
+  onBack: () => void;
 }) {
+  const Component = section.Component;
   const metrics = useSettingsMetrics();
   const palette = useSettingsPalette();
-  const Component = section.Component;
-  return <div className="flex flex-col gap-[var(--group-gap)] w-full max-w-[var(--content-max-width)] self-center">
-      <div className="px-[var(--gutter)]">
-        <div className="flex flex-col gap-2">
-          <span className="text-[var(--title-size)] text-foreground">{section.title}</span>
-        </div>
-      </div>
-      <div className="flex flex-col gap-[var(--group-gap)]">
-        <SettingsHeadingProvider visible={false}>
-          <Component isDark={isDark} />
-        </SettingsHeadingProvider>
-      </div>
+  return <div className="flex h-full min-h-0 flex-col border-l border-border">
+      <div className="flex h-10 shrink-0 items-center border-b border-border px-3"><span className="text-xs font-semibold text-foreground">{section.title}</span></div>
+      <div className="min-h-0 flex-1 overflow-hidden"><SettingsScroll><div className="flex flex-col gap-5"><SettingsHeadingProvider visible={false}><Component isDark={isDark} /></SettingsHeadingProvider></div></SettingsScroll></div>
     </div>;
 }
 function SettingsDetailChrome({
@@ -58,15 +50,15 @@ function SettingsDetailChrome({
 }) {
   const metrics = useSettingsMetrics();
   const palette = useSettingsPalette();
-  return <div className="min-h-full bg-background">
-      <div className="flex flex-col gap-2 px-[var(--gutter)] pt-[calc(var(--gutter)/2)]">
-        <div className="flex items-center gap-2 max-w-[var(--content-max-width)] min-h-0">
-          <button onClick={onBack} role="button" aria-label="返回设置">
+  return <div className="flex h-full min-h-0 flex-col bg-background">
+      <div className="flex h-10 shrink-0 items-center border-b border-border px-3">
+        <div className="mx-auto flex w-full max-w-[760px] items-center gap-2">
+          <button onClick={onBack} role="button" aria-label="返回设置" className="flex size-7 shrink-0 items-center justify-center rounded-md hover:bg-hover">
             <ChevronLeft size={metrics.chevronSize + 6} color={palette.text} strokeWidth={2} />
           </button>
-          <span className="text-[var(--title-size)] text-foreground">{title}</span>
+          <span className="font-sans text-sm font-semibold text-foreground">{title}</span>
         </div>
       </div>
-      <div className="flex flex-col gap-[var(--group-gap)] px-[var(--gutter)] pb-[calc(var(--bottom-inset)+32px)]">{children}</div>
+      <div className="min-h-0 flex-1 overflow-y-auto"><div className="mx-auto flex w-full max-w-[760px] flex-col gap-5 px-[var(--gutter)] pb-[calc(var(--bottom-inset)+32px)] pt-5">{children}</div></div>
     </div>;
 }

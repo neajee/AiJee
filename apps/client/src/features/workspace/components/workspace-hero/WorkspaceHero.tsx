@@ -73,30 +73,9 @@ export function WorkspaceHero() {
           <AiJeeLogo size={isWideScreen ? 64 : 52} color={textPrimary} opacity={isDark ? 0.92 : 0.88} />
         </div>
 
-        <span className="text-xl font-medium leading-7 tracking-tight text-foreground">
+        <span className="text-display font-medium leading-7 tracking-tight text-foreground">
           {greeting}
         </span>
       </div>
     </div>;
 }
-const styles = {
-  container: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingLeft: 24,
-    paddingRight: 24,
-    // The hero and the composer are centred together as one group, so the hero
-    // must give up space instead of pushing the composer off screen.
-    flexShrink: 1
-  },
-  content: {
-    alignItems: "center",
-    gap: 20,
-    maxWidth: 620
-  },
-  title: {
-    fontFamily: Fonts.sansMedium,
-    textAlign: "center",
-    letterSpacing: -0.3
-  }
-} as const;

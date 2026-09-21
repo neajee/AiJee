@@ -106,6 +106,8 @@ export interface ChatMessage {
   responseId?: string;
   usage?: MessageUsageInfo;
   stopReason?: string;
+  /** Wall-clock time the model spent generating this message (start → end). */
+  generationMs?: number;
   turnDurationMs?: number;
   turnFileStats?: TurnFileStats;
   systemKind?: "bashExecution" | "event" | "compaction";

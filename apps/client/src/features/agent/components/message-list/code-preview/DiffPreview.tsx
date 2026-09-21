@@ -90,7 +90,7 @@ export function DiffPreview({
     highlightBackground: withAlpha(colors.accent, "22"),
     highlightGutterBackground: withAlpha(colors.accent, "33")
   }), [colors]);
-  const viewer = (maxHeightValue?: number, split = splitView) => <Suspense fallback={<div className="p-3 font-mono text-xs text-text-tertiary">Loading diff…</div>}>
+  const viewer = (maxHeightValue?: number, split = splitView) => <Suspense fallback={<div className="p-3 font-mono text-caption text-text-tertiary">Loading diff…</div>}>
       <ReactDiffViewer oldValue={oldValue} newValue={newValue} splitView={split} useDarkTheme={isDark} disableWorker hideSummary showDiffOnly={false} disableWordDiff={false} highlightLanguage={language ? PRISM_LANGUAGE[language] ?? language : undefined} styles={{
       variables: { light: variables, dark: variables },
       diffContainer: { fontSize: "var(--fs-meta)", minWidth: "100%", pre: { lineHeight: "16px" } },
@@ -120,8 +120,8 @@ export function DiffPreview({
         }}>
           <div className="flex h-full max-h-[90vh] w-full max-w-[1200px] flex-col overflow-hidden rounded-xl border border-border bg-background shadow-2xl" role="dialog" aria-modal="true" aria-label={title ? `Diff of ${title}` : "Diff"} onMouseDown={event => event.stopPropagation()}>
             <div className="flex shrink-0 items-center gap-2 border-b border-border px-3 py-2">
-              <span className="min-w-0 flex-1 truncate font-mono text-xs text-text-secondary">{title}</span>
-              <button onClick={() => setSplitView(value => !value)} className="inline-flex h-7 items-center gap-1 rounded-md border border-border px-2 text-xs text-text-secondary hover:bg-hover" role="button" aria-label={splitView ? "Switch to unified view" : "Switch to split view"}>
+              <span className="min-w-0 flex-1 truncate font-mono text-caption text-text-secondary">{title}</span>
+              <button onClick={() => setSplitView(value => !value)} className="inline-flex h-7 items-center gap-1 rounded-md border border-border px-2 text-caption text-text-secondary hover:bg-hover" role="button" aria-label={splitView ? "Switch to unified view" : "Switch to split view"}>
                 {splitView ? <Rows2 size={13} strokeWidth={2} /> : <Columns2 size={13} strokeWidth={2} />}
                 <span>{splitView ? "Unified" : "Split"}</span>
               </button>

@@ -133,35 +133,6 @@ export default function WorkspaceScreen() {
           <div className="flex-1"><WorkspaceRightPane sessionId={preSessionId} /></div>
         </WorkspaceSidebar>}
     </div>;
-}
-const styles = {
-  container: {
-    flex: 1
-  },
-  upperRow: {
-    flex: 1,
-    flexDirection: "row"
-  },
-  editorColumn: {
-    flex: 1
-  },
-  centerStack: {
-    flex: 1,
-    justifyContent: "center",
-    gap: 20
-  },
-  sendingContainer: {
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 12,
-    paddingTop: 24,
-    paddingBottom: 24
-  },
-  sendingText: {
-    fontSize: 14,
-    fontFamily: Fonts.sansMedium
-  }
-} as const;
-export const Route = createFileRoute("/_app/workspace/$workspaceId/")({
+}export const Route = createFileRoute("/_app/workspace/$workspaceId/")({
   component: WorkspaceScreen
 });

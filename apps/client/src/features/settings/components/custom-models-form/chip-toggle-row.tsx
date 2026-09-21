@@ -10,8 +10,7 @@ import { useColors } from '../../hooks/use-custom-models-theme';
 export function ChipToggleRow({
   label,
   hint,
-  options,
-  colors
+  options
 }: {
   label: string;
   hint?: string;
@@ -24,19 +23,13 @@ export function ChipToggleRow({
   }[];
   colors: ReturnType<typeof useColors>;
 }) {
-  return <div className="flex flex-col">
-      <span className={"  text-text-secondary"}>
-        {label}
-      </span>
-      <div className="flex flex-col">
-        {options.map(item => <button key={item.key} onClick={item.locked ? undefined : item.onToggle} disabled={item.locked} role="checkbox" className={"  opacity-[0.6]"}>
-            <span>
-              {item.label}
-            </span>
+  return <div className="flex flex-col gap-1.5">
+      <span className="text-[var(--desc-size)] text-text-secondary">{label}</span>
+      <div className="flex flex-wrap gap-1.5">
+        {options.map(item => <button key={item.key} onClick={item.locked ? undefined : item.onToggle} disabled={item.locked} role="checkbox" aria-checked={item.active} className={`flex h-7 items-center rounded-md border px-2.5 text-caption disabled:opacity-60 ${item.active ? 'border-border-strong bg-active text-foreground' : 'border-border text-text-secondary hover:bg-hover'}`}>
+            <span>{item.label}</span>
           </button>)}
       </div>
-      {hint ? <span className={"  text-muted-foreground"}>
-          {hint}
-        </span> : null}
+      {hint ? <span className="text-meta text-text-tertiary">{hint}</span> : null}
     </div>;
 }

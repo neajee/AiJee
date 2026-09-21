@@ -1,6 +1,5 @@
 import { Animated } from "@/styles/motion";
 import { ChevronDown } from 'lucide-react';
-import { styles } from '../../../utils/toolbar-styles';
 import type { ToolbarController } from './component-types';
 type EffortPickerProps = Pick<ToolbarController, 'theme' | 'inline' | 'isWideScreen' | 'onOpenNarrowSheet' | 'currentModel' | 'toolbarDisabled' | 'controlHeight' | 'thinkingDisabled' | 'thinkingLabel' | 'thinkingPreference' | 'effortOptions' | 'activeDropdown' | 'toggleDropdown' | 'toolbarDropdownAnim' | 'popoverIndex' | 'handleSelectThinking'>;
 export function EffortPicker({
@@ -22,7 +21,7 @@ export function EffortPicker({
   handleSelectThinking
 }: EffortPickerProps) {
   return <div className="relative min-w-0">
-      <button className="flex h-7 min-w-0 items-center gap-1.5 rounded-md px-2 text-xs text-text-secondary hover:bg-hover disabled:opacity-40" onClick={() => isWideScreen ? toggleDropdown('effort') : onOpenNarrowSheet('effort')} disabled={toolbarDisabled || thinkingDisabled} role="button" aria-label={thinkingDisabled ? `Thinking not supported by ${currentModel?.name ?? 'this model'}` : `Thinking: ${thinkingLabel}. Press to change.`}>
+      <button className="flex h-7 min-w-0 items-center gap-1.5 rounded-md px-2 text-caption text-text-secondary hover:bg-hover disabled:opacity-40" onClick={() => isWideScreen ? toggleDropdown('effort') : onOpenNarrowSheet('effort')} disabled={toolbarDisabled || thinkingDisabled} role="button" aria-label={thinkingDisabled ? `Thinking not supported by ${currentModel?.name ?? 'this model'}` : `Thinking: ${thinkingLabel}. Press to change.`}>
         <span className="min-w-0 flex-1 truncate">{thinkingLabel}</span>
         {!thinkingDisabled && <ChevronDown className="shrink-0" size={14} color={theme.textMuted} strokeWidth={1.8} />}
       </button>
@@ -30,7 +29,7 @@ export function EffortPicker({
         {effortOptions.map((item, index) => {
         const highlighted = index === popoverIndex;
         const active = item.level === thinkingPreference;
-        return <button className={`flex h-7 w-full items-center rounded px-1.5 text-left text-xs hover:bg-hover ${active ? 'bg-active' : ''}`} key={item.level} onClick={() => handleSelectThinking(item.level)} role="menuitem" aria-label={item.description ? `${item.label} — ${item.description}` : item.label}>
+        return <button className={`flex h-7 w-full items-center rounded px-1.5 text-left text-caption hover:bg-hover ${active ? 'bg-active' : ''}`} key={item.level} onClick={() => handleSelectThinking(item.level)} role="menuitem" aria-label={item.description ? `${item.label} — ${item.description}` : item.label}>
             <span>{item.label}</span>
           </button>;
       })}

@@ -27,7 +27,7 @@ export function CommitBar({
   const commitInputRef = useRef<HTMLTextAreaElement>(null);
   return <div className="border-t border-border p-2">
       <div className="rounded-md border border-border bg-card">
-        <textarea ref={commitInputRef} value={commitMsg} onChange={event => onChangeCommitMsg(event.target.value)} placeholder={`Commit message for ${stagedCount} staged file${stagedCount !== 1 ? "s" : ""}...`} disabled={isCommitting} className="min-h-16 w-full resize-y bg-transparent p-2 text-sm outline-none" />
+        <textarea ref={commitInputRef} value={commitMsg} onChange={event => onChangeCommitMsg(event.target.value)} placeholder={`Commit message for ${stagedCount} staged file${stagedCount !== 1 ? "s" : ""}...`} disabled={isCommitting} className="min-h-16 w-full resize-y bg-transparent p-2 text-body outline-none" />
         <div className="flex justify-end p-2">
           {isCommitting ? <span className="size-3 animate-spin" /> : <button onClick={onCommit} disabled={!commitMsg.trim()} aria-label="Commit" {...{
           title: "Commit"
@@ -38,42 +38,3 @@ export function CommitBar({
       </div>
     </div>;
 }
-const styles = {
-  commitBar: {
-    paddingLeft: 10,
-    paddingRight: 10,
-    paddingTop: 8,
-    paddingBottom: 8,
-    borderTopWidth: 0.633
-  },
-  commitInputBox: {
-    borderWidth: 0.633,
-    borderRadius: 8,
-    overflow: "hidden"
-  },
-  commitTextarea: {
-    fontSize: 13,
-    fontFamily: Fonts.sans,
-    paddingLeft: 10,
-    paddingRight: 10,
-    paddingTop: 8,
-    paddingBottom: 4,
-    minHeight: 64,
-    maxHeight: 100,
-    outlineStyle: "none"
-  } as any,
-  commitActions: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-    paddingLeft: 8,
-    paddingRight: 8,
-    paddingBottom: 6
-  },
-  commitSendButton: {
-    width: 30,
-    height: 26,
-    borderRadius: 6,
-    alignItems: "center",
-    justifyContent: "center"
-  }
-} as const;

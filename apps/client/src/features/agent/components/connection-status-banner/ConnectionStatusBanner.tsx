@@ -12,7 +12,7 @@ export function ConnectionStatusBannerView({
   onRetry
 }: ConnectionStatusBannerViewProps) {
   if (!hasConnectionIssue && !isReconnecting) return null;
-  return <div className="flex items-center justify-between gap-3 border-b border-warning/30 bg-warning/10 px-4 py-2 text-sm">
+  return <div className="flex items-center justify-between gap-3 border-b border-warning/30 bg-warning/10 px-4 py-2 text-body">
       <div>
         <span className="inline-block">
           {message}

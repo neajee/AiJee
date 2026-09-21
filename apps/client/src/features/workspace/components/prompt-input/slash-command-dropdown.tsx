@@ -1,83 +1,29 @@
 import { useRef, useEffect } from 'react';
-import { Animated } from "@/styles/motion";
-import { Fonts } from '@/constants/theme';
 import { SlashCommand } from '../../utils/prompt-input';
-import { usePromptTheme } from '@/components/surface-theme/use-prompt-theme';
 interface SlashCommandDropdownProps {
   commands: SlashCommand[];
   selectedIndex: number;
-  dropdownAnim: Animated.Value;
+  dropdownAnim: unknown;
   overlay?: boolean;
   onSelect: (command: SlashCommand) => void;
 }
 export function SlashCommandDropdown({
   commands,
   selectedIndex,
-  dropdownAnim,
-  overlay = false,
+  dropdownAnim: _dropdownAnim,
+  overlay: _overlay = false,
   onSelect
 }: SlashCommandDropdownProps) {
-  const theme = usePromptTheme();
-  const scrollRef = useRef<ScrollView>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
-    scrollRef.current?.scrollTo({
-      y: selectedIndex * 36,
-      animated: true
-    });
+    scrollRef.current?.querySelector<HTMLElement>(`[data-command-index="${selectedIndex}"]`)?.scrollIntoView({ block: 'nearest' });
   }, [selectedIndex]);
-  return <div className={"  bg-surface border-border opacity-100"}>
-      <div ref={scrollRef} className="flex flex-col">
-        {commands.map((cmd, index) => <button key={cmd.name} onClick={() => onSelect(cmd)} role="menuitem" aria-label={`/${cmd.name} — ${cmd.description}`}>
-            <span className={"  text-foreground"}>
-              /{cmd.name}
-            </span>
-            <span className={"  text-text-secondary"}>
-              {cmd.description}
-            </span>
+  return <div className="max-h-64 overflow-hidden rounded-lg border border-border bg-card p-1.5 shadow-xl" role="menu" aria-label="Slash commands">
+      <div ref={scrollRef} className="flex max-h-60 flex-col gap-0.5 overflow-y-auto">
+        {commands.map((cmd, index) => <button key={cmd.name} data-command-index={index} onClick={() => onSelect(cmd)} role="menuitem" aria-label={`/${cmd.name} — ${cmd.description}`} className={`flex min-h-9 w-full items-center gap-3 rounded-md px-2.5 py-1.5 text-left transition-colors ${index === selectedIndex ? 'bg-hover' : 'hover:bg-hover'}`}>
+            <span className="w-28 shrink-0 truncate font-mono text-caption font-medium text-foreground">/{cmd.name}</span>
+            <span className="min-w-0 flex-1 truncate text-caption text-text-secondary">{cmd.description || 'Command'}</span>
           </button>)}
       </div>
     </div>;
 }
-const styles = {
-  container: {
-    borderWidth: 0.633,
-    overflow: 'hidden'
-  },
-  stackedContainer: {
-    borderTopLeftRadius: 12,
-    borderTopRightRadius: 12,
-    borderBottomWidth: 0,
-    zIndex: 2
-  },
-  overlayContainer: {
-    position: 'absolute',
-    left: 0,
-    right: 0,
-    bottom: '100%',
-    marginBottom: 8,
-    borderRadius: 12,
-    zIndex: 20,
-    elevation: 12
-  },
-  scroll: {
-    maxHeight: 260
-  },
-  item: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingLeft: 16,
-    paddingRight: 16,
-    height: 36,
-    gap: 12
-  },
-  name: {
-    fontSize: 13,
-    fontFamily: Fonts.sansMedium,
-    minWidth: 80
-  },
-  desc: {
-    fontSize: 13,
-    fontFamily: Fonts.sans,
-    flex: 1
-  }
-} as const;

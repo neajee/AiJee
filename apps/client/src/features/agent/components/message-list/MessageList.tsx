@@ -34,6 +34,7 @@ export function MessageListView({
     alignToLatest,
     scrollToBottom
   } = controller;
+
   const renderItem = useCallback(({
     item
   }: {
@@ -44,7 +45,7 @@ export function MessageListView({
   const listHeader = <div className="flex min-h-7 items-center justify-center">
       {session.isLoadingOlderMessages ? <div className="flex items-center justify-center py-2">
           <span className="size-4 animate-spin rounded-full border-2 border-border border-t-text-tertiary" />
-        </div> : session.hasMoreMessages ? <button onClick={handleLoadMore} role="button" aria-label="Load earlier messages" className="flex items-center justify-center px-4 py-2.5 text-xs font-medium text-text-tertiary hover:text-foreground">
+        </div> : session.hasMoreMessages ? <button onClick={handleLoadMore} role="button" aria-label="Load earlier messages" className="flex items-center justify-center px-4 py-2.5 text-caption font-medium text-text-tertiary hover:text-foreground">
           Load earlier messages
         </button> : null}
     </div>;
@@ -56,7 +57,7 @@ export function MessageListView({
           </button>
         </div>}
       {actionError && <button onClick={clearActionError} className="absolute bottom-3 left-4 right-4 z-30 rounded-lg border border-destructive bg-surface-raised px-2.5 py-2 text-left">
-          <span className="text-xs leading-[18px] text-destructive">{actionError}</span>
+          <span className="text-caption leading-[18px] text-destructive">{actionError}</span>
         </button>}
     </div>;
 }

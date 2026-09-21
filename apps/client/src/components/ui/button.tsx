@@ -9,5 +9,5 @@ export function Button({
   variant?: "default" | "outline" | "ghost";
   size?: "default" | "sm" | "lg";
 }) {
-  return <button className={cn("inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50", variant === "outline" && "border border-border bg-transparent", variant === "ghost" && "bg-transparent hover:bg-black/5", variant === "default" && "bg-primary text-white", size === "sm" && "px-3 py-1.5 text-xs", size === "lg" && "px-5 py-3", className)} {...props} />;
+  return <button className={cn("inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-body font-medium transition-colors disabled:pointer-events-none disabled:opacity-50", variant === "outline" && "border border-border bg-transparent", variant === "ghost" && "bg-transparent hover:bg-black/5", variant === "default" && "bg-primary text-white", size === "sm" && "px-3 py-1.5 text-caption", size === "lg" && "px-5 py-3", className)} {...props} />;
 }

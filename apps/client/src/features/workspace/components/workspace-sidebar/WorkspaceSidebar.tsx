@@ -1,7 +1,6 @@
 import { Files, GitBranch, Globe2 } from 'lucide-react';
 import { Animated } from "@/styles/motion";
 import { SeamToggle, SEAM_TOGGLE_HEIGHT, SEAM_TOGGLE_WIDTH } from '@/components/ui/seam-toggle';
-import { useThemeTokens } from '@/hooks/use-theme-tokens';
 import { useColorScheme } from '@/hooks/use-color-scheme';
 import { WorkspacePaneContext } from '../../hooks/workspace-pane-context';
 import { RailButton } from './rail-button';
@@ -14,7 +13,6 @@ export function WorkspaceSidebar({
   defaultCollapsed,
   locked
 }: WorkspaceSidebarProps) {
-  const colors = useThemeTokens();
   const isDark = (useColorScheme() ?? 'light') === 'dark';
   const {
     collapsed,
@@ -53,13 +51,13 @@ export function WorkspaceSidebar({
 
         {!locked && <div className="flex w-[38px] shrink-0 flex-col items-center gap-1 pt-1.5">
             <RailButton label="Open files" active={activePaneTab === 'files'} onClick={() => openPane('files')}>
-              <Files size={17} color={colors.textSecondary} strokeWidth={1.8} />
+              <Files size={17} strokeWidth={1.8} />
             </RailButton>
             {isGitRepo && <RailButton label="Open Git" active={activePaneTab === 'git'} onClick={() => openPane('git')}>
-                <GitBranch size={17} color={colors.textSecondary} strokeWidth={1.8} />
+                <GitBranch size={17} strokeWidth={1.8} />
               </RailButton>}
             {isDesktopShell && <RailButton label="Open browser" active={activePaneTab === 'preview'} onClick={() => openPane('preview')}>
-                <Globe2 size={17} color={colors.textSecondary} strokeWidth={1.8} />
+                <Globe2 size={17} strokeWidth={1.8} />
               </RailButton>}
           </div>}
 
@@ -67,7 +65,7 @@ export function WorkspaceSidebar({
             <SeamToggle chevron="right" onClick={toggleCollapsed} label="Close side panel" />
           </div>}
 
-        {!locked && !collapsed && <div {...panelResizer.panHandlers} {...webSeamHoverProps} className="absolute inset-y-0 left-[-8px] z-20 flex w-4 cursor-col-resize justify-center">
+        {!locked && !collapsed && <div {...panelResizer} {...webSeamHoverProps} className="absolute inset-y-0 left-[-6px] z-20 flex w-3 touch-none cursor-col-resize justify-center">
             <div className="h-full w-1 rounded" style={{ backgroundColor: seamActive ? isResizing ? seamDragTint : seamTint : 'transparent' }} />
           </div>}
       </div>

@@ -1,61 +1,35 @@
-import { useState } from "react";
-import { HAIRLINE_WIDTH } from '@/constants/layout';
-import { ChevronDown, ChevronUp } from "lucide-react";
-import { useSettingsPalette } from "@/components/settings-surface";
-import { formatReleaseShort, formatReleaseTime, type VersionInfo } from "../utils/about";
-import { aboutStyles } from "../utils/about-styles";
-/** One collapsible release row in the changelog timeline. */
+import { formatReleaseShort, type VersionInfo } from "../utils/about";
+/** One release in the changelog: time on the left, notes on the right. */
 export function ReleaseRow({
   release,
-  current,
-  defaultOpen
+  current
 }: {
   release: NonNullable<VersionInfo['timeline']>[number];
   current: boolean;
-  defaultOpen: boolean;
 }) {
-  const p = useSettingsPalette();
-  const [open, setOpen] = useState(defaultOpen);
   const notes = release.notes ?? [];
-  const featureTotal = notes.filter(note => note.type === 'feature').length;
-  const fixTotal = notes.filter(note => note.type === 'fix').length;
-  const otherTotal = notes.filter(note => note.type === 'other').length;
-  const countText = [featureTotal && `${featureTotal} 新功能`, fixTotal && `${fixTotal} 修复`, otherTotal && `${otherTotal} 其他`].filter(Boolean).join(' · ') || '无变更记录';
-  return <div>
-      <button onClick={() => setOpen(value => !value)} role="button" aria-label={`${release.tag}，发布于 ${formatReleaseTime(release.published_at)}，${countText}`}>
-        <div />
-        <span>
-          {release.tag}
-        </span>
-        <span className={"  text-text-tertiary"}>
-          {formatReleaseShort(release.published_at)}
-        </span>
-        <span className={"  text-text-tertiary"}>
-          {countText}
-        </span>
-        {current ? <div className={"  bg-muted"}>
-            <span className={"  text-text-secondary"}>当前</span>
-          </div> : null}
-        {open ? <ChevronUp size={14} color={p.textTertiary} strokeWidth={2} /> : <ChevronDown size={14} color={p.textTertiary} strokeWidth={2} />}
-      </button>
-      {open ? <div>
-          {(['feature', 'fix', 'other'] as const).map(type => {
-        const items = notes.filter(note => note.type === type);
-        if (!items.length) return null;
-        const label = type === 'feature' ? '新功能' : type === 'fix' ? '修复' : '其他';
-        return <div key={type} className="flex flex-col">
-                <span className={"  text-text-secondary"}>
-                  {label} · {items.length}
-                </span>
-                {items.map((note, index) => <div key={`${note.commit}-${index}`} className="flex flex-col">
-                    <span className={"  text-foreground"}>
-                      {note.title}
-                    </span>
-                    {note.commit ? <span className={"  text-text-tertiary"}>{note.commit}</span> : null}
-                  </div>)}
-              </div>;
-      })}
-          {!notes.length ? <span className={"  text-text-tertiary"}>无变更记录</span> : null}
-        </div> : null}
+  const groups = (['feature', 'fix', 'other'] as const).map(type => ({
+    type,
+    label: type === 'feature' ? '新功能' : type === 'fix' ? '修复' : '其他',
+    items: notes.filter(note => note.type === type)
+  })).filter(group => group.items.length > 0);
+  return <div className="relative flex min-w-0 gap-4 border-b border-border/60 py-3 pl-7 last:border-b-0">
+      <span className={`absolute left-[5px] top-5 size-2.5 rounded-full border-2 ${current ? 'border-primary bg-primary' : 'border-border bg-card'}`} />
+      <span className="absolute bottom-[-1.25rem] left-[9px] top-8 w-px bg-border" />
+      <div className="flex w-24 shrink-0 flex-col gap-1">
+        <span className="font-mono text-caption text-text-tertiary">{formatReleaseShort(release.published_at)}</span>
+        <span className="flex flex-wrap items-center gap-1.5"><span className={`font-mono text-caption ${current ? 'font-semibold text-foreground' : 'text-text-secondary'}`}>{release.tag}</span>{current ? <span className="rounded bg-primary/15 px-1.5 py-0.5 text-[10px] font-medium text-primary">当前</span> : null}</span>
+      </div>
+      <div className="flex min-w-0 flex-1 flex-col gap-2">
+        {groups.length ? groups.map(group => <div key={group.type} className="flex flex-col gap-1">
+            <span className="text-meta font-semibold text-text-secondary">
+              {group.label} · {group.items.length}
+            </span>
+            {group.items.map((note, index) => <div key={`${note.commit}-${index}`} className="flex min-w-0 items-baseline gap-2">
+                <span className="min-w-0 flex-1 text-body leading-[18px] text-foreground">{note.title}</span>
+                {note.commit ? <span className="shrink-0 font-mono text-meta text-text-tertiary">{note.commit}</span> : null}
+              </div>)}
+          </div>) : <span className="text-caption text-text-tertiary">无变更记录</span>}
+      </div>
     </div>;
 }

@@ -6,7 +6,7 @@ import * as DocumentPicker from '@/platform/files';
 import { File as ExpoFile } from '@/platform/files';
 import { useQuery } from '@tanstack/react-query';
 import { useCachedAgentConfig } from '@/features/agent/hooks/use-cached-agent-config';
-import { useAgentSession, usePiClient } from '@aijee/client-sdk';
+import { useAgentSession, usePathCompletion, usePiClient } from '@aijee/client-sdk';
 import { useResponsiveLayout } from '@/hooks/use-responsive-layout';
 import { useSpeechRecognition } from '@/features/speech/hooks/use-speech-recognition';
 import { useSpeechSettingsStore } from '@/features/speech/store';
@@ -14,6 +14,7 @@ import type { SlashCommand, Attachment, ThinkingPreference } from '../utils/prom
 import { resolveAutoThinkingLevel } from '../utils/prompt-input';
 import { usePromptTheme } from '@/components/surface-theme/use-prompt-theme';
 import { useDraftStore } from '../store/draft';
+import type { FileCompletionItem } from '../components/prompt-input/file-completion-dropdown';
 const EMPTY_SLASH_COMMANDS: SlashCommand[] = [];
 const BUILTIN_COMMANDS: SlashCommand[] = [{
   name: "work",
@@ -90,6 +91,7 @@ export function usePromptInputController({
   const agentConfig = useCachedAgentConfig(sessionId ?? null, {
     enabled: sessionReady
   });
+  const { complete: completePath, completions: fileCompletions } = usePathCompletion();
 
   // Context usage: input + output + cacheRead + cacheWrite against context window
   const contextUsage = useMemo(() => {
@@ -220,6 +222,8 @@ export function usePromptInputController({
   const [showCommands, setShowCommands] = useState(false);
   const [filteredCommands, setFilteredCommands] = useState<SlashCommand[]>([]);
   const [slashIndex, setSlashIndex] = useState(0);
+  const [showFileCompletions, setShowFileCompletions] = useState(false);
+  const [fileCompletionIndex, setFileCompletionIndex] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const trimmedText = text.trim();
   const hasDraft = trimmedText.length > 0 || attachments.length > 0;
@@ -227,10 +231,12 @@ export function usePromptInputController({
   const showQueueActions = !!isStreaming && hasDraft;
   const queuedMessages = [...agentSession.steeringQueue.map(message => ({
     message,
-    kind: "Steer"
+    kind: "Steer",
+    behavior: "steer" as const,
   })), ...agentSession.followUpQueue.map(message => ({
     message,
-    kind: "Follow up"
+    kind: "Follow up",
+    behavior: "followUp" as const,
   }))];
   const queuedCount = queuedMessages.length;
   const textBeforeSpeechRef = useRef("");
@@ -359,11 +365,36 @@ export function usePromptInputController({
     }
   }, [agentConfig, attachments, clearDraft, draftKey, hasDraft, onClearError, onSend, sessionId, setText, setAttachments, thinkingPreference, trimmedText]);
 
-  // Pi exposes `clear_queue` through its RPC mode, but AiJee's embedded session
-  // API does not expose that command yet. Stopping only aborts the current run.
   const requestAbort = useCallback(async () => {
+    await agentSession.clearQueue();
     await onAbort?.();
-  }, [onAbort]);
+  }, [agentSession, onAbort]);
+  const requeue = useCallback(async (items: typeof queuedMessages) => {
+    for (const item of items) {
+      if (item.behavior === "steer") await agentSession.steer(item.message);
+      else await agentSession.followUp(item.message);
+    }
+  }, [agentSession]);
+  const removeQueuedMessage = useCallback(async (index: number) => {
+    const target = queuedMessages[index];
+    if (!target) return;
+    const cleared = await agentSession.clearQueue();
+    const remaining = [...cleared.steering.map(message => ({ message, kind: "Steer", behavior: "steer" as const })), ...cleared.followUp.map(message => ({ message, kind: "Follow up", behavior: "followUp" as const }))];
+    const targetIndex = remaining.findIndex(item => item.behavior === target.behavior && item.message === target.message);
+    if (targetIndex >= 0) remaining.splice(targetIndex, 1);
+    await requeue(remaining);
+  }, [agentSession, queuedMessages, requeue]);
+  const editQueuedMessage = useCallback(async (index: number) => {
+    const target = queuedMessages[index];
+    if (!target) return;
+    const cleared = await agentSession.clearQueue();
+    const remaining = [...cleared.steering.map(message => ({ message, kind: "Steer", behavior: "steer" as const })), ...cleared.followUp.map(message => ({ message, kind: "Follow up", behavior: "followUp" as const }))];
+    const targetIndex = remaining.findIndex(item => item.behavior === target.behavior && item.message === target.message);
+    if (targetIndex >= 0) remaining.splice(targetIndex, 1);
+    await requeue(remaining);
+    setText(target.message);
+    inputRef.current?.focus();
+  }, [agentSession, inputRef, queuedMessages, requeue, setText]);
   const handleSubmit = useCallback(() => {
     if (sendDisabled) return;
     if (showAbortButton) {
@@ -389,7 +420,15 @@ export function usePromptInputController({
     } else {
       setShowCommands(false);
     }
-  }, [setText, slashCommands]);
+    const fileMatch = value.match(/(?:^|\s)@([^\s]*)$/);
+    if (fileMatch) {
+      setFileCompletionIndex(0);
+      setShowFileCompletions(true);
+      void completePath(`@${fileMatch[1] ?? ''}`);
+    } else {
+      setShowFileCompletions(false);
+    }
+  }, [completePath, setText, slashCommands]);
   const handleSelectCommand = useCallback((command: SlashCommand) => {
     const newText = text.replace(/(?:^|\s)\/([\w:-]*)$/, match => {
       const prefix = match.startsWith(" ") ? " " : "";
@@ -397,6 +436,15 @@ export function usePromptInputController({
     });
     setText(newText);
     setShowCommands(false);
+    inputRef.current?.focus();
+  }, [setText, text]);
+  const handleSelectFile = useCallback((item: FileCompletionItem) => {
+    const newText = text.replace(/(?:^|\s)@([^\s]*)$/, match => {
+      const prefix = match.startsWith(' ') ? ' ' : '';
+      return `${prefix}@${item.path} `;
+    });
+    setText(newText);
+    setShowFileCompletions(false);
     inputRef.current?.focus();
   }, [setText, text]);
 
@@ -572,6 +620,28 @@ export function usePromptInputController({
         return;
       }
     }
+    if (showFileCompletions && fileCompletions.length > 0) {
+      if (key === 'ArrowUp') {
+        e.preventDefault?.();
+        setFileCompletionIndex(prev => prev <= 0 ? fileCompletions.length - 1 : prev - 1);
+        return;
+      }
+      if (key === 'ArrowDown') {
+        e.preventDefault?.();
+        setFileCompletionIndex(prev => prev >= fileCompletions.length - 1 ? 0 : prev + 1);
+        return;
+      }
+      if (key === 'Escape') {
+        e.preventDefault?.();
+        setShowFileCompletions(false);
+        return;
+      }
+      if ((key === 'Tab' || key === 'Enter') && !isShiftEnter) {
+        e.preventDefault?.();
+        handleSelectFile(fileCompletions[fileCompletionIndex]!);
+        return;
+      }
+    }
     if (key === "Escape" && showAbortButton) {
       e.preventDefault?.();
       void requestAbort();
@@ -582,7 +652,7 @@ export function usePromptInputController({
       e.preventDefault?.();
       handleSubmit();
     }
-  }, [requestAbort, filteredCommands, handleSelectCommand, handleSubmit, showAbortButton, showCommands, slashIndex]);
+  }, [requestAbort, fileCompletionIndex, fileCompletions, filteredCommands, handleSelectCommand, handleSelectFile, handleSubmit, showAbortButton, showCommands, showFileCompletions, slashIndex]);
   return {
     theme,
     isWideScreen,
@@ -598,10 +668,16 @@ export function usePromptInputController({
     clearSpeechError,
     queuedCount,
     queuedMessages,
+    removeQueuedMessage,
+    editQueuedMessage,
     isStreaming: !!isStreaming,
     requestAbort,
     showCommands,
     filteredCommands,
+    showFileCompletions,
+    fileCompletions,
+    fileCompletionIndex,
+    handleSelectFile,
     slashIndex,
     shouldOverlaySlashCommands,
     handleSelectCommand,

@@ -27,12 +27,12 @@ export function FileTreeRoot({
       </div>;
   }
   if (error) {
-    return <span className="mt-8 block px-3 text-center text-[13px] text-text-tertiary">
+    return <span className="mt-8 block px-3 text-center text-body text-text-tertiary">
         Failed to load: {error}
       </span>;
   }
   if (!entries || entries.length === 0) {
-    return <span className="mt-8 block px-3 text-center text-[13px] text-text-tertiary">
+    return <span className="mt-8 block px-3 text-center text-body text-text-tertiary">
         Empty directory
       </span>;
   }
@@ -41,7 +41,7 @@ export function FileTreeRoot({
     return a.name.localeCompare(b.name);
   });
   if (query && sorted.length === 0) {
-    return <span className="mt-8 block px-3 text-center text-[13px] text-text-tertiary">No matches</span>;
+    return <span className="mt-8 block px-3 text-center text-body text-text-tertiary">No matches</span>;
   }
   return <div className="flex flex-col">
       {sorted.map(entry => <FileTreeNode key={entry.path} entry={entry} depth={0} onFilePress={onFilePress} expandedDirs={expandedDirs} onToggleDir={onToggleDir} query={query} selectedPath={selectedPath} />)}

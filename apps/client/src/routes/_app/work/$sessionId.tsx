@@ -84,20 +84,6 @@ export default function WorkSessionScreen() {
         <PromptInput sessionId={sessionId} onSend={handleSend} isStreaming={agentSession.isStreaming} onAbort={handleAbort} sessionReady={agentSession.isReady} disabled={inputBlockedByConnection || !!agentSession.pendingExtensionUiRequest} allowTypingWhileDisabled={!inputBlockedByConnection} stackedAbove={!!agentSession.pendingExtensionUiRequest} errorMessage={alertMessage} onClearError={clearAlert} />
       </div>
     </div>;
-}
-const styles = {
-  container: {
-    flex: 1
-  },
-  editorColumn: {
-    flex: 1
-  },
-  emptyCenter: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center"
-  }
-} as const;
-export const Route = createFileRoute("/_app/work/$sessionId")({
+}export const Route = createFileRoute("/_app/work/$sessionId")({
   component: WorkSessionScreen
 });

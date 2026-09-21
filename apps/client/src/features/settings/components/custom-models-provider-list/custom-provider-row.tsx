@@ -1,17 +1,14 @@
 import { useState } from 'react';
-import { Plus } from 'lucide-react';
-import { API_TYPES, ApiTypeSelector, Field, ModelEntryRow } from '../custom-models-form';
-import { providerPageStyles } from '../../utils/custom-models-styles';
+import { API_TYPES } from '../custom-models-form';
 import { ProviderRow } from './provider-row';
 import type { CustomProviderRowProps } from './component-types';
 export function CustomProviderRow({
   name,
   provider,
   colors,
-  onUpdate,
+  onEdit,
   onRemove
 }: CustomProviderRowProps) {
-  const [expanded, setExpanded] = useState(false);
   const [hovered, setHovered] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const modelCount = provider.models?.length ?? 0;
@@ -20,57 +17,20 @@ export function CustomProviderRow({
     setHovered(false);
     setMenuOpen(false);
   }}>
-      <ProviderRow name={name} meta={`${apiLabel} · ${modelCount} 个模型`} colors={colors} onClick={() => setExpanded(value => !value)} trailing={hovered || menuOpen ? <div className="flex flex-col">
+      <ProviderRow name={name} meta={`${apiLabel} · ${modelCount} 个模型`} colors={colors} onClick={onEdit} trailing={hovered || menuOpen ? <div className="relative flex items-center">
             <button onClick={event => {
         event.stopPropagation?.();
         setMenuOpen(value => !value);
-      }} role="button" aria-label={`管理 ${name}`}>
-              <span className={"  text-text-secondary"}>•••</span>
+      }} role="button" aria-label={`管理 ${name}`} className="flex size-7 items-center justify-center rounded-md text-text-secondary hover:bg-hover">
+              <span className="text-caption leading-none">•••</span>
             </button>
             {menuOpen ? <button onClick={event => {
         event.stopPropagation?.();
         onRemove();
         setMenuOpen(false);
-      }} role="button" aria-label={`删除 ${name}`} className={"  bg-card border-border"}>
-                <span className={"  text-destructive"}>删除服务</span>
+      }} role="button" aria-label={`删除 ${name}`} className="absolute right-0 top-full z-20 mt-1 whitespace-nowrap rounded-md border border-border bg-card px-2.5 py-1.5 text-caption text-destructive shadow-lg">
+                <span>删除服务</span>
               </button> : null}
           </div> : null} />
-      {expanded ? <div>
-          <Field label="Base URL" value={provider.baseUrl ?? ''} onChange={event => (value => onUpdate({
-        ...provider,
-        baseUrl: value || undefined
-      }))(event.target.value)} placeholder="http://localhost:11434/v1" colors={colors} mono />
-          <ApiTypeSelector value={provider.api ?? 'openai-completions'} onChange={value => onUpdate({
-        ...provider,
-        api: value
-      })} colors={colors} />
-          <Field label="API 密钥" value={provider.apiKey ?? ''} onChange={event => (value => onUpdate({
-        ...provider,
-        apiKey: value || undefined
-      }))(event.target.value)} placeholder="可选" colors={colors} />
-          <div className="flex flex-col">
-            <span className={"  text-text-secondary"}>模型</span>
-            <button onClick={() => onUpdate({
-          ...provider,
-          models: [...(provider.models ?? []), {
-            id: `model-${modelCount + 1}`
-          }]
-        })} role="button">
-              <Plus size={14} color={colors.textSecondary} strokeWidth={2} />
-              <span className={"  text-text-secondary"}>添加模型</span>
-            </button>
-          </div>
-          {(provider.models ?? []).map((model, index) => <ModelEntryRow key={`${model.id}-${index}`} model={model} colors={colors} isLast={index === modelCount - 1} onUpdate={next => {
-        const models = [...(provider.models ?? [])];
-        models[index] = next;
-        onUpdate({
-          ...provider,
-          models
-        });
-      }} onRemove={() => onUpdate({
-        ...provider,
-        models: (provider.models ?? []).filter((_, itemIndex) => itemIndex !== index)
-      })} />)}
-        </div> : null}
     </div>;
 }

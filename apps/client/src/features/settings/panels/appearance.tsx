@@ -1,11 +1,9 @@
 import { useEffect, type ComponentType } from "react";
 import { Monitor, Moon, Sun } from "lucide-react";
-import { HAIRLINE_WIDTH } from '@/constants/layout';
-import { Fonts, type AccentPreset, type ThemePreset } from "@/constants/theme";
+import { type AccentPreset, type ThemePreset } from "@/constants/theme";
 import { useAppSettingsStore, type ThemeMode } from "../store";
-import { SettingsGroup, SettingsRow, useSettingsMetrics, useSettingsPhoneLayout, useSettingsPalette } from "@/components/settings-surface";
+import { SettingsGroup, SettingsRow, useSettingsMetrics, useSettingsPalette } from "@/components/settings-surface";
 import { Select } from "@/components/ui/select";
-import { pickerStyles } from "../utils/appearance-styles";
 const THEMES: {
   key: ThemeMode;
   icon: ComponentType<{
@@ -81,28 +79,24 @@ function themeEntry(mode: ThemeMode) {
 function ThemePicker({
   value,
   onChange,
-  compact = false,
-  wide = false
+  compact = false
 }: {
   value: ThemeMode;
   onChange: (v: ThemeMode) => void;
   compact?: boolean;
-  wide?: boolean;
 }) {
   const m = useSettingsMetrics();
   const p = useSettingsPalette();
-  const phone = useSettingsPhoneLayout();
-  const size = compact ? m.rowMinHeight - 12 : undefined;
-  return <div className={"  w-0 rounded-none"}>
+  return <div className="flex shrink-0 items-center gap-0.5 rounded-md border border-border p-0.5">
       {THEMES.map(({
       key,
       icon: Icon,
       label
     }) => {
       const active = value === key;
-      return <button key={key} onClick={() => onChange(key)} role="button" aria-label={`主题：${label}`}>
-            <Icon size={m.tileIcon + 2} color={active ? compact ? p.text : p.onAccent : p.textTertiary} strokeWidth={active ? 2.2 : 1.8} />
-            {!compact ? <span className={"text-[var(--desc-size)] font-sans"}>{label}</span> : null}
+      return <button key={key} onClick={() => onChange(key)} role="button" aria-label={`主题：${label}`} className={`flex size-6 items-center justify-center rounded-[5px] ${active ? 'bg-active' : 'hover:bg-hover'}`}>
+            <Icon size={m.tileIcon} color={active ? p.text : p.textTertiary} strokeWidth={active ? 2.2 : 1.8} />
+            {!compact ? <span className="text-[var(--desc-size)] font-sans">{label}</span> : null}
           </button>;
     })}
     </div>;
@@ -142,7 +136,6 @@ export function AppearanceRow({
   })} compact />} />;
 }
 export function AppearancePanel() {
-  const p = useSettingsPalette();
   const {
     themeMode,
     update
@@ -160,66 +153,35 @@ export function AppearancePanel() {
       label: item.label
     }))} onChange={value => update({
       themePreset: value
-    })} compact className="flex flex-col" />} />
+    })} compact />} />
       <SettingsRow label="强调色" right={<Select value={accentPreset} options={ACCENTS.map(item => ({
       value: item.key,
       label: item.label
     }))} onChange={value => update({
       accentPreset: value
-    })} compact className="flex flex-col" />} />
+    })} compact />} />
       <SettingsRow label="UI 字号" right={<SizeStepper value={uiFontSize} onChange={value => update({
       uiFontSize: value
-    })} min={12} max={18} palette={p} />} />
+    })} min={12} max={18} />} />
       <SettingsRow label="代码字号" isLast right={<SizeStepper value={codeFontSize} onChange={value => update({
       codeFontSize: value
-    })} min={11} max={18} palette={p} />} />
+    })} min={11} max={18} />} />
     </SettingsGroup>;
 }
 function SizeStepper({
   value,
   onChange,
   min,
-  max,
-  palette
+  max
 }: {
   value: number;
   onChange: (value: number) => void;
   min: number;
   max: number;
-  palette: ReturnType<typeof useSettingsPalette>;
 }) {
-  return <div>
-      <button onClick={() => onChange(Math.max(min, value - 1))} aria-label="减小字号"><span className="inline-block">−</span></button>
-      <span>{value}px</span>
-      <button onClick={() => onChange(Math.min(max, value + 1))} aria-label="增大字号"><span className="inline-block">+</span></button>
+  return <div className="flex shrink-0 items-center overflow-hidden rounded-md border border-border">
+      <button onClick={() => onChange(Math.max(min, value - 1))} disabled={value <= min} aria-label="减小字号" className="flex size-7 items-center justify-center text-text-secondary hover:bg-hover disabled:opacity-40"><span className="inline-block">−</span></button>
+      <span className="w-11 text-center font-mono text-[var(--value-size)] text-foreground">{value}px</span>
+      <button onClick={() => onChange(Math.min(max, value + 1))} disabled={value >= max} aria-label="增大字号" className="flex size-7 items-center justify-center text-text-secondary hover:bg-hover disabled:opacity-40"><span className="inline-block">+</span></button>
     </div>;
 }
-const appearanceStyles = {
-  themeSelect: {
-    width: 120,
-    maxWidth: '100%'
-  },
-  accentSelect: {
-    width: 120,
-    maxWidth: '100%'
-  },
-  stepper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: HAIRLINE_WIDTH,
-    borderRadius: 6,
-    overflow: 'hidden'
-  },
-  stepButton: {
-    width: 28,
-    height: 26,
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  stepperValue: {
-    width: 44,
-    textAlign: 'center',
-    fontFamily: Fonts.mono,
-    fontSize: 11
-  }
-} as const;

@@ -36,10 +36,10 @@ export function AppSheet({
     <section ref={sheetRef} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby={title ? titleId : undefined} style={style} className={`absolute inset-x-0 bottom-0 flex max-h-[80dvh] min-h-0 flex-col overflow-hidden rounded-t-xl border border-b-0 border-border bg-card text-foreground shadow-2xl outline-none ${className}`} onMouseDown={event => event.stopPropagation()}>
       <div className="relative flex shrink-0 items-center justify-center border-b border-border px-4 py-2">
         <span className="h-1 w-8 rounded-full bg-muted" />
-        {title ? <h2 id={titleId} className="absolute left-4 text-xs font-semibold">{title}</h2> : null}
-        <button type="button" className="absolute right-2 flex size-7 items-center justify-center rounded-md text-lg text-muted-foreground hover:bg-hover" aria-label="Close" onClick={onClose}>×</button>
+        {title ? <h2 id={titleId} className="absolute left-4 text-caption font-semibold">{title}</h2> : null}
+        <button type="button" className="absolute right-2 flex size-7 items-center justify-center rounded-md text-title text-muted-foreground hover:bg-hover" aria-label="Close" onClick={onClose}>×</button>
       </div>
-      <div className="min-h-0 flex-1 overflow-y-auto p-3 text-sm">{children}</div>
+      <div className="min-h-0 flex-1 overflow-y-auto p-3 text-body">{children}</div>
     </section>
   </div>;
 }

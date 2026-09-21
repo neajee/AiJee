@@ -44,14 +44,14 @@ export function DialogTitle({
 }: {
   children: ReactNode;
 }) {
-  return <h2 className="text-lg font-semibold">{children}</h2>;
+  return <h2 className="text-title font-semibold">{children}</h2>;
 }
 export function DialogDescription({
   children
 }: {
   children: ReactNode;
 }) {
-  return <p className="mt-1 text-sm text-muted-foreground">{children}</p>;
+  return <p className="mt-1 text-body text-muted-foreground">{children}</p>;
 }
 export function DialogClose({
   children

@@ -33,37 +33,6 @@ export default function ServersScreen() {
           </div>
         </div>}
     </div>;
-}
-const styles = {
-  safeArea: {
-    flex: 1
-  },
-  scroll: {
-    flex: 1
-  },
-  content: {
-    paddingLeft: 16,
-    paddingRight: 16,
-    paddingTop: 20
-  },
-  inner: {
-    width: "100%",
-    maxWidth: 640,
-    alignSelf: "center"
-  },
-  title: {
-    fontSize: 24,
-    lineHeight: 32,
-    fontFamily: Fonts.sansMedium
-  },
-  subtitle: {
-    fontSize: 14,
-    lineHeight: 21,
-    fontFamily: Fonts.sans,
-    marginTop: 2,
-    marginBottom: 20
-  }
-} as const;
-export const Route = createFileRoute("/_app/servers")({
+}export const Route = createFileRoute("/_app/servers")({
   component: ServersScreen
 });

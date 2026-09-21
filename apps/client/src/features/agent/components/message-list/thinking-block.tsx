@@ -51,16 +51,16 @@ export const ThinkingBlock = memo(function ThinkingBlock({
   // whole line saying "Thinking", which the moving text already says.
   const headline = peek || label;
   return <div>
-      <button onClick={toggle} disabled={!text} role="button" aria-label={expanded ? "Collapse thinking" : "Expand thinking"} className="flex min-h-7 w-full items-center gap-1.5 py-1 text-left text-xs hover:bg-hover disabled:cursor-default">
+      <button onClick={toggle} disabled={!text} role="button" aria-label={expanded ? "Collapse thinking" : "Expand thinking"} className="flex min-h-7 w-full items-center gap-1.5 py-1 text-left text-caption hover:bg-hover disabled:cursor-default">
         <Brain size={12} color={colors.textTertiary} strokeWidth={1.8} className="shrink-0" />
-        <span className={`text-xs text-text-tertiary ${peek ? "min-w-0 flex-1 truncate font-normal leading-[18px] opacity-[0.85]" : "font-semibold"}`}>
+        <span className={`text-caption text-text-tertiary ${peek ? "min-w-0 flex-1 truncate font-normal leading-[18px] opacity-[0.85]" : "font-semibold"}`}>
           {headline}
         </span>
         {!!text && <ChevronRight className={`shrink-0 transition-transform ${expanded ? "rotate-90" : ""}`} size={11} color={colors.textTertiary} strokeWidth={2} />}
       </button>
 
       <AnimatedCollapse expanded={expanded}>
-        <span className="block whitespace-pre-wrap pb-1.5 pt-0.5 text-xs leading-[18px] text-text-secondary">
+        <span className="block whitespace-pre-wrap pb-1.5 pt-0.5 text-caption leading-[18px] text-text-secondary">
           {text}
         </span>
       </AnimatedCollapse>

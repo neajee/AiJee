@@ -25,5 +25,5 @@ export function TooltipContent({
 }: {
   children: ReactNode;
 }) {
-  return <span className="absolute bottom-full left-1/2 z-20 mb-2 -translate-x-1/2 whitespace-nowrap rounded bg-foreground px-2 py-1 text-xs text-background">{children}</span>;
+  return <span className="absolute bottom-full left-1/2 z-20 mb-2 -translate-x-1/2 whitespace-nowrap rounded bg-foreground px-2 py-1 text-caption text-background">{children}</span>;
 }

@@ -8,7 +8,6 @@ export function ServerFormSheet({
   onClose,
   onSave,
   initial,
-  isDark,
   loading,
   error
 }: ServerFormProps) {
@@ -23,9 +22,9 @@ export function ServerFormSheet({
   }, [initial, visible]);
   return <AppModal visible={visible} onClose={loading ? () => undefined : onClose}>
       <div className="flex flex-col gap-5">
-        <h2 className="text-lg font-semibold">{initial ? 'Edit Server' : 'Add Server'}</h2>
-        <ServerFormFields name={name} setName={setName} address={address} setAddress={setAddress} isDark={isDark} />
-        {error && <p className="text-sm text-destructive">{error}</p>}
+        <h2 className="text-title font-semibold">{initial ? 'Edit Server' : 'Add Server'}</h2>
+        <ServerFormFields name={name} setName={setName} address={address} setAddress={setAddress} />
+        {error && <p className="text-body text-destructive">{error}</p>}
         <button onClick={() => canSave && onSave({ name: name.trim(), address: address.trim() })} className="rounded-md bg-primary px-4 py-2 font-medium text-primary-foreground disabled:cursor-not-allowed disabled:opacity-40" disabled={!canSave}>
           {loading ? <span className="inline-block size-3 animate-spin rounded-full border-2 border-current border-r-transparent" /> : initial ? 'Save & Connect' : 'Add & Connect'}
         </button>

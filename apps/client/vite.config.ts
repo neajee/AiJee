@@ -11,6 +11,13 @@ export default defineConfig(({ mode }) => ({
       { find: "@", replacement: fileURLToPath(new URL("./src", import.meta.url)) },
     ],
   },
+  // Streamdown (and its Shiki plugin) split into dynamic chunks. Pre-bundling
+  // them up front keeps Vite from discovering the dependency mid-session, which
+  // leaves a stale optimizer cache whose lazy chunk requests 504 and crash the
+  // message tree.
+  optimizeDeps: {
+    include: ["streamdown", "@streamdown/code"],
+  },
   define: { __DEV__: JSON.stringify(mode !== "production") },
   base: "/",
   build: { outDir: "../../dist", emptyOutDir: true },

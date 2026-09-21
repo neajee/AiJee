@@ -7,7 +7,6 @@ export function ServerFormDesktopModal({
   onClose,
   onSave,
   initial,
-  isDark,
   loading,
   error
 }: ServerFormProps) {
@@ -22,11 +21,11 @@ export function ServerFormDesktopModal({
   const canSave = Boolean(name.trim() && address.trim() && !loading);
   return <AppModal visible={visible} onClose={loading ? () => undefined : onClose} title={initial ? 'Edit Server' : 'Add Server'} showClose>
           <div className="flex flex-col gap-5">
-            <ServerFormFields name={name} setName={setName} address={address} setAddress={setAddress} isDark={isDark} autoFocus />
-            {error && <p className="text-sm text-error">{error}</p>}
+            <ServerFormFields name={name} setName={setName} address={address} setAddress={setAddress} autoFocus />
+            {error && <p className="text-body text-error">{error}</p>}
             <div className="flex justify-end gap-2">
-              <button className="rounded-md px-3 py-2 text-sm hover:bg-hover disabled:opacity-50" onClick={onClose} disabled={loading}>Cancel</button>
-              <button className="rounded-md bg-primary px-3 py-2 text-sm text-primary-content hover:opacity-90 disabled:opacity-40" onClick={() => {
+              <button className="rounded-md px-3 py-2 text-body hover:bg-hover disabled:opacity-50" onClick={onClose} disabled={loading}>Cancel</button>
+              <button className="rounded-md bg-primary px-3 py-2 text-body text-primary-content hover:opacity-90 disabled:opacity-40" onClick={() => {
             if (canSave) onSave({
               name: name.trim(),
               address: address.trim()

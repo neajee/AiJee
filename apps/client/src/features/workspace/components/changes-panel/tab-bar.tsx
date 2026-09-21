@@ -33,62 +33,17 @@ export function TabBar({
     dividerColor,
     hoverBg
   } = useChangesTheme();
-  return <div>
+  return <div className="flex h-9 shrink-0 items-stretch border-b border-border bg-surface-raised px-1">
       {items.map(item => {
       const isActive = activeKey === item.key;
-      return <button key={item.key} onClick={() => onSelect(item.key)} role="tab">
-            <span>
-              {item.label}
-            </span>
-            {!!item.count && item.count > 0 && <span>
-                {item.count}
-              </span>}
-            {isActive && <div className={"  bg-foreground"} />}
+      return <button key={item.key} className={`relative flex items-center gap-1 px-2.5 text-caption ${isActive ? 'font-medium text-foreground' : 'text-text-secondary hover:bg-hover'}`} onClick={() => onSelect(item.key)} role="tab">
+            <span>{item.label}</span>{!!item.count && item.count > 0 && <span className="font-mono text-meta text-text-tertiary">{item.count}</span>}
+            {isActive && <span className="absolute inset-x-2 bottom-0 h-0.5 rounded-full bg-primary" />}
           </button>;
     })}
       {!!right && <>
-          <div className="flex flex-col" />
+          <div className="flex-1" />
           {right}
         </>}
     </div>;
 }
-const styles = {
-  tabBar: {
-    flexDirection: "row",
-    alignItems: "stretch",
-    height: 32,
-    paddingLeft: 4,
-    paddingRight: 8,
-    borderBottomWidth: 0.633
-  },
-  tab: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 5,
-    paddingLeft: 8,
-    paddingRight: 8,
-    borderRadius: 5
-  },
-  tabText: {
-    fontSize: 12,
-    fontFamily: Fonts.sansMedium
-  },
-  tabCount: {
-    fontSize: 11,
-    fontFamily: Fonts.mono
-  },
-  underline: {
-    position: "absolute",
-    left: 8,
-    right: 8,
-    bottom: 0,
-    height: 1.5,
-    borderTopLeftRadius: 1,
-    borderTopRightRadius: 1
-  },
-  filler: {
-    flexGrow: 1,
-    flexShrink: 0,
-    minWidth: 12
-  }
-} as const;

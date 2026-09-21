@@ -44,12 +44,16 @@ function isAbortedMessage(msg: ChatMessage): boolean {
 }
 
 function buildTurn(msgs: ChatMessage[], requestedAt?: number, sourceEntryId?: string): TurnListItem {
-  // The answer is the last message that produced visible output; everything
-  // before it (thinking, narration, tool calls) is work history.
+  // Only text after the final tool call is the answer. Assistant narration
+  // before another tool call is a work step and must stay inside the fold.
+  let lastToolIndex = -1;
+  for (let i = 0; i < msgs.length; i++) {
+    if (msgs[i]!.toolCalls?.length) lastToolIndex = i;
+  }
   let finalIdx = -1;
   for (let i = msgs.length - 1; i >= 0; i--) {
     const msg = msgs[i]!;
-    if (msg.text || msg.errorMessage) {
+    if (i > lastToolIndex && (msg.text || msg.errorMessage)) {
       finalIdx = i;
       break;
     }
@@ -64,12 +68,14 @@ function buildTurn(msgs: ChatMessage[], requestedAt?: number, sourceEntryId?: st
   const steps: WorkStep[] = [];
   let durationMs: number | undefined;
   let outputTokens = 0;
+  let generationMs = 0;
   let fileStats: TurnFileStats | undefined;
 
   for (let i = 0; i < msgs.length; i++) {
     const msg = msgs[i]!;
     if (durationMs === undefined) durationMs = msg.turnDurationMs;
     outputTokens += msg.usage?.output ?? 0;
+    generationMs += msg.generationMs ?? 0;
     if (fileStats === undefined) fileStats = msg.turnFileStats;
 
     if (msg.thinking) {
@@ -106,18 +112,31 @@ function buildTurn(msgs: ChatMessage[], requestedAt?: number, sourceEntryId?: st
   }
 
   if (!durationMs || durationMs <= 0) {
-    const timestamps = [requestedAt, ...msgs.map((msg) => msg.timestamp)]
-      .filter((value): value is number => typeof value === "number")
-      .map((value) => value < 1e12 ? value * 1000 : value)
-      .filter((value) => Number.isFinite(value) && value > 0);
-    const inferred = timestamps.length > 1
-      ? Math.max(...timestamps) - Math.min(...timestamps)
-      : 0;
-    if (inferred > 0) durationMs = inferred;
+    // Messages are stamped at generation start, so the first one opens the turn
+    // and the last one plus its generation time closes it. This is the closest
+    // wall-clock reading available without backend turn stats.
+    const first = msgs[0];
+    const last = msgs[msgs.length - 1];
+    const lastEnd = last?.generationMs ? last.timestamp + last.generationMs : undefined;
+    if (first && lastEnd !== undefined && lastEnd > first.timestamp) {
+      durationMs = lastEnd - first.timestamp;
+    } else {
+      const timestamps = [requestedAt, ...msgs.map((msg) => msg.timestamp)]
+        .filter((value): value is number => typeof value === "number")
+        .map((value) => value < 1e12 ? value * 1000 : value)
+        .filter((value) => Number.isFinite(value) && value > 0);
+      const inferred = timestamps.length > 1
+        ? Math.max(...timestamps) - Math.min(...timestamps)
+        : 0;
+      if (inferred > 0) durationMs = inferred;
+    }
   }
 
-  const tps = outputTokens > 0 && durationMs && durationMs > 0
-    ? outputTokens / (durationMs / 1000)
+  // Throughput is only meaningful against measured generation time; without it
+  // (e.g. a turn loaded from persisted history) we show nothing rather than a
+  // number derived from unrelated timestamps.
+  const tps = outputTokens > 0 && generationMs > 0
+    ? outputTokens / (generationMs / 1000)
     : undefined;
 
   return {

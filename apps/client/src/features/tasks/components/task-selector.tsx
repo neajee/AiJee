@@ -59,38 +59,3 @@ export function TaskSelector({
       {panelOpen && <TasksDropdown placement={placement} />}
     </div>;
 }
-const styles = {
-  container: {
-    position: 'relative'
-  },
-  selector: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    height: 26,
-    borderRadius: 6,
-    overflow: 'hidden'
-  },
-  toggleBtn: {
-    width: 26,
-    height: 26,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: 'rgba(128,128,128,0.12)'
-  },
-  labelBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingLeft: 8,
-    paddingRight: 8,
-    height: 26,
-    backgroundColor: 'rgba(128,128,128,0.08)'
-  },
-  label: {
-    fontSize: 12,
-    fontFamily: Fonts.sansMedium,
-    fontWeight: '500',
-    color: '#999',
-    maxWidth: 120
-  }
-} as const;

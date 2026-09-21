@@ -1,5 +1,5 @@
 export const PANEL_DEFAULT = 280;
-export const PANEL_MIN = 180;
+export const PANEL_MIN = 220;
 export const PANEL_MAX = 1000;
 export const PANEL_MAX_FRACTION = 0.72;
 export const COLLAPSED_WIDTH = 38;

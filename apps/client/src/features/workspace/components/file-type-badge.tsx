@@ -135,16 +135,3 @@ export function FileTypeBadge({
       </span>
     </div>;
 }
-const styles = {
-  badge: {
-    width: 22,
-    alignItems: "center",
-    justifyContent: "center"
-  },
-  label: {
-    fontSize: 9,
-    lineHeight: 12,
-    fontFamily: Fonts.mono,
-    letterSpacing: -0.3
-  }
-} as const;

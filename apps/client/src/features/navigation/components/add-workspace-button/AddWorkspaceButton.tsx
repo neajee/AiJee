@@ -18,24 +18,3 @@ export function AddWorkspaceButton({
       </button>
     </div>;
 }
-const styles = {
-  wrapper: {
-    alignItems: 'center',
-    justifyContent: 'center'
-  },
-  wrapperVertical: {
-    alignSelf: 'stretch',
-    height: 44
-  },
-  wrapperHorizontal: {
-    width: 50,
-    height: 54
-  },
-  button: {
-    width: 32,
-    height: 32,
-    borderRadius: 4,
-    alignItems: 'center',
-    justifyContent: 'center'
-  }
-} as const;

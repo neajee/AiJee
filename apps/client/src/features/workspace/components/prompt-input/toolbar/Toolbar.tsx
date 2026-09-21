@@ -1,6 +1,5 @@
 import { RotateCw } from 'lucide-react';
 import { TaskSelector } from '@/features/tasks/components/task-selector';
-import { styles } from '../../../utils/toolbar-styles';
 import { EffortPicker } from './effort-picker';
 import { ModeToggle } from './mode-toggle';
 import { ModelPicker } from './model-picker';

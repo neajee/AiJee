@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Cpu, Pencil, Trash2 } from 'lucide-react';
-import { HAIRLINE_WIDTH } from '@/constants/layout';
 import { type CustomModelEntry } from '../../store/custom-models';
 import { useColors } from '../../hooks/use-custom-models-theme';
 import { PI_DEFAULTS } from './constants';
@@ -13,8 +12,7 @@ export function ModelEntryRow({
   model,
   onRemove,
   onUpdate,
-  colors,
-  isLast
+  colors
 }: {
   model: CustomModelEntry;
   onRemove: () => void;
@@ -44,33 +42,33 @@ export function ModelEntryRow({
     return parts.join(' · ');
   }, [model.name, model.contextWindow, model.input, model.reasoning]);
   if (editing) {
-    return <div>
-        <div className="flex flex-col">
-          <div className={"flex-1"}>
-            <Field label="模型 ID" value={draft.id} onChange={event => (v => setDraft({
+    return <div className="flex flex-col gap-3 p-[var(--gutter)]">
+        <div className="flex gap-3">
+          <div className="min-w-0 flex-1">
+            <Field label="模型 ID" value={draft.id} onChange={v => setDraft({
             ...draft,
             id: v
-          }))(event.target.value)} placeholder="llama3.1:8b" colors={colors} mono />
+          })} placeholder="llama3.1:8b" colors={colors} mono />
           </div>
-          <div className={"flex-1"}>
-            <Field label="显示名称" value={draft.name ?? ''} onChange={event => (v => setDraft({
+          <div className="min-w-0 flex-1">
+            <Field label="显示名称" value={draft.name ?? ''} onChange={v => setDraft({
             ...draft,
             name: v || undefined
-          }))(event.target.value)} placeholder="可选" colors={colors} />
+          })} placeholder="可选" colors={colors} />
           </div>
         </div>
-        <div className="flex flex-col">
-          <div className={"flex-1"}>
-            <Field label="上下文窗口" value={draft.contextWindow?.toString() ?? ''} onChange={event => (v => setDraft({
+        <div className="flex gap-3">
+          <div className="min-w-0 flex-1">
+            <Field label="上下文窗口" value={draft.contextWindow?.toString() ?? ''} onChange={v => setDraft({
             ...draft,
             contextWindow: v ? parseInt(v, 10) || undefined : undefined
-          }))(event.target.value)} placeholder={`${PI_DEFAULTS.contextWindow}（缺省）`} colors={colors} />
+          })} placeholder={`${PI_DEFAULTS.contextWindow}（缺省）`} colors={colors} />
           </div>
-          <div className={"flex-1"}>
-            <Field label="最大 Token" value={draft.maxTokens?.toString() ?? ''} onChange={event => (v => setDraft({
+          <div className="min-w-0 flex-1">
+            <Field label="最大 Token" value={draft.maxTokens?.toString() ?? ''} onChange={v => setDraft({
             ...draft,
             maxTokens: v ? parseInt(v, 10) || undefined : undefined
-          }))(event.target.value)} placeholder={`${PI_DEFAULTS.maxTokens}（缺省）`} colors={colors} />
+          })} placeholder={`${PI_DEFAULTS.maxTokens}（缺省）`} colors={colors} />
           </div>
         </div>
         <ChipToggleRow label="输入模态" hint="决定能否向该模型发送图片附件；留空等同仅文本。" colors={colors} options={[{
@@ -98,11 +96,9 @@ export function ModelEntryRow({
           reasoning: draft.reasoning === true ? undefined : true
         })
       }]} />
-        <div className="flex flex-col">
-          <button onClick={() => setEditing(false)}>
-            <span>
-              取消
-            </span>
+        <div className="flex justify-end gap-2">
+          <button onClick={() => setEditing(false)} className="flex h-8 items-center rounded-md border border-border px-3 text-caption text-text-secondary hover:bg-hover">
+            <span>取消</span>
           </button>
           <button onClick={() => {
           if (draft.id.trim()) {
@@ -112,29 +108,23 @@ export function ModelEntryRow({
             });
             setEditing(false);
           }
-        }}>
-            <span>
-              保存
-            </span>
+        }} disabled={!draft.id.trim()} className="flex h-8 items-center rounded-md bg-accent px-3 text-caption font-medium text-accent-content hover:opacity-90 disabled:opacity-40">
+            <span>保存</span>
           </button>
         </div>
       </div>;
   }
-  return <div>
-      <Cpu size={colors.roomy ? 14 : 9} color={colors.textMuted} strokeWidth={1.8} />
-      <div className="flex flex-col">
-        <span>
-          {model.id}
-        </span>
-        {summary ? <span>
-            {summary}
-          </span> : null}
+  return <div className="flex items-center gap-2 py-1.5">
+      <Cpu className="shrink-0" size={14} color={colors.textMuted} strokeWidth={1.8} />
+      <div className="flex min-w-0 flex-1 flex-col">
+        <span className="truncate text-caption text-foreground">{model.id}</span>
+        {summary ? <span className="truncate text-meta text-text-tertiary">{summary}</span> : null}
       </div>
-      <button onClick={() => setEditing(true)}>
-        <Pencil size={colors.roomy ? 15 : 9} color={colors.textMuted} strokeWidth={1.8} />
+      <button onClick={() => setEditing(true)} aria-label={`编辑 ${model.id}`} className="flex size-7 shrink-0 items-center justify-center rounded-md hover:bg-hover">
+        <Pencil size={14} color={colors.textMuted} strokeWidth={1.8} />
       </button>
-      <button onClick={onRemove}>
-        <Trash2 size={colors.roomy ? 15 : 9} color={colors.dangerColor} strokeWidth={1.8} />
+      <button onClick={onRemove} aria-label={`删除 ${model.id}`} className="flex size-7 shrink-0 items-center justify-center rounded-md hover:bg-hover">
+        <Trash2 size={14} color={colors.dangerColor} strokeWidth={1.8} />
       </button>
     </div>;
 }

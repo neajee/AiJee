@@ -1,5 +1,17 @@
 @import "tailwindcss";
 
+/* Streamdown ships its markup as precompiled Tailwind classes, so its dist
+   files must be scanned or every code-block, table and control style is
+   dropped. Paths are relative to this file; node_modules is hoisted to the
+   repository root. */
+@source "../../../../node_modules/streamdown/dist/*.js";
+@source "../../../../node_modules/@streamdown/code/dist/*.js";
+
+/* The app drives dark mode through the settings store (which can override the
+   OS), not the media query, so streamdown's `dark:` utilities must key off the
+   theme attribute the root element carries instead of `prefers-color-scheme`. */
+@custom-variant dark (&:where([data-aijee-theme$="-dark"], [data-aijee-theme$="-dark"] *));
+
 @theme {
   --color-background: var(--aijee-background, #ffffff);
   --color-foreground: var(--aijee-text, #1c1c1c);
@@ -18,6 +30,12 @@
   --color-hover: var(--aijee-hover, rgba(0, 0, 0, 0.05));
   --color-active: var(--aijee-active, rgba(0, 0, 0, 0.08));
   --color-muted: var(--aijee-muted, #f1f3f5);
+  /* Streamdown's built-in code-block, table and control chrome reads these
+     shadcn-style tokens; map them onto the app palette so the renderer and the
+     rest of the message column share one theme. */
+  --color-primary-foreground: var(--aijee-on-accent, #ffffff);
+  --color-sidebar: var(--aijee-code-background, #f6f8fa);
+  --color-sidebar-foreground: var(--aijee-text, #1c1c1c);
   --color-overlay: var(--aijee-overlay, rgba(0, 0, 0, 0.4));
   --color-success: var(--aijee-success, #30a46c);
   --spacing-bottom-inset: var(--bottom-inset, 0px);
@@ -39,11 +57,20 @@
 :root {
   font-family: system-ui, sans-serif;
   color-scheme: light dark;
-  --fs-meta: 11px;
-  --fs-caption: 12px;
-  --fs-body: 14px;
-  --fs-title: 16px;
-  --fs-display: 20px;
+  /* Code font size drives the two small tiers; UI font size drives the rest.
+     Defaults: code 13 -> meta 11 / caption 12; UI 14 -> body 14 / title 16 / display 20. */
+  --fs-meta: max(10px, calc(var(--aijee-code-font-size, 13px) - 3px));
+  --fs-caption: max(11px, calc(var(--aijee-code-font-size, 13px) - 2px));
+  --fs-body: max(12px, calc(var(--aijee-ui-font-size, 14px) - 2px));
+  --fs-title: var(--aijee-ui-font-size, 14px);
+  --fs-display: calc(var(--aijee-ui-font-size, 14px) + 2px);
+  /* Settings surface text roles, two steps below the prose scale so the panels
+     stay dense. */
+  --label-size: var(--fs-caption);
+  --desc-size: var(--fs-meta);
+  --value-size: var(--fs-meta);
+  --header-size: max(9px, calc(var(--fs-meta) - 1px));
+  --title-size: calc(var(--fs-body) + 1px);
 }
 html, body, #root { min-height: 100%; margin: 0; }
 body { background: var(--aijee-background, #fff); color: var(--aijee-text, #1c1c1c); }
@@ -53,21 +80,97 @@ body { background: var(--aijee-background, #fff); color: var(--aijee-text, #1c1c
 * { scrollbar-width: none; -ms-overflow-style: none; }
 *::-webkit-scrollbar { display: none; }
 
-.aijee-markdown { color: var(--aijee-text); font-size: 14px; line-height: 1.7; overflow-wrap: anywhere; }
+.aijee-markdown { color: var(--aijee-text); font-size: var(--fs-body); line-height: 1.7; overflow-wrap: anywhere; }
+.aijee-markdown p,
+.aijee-markdown ul,
+.aijee-markdown ol,
+.aijee-markdown li,
+.aijee-markdown th,
+.aijee-markdown td { font-size: var(--fs-body); line-height: 1.7; }
 .aijee-markdown > :first-child { margin-top: 0; }
 .aijee-markdown > :last-child { margin-bottom: 0; }
-.aijee-markdown p, .aijee-markdown ul, .aijee-markdown ol, .aijee-markdown pre, .aijee-markdown blockquote, .aijee-markdown table { margin: 0.75rem 0; }
+/* Code blocks, tables and their controls are owned by Streamdown (which styles
+   them from the theme tokens above), so only the prose rhythm is overridden
+   here to keep the message column on the app's type scale. */
+.aijee-markdown p, .aijee-markdown ul, .aijee-markdown ol, .aijee-markdown blockquote { margin: 0.75rem 0; }
 .aijee-markdown ul, .aijee-markdown ol { padding-left: 1.4rem; }
 .aijee-markdown li + li { margin-top: 0.2rem; }
 .aijee-markdown h1, .aijee-markdown h2, .aijee-markdown h3 { margin: 1.25rem 0 0.5rem; font-weight: 600; line-height: 1.3; }
-.aijee-markdown h1 { font-size: 1.35rem; }
-.aijee-markdown h2 { font-size: 1.15rem; }
-.aijee-markdown h3 { font-size: 1rem; }
-.aijee-markdown code { border-radius: 0.25rem; background: var(--aijee-muted); padding: 0.1rem 0.3rem; font-family: var(--aijee-code-font-family, ui-monospace, monospace); font-size: 0.9em; }
-.aijee-markdown pre { overflow-x: auto; border: 1px solid var(--aijee-border); border-radius: 0.5rem; background: var(--aijee-code-background); padding: 0.85rem 1rem; }
-.aijee-markdown pre code { background: transparent; padding: 0; }
-.aijee-markdown table { display: block; width: max-content; max-width: 100%; overflow-x: auto; border: 1px solid var(--aijee-border); border-collapse: separate; border-spacing: 0; border-radius: 0.5rem; }
-.aijee-markdown th, .aijee-markdown td { border-bottom: 1px solid var(--aijee-border); padding: 0.45rem 0.7rem; text-align: left; vertical-align: top; white-space: nowrap; }
-.aijee-markdown th { background: var(--aijee-surface-raised); font-weight: 600; }
-.aijee-markdown tr:last-child td { border-bottom: 0; }
+.aijee-markdown h1 { font-size: var(--fs-display); }
+.aijee-markdown h2 { font-size: var(--fs-title); }
+.aijee-markdown h3 { font-size: var(--fs-body); }
 .aijee-markdown blockquote { border-left: 3px solid var(--aijee-accent); color: var(--aijee-text-secondary); padding-left: 0.85rem; }
+/* Inline code must stay on the same type scale as surrounding prose. Streamdown
+   otherwise applies its own larger code size, which makes labels and settings
+   values look visually inconsistent. */
+.aijee-markdown :not(pre) > code {
+  border-radius: 0.35rem;
+  background: var(--aijee-code-background);
+  padding: 0.08em 0.35em;
+  font-family: var(--aijee-code-font-family, ui-monospace, monospace);
+  font-size: var(--fs-body);
+  font-weight: 400;
+  line-height: 1.45;
+}
+/* The default light Shiki palette is too saturated against the white prose
+   surface. Keep syntax hierarchy, but reduce the two code surfaces' contrast. */
+:root:not([data-aijee-theme$="-dark"]) .aijee-markdown :not(pre) > code {
+  background: color-mix(in srgb, var(--aijee-code-background) 32%, var(--aijee-background));
+  color: var(--aijee-text-secondary);
+}
+/* Reply code blocks: Streamdown nests a bordered header + body inside a padded,
+   bordered container, which reads much heavier than the prose around it. Flatten
+   it to one compact, borderless surface and drop the language label — copy is
+   the only control a snippet in chat needs. */
+.aijee-markdown [data-streamdown="code-block"] {
+  margin: 0.75rem 0;
+  gap: 0;
+  border: 0;
+  padding: 0;
+  border-radius: var(--radius-md);
+  background: var(--aijee-code-background);
+  overflow: hidden;
+}
+:root:not([data-aijee-theme$="-dark"]) .aijee-markdown [data-streamdown="code-block"] {
+  background: color-mix(in srgb, var(--aijee-code-background) 38%, var(--aijee-background));
+}
+:root:not([data-aijee-theme$="-dark"]) .aijee-markdown [data-streamdown="code-block"] pre {
+  background: transparent !important;
+}
+.aijee-markdown [data-streamdown="code-block-header"] {
+  height: auto;
+  justify-content: flex-end;
+  padding: 0.125rem 0.25rem 0 0;
+}
+.aijee-markdown [data-streamdown="code-block-header"] > span { display: none; }
+.aijee-markdown [data-streamdown="code-block-body"] {
+  border: 0;
+  border-radius: 0;
+  padding: 0.5rem 0.75rem;
+  background: transparent;
+  font-size: var(--fs-caption);
+  line-height: 1.55;
+}
+.aijee-markdown [data-streamdown="code-block-body"] code { font-size: inherit; }
+
+/* Tables: no chrome, no extra surface — just the table on the prose background
+   at the caption tier. */
+.aijee-markdown [data-streamdown="table-wrapper"] {
+  margin: 0.75rem 0;
+  gap: 0;
+  border: 0;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  overflow: visible;
+}
+.aijee-markdown [data-streamdown="table-wrapper"] > div:last-child {
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+.aijee-markdown [data-streamdown="table"] {
+  border: 0;
+  font-family: inherit;
+  font-size: var(--fs-body);
+}

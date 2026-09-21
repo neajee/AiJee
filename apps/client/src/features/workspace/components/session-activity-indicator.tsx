@@ -1,9 +1,5 @@
-import { useEffect, useRef } from "react";
-import { Animated } from "@/styles/motion";
-import { Minus } from "lucide-react";
-import { useAgentSession } from "@aijee/client-sdk";
-const DOT_COUNT = 3;
-const DOT_SIZE = 3.5;
+import { LoaderCircle, Minus } from "lucide-react";
+import { useIsSessionStreaming } from "@aijee/client-sdk";
 interface SessionActivityIndicatorProps {
   sessionId: string;
   color: string;
@@ -18,58 +14,9 @@ export function SessionActivityIndicator({
   color,
   idlePlaceholder = true
 }: SessionActivityIndicatorProps) {
-  const {
-    isStreaming
-  } = useAgentSession(sessionId);
-  // Reduced for every session, not just the one on screen, so a background
-  // session mid-turn animates too. "Active" is deliberately not used here: a
-  // live process that already answered is idle, and would spin forever.
-  const isWorking = isStreaming;
-  const dotAnims = useRef(Array.from({
-    length: DOT_COUNT
-  }, () => new Animated.Value(0.35))).current;
-  useEffect(() => {
-    if (!isWorking) {
-      dotAnims.forEach(anim => {
-        anim.stopAnimation();
-        anim.setValue(0.35);
-      });
-      return;
-    }
-    const loops = dotAnims.map((anim, index) => Animated.loop(Animated.sequence([Animated.delay(index * 140), Animated.timing(anim, {
-      toValue: 1,
-      duration: 280,
-      useNativeDriver: true
-    }), Animated.timing(anim, {
-      toValue: 0.35,
-      duration: 280,
-      useNativeDriver: true
-    }), Animated.delay((DOT_COUNT - index - 1) * 140)])));
-    loops.forEach(loop => loop.start());
-    return () => {
-      loops.forEach(loop => loop.stop());
-      dotAnims.forEach(anim => anim.stopAnimation());
-    };
-  }, [dotAnims, isWorking]);
+  const isWorking = useIsSessionStreaming(sessionId);
   if (!isWorking) {
     return idlePlaceholder ? <Minus size={14} color={color} strokeWidth={2} /> : null;
   }
-  return <div className="flex flex-col">
-      {dotAnims.map((anim, index) => <div key={index} className={"  opacity-100"} />)}
-    </div>;
+  return <LoaderCircle size={13} color={color} strokeWidth={2} className="animate-spin" aria-label="生成中" />;
 }
-const styles = {
-  row: {
-    width: 16,
-    height: 14,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 2
-  },
-  dot: {
-    width: DOT_SIZE,
-    height: DOT_SIZE,
-    borderRadius: DOT_SIZE / 2
-  }
-} as const;

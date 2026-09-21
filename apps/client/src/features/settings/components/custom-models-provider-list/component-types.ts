@@ -35,6 +35,13 @@ export interface CustomProviderRowProps {
   name: string;
   provider: CustomProvider;
   colors: CustomModelsColors;
-  onUpdate: (provider: CustomProvider) => void;
+  onEdit: () => void;
   onRemove: () => void;
+}
+
+export interface CustomProviderModalProps {
+  provider: CustomProvider;
+  colors: CustomModelsColors;
+  onUpdate: (provider: CustomProvider) => void;
+  onClose: () => void;
 }

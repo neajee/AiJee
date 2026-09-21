@@ -39,12 +39,12 @@ export function TaskOutputSheet({
           <div className="min-w-0 flex-1">
             {selectedInstance ? <>
               <div className="flex items-center gap-2"><Circle size={8} color={statusColor} fill={statusColor} strokeWidth={0} /><span className="font-medium">{selectedInstance.label}</span></div>
-              <p className="truncate text-xs text-muted-foreground">{selectedInstance.command}</p>
+              <p className="truncate text-caption text-muted-foreground">{selectedInstance.command}</p>
             </> : <span className="font-medium">Task Output</span>}
           </div>
           <button onClick={onClose} className="rounded p-1 hover:bg-hover" aria-label="Close task output"><X size={18} /></button>
         </header>
-        <div ref={logScrollRef} className="min-h-0 flex-1 overflow-auto whitespace-pre-wrap bg-muted/40 p-4 font-mono text-xs">
+        <div ref={logScrollRef} className="min-h-0 flex-1 overflow-auto whitespace-pre-wrap bg-muted/40 p-4 font-mono text-caption">
           {selectedLogs.length === 0 ? <span>
               {selectedInstance ? 'No output yet...' : 'Select a running task to view output'}
             </span> : selectedLogs.map((line, i) => <span key={i}>

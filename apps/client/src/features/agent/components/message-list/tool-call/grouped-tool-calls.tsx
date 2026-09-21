@@ -70,14 +70,14 @@ export const GroupedToolCalls = memo(function GroupedToolCalls({
   const visible = expanded ? showAll ? calls : calls.slice(0, MAX_VISIBLE) : [];
   return <div>
       <ToolHeader expanded={expanded} expandable onToggle={() => setExpanded(value => !value)} isDark={isDark} icon={GROUP_ICONS[toolName] ?? Wrench} aria-label={`${expanded ? 'Collapse' : 'Expand'} ${calls.length} ${toolName} calls`}>
-        <span className="block truncate text-xs font-semibold text-foreground">
+        <span className="block truncate text-caption font-semibold text-foreground">
           {activeCall ? base.activeBefore ?? base.before : base.before}{calls.length}{base.after}
         </span>
       </ToolHeader>
       <ToolBody expanded={expanded}>
         <div className="flex flex-col gap-1 pl-0.5">
-          {visible.map(call => <div key={call.id} className="flex items-center gap-1.5 py-0.5"><span className="min-w-0 flex-1 truncate text-xs text-text-secondary">{formatSingleLine(call)}</span></div>)}
-          {calls.length > MAX_VISIBLE && !showAll && <button role="button" onClick={() => setShowAll(true)} className="self-start px-1 py-1 text-xs text-text-tertiary hover:opacity-70"><span>Show {calls.length - MAX_VISIBLE} more…</span></button>}
+          {visible.map(call => <div key={call.id} className="flex items-center gap-1.5 py-0.5"><span className="min-w-0 flex-1 truncate text-caption text-text-secondary">{formatSingleLine(call)}</span></div>)}
+          {calls.length > MAX_VISIBLE && !showAll && <button role="button" onClick={() => setShowAll(true)} className="self-start px-1 py-1 text-caption text-text-tertiary hover:opacity-70"><span>Show {calls.length - MAX_VISIBLE} more…</span></button>}
         </div>
       </ToolBody>
     </div>;

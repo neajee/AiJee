@@ -11,7 +11,6 @@
 import { Route as rootRouteImport } from './__root'
 import { Route as AppRouteImport } from './_app'
 import { Route as ConnectRouteImport } from './connect'
-import { Route as ModalRouteImport } from './modal'
 import { Route as AppIndexRouteImport } from './_app/index'
 import { Route as AppPackagesRouteImport } from './_app/packages'
 import { Route as AppServersRouteImport } from './_app/servers'
@@ -29,11 +28,6 @@ const AppRoute = AppRouteImport.update({
 const ConnectRoute = ConnectRouteImport.update({
   id: '/connect',
   path: '/connect',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ModalRoute = ModalRouteImport.update({
-  id: '/modal',
-  path: '/modal',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppIndexRoute = AppIndexRouteImport.update({
@@ -87,7 +81,6 @@ const AppWorkspaceWorkspaceIdSSessionIdRoute =
 export interface FileRoutesByFullPath {
   '/': typeof AppIndexRoute
   '/connect': typeof ConnectRoute
-  '/modal': typeof ModalRoute
   '/packages': typeof AppPackagesRoute
   '/servers': typeof AppServersRoute
   '/settings/$section': typeof AppSettingsSectionRoute
@@ -99,7 +92,6 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/connect': typeof ConnectRoute
-  '/modal': typeof ModalRoute
   '/packages': typeof AppPackagesRoute
   '/servers': typeof AppServersRoute
   '/': typeof AppIndexRoute
@@ -114,7 +106,6 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/_app': typeof AppRouteWithChildren
   '/connect': typeof ConnectRoute
-  '/modal': typeof ModalRoute
   '/_app/packages': typeof AppPackagesRoute
   '/_app/servers': typeof AppServersRoute
   '/_app/': typeof AppIndexRoute
@@ -130,7 +121,6 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/connect'
-    | '/modal'
     | '/packages'
     | '/servers'
     | '/settings/$section'
@@ -142,7 +132,6 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/connect'
-    | '/modal'
     | '/packages'
     | '/servers'
     | '/'
@@ -156,7 +145,6 @@ export interface FileRouteTypes {
     | '__root__'
     | '/_app'
     | '/connect'
-    | '/modal'
     | '/_app/packages'
     | '/_app/servers'
     | '/_app/'
@@ -171,7 +159,6 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   AppRoute: typeof AppRouteWithChildren
   ConnectRoute: typeof ConnectRoute
-  ModalRoute: typeof ModalRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -188,13 +175,6 @@ declare module '@tanstack/react-router' {
       path: '/connect'
       fullPath: '/connect'
       preLoaderRoute: typeof ConnectRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/modal': {
-      id: '/modal'
-      path: '/modal'
-      fullPath: '/modal'
-      preLoaderRoute: typeof ModalRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app/': {
@@ -293,7 +273,6 @@ const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   AppRoute: AppRouteWithChildren,
   ConnectRoute: ConnectRoute,
-  ModalRoute: ModalRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

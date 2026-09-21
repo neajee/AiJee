@@ -38,12 +38,12 @@ export function WorkspaceSheet({
             const isActive = workspace.id === selectedWorkspaceId;
             return <button key={workspace.id} className="flex w-16 shrink-0 flex-col items-center gap-1" onClick={() => handleWorkspacePress(workspace.id, index)}>
                   <div className={`grid size-11 place-items-center rounded-full border-2 ${isActive ? 'border-primary bg-primary text-primary-foreground' : 'border-border bg-background'}`}>
-                      <span className="text-sm font-semibold">
+                      <span className="text-body font-semibold">
                         {workspace.title.charAt(0).toUpperCase()}
                       </span>
                     {workspace.hasNotifications && <span className="absolute size-2 rounded-full bg-primary" />}
                   </div>
-                  <span className="w-full truncate text-xs font-medium">
+                  <span className="w-full truncate text-caption font-medium">
                     {workspace.title}
                   </span>
                 </button>;
@@ -51,7 +51,7 @@ export function WorkspaceSheet({
             <button className="flex w-16 shrink-0 flex-col items-center gap-1" onClick={handleAddWorkspace}>
               <div className="grid size-11 place-items-center rounded-full border-2 border-dashed border-border"><Plus size={18} color={colors.icon} strokeWidth={1.8} />
               </div>
-              <span className="text-xs">Add</span>
+              <span className="text-caption">Add</span>
             </button>
         </div>
         <div className="min-h-0 flex-1 overflow-auto">

@@ -1,10 +1,7 @@
 import { memo, useCallback, useMemo, useState } from "react";
 import { Bot } from "lucide-react";
-import { useThemeTokens } from "@/hooks/use-theme-tokens";
-import { useAppSettingsStore } from "@/features/settings/store";
 import type { ToolCallInfo } from "../../../component-types.ts";
-import { useStableMarkdown } from "../../../hooks/use-stable-markdown";
-import { createMarkedOptions } from "../../../theme";
+import { AssistantMarkdown } from "../assistant-markdown";
 import { isToolActive, parseToolArguments } from "../../../utils/message-list";
 import { ToolBody, ToolHeader, ToolSurface } from "./tool-disclosure";
 interface SubagentToolCallProps {
@@ -28,8 +25,6 @@ export const SubagentToolCall = memo(function SubagentToolCall({
   const recentOutput = tc.progress?.recentOutput ?? [];
   const hasProgressMeta = !!tc.progress?.status || !!tc.progress?.toolCount || !!tc.progress?.durationMs;
   const hasDetail = !!transcript || recentTools.length > 0 || recentOutput.length > 0 || hasProgressMeta;
-  const markdownOptions = createMarkedOptions(useThemeTokens(), isDark ? 'dark' : 'light', useAppSettingsStore(s => s.codeFontSize));
-  const markdownElements = useStableMarkdown(transcript, markdownOptions, active && !tc.result);
   const meta = tc.subagentMeta;
   const metaItems = useMemo(() => {
     const items: string[] = [];
@@ -84,7 +79,7 @@ export const SubagentToolCall = memo(function SubagentToolCall({
 
             {!!transcript && <div className="flex flex-col">
                 {(recentTools.length > 0 || recentOutput.length > 0 || hasProgressMeta) && <span className={"  text-text-tertiary"}>Transcript</span>}
-                <div className="flex flex-col">{markdownElements}</div>
+                <AssistantMarkdown text={transcript} isStreaming={active && !tc.result} />
               </div>}
           </div>
         </ToolSurface>

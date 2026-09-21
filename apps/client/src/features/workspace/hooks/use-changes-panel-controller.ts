@@ -11,10 +11,10 @@ export function useChangesPanelController({
   activeExtraTab = null,
   onExtraTabChange,
 }: Pick<ChangesPanelProps, 'extraTabs' | 'activeExtraTab' | 'onExtraTabChange'> = {}) {
-  const [activeTab, setActiveTab] = useState<Tab>('git');
+  const [activeTab, setActiveTab] = useState<Tab>('files');
   const [commitMsg, setCommitMsg] = useState('');
   const [logOpen, setLogOpen] = useState(false);
-  const [changesOpen, setChangesOpen] = useState(true);
+  const [changesOpen, setChangesOpen] = useState(false);
   const [selectedFile, setSelectedFile] = useState<SelectedFile | null>(null);
   const [viewingFile, setViewingFile] = useState<string | null>(null);
   const [expandedDirs, setExpandedDirs] = useState<Set<string>>(new Set());
@@ -27,10 +27,10 @@ export function useChangesPanelController({
   const { data: fileDiffData, isLoading: diffLoading } = useFileDiff(isGitRepo ? cwd : null, selectedFile?.path ?? null, selectedFile?.staged ?? false);
 
   useEffect(() => {
-    setActiveTab('git');
+    setActiveTab('files');
     setCommitMsg('');
     setLogOpen(false);
-    setChangesOpen(true);
+    setChangesOpen(false);
     setSelectedFile(null);
     setViewingFile(null);
     setExpandedDirs(new Set());
@@ -79,6 +79,7 @@ export function useChangesPanelController({
   return {
     activeExtraTab,
     activeTab,
+    setActiveTab,
     changesOpen,
     setChangesOpen,
     commitMsg,

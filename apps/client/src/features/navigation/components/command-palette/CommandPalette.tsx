@@ -46,7 +46,7 @@ export function CommandPalette({ visible, onClose }: CommandPaletteProps) {
             autoCapitalize="none"
             autoCorrect="off"
             spellCheck={false}
-            className="min-w-0 flex-1 bg-transparent text-[14px] text-foreground outline-none placeholder:text-text-tertiary"
+            className="min-w-0 flex-1 bg-transparent text-body text-foreground outline-none placeholder:text-text-tertiary"
           />
         </div>
 
@@ -56,14 +56,14 @@ export function CommandPalette({ visible, onClose }: CommandPaletteProps) {
               <span className="size-3.5 animate-spin rounded-full border-2 border-border border-t-text-tertiary" />
             </div>
           ) : sections.length === 0 ? (
-            <div className="py-6 text-center text-[12px] text-text-tertiary">
+            <div className="py-6 text-center text-caption text-text-tertiary">
               {search.trim() ? "没有匹配的对话" : "暂无最近对话"}
             </div>
           ) : null}
 
           {sections.map(section => (
             <div key={section.title}>
-              <div className="px-4 pb-1 pt-3 text-[10.5px] font-medium uppercase tracking-wide text-text-tertiary">
+              <div className="px-4 pb-1 pt-3 text-meta font-medium uppercase tracking-wide text-text-tertiary">
                 {section.title}
               </div>
               {section.items.map(item => {
@@ -87,12 +87,12 @@ export function CommandPalette({ visible, onClose }: CommandPaletteProps) {
                       className={`shrink-0 ${isSelected ? "text-foreground" : "text-text-tertiary"}`}
                     />
                     <span className="flex min-w-0 flex-1 flex-col">
-                      <span className="truncate text-[12px] text-foreground">{item.label}</span>
+                      <span className="truncate text-caption text-foreground">{item.label}</span>
                       {item.description ? (
-                        <span className="truncate text-[10.5px] text-text-secondary">{item.description}</span>
+                        <span className="truncate text-meta text-text-secondary">{item.description}</span>
                       ) : null}
                     </span>
-                    {isSelected ? <span className="shrink-0 font-mono text-[12px] text-text-tertiary">↵</span> : null}
+                    {isSelected ? <span className="shrink-0 font-mono text-caption text-text-tertiary">↵</span> : null}
                   </button>
                 );
               })}

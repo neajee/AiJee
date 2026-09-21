@@ -93,19 +93,7 @@ export function BrowserPreviewDesktop({
       });
     }} tabIndex={0} /> : <div className="flex flex-col" />}
   </div>;
-}
-const styles = {
-  container: {
-    flex: 1,
-    backgroundColor: "#111",
-    alignItems: "center",
-    justifyContent: "center"
-  },
-  image: {
-    flex: 1
-  }
-} as const;
-const imageStyle = {
+}const imageStyle = {
   width: "100%",
   height: "100%",
   objectFit: "contain",

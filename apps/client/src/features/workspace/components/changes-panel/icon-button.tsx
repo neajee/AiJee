@@ -20,12 +20,3 @@ export function IconButton({
       {icon}
     </button>;
 }
-const styles = {
-  iconButton: {
-    width: 24,
-    height: 24,
-    borderRadius: 4,
-    alignItems: "center",
-    justifyContent: "center"
-  }
-} as const;

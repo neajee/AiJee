@@ -1,5 +1,4 @@
 import { formatAgentModeLabel, type AgentMode } from '@/features/agent/mode';
-import { styles } from '../../../utils/toolbar-styles';
 import type { ToolbarController } from './component-types';
 type ModeToggleProps = Pick<ToolbarController, 'theme' | 'appMode' | 'toolbarDisabled' | 'displayedMode' | 'pendingMode' | 'handleSelectMode'>;
 export function ModeToggle({

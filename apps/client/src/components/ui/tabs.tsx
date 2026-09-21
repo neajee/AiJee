@@ -36,7 +36,7 @@ export function TabsTrigger({
   children: ReactNode;
 }) {
   const ctx = useContext(TabsContext);
-  return <button className={ctx.value === value ? "rounded bg-background px-3 py-1.5 text-sm shadow-sm" : "rounded px-3 py-1.5 text-sm text-muted-foreground"} onClick={() => ctx.onValueChange?.(value)}>{children}</button>;
+  return <button className={ctx.value === value ? "rounded bg-background px-3 py-1.5 text-body shadow-sm" : "rounded px-3 py-1.5 text-body text-muted-foreground"} onClick={() => ctx.onValueChange?.(value)}>{children}</button>;
 }
 export function TabsContent({
   value,

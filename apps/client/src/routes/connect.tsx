@@ -112,60 +112,6 @@ export default function DirectConnectScreen() {
           </button>}
       </div>
     </div>;
-}
-const styles = {
-  screen: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    padding: 24
-  },
-  card: {
-    width: "100%",
-    maxWidth: 420,
-    borderWidth: 1,
-    borderRadius: 24,
-    paddingLeft: 28,
-    paddingRight: 28,
-    paddingTop: 32,
-    paddingBottom: 32,
-    alignItems: "center"
-  },
-  badge: {
-    width: 18,
-    height: 18,
-    borderRadius: 999
-  },
-  title: {
-    marginTop: 20,
-    fontSize: 26,
-    lineHeight: 32,
-    fontFamily: Fonts.sansSemiBold,
-    textAlign: "center"
-  },
-  description: {
-    marginTop: 10,
-    fontSize: 15,
-    lineHeight: 22,
-    fontFamily: Fonts.sans,
-    textAlign: "center"
-  },
-  button: {
-    marginTop: 24,
-    minWidth: 180,
-    borderRadius: 999,
-    paddingLeft: 20,
-    paddingRight: 20,
-    paddingTop: 14,
-    paddingBottom: 14,
-    alignItems: "center"
-  },
-  buttonText: {
-    fontSize: 15,
-    lineHeight: 18,
-    fontFamily: Fonts.sansSemiBold
-  }
-} as const;
-export const Route = createFileRoute("/connect")({
+}export const Route = createFileRoute("/connect")({
   component: DirectConnectScreen
 });

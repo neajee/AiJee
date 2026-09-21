@@ -10,7 +10,7 @@ export function SectionHeader({
   isDark: boolean;
 }) {
   const colors = useThemeTokens();
-  return <div className="flex items-center justify-between gap-px px-2 pb-0.5 pt-4">
+  return <div className="flex items-center justify-between gap-px pb-0.5 pl-2 pr-0 pt-4">
       <span className="flex-1 text-meta leading-4 font-medium tracking-wide text-text-tertiary">
         {title}
       </span>
@@ -57,7 +57,7 @@ export function SidebarRow({
   const [hovered, setHovered] = useState(false);
   const hoverBg = isDark ? "rgba(255,255,255,0.05)" : "rgba(0,0,0,0.035)";
   const activeBg = isDark ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)";
-  return <button className={`flex h-[29px] w-full items-center gap-[7px] rounded-md px-[7px] text-left text-[13.5px] leading-[19px] transition-colors hover:bg-hover ${isActive ? 'bg-active font-medium' : ''} ${disabled ? 'opacity-40' : ''}`} onClick={onClick} disabled={disabled} onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)}>
+  return <button className={`flex h-[29px] w-full items-center gap-[7px] rounded-md px-[7px] text-left text-body leading-[19px] transition-colors hover:bg-hover ${isActive ? 'bg-active font-medium' : ''} ${disabled ? 'opacity-40' : ''}`} onClick={onClick} disabled={disabled} onPointerEnter={() => setHovered(true)} onPointerLeave={() => setHovered(false)}>
       <span className="flex size-5 shrink-0 items-center justify-center">{icon}</span>
       <span className="truncate">
         {label}

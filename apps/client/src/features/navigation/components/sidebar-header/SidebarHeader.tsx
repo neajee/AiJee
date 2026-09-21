@@ -40,22 +40,3 @@ export function SidebarHeader() {
       <CommandPalette visible={paletteVisible} onClose={() => setPaletteVisible(false)} />
     </div>;
 }
-const styles = {
-  row: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    height: 40,
-    paddingLeft: 6,
-    // Clear of the content card's rounded corner, which crowds this edge.
-    paddingRight: 12
-  },
-  iconBtn: {
-    width: 26,
-    height: 26,
-    borderRadius: 6,
-    alignItems: "center",
-    justifyContent: "center",
-    cursor: "pointer"
-  } as any
-} as const;

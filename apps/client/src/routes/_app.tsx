@@ -38,21 +38,21 @@ function StartupScreen({
   const colors = useThemeTokens();
   return <div className={"flex flex-1 flex-col justify-center items-center p-[24px]"}>
       <div className={"w-full max-w-[420px] pl-[24px] pr-[24px] pt-[28px] pb-[28px] rounded-[24px] border"}>
-        <span className={"font-sans text-[24px] leading-[30px]"}>
+        <span className={"font-sans text-display leading-[30px]"}>
           {title}
         </span>
-        <span className={"mt-[10px] font-sans text-[15px] leading-[22px]"}>
+        <span className={"mt-[10px] font-sans text-body leading-[22px]"}>
           {description}
         </span>
 
         {primaryLabel && onPrimaryPress ? <button onClick={onPrimaryPress}>
-            <span className={"font-sans text-[15px]"}>
+            <span className={"font-sans text-body"}>
               {primaryLabel}
             </span>
           </button> : null}
 
         {secondaryLabel && onSecondaryPress ? <button onClick={onSecondaryPress}>
-            <span className={"font-sans text-[15px]"}>
+            <span className={"font-sans text-body"}>
               {secondaryLabel}
             </span>
           </button> : null}
@@ -67,11 +67,11 @@ function UnconnectedNotice({
   const colors = useThemeTokens();
   return <div className={"flex-1 p-[16px]"}>
       <div className={"self-center w-full max-w-[760px] flex flex-row items-center justify-between gap-[16px] pl-[18px] pr-[18px] pt-[14px] pb-[14px] rounded-[12px]"}>
-        <span className={"flex-1 font-sans text-[14px]"}>
+        <span className={"flex-1 font-sans text-body"}>
           未连接 AiJee 设备。连接后即可同步工作区与会话。
         </span>
         <button onClick={onAddDevice}>
-          <span className={"font-sans text-[14px]"}>添加设备</span>
+          <span className={"font-sans text-body"}>添加设备</span>
         </button>
       </div>
     </div>;

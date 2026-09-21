@@ -1,6 +1,5 @@
 import { GitBranch, ArrowUp, ArrowDown } from "lucide-react";
 import { Fonts } from "@/constants/theme";
-import { useChangesTheme } from "../../hooks/use-changes-theme";
 
 /**
  * The current branch, riding along at the end of the tab row.
@@ -17,46 +16,16 @@ export function BranchLabel({
   ahead: number;
   behind: number;
 }) {
-  const {
-    textSecondary,
-    textMuted
-  } = useChangesTheme();
-  return <div className="flex flex-col">
-      <GitBranch size={12} color={textMuted} strokeWidth={2} />
-      <span {...{
-      title: branch
-    }}>
-        {branch}
-      </span>
-      {ahead > 0 && <div className="flex flex-col">
-          <ArrowUp size={9} color={textMuted} strokeWidth={2.5} />
+  return <div className="flex min-w-0 items-center gap-1 text-caption text-text-secondary">
+      <GitBranch size={12} className="text-text-tertiary" strokeWidth={2} />
+      <span className="max-w-24 truncate" title={branch}>{branch}</span>
+      {ahead > 0 && <span className="flex items-center gap-0.5">
+          <ArrowUp size={9} className="text-text-tertiary" strokeWidth={2.5} />
           <span>{ahead}</span>
-        </div>}
-      {behind > 0 && <div className="flex flex-col">
-          <ArrowDown size={9} color={textMuted} strokeWidth={2.5} />
+        </span>}
+      {behind > 0 && <span className="flex items-center gap-0.5">
+          <ArrowDown size={9} className="text-text-tertiary" strokeWidth={2.5} />
           <span>{behind}</span>
-        </div>}
+        </span>}
     </div>;
 }
-const styles = {
-  wrap: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 4,
-    maxWidth: 180
-  },
-  branch: {
-    flexShrink: 1,
-    fontSize: 11.5,
-    fontFamily: Fonts.sansMedium
-  },
-  badge: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 1
-  },
-  badgeText: {
-    fontSize: 10,
-    fontFamily: Fonts.mono
-  }
-} as const;

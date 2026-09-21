@@ -1,6 +1,6 @@
-import { memo, useCallback, useState } from "react";
-import * as Clipboard from "@/platform/clipboard";
-import { Copy } from "lucide-react";
+import { memo, useCallback } from "react";
+import { AlertCircle, Check, Copy } from "lucide-react";
+import { useCopyToClipboard } from "@/hooks/use-copy-to-clipboard";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import type { ChatMessage } from "../../component-types.ts";
 import { AssistantMarkdown } from "./assistant-markdown";
@@ -32,7 +32,7 @@ export const AssistantMessage = memo(function AssistantMessage({
         </div>}
 
       {hasError && <div className="rounded-md bg-destructive/10 px-2.5 py-1.5">
-          <span className="text-xs leading-[18px] text-destructive">
+          <span className="text-caption leading-[18px] text-destructive">
             {message.errorMessage}
           </span>
         </div>}
@@ -49,16 +49,13 @@ export const MessageToolbar = memo(function MessageToolbar({
   hovered: boolean;
 }) {
   const colors = useThemeTokens();
-  const [copied, setCopied] = useState(false);
-  const handleCopy = useCallback(async () => {
-    if (!message.text) return;
-    await Clipboard.setStringAsync(message.text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
-  }, [message.text]);
+  const { status, copy } = useCopyToClipboard();
+  const handleCopy = useCallback(() => {
+    void copy(message.text);
+  }, [copy, message.text]);
   return <div className={`relative z-20 flex items-center gap-0.5 transition-opacity ${hovered ? 'opacity-100' : 'opacity-0'}`}>
-      <button onClick={handleCopy} className="flex size-[26px] items-center justify-center rounded-md hover:bg-hover" aria-label={copied ? 'Copied' : 'Copy'}>
-        {copied ? <span className="text-xs text-text-tertiary">✓</span> : <Copy size={13} color={colors.textTertiary} strokeWidth={1.8} />}
+      <button onClick={handleCopy} className="flex size-[26px] items-center justify-center rounded-md hover:bg-hover" aria-label={status === 'copied' ? 'Copied' : status === 'error' ? 'Copy failed' : 'Copy'}>
+        {status === 'copied' ? <Check size={13} color={colors.success} strokeWidth={1.8} /> : status === 'error' ? <AlertCircle size={13} color={colors.destructive} strokeWidth={1.8} /> : <Copy size={13} color={colors.textTertiary} strokeWidth={1.8} />}
       </button>
     </div>;
 });

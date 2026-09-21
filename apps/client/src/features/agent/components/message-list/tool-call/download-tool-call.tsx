@@ -14,7 +14,7 @@ export const DownloadToolCall = memo(function DownloadToolCall({
     return <div>
       <div className="flex min-w-0 items-center gap-1.5 py-1">
         <Download size={12} strokeWidth={1.8} className="shrink-0 text-text-tertiary" />
-        <span className="shrink-0 text-xs font-medium text-text-secondary">
+        <span className="shrink-0 text-caption font-medium text-text-secondary">
           Download
         </span>
         {url ? <span className="min-w-0 flex-1 truncate font-mono text-meta text-text-tertiary">

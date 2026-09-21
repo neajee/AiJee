@@ -1,26 +1,34 @@
 import { memo } from "react";
-import { useColorScheme } from "@/hooks/use-color-scheme";
-import { useThemeTokens } from "@/hooks/use-theme-tokens";
-import { useAppSettingsStore } from "@/features/settings/store";
-import { useStableMarkdown } from "../../hooks/use-stable-markdown";
-import { createMarkedOptions } from "../../theme";
+import { Streamdown } from "streamdown";
+import { code } from "@streamdown/code";
 interface AssistantMarkdownProps {
   text: string;
   isStreaming?: boolean;
 }
 
 /**
- * Renders assistant markdown. Shared by the final answer and by the narration
- * captured inside a turn's collapsed work history.
+ * Renders assistant markdown with Streamdown. It handles incomplete markdown
+ * while a response streams, highlights code with Shiki, and sanitises the
+ * output, so callers only supply the accumulated text and whether it is still
+ * growing.
  */
 export const AssistantMarkdown = memo(function AssistantMarkdown({
   text,
   isStreaming
 }: AssistantMarkdownProps) {
-  const colorScheme = useColorScheme() ?? "light";
-  const tokens = useThemeTokens();
-  const codeFontSize = useAppSettingsStore(s => s.codeFontSize);
-  const options = createMarkedOptions(tokens, colorScheme, codeFontSize);
-  const elements = useStableMarkdown(text, options, isStreaming);
-  return <>{elements}</>;
+  return <Streamdown
+    className="aijee-markdown"
+    mode={isStreaming ? "streaming" : "static"}
+    isAnimating={!!isStreaming}
+    caret={isStreaming ? "block" : undefined}
+    shikiTheme={["min-light", "github-dark"]}
+    plugins={{ code }}
+    // Copying is the only action a snippet needs; tables need no chrome at all.
+    controls={{
+      code: { copy: true, download: false },
+      table: false
+    }}
+  >
+    {text}
+  </Streamdown>;
 });

@@ -47,32 +47,3 @@ export function FilesPanel() {
       <FileTree rootPath={cwd} viewingFile={viewingFile} onViewFile={setViewingFile} expandedDirs={expandedDirs} onToggleDir={handleToggleDir} />
     </div>;
 }
-const styles = {
-  container: {
-    flex: 1
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    paddingLeft: 12,
-    paddingRight: 12,
-    height: 36,
-    borderBottomWidth: 0.633
-  },
-  title: {
-    fontSize: 14,
-    fontFamily: Fonts.sansSemiBold
-  },
-  subtitle: {
-    fontSize: 12,
-    fontFamily: Fonts.sans,
-    flex: 1
-  },
-  emptyText: {
-    fontSize: 13,
-    fontFamily: Fonts.sans,
-    textAlign: "center",
-    marginTop: 32
-  }
-} as const;

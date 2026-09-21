@@ -1,21 +1,16 @@
 import type { ReactNode } from "react";
-import { HAIRLINE_WIDTH } from '@/constants/layout';
-import { useSettingsMetrics, useSettingsPalette } from "@/components/settings-surface";
-import { aboutStyles } from "../utils/about-styles";
 /** Group header that survives the SettingsHeadingProvider suppression. */
 export function AboutGroup({
   title,
-  children
+  children,
+  divided = false
 }: {
   title: string;
   children: ReactNode;
+  divided?: boolean;
 }) {
-  const m = useSettingsMetrics();
-  const p = useSettingsPalette();
-  return <div className={"flex flex-col gap-[8px]"}>
-      <span>{title}</span>
-      <div className={"rounded-[var(--card-radius)] border-0 overflow-hidden"}>
-        {children}
-      </div>
+  return <div className="flex flex-col gap-2">
+      {divided ? <div className="flex items-center gap-3 py-2.5"><span className="h-px flex-1 bg-border" /><span className="text-body font-medium text-text-secondary">{title}</span><span className="h-px flex-1 bg-border" /></div> : <span className="px-[var(--header-inset)] text-left text-caption font-medium text-text-secondary">{title}</span>}
+      {children}
     </div>;
 }

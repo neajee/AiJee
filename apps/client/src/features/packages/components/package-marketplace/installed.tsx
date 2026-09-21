@@ -29,7 +29,7 @@ export function InstalledView({
         })} /><SecondaryButton label="刷新" onClick={onRefresh} /></div>
         </div>
 
-        {message ? <span className="rounded-[var(--tile-radius)] border border-border bg-active px-2.5 py-2 font-sans text-xs text-text-secondary">{message}</span> : null}
+        {message ? <span className="rounded-[var(--tile-radius)] border border-border bg-active px-2.5 py-2 font-sans text-caption text-text-secondary">{message}</span> : null}
         {error ? <Notice text={error} tone="error" /> : null}
 
         {loading ? <div className="flex items-center justify-center py-8"><span className="inline-block size-4 animate-spin rounded-full border-2 border-border border-t-text-tertiary" /></div> : output === '暂无已安装插件' ? <span className="py-2 font-sans text-[var(--desc-size)] text-text-tertiary">暂无已安装插件。</span> : <div className="flex flex-wrap items-stretch gap-3">
