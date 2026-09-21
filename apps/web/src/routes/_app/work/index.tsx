@@ -15,7 +15,7 @@ type PendingWorkSession = {
   session_id: string;
   session_file?: string;
 };
-export default function WorkIndex() {
+function WorkIndex() {
   const router = useRouter();
   const client = usePiClient();
   const colors = useThemeTokens();

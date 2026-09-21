@@ -76,7 +76,7 @@ function UnconnectedNotice({
       </div>
     </div>;
 }
-export default function AppLayout() {
+function AppLayout() {
   const pathname = usePathname();
   const router = useRouter();
   const colors = useThemeTokens();

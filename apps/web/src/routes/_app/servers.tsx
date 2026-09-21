@@ -14,7 +14,7 @@ import { useSettingsPalette } from "@/components/settings-surface";
  * breaks (offline recovery), when the app shell cannot mount. It renders the
  * same section as settings, so the two can't drift apart.
  */
-export default function ServersScreen() {
+function ServersScreen() {
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme() ?? "light";
   const isDark = colorScheme === "dark";

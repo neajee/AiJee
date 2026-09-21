@@ -15,7 +15,7 @@ import { useWorkspaceStore } from "@/features/workspace/store";
 import { useThemeTokens } from "@/hooks/use-theme-tokens";
 import { usePiClient, useAgentModes } from "@aijee/client-sdk";
 import { requestBrowserNotificationPermission } from "@/features/agent/browser-notifications";
-export default function WorkspaceScreen() {
+function WorkspaceScreen() {
   const {
     workspaceId
   } = useLocalSearchParams<{

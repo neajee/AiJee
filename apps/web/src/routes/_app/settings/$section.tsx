@@ -5,7 +5,7 @@ import { useColorScheme } from '@/hooks/use-color-scheme';
 import { SettingsDetailScreen } from '@/features/settings/components/settings-screens';
 import { findSettingsSection } from '@/features/settings/sections';
 import { useWorkspaceStore } from '@/features/workspace/store';
-export default function SettingsSectionScreen() {
+function SettingsSectionScreen() {
   const router = useRouter();
   const isDark = (useColorScheme() ?? 'light') === 'dark';
   const {

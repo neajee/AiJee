@@ -4,7 +4,7 @@ import { useServersStore } from "@/features/servers/store";
 import { useAuthStore } from "@/features/auth/store";
 import { useWorkspaceStore } from "@/features/workspace/store";
 import MorphLoading from "@/components/ui/morph-loading";
-export default function AppIndex() {
+function AppIndex() {
   const serversLoaded = useServersStore(s => s.loaded);
   const bootstrapReady = useServersStore(s => s.bootstrapReady);
   const authLoaded = useAuthStore(s => s.loaded);

@@ -16,7 +16,7 @@ import type { PendingExtensionUiRequest as LegacyPendingUiRequest } from "@/feat
 import type { ChatMessage } from "@/features/agent/component-types";
 import type { Attachment } from "@/features/workspace/utils/prompt-input";
 import { attachmentsToImages } from "@/features/workspace/utils/prompt-input-attachments";
-export default function WorkSessionScreen() {
+function WorkSessionScreen() {
   const {
     sessionId,
     sessionFile: sessionFileParam

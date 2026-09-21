@@ -25,7 +25,7 @@ function resolveBaseUrl(params: ConnectParams) {
   const preferredHost = params.ips.find(entry => entry === "localhost") ?? params.ips[0];
   return buildServerAddress(preferredHost, params.port);
 }
-export default function DirectConnectScreen() {
+function DirectConnectScreen() {
   const router = useRouter();
   const colors = useThemeTokens();
   const authLoaded = useAuthStore(state => state.loaded);
