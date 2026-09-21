@@ -7,16 +7,16 @@
     "packages/*"
   ],
   "scripts": {
-    "start": "yarn workspace @aijee/client start",
-    "web": "yarn workspace @aijee/client web",
+    "start": "yarn workspace @aijee/web start",
+    "web": "yarn workspace @aijee/web web",
     "dev:full": "node scripts/start-web.mjs",
     "desktop": "yarn web:build && yarn workspace @aijee/desktop dev",
     "runtime:start": "node --experimental-strip-types apps/server/src/main.ts serve",
     "runtime:check": "yarn workspace @aijee/engine check && yarn workspace aijee check",
-    "typecheck": "yarn workspace @aijee/client-sdk typecheck && yarn workspace @aijee/client typecheck",
-    "lint": "yarn workspace @aijee/client lint",
-    "test": "yarn workspace @aijee/client-sdk test && yarn workspace @aijee/client test && yarn workspace @aijee/engine test && yarn workspace aijee test",
-    "web:build": "yarn workspace @aijee/client build && node scripts/write-releases-snapshot.mjs && node scripts/prepare-web-assets.cjs",
+    "typecheck": "yarn workspace @aijee/client-sdk typecheck && yarn workspace @aijee/web typecheck",
+    "lint": "yarn workspace @aijee/web lint",
+    "test": "yarn workspace @aijee/client-sdk test && yarn workspace @aijee/web test && yarn workspace @aijee/engine test && yarn workspace aijee test",
+    "web:build": "yarn workspace @aijee/web build && node scripts/write-releases-snapshot.mjs && node scripts/prepare-web-assets.cjs",
     "release:snapshot": "node scripts/write-releases-snapshot.mjs",
     "build:prod": "yarn web:build && yarn runtime:check"
   },

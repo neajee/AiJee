@@ -12,14 +12,14 @@ AiJee/
 ├── apps/
 │   ├── client/             # Expo Web entry / Electron renderer
 │   └── desktop/            # Electron platform entry
-├── apps/client/
+├── apps/web/
 │   ├── app/                # Expo Router thin dispatchers only
 │   │   └── (app)/           # .tsx → desktop screen views
 │   ├── desktop/             # Web + Electron screen ownership
 │   │   ├── screens/
 │   │   └── components/
 │   └── platform config
-├── apps/client/ui/         # App-internal product UI, themes and feature modules
+├── apps/web/src/           # App-internal product UI, themes and feature modules
 │   ├── features/           # Feature modules (UI + shared state)
 │   │   ├── agent/          # Agent message list, extension UI, store
 │   │   ├── auth/            # Auth store (zustand + SecureStore)
@@ -35,7 +35,7 @@ AiJee/
 └── public/                 # Expo web source assets
 ```
 
-`apps/client` renders the Web + Electron screens via `desktop/`. The app uses a
+`apps/web` renders the Web + Electron screens via `desktop/`. The app uses a
 single URL structure and `packages/client-sdk` data contract.
 
 ## @aijee/client-sdk package

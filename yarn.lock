@@ -17,9 +17,36 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@aijee/client@workspace:apps/client":
+"@aijee/desktop@workspace:apps/desktop":
   version: 0.0.0-use.local
-  resolution: "@aijee/client@workspace:apps/client"
+  resolution: "@aijee/desktop@workspace:apps/desktop"
+  dependencies:
+    aijee: "workspace:*"
+    electron: "npm:36.9.5"
+    electron-builder: "npm:^26.0.12"
+    esbuild: "npm:^0.25.0"
+  languageName: unknown
+  linkType: soft
+
+"@aijee/engine@workspace:*, @aijee/engine@workspace:packages/engine":
+  version: 0.0.0-use.local
+  resolution: "@aijee/engine@workspace:packages/engine"
+  dependencies:
+    "@earendil-works/pi-coding-agent": "npm:0.86.0"
+    "@types/node": "npm:^24.0.0"
+    typescript: "npm:^5.9.2"
+  languageName: unknown
+  linkType: soft
+
+"@aijee/protocol@workspace:*, @aijee/protocol@workspace:packages/protocol":
+  version: 0.0.0-use.local
+  resolution: "@aijee/protocol@workspace:packages/protocol"
+  languageName: unknown
+  linkType: soft
+
+"@aijee/web@workspace:apps/web":
+  version: 0.0.0-use.local
+  resolution: "@aijee/web@workspace:apps/web"
   dependencies:
     "@aijee/client-sdk": "workspace:*"
     "@aijee/protocol": "workspace:*"
@@ -45,33 +72,6 @@ __metadata:
     typescript-eslint: "npm:^8.70.0"
     vite: "npm:^8.3.0"
     zustand: "npm:^5.0.12"
-  languageName: unknown
-  linkType: soft
-
-"@aijee/desktop@workspace:apps/desktop":
-  version: 0.0.0-use.local
-  resolution: "@aijee/desktop@workspace:apps/desktop"
-  dependencies:
-    aijee: "workspace:*"
-    electron: "npm:36.9.5"
-    electron-builder: "npm:^26.0.12"
-    esbuild: "npm:^0.25.0"
-  languageName: unknown
-  linkType: soft
-
-"@aijee/engine@workspace:*, @aijee/engine@workspace:packages/engine":
-  version: 0.0.0-use.local
-  resolution: "@aijee/engine@workspace:packages/engine"
-  dependencies:
-    "@earendil-works/pi-coding-agent": "npm:0.86.0"
-    "@types/node": "npm:^24.0.0"
-    typescript: "npm:^5.9.2"
-  languageName: unknown
-  linkType: soft
-
-"@aijee/protocol@workspace:*, @aijee/protocol@workspace:packages/protocol":
-  version: 0.0.0-use.local
-  resolution: "@aijee/protocol@workspace:packages/protocol"
   languageName: unknown
   linkType: soft
 

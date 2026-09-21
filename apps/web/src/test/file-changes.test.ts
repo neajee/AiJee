@@ -123,8 +123,8 @@ test("a truncated streaming argument still yields the path", () => {
 
 test("a path inside the workspace is shown relative to it", () => {
   assert.equal(
-    relativePath("/home/me/proj/apps/client/ui/index.tsx", "/home/me/proj"),
-    "apps/client/ui/index.tsx",
+    relativePath("/home/me/proj/apps/web/src/index.tsx", "/home/me/proj"),
+    "apps/web/src/index.tsx",
   );
 });
 
@@ -147,7 +147,7 @@ test("a sibling directory sharing the root's prefix is not stripped", () => {
 });
 
 test("an already relative path is left alone", () => {
-  assert.equal(relativePath("apps/client/ui/index.tsx", "/home/me/proj"), "apps/client/ui/index.tsx");
+  assert.equal(relativePath("apps/web/src/index.tsx", "/home/me/proj"), "apps/web/src/index.tsx");
 });
 
 test("without a workspace root the path is untouched", () => {

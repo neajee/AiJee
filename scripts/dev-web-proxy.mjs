@@ -45,7 +45,7 @@ function proxy(requestFromClient, responseToClient) {
       "cache-control": "no-store",
       "service-worker-allowed": "/",
     });
-    createReadStream(fileURLToPath(new URL("../apps/client/public/preview-sw.js", import.meta.url))).pipe(responseToClient);
+    createReadStream(fileURLToPath(new URL("../apps/web/public/preview-sw.js", import.meta.url))).pipe(responseToClient);
     return;
   }
   const targetPort = targetFor(requestFromClient.url ?? "/");

@@ -47,9 +47,9 @@ AiJee/
 
 ### Client平台边界
 
-`apps/client/app/(app)`是Web路由入口，路由只做转发，继续使用同一组URL（包括`/workspace/:id/s/:sid`）。
+`apps/web/src/routes`是Web路由入口，继续使用同一组URL（包括`/workspace/:id/s/:sid`）。
 
-`apps/client`作为Web/桌面Renderer承载Web/Electron视图，通信统一经过`@aijee/client-sdk`。
+`apps/web`作为Web/桌面Renderer承载Web/Electron视图，通信统一经过`@aijee/client-sdk`。
 
 ## 运行时依赖方向
 
@@ -110,7 +110,7 @@ features/<feature>/components/<MajorComponent>/
 
 ### UI样式体系
 
-Web统一使用Tamagui作为布局、文本与滚动原语。`apps/client/tamagui.config.ts`共用`apps/client/ui/constants/theme-static.ts`；运行时主题预设与字号仍通过`useThemeTokens`注入语义样式。组件样式以Tamagui可消费的静态对象和主题值表达，禁止新增StyleSheet样式工厂。
+Web统一使用Vite、React和Tailwind作为构建与样式体系。`apps/web/vite.config.ts`负责Web构建，组件样式使用静态Tailwind class，运行时主题通过语义CSS变量注入。
 
 运行时状态保存在`~/.aijee/`：工作区、模式、会话索引和任务日志均可在重启后恢复；会话激活时才由`SessionRegistry`按其磁盘session file重建。文件、Git和任务cwd必须位于已配置工作区内。
 
@@ -122,7 +122,7 @@ Rust RPC不再是运行时依赖；Server直接调用Pi SDK。确需原生能力
 
 ## 迁移顺序
 
-已完成：冻结`api-contract` → 建立`engine/core`、`EngineRegistry`与`adapters/pi` → `apps/server`承接Runtime → 移除独立移动端客户端，`apps/client`统一作为Web/桌面Renderer → 删除Rust RPC与旧适配器。下一步仅增加Codex/OpenCode适配器并复用同一契约。
+已完成：建立`engine/core`、`EngineRegistry`与`adapters/pi` → `apps/server`承接Runtime → 移除独立移动端客户端，`apps/web`统一作为Web/桌面Renderer → 删除Rust RPC与旧适配器。下一步仅增加Codex/OpenCode适配器并复用同一契约。
 
 ## 最终验收条件
 

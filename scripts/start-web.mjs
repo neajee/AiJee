@@ -117,7 +117,7 @@ if (webResolution.reuse) {
     console.error(error instanceof Error ? error.message : String(error));
     shutdown(1);
   }
-  const frontend = startYarn(["workspace", "@aijee/client", "web", "--port", String(frontendPort)], { env: childEnv });
+  const frontend = startYarn(["workspace", "@aijee/web", "web", "--port", String(frontendPort)], { env: childEnv });
   const proxy = start("node", ["scripts/dev-web-proxy.mjs"], { env: childEnv });
   console.log(`AiJee web: http://127.0.0.1:${webPort} (Vite ${frontendPort}, API ${apiPort})`);
 
