@@ -22,13 +22,15 @@
   "build": {
     "appId": "com.anthaathi.aijee",
     "productName": "AiJee",
+    "desktopName": "AiJee",
     "executableName": "aijee",
     "icon": "assets/icon.png",
     "linux": {
       "target": [
         "AppImage"
       ],
-      "category": "Utility"
+      "category": "Utility",
+      "syncDesktopName": true
     },
     "files": [
       "assets/**/*",

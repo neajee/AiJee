@@ -78,6 +78,7 @@ function createWindow() {
     width: 1440,
     height: 960,
     autoHideMenuBar: true,
+    icon: join(__dirname, process.platform === "win32" ? "../assets/icon.ico" : "../assets/icon.png"),
     webPreferences: { contextIsolation: true, sandbox: true },
   });
   // The renderer owns the app navigation; never show Electron's legacy menu.
