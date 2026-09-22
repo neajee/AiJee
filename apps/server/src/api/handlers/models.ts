@@ -56,7 +56,7 @@ export async function saveBuiltinProviderKey(ctx: HandlerContext, providerId: st
 
 export async function removeBuiltinProviderKey(_ctx: HandlerContext, providerId: string): Promise<void> {
     const runtime = await ModelRuntime.create({ signal: AbortSignal.timeout(15_000) });
-    await runtime.removeRuntimeApiKey(providerId);
+    await runtime.logout(providerId, { signal: AbortSignal.timeout(15_000) });
   }
 
 

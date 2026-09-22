@@ -57,7 +57,7 @@ export async function fsComplete(ctx: HandlerContext, url: URL, response: Server
       return ctx.ok(response, matches.sort((a, b) => a.path.localeCompare(b.path)));
     }
     const expanded = input.startsWith("~/") ? join(homedir(), input.slice(2)) : input;
-    const directoryQuery = expanded.length > 1 && expanded.endsWith("/");
+    const directoryQuery = input.length > 1 && input.endsWith("/");
     const parent = directoryQuery ? expanded : dirname(expanded || ".");
     const prefix = directoryQuery ? "" : basename(expanded);
     try {

@@ -27,9 +27,12 @@ export function listWorkspaces(ctx: HandlerContext, url: URL, response: ServerRe
 export async function createWorkspace(ctx: HandlerContext, request: IncomingMessage, response: ServerResponse): Promise<void> {
     const body = await ctx.body<{ name?: string; path?: string; color?: string; workspace_enabled?: boolean; startup_script?: string }>(request);
     if (!body.name || !body.path) return ctx.error(response, 422, "name and path are required");
-    if (!existsSync(body.path)) return ctx.error(response, 400, `Path does not exist: ${body.path}`);
+    const path = resolve(body.path);
+    if (!existsSync(path)) return ctx.error(response, 400, `Path does not exist: ${body.path}`);
+    const existing = [...ctx.workspaces.values()].find((workspace) => workspace.status === "active" && resolve(workspace.path) === path);
+    if (existing) return ctx.ok(response, existing, 200);
     const now = new Date().toISOString();
-    const workspace: Workspace = { id: randomUUID(), name: body.name, path: body.path, color: body.color ?? null, workspace_enabled: body.workspace_enabled ?? true, startup_script: body.startup_script ?? null, status: "active", created_at: now, updated_at: now };
+    const workspace: Workspace = { id: randomUUID(), name: body.name, path, color: body.color ?? null, workspace_enabled: body.workspace_enabled ?? true, startup_script: body.startup_script ?? null, status: "active", created_at: now, updated_at: now };
     ctx.workspaces.set(workspace.id, workspace);
     await ctx.persist();
     ctx.ok(response, workspace, 201);
