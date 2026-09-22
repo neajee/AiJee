@@ -84,7 +84,7 @@ export function ContextDropdown({
             {servers.map(server => {
             const active = server.id === activeServerId;
             return <button className="flex min-h-8 w-full items-center justify-between gap-1.5 rounded px-1.5 text-left hover:bg-hover" key={server.id} onClick={() => void onSelectServer(server)} role="menuitem">
-                <span className="flex min-w-0 items-center gap-1.5"><Globe size={12} color={active ? theme.accentColor : theme.textMuted} strokeWidth={1.8} /><span className="flex min-w-0 flex-col"><span className="truncate text-caption">{server.name}</span><span className="truncate text-meta text-text-secondary">{server.address}</span></span></span>
+                <span className="flex min-w-0 items-center gap-1.5"><Globe size={12} color={active ? theme.accentColor : theme.textMuted} strokeWidth={1.8} /><span className="truncate text-caption">{server.name}</span></span>
                 {busy === server.id ? <span className="size-3 animate-spin" /> : active && <Check size={13} color={theme.accentColor} strokeWidth={2} />}
               </button>;
           })}

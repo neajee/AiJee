@@ -7,6 +7,8 @@ import { useColorScheme } from "@/hooks/use-color-scheme";
 import { useResponsiveLayout } from "@/hooks/use-responsive-layout";
 import { useWorkspaceStore } from "../store";
 import { api, unwrapApiData, type PathCompletion } from "@aijee/client-sdk";
+import { useAuthStore } from "@/features/auth/store";
+import { useServersStore, type Server } from "@/features/servers/store";
 export function useNewWorkspaceController({
   visible,
   onClose
@@ -23,6 +25,10 @@ export function useNewWorkspaceController({
   const insets = useSafeAreaInsets();
   const useInlineSuggestions = !isWideScreen;
   const addWorkspace = useWorkspaceStore(s => s.addWorkspace);
+  const switchServer = useWorkspaceStore(s => s.switchServer);
+  const activeServerId = useAuthStore(s => s.activeServerId);
+  const activateServer = useAuthStore(s => s.activateServer);
+  const servers = useServersStore(s => s.servers);
   const workspaceCount = useWorkspaceStore(s => s.workspaces.length);
   const [path, setPath] = useState('');
   const [name, setName] = useState('');
@@ -31,6 +37,7 @@ export function useNewWorkspaceController({
   const [suggestionIndex, setSuggestionIndex] = useState(-1);
   const [suggestions, setSuggestions] = useState<PathCompletion[]>([]);
   const [loadingSuggestions, setLoadingSuggestions] = useState(false);
+  const [switchingServer, setSwitchingServer] = useState(false);
   const pathRef = useRef<HTMLInputElement>(null);
   const nameRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<FlatList<PathCompletion>>(null);
@@ -52,7 +59,7 @@ export function useNewWorkspaceController({
       setShowSuggestions(false);
       setSuggestionIndex(-1);
       setSuggestions([]);
-      setTimeout(() => pathRef.current?.focus(), 100);
+      setTimeout(() => nameRef.current?.focus(), 100);
     }
   }, [visible]);
 
@@ -82,6 +89,12 @@ export function useNewWorkspaceController({
     setLoadingSuggestions(false);
   }, []);
 
+  useEffect(() => {
+    if (!visible) return;
+    setShowSuggestions(true);
+    void fetchCompletions("~/");
+  }, [fetchCompletions, visible]);
+
   // Scroll suggestion into view
   useEffect(() => {
     if (!useInlineSuggestions && suggestionIndex >= 0 && suggestionsRef.current) {
@@ -100,7 +113,7 @@ export function useNewWorkspaceController({
     requestAnimationFrame(() => {
       suggestionsRef.current?.scrollToOffset({
         animated: true,
-        offset: Math.max(0, index * 40 - 80)
+        offset: Math.max(0, index * 28 - 56)
       });
     });
   }, []);
@@ -209,6 +222,16 @@ export function useNewWorkspaceController({
       handleCreate();
     }
   }, [path, handleCreate]);
+  const handleSelectServer = useCallback(async (server: Server) => {
+    if (server.id === activeServerId || switchingServer) return;
+    setSwitchingServer(true);
+    try {
+      await switchServer(server.id);
+      await activateServer(server);
+    } finally {
+      setSwitchingServer(false);
+    }
+  }, [activateServer, activeServerId, switchServer, switchingServer]);
   const canCreate = path.trim().length > 0;
   const pathPreview = path.trim().replace(/\/+$/, '') || path.trim();
   return {
@@ -240,6 +263,10 @@ export function useNewWorkspaceController({
     handlePathKeyPress,
     handleNameKeyPress,
     canCreate,
+    activeServerId,
+    servers,
+    switchingServer,
+    handleSelectServer,
     pathPreview,
     textPrimary,
     textMuted,

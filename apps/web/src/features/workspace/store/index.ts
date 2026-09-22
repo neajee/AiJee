@@ -271,7 +271,9 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
     if (rawWorkspace) {
       const ws = mapApiWorkspace(rawWorkspace, get().workspaces.length);
       set((state) => ({
-        workspaces: [...state.workspaces, ws],
+        workspaces: state.workspaces.some((item) => item.id === ws.id)
+          ? state.workspaces.map((item) => item.id === ws.id ? { ...item, ...ws } : item)
+          : [...state.workspaces, ws],
         selectedWorkspaceId: ws.id,
       }));
       writeSelectedId(ws.id, get().currentServerId);
