@@ -8,4 +8,5 @@ export interface CodePreviewProps {
   showLineNumbers?: boolean;
   fill?: boolean;
   bare?: boolean;
+  surface?: 'muted' | 'code' | 'background';
 }

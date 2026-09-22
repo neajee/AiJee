@@ -1,7 +1,6 @@
 import { useCallback } from 'react';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useFileList, type FsEntry } from '@aijee/client-sdk';
-import { useThemeTokens } from '@/hooks/use-theme-tokens';
 import { FileTypeBadge } from '../file-type-badge';
 import { applyFilter } from '../../utils/file-tree';
 import { NODE_INDENT, NODE_STEP } from '../../utils/file-tree-constants';
@@ -22,7 +21,6 @@ export function FileTreeNode({
   query: string;
   selectedPath: string | null;
 }) {
-  const colors = useThemeTokens();
   const expanded = entry.is_dir && expandedDirs.has(entry.path);
   const isSelected = !entry.is_dir && entry.path === selectedPath;
   const handlePress = useCallback(() => {
@@ -37,7 +35,7 @@ export function FileTreeNode({
         {/* One glyph slot per row: a caret for directories, the file's kind for
             files, so names line up at the same x within a level. */}
         <span className="flex w-[22px] shrink-0 items-center justify-center">
-          {entry.is_dir ? expanded ? <ChevronDown size={13} strokeWidth={2} className="text-text-tertiary" /> : <ChevronRight size={13} strokeWidth={2} className="text-text-tertiary" /> : <FileTypeBadge path={entry.path} fallbackColor={colors.textTertiary} />}
+          {entry.is_dir ? expanded ? <ChevronDown size={13} strokeWidth={2} className="text-text-tertiary" /> : <ChevronRight size={13} strokeWidth={2} className="text-text-tertiary" /> : <FileTypeBadge path={entry.path} />}
         </span>
         <span className={`min-w-0 flex-1 truncate ${entry.is_dir ? 'font-medium text-foreground' : isSelected ? 'text-foreground' : 'text-text-secondary'}`}>
           {entry.name}

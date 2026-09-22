@@ -9,12 +9,14 @@ export const CodePreview = memo(function CodePreview({
   diffLanguage,
   showLineNumbers = true,
   fill = false,
-  bare = false
+  bare = false,
+  surface = 'muted'
 }: CodePreviewProps) {
   const lines = useMemo(() => code.split('\n'), [code]);
   // Borderless so an expanded tool result reads as a continuation of its header;
   // only the bottom corners round off.
-  return <div className={`overflow-hidden bg-muted ${bare ? '' : 'rounded-b-md'}`}>
+  const surfaceClass = surface === 'background' ? 'bg-background' : surface === 'code' ? 'bg-[var(--aijee-code-background)]' : 'bg-muted';
+  return <div className={`min-w-0 overflow-hidden ${surfaceClass} ${bare ? '' : 'rounded-b-md'}`}>
       <div className={fill ? "overflow-auto" : "max-h-80 overflow-auto"} style={maxHeight ? { maxHeight } : undefined}>
         <div className="min-w-max p-3 font-mono text-caption leading-5">
             {lines.map((line, index) => {

@@ -45,11 +45,8 @@ export function FileTree({
       </div>
     </>;
   return <div ref={containerRef} className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
-      {isNarrow ? (
-    // One column: the file takes the panel while it is open, the tree
-    // returns when it is closed.
-    viewingFile ? <FileViewer filePath={viewingFile} rootPath={rootPath} onClose={() => onViewFile(null)} /> : <div className="flex min-h-0 flex-1 flex-col">{tree}</div>) : <div className="flex min-h-0 flex-1 flex-row">
-          <div className="flex min-h-0 flex-1 flex-col">
+      <div className="flex min-h-0 min-w-0 flex-1 flex-row">
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col">
             {viewingFile ? <FileViewer filePath={viewingFile} rootPath={rootPath} onClose={() => onViewFile(null)} /> : <div className="flex flex-1 flex-col items-center justify-center gap-1.5 px-6">
                 <FolderOpen size={26} strokeWidth={1.5} className="text-text-tertiary" />
                 <span className="text-body font-medium text-text-secondary">
@@ -63,6 +60,6 @@ export function FileTree({
           <div className="flex min-h-0 min-w-0 shrink-0 flex-col border-l border-border" style={{ width: treeWidth }}>
             {tree}
           </div>
-        </div>}
+        </div>
     </div>;
 }
